@@ -522,14 +522,28 @@ function renderAdminDays() {
         <textarea class="form-control" rows="2" onchange="updateDayField(${dayIndex}, 'description', this.value)">${item.description || ''}</textarea>
       </div>
 
+      <div class="form-row" style="margin-bottom:8px;">
+        <div class="form-group" style="flex:1;">
+          <label>Position GPS de l'étape :</label>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <button type="button" onclick="autoGeocodeDay(${dayIndex})" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; white-space:nowrap; font-weight:700;">
+              <i class="fa-solid fa-location-crosshairs"></i> Proposer coordonnées GPS
+            </button>
+            <span id="day-geocode-status-${dayIndex}" style="font-size:0.75rem; font-weight:bold; color:#059669;">
+              ${(item.lat && item.lng) ? `<i class="fa-solid fa-check"></i> Fixé (${Number(item.lat).toFixed(4)}, ${Number(item.lng).toFixed(4)})` : '<span style="color:#b45309;"><i class="fa-solid fa-triangle-exclamation"></i> Non géolocalisé</span>'}
+            </span>
+          </div>
+        </div>
+      </div>
+
       <div class="form-row" style="margin-bottom:14px;">
         <div class="form-group">
           <label>Latitude étape :</label>
-          <input type="number" step="any" class="form-control" value="${item.lat || ''}" onchange="updateDayField(${dayIndex}, 'lat', parseFloat(this.value))">
+          <input type="number" step="any" id="day-lat-${dayIndex}" class="form-control" value="${item.lat || ''}" placeholder="Ex: 45.4929" onchange="updateDayField(${dayIndex}, 'lat', parseFloat(this.value))">
         </div>
         <div class="form-group">
           <label>Longitude étape :</label>
-          <input type="number" step="any" class="form-control" value="${item.lng || ''}" onchange="updateDayField(${dayIndex}, 'lng', parseFloat(this.value))">
+          <input type="number" step="any" id="day-lng-${dayIndex}" class="form-control" value="${item.lng || ''}" placeholder="Ex: 10.6083" onchange="updateDayField(${dayIndex}, 'lng', parseFloat(this.value))">
         </div>
       </div>
 
@@ -673,6 +687,56 @@ function autoGeocodeVisit(dayIndex, visitIndex) {
       console.warn("Erreur geocoding:", err);
       statusEl.innerText = "Connexion indisponible. Saisissez la latitude manuellement.";
       statusEl.style.color = "#dc2626";
+    });
+}
+
+// Géocodage automatique de l'étape du jour (Ville ou Titre)
+function autoGeocodeDay(dayIndex) {
+  const day = tripData.itinerary[dayIndex];
+  if (!day) return;
+
+  const query = (day.city && day.city.trim()) ? day.city.trim() : (day.title ? day.title.trim() : '');
+  const statusEl = document.getElementById(`day-geocode-status-${dayIndex}`);
+
+  if (!query) {
+    alert("Veuillez renseigner une Ville ou un Titre d'étape pour calculer les coordonnées GPS.");
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.innerHTML = '<span style="color:#0284c7;"><i class="fa-solid fa-spinner fa-spin"></i> Recherche satellite...</span>';
+  }
+
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+  fetch(url, { headers: { 'Accept-Language': 'fr' } })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+
+        tripData.itinerary[dayIndex].lat = lat;
+        tripData.itinerary[dayIndex].lng = lon;
+
+        const latInput = document.getElementById(`day-lat-${dayIndex}`);
+        const lngInput = document.getElementById(`day-lng-${dayIndex}`);
+        if (latInput) latInput.value = lat;
+        if (lngInput) lngInput.value = lon;
+
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> Trouvé : [${lat.toFixed(4)}, ${lon.toFixed(4)}] (validez ou ajustez si besoin)</span>`;
+        }
+      } else {
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color:#dc2626;"><i class="fa-solid fa-circle-exclamation"></i> Non trouvé automatiquement. Saisissez lat/lng manuellement.</span>`;
+        }
+      }
+    })
+    .catch(err => {
+      console.warn("Erreur geocoding jour:", err);
+      if (statusEl) {
+        statusEl.innerHTML = `<span style="color:#dc2626;">Erreur réseau lors de la recherche.</span>`;
+      }
     });
 }
 
