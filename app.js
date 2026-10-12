@@ -1045,10 +1045,26 @@ function initMap() {
     return;
   }
 
+  // Trouver le centre initial selon les étapes ou hôtels du voyage
+  let initialCenter = [46.2276, 2.2137]; // Défaut France
+  let initialZoom = 5;
+
+  if (currentTrip && currentTrip.itinerary) {
+    const firstWithGps = currentTrip.itinerary.find(it => {
+      const lat = parseFloat(it.lat);
+      const lng = parseFloat(it.lng);
+      return !isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0);
+    });
+    if (firstWithGps) {
+      initialCenter = [parseFloat(firstWithGps.lat), parseFloat(firstWithGps.lng)];
+      initialZoom = 10;
+    }
+  }
+
   // OpenStreetMap France Tiles
   leafletMap = L.map('travel-map', {
-    center: [-29.0, 25.0],
-    zoom: 5,
+    center: initialCenter,
+    zoom: initialZoom,
     zoomControl: true
   });
 
@@ -1063,7 +1079,10 @@ function initMap() {
 
   setTimeout(() => {
     leafletMap.invalidateSize(true);
-  }, 250);
+    if (mapMarkers.length > 0) {
+      renderMapMarkers('all');
+    }
+  }, 300);
 }
 
 function renderMapMarkers(filterCategory = 'all') {
@@ -1246,7 +1265,15 @@ function renderMapMarkers(filterCategory = 'all') {
   }
 
   if (bounds.length > 0) {
-    leafletMap.fitBounds(bounds, { padding: [40, 40] });
+    try {
+      if (bounds.length === 1) {
+        leafletMap.setView(bounds[0], 12);
+      } else {
+        leafletMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+      }
+    } catch(e) {
+      console.warn('fitBounds error:', e);
+    }
   }
 }
 

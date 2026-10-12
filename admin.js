@@ -1263,6 +1263,40 @@ function saveAllCarnet() {
     link: document.getElementById('adm-alert-link').value
   };
 
+  // Synchronisation directe et garantie de l'itinéraire depuis les champs du formulaire
+  if (tripData.itinerary && Array.isArray(tripData.itinerary)) {
+    tripData.itinerary.forEach((day, dayIndex) => {
+      const latInput = document.getElementById(`day-lat-${dayIndex}`);
+      const lngInput = document.getElementById(`day-lng-${dayIndex}`);
+      if (latInput && latInput.value !== '') {
+        const parsedLat = parseFloat(latInput.value);
+        if (!isNaN(parsedLat)) day.lat = parsedLat;
+      }
+      if (lngInput && lngInput.value !== '') {
+        const parsedLng = parseFloat(lngInput.value);
+        if (!isNaN(parsedLng)) day.lng = parsedLng;
+      }
+
+      // Synchroniser également les visites
+      if (day.timeline && Array.isArray(day.timeline)) {
+        day.timeline.forEach((v, vIdx) => {
+          const vLatInp = document.getElementById(`visit-lat-${dayIndex}-${vIdx}`);
+          const vLngInp = document.getElementById(`visit-lng-${dayIndex}-${vIdx}`);
+          const vAddrInp = document.getElementById(`visit-addr-${dayIndex}-${vIdx}`);
+          if (vLatInp && vLatInp.value !== '') {
+            const p = parseFloat(vLatInp.value);
+            if (!isNaN(p)) v.lat = p;
+          }
+          if (vLngInp && vLngInp.value !== '') {
+            const p = parseFloat(vLngInp.value);
+            if (!isNaN(p)) v.lng = p;
+          }
+          if (vAddrInp) v.address = vAddrInp.value;
+        });
+      }
+    });
+  }
+
   // Synchronisation rétrocompatible de l'objet flights
   if (tripData.flightsList && tripData.flightsList.length > 0) {
     const outboundFlight = tripData.flightsList.find(f => f.type === 'Aller') || tripData.flightsList[0];
