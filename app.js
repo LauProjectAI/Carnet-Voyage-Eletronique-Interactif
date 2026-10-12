@@ -1073,12 +1073,15 @@ function renderMapMarkers(filterCategory = 'all') {
   mapMarkers = [];
   const bounds = [];
 
-  // 1. Itinerary
+  // 1. Itinerary & Visits
   if (filterCategory === 'all' || filterCategory === 'itinerary') {
     if (currentTrip.itinerary) {
       currentTrip.itinerary.forEach((item) => {
-        if (item.lat && item.lng) {
-          const gpsUrl = getGpsUrl(item.lat, item.lng, item.title);
+        const itemLat = parseFloat(item.lat);
+        const itemLng = parseFloat(item.lng);
+
+        if (!isNaN(itemLat) && !isNaN(itemLng) && (itemLat !== 0 || itemLng !== 0)) {
+          const gpsUrl = getGpsUrl(itemLat, itemLng, item.title);
           const icon = L.divIcon({
             className: 'custom-map-pin',
             html: `<div style="background:#144534; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);">${item.day}</div>`,
@@ -1086,7 +1089,7 @@ function renderMapMarkers(filterCategory = 'all') {
             iconAnchor: [13, 13]
           });
 
-          const marker = L.marker([item.lat, item.lng], { icon: icon }).addTo(leafletMap);
+          const marker = L.marker([itemLat, itemLng], { icon: icon }).addTo(leafletMap);
           marker.bindPopup(`
             <div style="font-family:'Archivo',sans-serif; max-width:210px;">
               <strong style="color:#144534;">Jour ${item.day} • ${item.city || ''}</strong><br>
@@ -1097,7 +1100,38 @@ function renderMapMarkers(filterCategory = 'all') {
             </div>
           `);
           mapMarkers.push(marker);
-          bounds.push([item.lat, item.lng]);
+          bounds.push([itemLat, itemLng]);
+        }
+
+        // Points des visites précises du jour si géolocalisées
+        if (item.timeline && Array.isArray(item.timeline)) {
+          item.timeline.forEach(visit => {
+            const vLat = parseFloat(visit.lat);
+            const vLng = parseFloat(visit.lng);
+            if (!isNaN(vLat) && !isNaN(vLng) && (vLat !== 0 || vLng !== 0)) {
+              const gpsUrl = getGpsUrl(vLat, vLng, visit.title);
+              const icon = L.divIcon({
+                className: 'custom-map-pin-visit',
+                html: `<div style="background:#0284c7; color:white; border-radius:50%; width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-size:10px; border:2px solid white; box-shadow:0 2px 5px rgba(0,0,0,0.25);" title="${visit.title}"><i class="fa-solid fa-location-dot"></i></div>`,
+                iconSize: [22, 22],
+                iconAnchor: [11, 11]
+              });
+
+              const vMarker = L.marker([vLat, vLng], { icon: icon }).addTo(leafletMap);
+              vMarker.bindPopup(`
+                <div style="font-family:'Archivo',sans-serif; max-width:210px;">
+                  <span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold;">Jour ${item.day} • ${visit.time || 'Visite'}</span>
+                  <div style="font-size:12px; font-weight:bold; margin:4px 0 2px; color:#0f172a;">${visit.title}</div>
+                  ${visit.subtitle ? `<div style="font-size:11px; color:#64748b; margin-bottom:4px;">${visit.subtitle}</div>` : ''}
+                  <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:4px; background:#0284c7; color:white; padding:3px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">
+                    <i class="fa-solid fa-location-arrow"></i> GPS
+                  </a>
+                </div>
+              `);
+              mapMarkers.push(vMarker);
+              bounds.push([vLat, vLng]);
+            }
+          });
         }
       });
     }
@@ -1107,9 +1141,14 @@ function renderMapMarkers(filterCategory = 'all') {
   if (filterCategory === 'all' || filterCategory === 'flights' || filterCategory === 'itinerary') {
     const domesticFlights = (currentTrip.flights && currentTrip.flights.domesticFlights) ? currentTrip.flights.domesticFlights : [];
     domesticFlights.forEach((flight) => {
-      if (flight.fromLat && flight.fromLng && flight.toLat && flight.toLng) {
-        const fromPoint = [flight.fromLat, flight.fromLng];
-        const toPoint = [flight.toLat, flight.toLng];
+      const fLat = parseFloat(flight.fromLat);
+      const fLng = parseFloat(flight.fromLng);
+      const tLat = parseFloat(flight.toLat);
+      const tLng = parseFloat(flight.toLng);
+
+      if (!isNaN(fLat) && !isNaN(fLng) && !isNaN(tLat) && !isNaN(tLng)) {
+        const fromPoint = [fLat, fLng];
+        const toPoint = [tLat, tLng];
 
         const flightLine = L.polyline([fromPoint, toPoint], {
           color: '#0284c7',
@@ -1121,8 +1160,8 @@ function renderMapMarkers(filterCategory = 'all') {
 
         mapMarkers.push(flightLine);
 
-        const midLat = (flight.fromLat + flight.toLat) / 2;
-        const midLng = (flight.fromLng + flight.toLng) / 2;
+        const midLat = (fLat + tLat) / 2;
+        const midLng = (fLng + tLng) / 2;
 
         const planeIcon = L.divIcon({
           className: 'plane-marker-icon',
@@ -1150,8 +1189,10 @@ function renderMapMarkers(filterCategory = 'all') {
   if (filterCategory === 'all' || filterCategory === 'hotels') {
     if (currentTrip.hotels) {
       currentTrip.hotels.forEach((hotel) => {
-        if (hotel.lat && hotel.lng) {
-          const gpsUrl = getGpsUrl(hotel.lat, hotel.lng, hotel.name);
+        const hLat = parseFloat(hotel.lat);
+        const hLng = parseFloat(hotel.lng);
+        if (!isNaN(hLat) && !isNaN(hLng) && (hLat !== 0 || hLng !== 0)) {
+          const gpsUrl = getGpsUrl(hLat, hLng, hotel.name);
           const icon = L.divIcon({
             className: 'custom-map-pin-hotel',
             html: `<div style="background:#c29958; color:white; border-radius:50%; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:12px; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"><i class="fa-solid fa-bed"></i></div>`,
@@ -1159,7 +1200,7 @@ function renderMapMarkers(filterCategory = 'all') {
             iconAnchor: [14, 14]
           });
 
-          const marker = L.marker([hotel.lat, hotel.lng], { icon: icon }).addTo(leafletMap);
+          const marker = L.marker([hLat, hLng], { icon: icon }).addTo(leafletMap);
           marker.bindPopup(`
             <div style="font-family:'Archivo',sans-serif; max-width:220px;">
               <strong style="color:#c29958;"><i class="fa-solid fa-hotel"></i> ${hotel.name}</strong><br>
@@ -1168,7 +1209,7 @@ function renderMapMarkers(filterCategory = 'all') {
             </div>
           `);
           mapMarkers.push(marker);
-          bounds.push([hotel.lat, hotel.lng]);
+          bounds.push([hLat, hLng]);
         }
       });
     }
@@ -1178,8 +1219,10 @@ function renderMapMarkers(filterCategory = 'all') {
   if (filterCategory === 'all' || filterCategory === 'freetime') {
     if (currentTrip.freeTimeSuggestions) {
       currentTrip.freeTimeSuggestions.forEach((sug) => {
-        if (sug.lat && sug.lng) {
-          const gpsUrl = getGpsUrl(sug.lat, sug.lng, sug.name);
+        const sLat = parseFloat(sug.lat);
+        const sLng = parseFloat(sug.lng);
+        if (!isNaN(sLat) && !isNaN(sLng) && (sLat !== 0 || sLng !== 0)) {
+          const gpsUrl = getGpsUrl(sLat, sLng, sug.name);
           const icon = L.divIcon({
             className: 'custom-map-pin-sug',
             html: `<div style="background:#e11d48; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"><i class="fa-solid fa-heart"></i></div>`,
@@ -1187,7 +1230,7 @@ function renderMapMarkers(filterCategory = 'all') {
             iconAnchor: [13, 13]
           });
 
-          const marker = L.marker([sug.lat, sug.lng], { icon: icon }).addTo(leafletMap);
+          const marker = L.marker([sLat, sLng], { icon: icon }).addTo(leafletMap);
           marker.bindPopup(`
             <div style="font-family:'Archivo',sans-serif; max-width:220px;">
               <strong style="color:#1e293b; font-size:13px;">${sug.name}</strong><br>
@@ -1196,7 +1239,7 @@ function renderMapMarkers(filterCategory = 'all') {
             </div>
           `);
           mapMarkers.push(marker);
-          bounds.push([sug.lat, sug.lng]);
+          bounds.push([sLat, sLng]);
         }
       });
     }
@@ -1264,8 +1307,11 @@ function switchMainTab(targetId) {
 
   if (targetId === 'tab-carte') {
     initMap();
-    setTimeout(() => {
-      if (leafletMap) leafletMap.invalidateSize(true);
-    }, 200);
+    if (leafletMap) {
+      renderMapMarkers('all');
+      setTimeout(() => {
+        leafletMap.invalidateSize(true);
+      }, 150);
+    }
   }
 }
