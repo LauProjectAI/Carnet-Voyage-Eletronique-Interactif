@@ -1,0 +1,16 @@
+{
+  "short_name": "Carnet Girardot",
+  "name": "Carnet de Voyage - Voyages Girardot",
+  "icons": [
+    {
+      "src": "Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png",
+      "type": "image/png",
+      "sizes": "192x192 512x512"
+    }
+  ],
+  "start_url": "./index.html",
+  "background_color": "#16382b",
+  "theme_color": "#1c4937",
+  "display": "standalone",
+  "orientation": "portrait"
+}

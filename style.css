@@ -1,0 +1,895 @@
+:root {
+  --primary-color: #144534;       /* Girardot signature deep forest green */
+  --primary-light: #236c53;
+  --primary-olive: #6c7d47;       /* Olive tone inspired by screenshot banner */
+  --primary-olive-dark: #4b5830;
+  --primary-dark: #0d2c21;
+  --accent-gold: #c29958;         /* Elegant warm heritage gold */
+  --accent-gold-light: #f7f1e6;
+  --bg-app: #f4f6f4;
+  --bg-card: #ffffff;
+  --bg-sand: #fbfaf6;            /* Warm editorial paper tone */
+  --text-main: #18221b;
+  --text-muted: #5e6d63;
+  --border-light: #e6eae6;
+  --border-color: #dbe2dc;
+  --orange-capture: #ff6a2b;
+  --teal-ring: #06b6d4;
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 18px;
+  --radius-lg: 26px;
+  --radius-pill: 9999px;
+  --shadow-subtle: 0 4px 18px rgba(15, 35, 25, 0.04);
+  --shadow-card: 0 10px 30px rgba(15, 35, 25, 0.07);
+  --shadow-float: 0 14px 40px rgba(15, 35, 25, 0.14);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Archivo', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  line-height: 1.5;
+  padding-bottom: 96px;
+  min-height: 100vh;
+  letter-spacing: -0.01em;
+}
+
+/* App Container */
+.app-container {
+  max-width: 680px; /* Refined magazine smartphone/tablet proportion */
+  margin: 0 auto;
+  position: relative;
+  background-color: var(--bg-sand);
+  min-height: 100vh;
+  box-shadow: var(--shadow-float);
+}
+
+/* Minimal Top Branding bar */
+.editorial-topbar {
+  padding: 14px 20px 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-sand);
+  position: sticky;
+  top: 0;
+  z-index: 999;
+}
+
+.brand-minimal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--primary-dark);
+}
+
+.brand-minimal .logo-text {
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+.brand-minimal .logo-sub {
+  font-size: 0.6rem;
+  letter-spacing: 2px;
+  color: var(--accent-gold);
+  font-weight: 700;
+  display: block;
+}
+
+.top-right-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sos-badge {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 0.76rem;
+  font-weight: 800;
+  padding: 5px 12px;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s;
+}
+
+.sos-badge:hover {
+  background: #fee2e2;
+  transform: scale(1.03);
+}
+
+.sos-badge i {
+  font-size: 0.8rem;
+}
+
+.admin-icon-btn {
+  background: white;
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  text-decoration: none;
+}
+
+/* DAY TITLE EDITORIAL HEADER (Inspiré de la photo utilisateur) */
+.day-focus-header {
+  padding: 16px 22px 10px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.day-focus-headline {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: var(--text-main);
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.day-focus-meta {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-top: 5px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.weather-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+/* Day Selector Strip (Pour changer de jour si souhaité) */
+.day-selector-scroll {
+  display: flex;
+  gap: 8px;
+  padding: 6px 20px 14px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.day-selector-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.day-pill-btn {
+  border: 1px solid var(--border-color);
+  background: white;
+  color: var(--text-muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s ease;
+}
+
+.day-pill-btn.active {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 12px rgba(20, 69, 52, 0.2);
+}
+
+/* "NEXT / À VENIR" HERO CARD (Copie conforme style magazine de la photo) */
+.next-event-card {
+  margin: 4px 20px 20px;
+  background: linear-gradient(145deg, #62723e 0%, #4f5d32 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 20px 22px;
+  box-shadow: 0 8px 24px rgba(79, 93, 50, 0.28);
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.next-event-card::before {
+  content: '';
+  position: absolute;
+  top: -40px;
+  right: -40px;
+  width: 130px;
+  height: 130px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 50%;
+}
+
+.next-tag {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #e5ecd3;
+  margin-bottom: 2px;
+}
+
+.next-event-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.next-event-sub {
+  font-size: 0.88rem;
+  color: #dce5c7;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.btn-qr-action {
+  background: #ffffff;
+  color: #3b4624;
+  border: none;
+  font-size: 0.86rem;
+  font-weight: 800;
+  padding: 10px 20px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  transition: transform 0.15s ease;
+  width: 100%;
+  max-width: 280px;
+}
+
+.btn-qr-action:active {
+  transform: scale(0.98);
+}
+
+/* EDITORIAL TIMELINE STREAM */
+.timeline-stream-container {
+  padding: 4px 20px 30px;
+}
+
+.timeline-entry {
+  display: flex;
+  gap: 16px;
+  position: relative;
+  margin-bottom: 22px;
+}
+
+/* Ligne pointillée verticale */
+.timeline-track-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 48px;
+  flex-shrink: 0;
+}
+
+.timeline-time-label {
+  font-size: 0.84rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 6px;
+  letter-spacing: -0.02em;
+}
+
+.timeline-node-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  background: white;
+  border: 2px solid var(--border-color);
+  color: var(--primary-olive);
+  z-index: 2;
+  transition: all 0.2s ease;
+}
+
+.timeline-node-icon.done {
+  background: #eef7ee;
+  border-color: #62723e;
+  color: #62723e;
+}
+
+.timeline-node-icon.next {
+  border: 2px solid var(--primary-olive);
+  background: var(--primary-olive);
+  color: white;
+  animation: pulse-node 2.2s infinite;
+}
+
+@keyframes pulse-node {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(98, 114, 62, 0.4); }
+  50% { box-shadow: 0 0 0 7px rgba(98, 114, 62, 0); }
+}
+
+.timeline-line-stem {
+  flex: 1;
+  width: 2px;
+  background-image: linear-gradient(to bottom, #cfd8cf 50%, transparent 50%);
+  background-size: 2px 8px;
+  margin-top: 4px;
+}
+
+/* Timeline Content Card */
+.timeline-content-card {
+  flex: 1;
+  background: white;
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  padding: 14px 16px;
+  box-shadow: var(--shadow-subtle);
+  position: relative;
+}
+
+.timeline-content-card.featured-next {
+  border-color: #c7d5a5;
+  background: #fbfdf9;
+  border-style: dashed;
+}
+
+.entry-title {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-main);
+  line-height: 1.25;
+  margin-bottom: 2px;
+}
+
+.entry-subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin-bottom: 8px;
+}
+
+.entry-photo-wrapper {
+  margin: 10px 0 6px;
+  border-radius: 12px;
+  overflow: hidden;
+  height: 130px;
+  position: relative;
+  background: #e2e8f0;
+}
+
+.entry-photo-wrapper img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.entry-actions-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid #f1f4f1;
+}
+
+.btn-entry-gps {
+  color: #0284c7;
+  background: #f0f9ff;
+  border: none;
+  font-size: 0.74rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  border-radius: var(--radius-xs);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.btn-entry-note {
+  color: var(--text-muted);
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* QR Code Modal Overlay */
+.qr-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(13, 30, 22, 0.6);
+  backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.qr-modal-backdrop.open {
+  display: flex;
+}
+
+.qr-modal-sheet {
+  background: white;
+  border-radius: 24px;
+  max-width: 360px;
+  width: 100%;
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow: var(--shadow-float);
+  animation: modal-pop 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modal-pop {
+  from { transform: scale(0.9); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+.qr-modal-sheet h3 {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 4px;
+}
+
+.qr-modal-sheet p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.qr-box {
+  background: #f8faf9;
+  border: 2px dashed #cbd5e1;
+  padding: 16px;
+  border-radius: 16px;
+  display: inline-block;
+  margin-bottom: 16px;
+}
+
+.qr-box img {
+  display: block;
+  width: 180px;
+  height: 180px;
+  margin: 0 auto;
+}
+
+.btn-close-modal {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 10px 24px;
+  border-radius: var(--radius-pill);
+  font-size: 0.88rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/* FLOATING CURVED MAGAZINE BOTTOM BAR (Style photo) */
+.magazine-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  max-width: 680px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-top: 1px solid var(--border-color);
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 1000;
+  box-shadow: 0 -8px 24px rgba(15, 35, 25, 0.08);
+}
+
+.nav-tab-btn {
+  background: none;
+  border: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: #64748b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  cursor: pointer;
+  flex: 1;
+  transition: color 0.15s ease;
+}
+
+.nav-tab-btn i {
+  font-size: 1.25rem;
+  transition: transform 0.15s ease;
+}
+
+.nav-tab-btn.active {
+  color: var(--primary-color);
+}
+
+.nav-tab-btn.active i {
+  color: var(--primary-color);
+  transform: translateY(-2px);
+}
+
+/* Floating Center CAPTURE Button (Bouton central orange/turquoise de la photo) */
+.center-capture-wrapper {
+  position: relative;
+  top: -18px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.center-capture-btn {
+  width: 62px;
+  height: 62px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ff7a3d 0%, #f05a1a 100%);
+  border: 4px solid #06b6d4; /* Vibrant teal ring around orange button */
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 20px rgba(240, 90, 26, 0.4);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.center-capture-btn:active {
+  transform: scale(0.92);
+}
+
+.center-capture-btn i {
+  font-size: 1.2rem;
+  margin-bottom: 1px;
+}
+
+.center-capture-btn span {
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* Content Views Management */
+.tab-page-view {
+  display: none;
+  padding-bottom: 20px;
+}
+
+.tab-page-view.active {
+  display: block;
+}
+
+/* Carte & Autres onglets styles standard */
+#travel-map {
+  width: 100%;
+  height: 480px;
+  min-height: 480px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-subtle);
+  background-color: #e5e3df;
+}
+
+.map-filters {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.filter-btn {
+  padding: 6px 14px;
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.filter-btn.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Souvenirs / Album Grid */
+.souvenirs-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.souvenir-card {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  border: 1px solid var(--border-light);
+  box-shadow: var(--shadow-subtle);
+}
+
+.souvenir-card img {
+  width: 100%;
+  height: 120px;
+  object-fit: cover;
+  display: block;
+}
+
+.souvenir-body {
+  padding: 10px;
+}
+
+.souvenir-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.souvenir-date {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+/* Flight Path Styling & Animated Marker */
+.flight-path {
+  stroke-dasharray: 8, 8;
+  animation: flight-dash 20s linear infinite;
+}
+
+@keyframes flight-dash {
+  to {
+    stroke-dashoffset: -100;
+  }
+}
+
+.plane-mid-marker {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #0284c7;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #ffffff;
+  box-shadow: 0 4px 10px rgba(2, 132, 199, 0.45);
+  font-size: 14px;
+}
+
+/* CONCIERGERIE IA STYLES */
+.concierge-hero-header {
+  background: linear-gradient(145deg, #184232 0%, #0d281e 100%);
+  color: white;
+  border-radius: 20px;
+  padding: 22px 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 10px 25px rgba(13, 40, 30, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.concierge-hero-header::after {
+  content: '\f521';
+  font-family: 'Font Awesome 6 Free';
+  font-weight: 900;
+  position: absolute;
+  right: -10px;
+  bottom: -15px;
+  font-size: 5rem;
+  color: rgba(255, 255, 255, 0.05);
+  pointer-events: none;
+}
+
+.concierge-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(194, 153, 88, 0.2);
+  border: 1px solid rgba(194, 153, 88, 0.4);
+  color: #f7e7ce;
+  font-size: 0.74rem;
+  font-weight: 800;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  margin-bottom: 8px;
+}
+
+.concierge-welcome-bubble {
+  background: white;
+  border-radius: 18px;
+  border-top-left-radius: 4px;
+  padding: 14px 18px;
+  color: var(--text-main);
+  box-shadow: var(--shadow-subtle);
+  border: 1px solid var(--border-light);
+  margin-bottom: 18px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.concierge-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+  box-shadow: 0 3px 10px rgba(20, 69, 52, 0.3);
+}
+
+.concierge-prompt-title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  margin-bottom: 3px;
+}
+
+.concierge-prompt-sub {
+  font-size: 0.84rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+/* Quick theme buttons */
+.concierge-themes-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 22px;
+}
+
+.concierge-theme-pill {
+  background: white;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: var(--shadow-subtle);
+}
+
+.concierge-theme-pill:hover, .concierge-theme-pill.active {
+  border-color: var(--primary-color);
+  background: #f7faf8;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 18px rgba(20, 69, 52, 0.08);
+}
+
+.concierge-theme-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.theme-icon-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: white;
+  flex-shrink: 0;
+}
+
+.theme-text-title {
+  font-size: 0.96rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin-bottom: 2px;
+}
+
+.theme-text-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.35;
+}
+
+/* Concierge recommendation item cards */
+.concierge-place-card {
+  background: white;
+  border-radius: 18px;
+  border: 1px solid var(--border-light);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow-subtle);
+  position: relative;
+  transition: transform 0.15s ease;
+}
+
+.concierge-place-card:hover {
+  transform: translateY(-2px);
+}
+
+.concierge-tag-badge {
+  display: inline-block;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+/* Offline assurance notice in Conciergerie */
+.concierge-offline-notice {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  border-radius: 12px;
+  padding: 10px 14px;
+  font-size: 0.78rem;
+  color: #065f46;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  font-weight: 600;
+}
+
+/* Responsive Tablet & Desktop refinement */
+@media (min-width: 681px) {
+  body {
+    padding-top: 24px;
+  }
+  .app-container {
+    border-radius: 28px;
+    overflow: hidden;
+  }
+  .magazine-bottom-nav {
+    border-bottom-left-radius: 28px;
+    border-bottom-right-radius: 28px;
+  }
+}

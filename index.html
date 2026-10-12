@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Carnet de Voyage — Voyages Girardot</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#144534">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="referrer" content="no-referrer-when-downgrade">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="app-container">
+
+    <!-- Top Minimal Branding & Emergency Row -->
+    <header class="editorial-topbar">
+      <a href="#" class="brand-minimal" onclick="switchMainTab('tab-today'); return false;">
+        <div>
+          <div class="logo-text">Voyages Girardot</div>
+          <span class="logo-sub">DEPUIS 1920</span>
+        </div>
+      </a>
+      <div class="top-right-actions">
+        <!-- Sélecteur rapide de carnet (si plusieurs voyages créés/disponibles) -->
+        <select id="client-trip-quick-selector" class="form-control" style="font-size:0.75rem; padding:4px 8px; border-radius:20px; font-weight:700; max-width:140px; background:#f8fafc; border:1px solid #cbd5e1;" onchange="onClientTripSwitch(this.value)">
+        </select>
+        <a href="#sos" class="sos-badge" onclick="switchMainTab('tab-pratique'); return false;" title="Assistance et urgence 24/7">
+          <i class="fa-solid fa-phone"></i> SOS
+        </a>
+        <a href="admin.html" class="admin-icon-btn" title="Espace d'administration">
+          <i class="fa-solid fa-gear"></i>
+        </a>
+      </div>
+    </header>
+
+    <!-- MAIN VIEWS -->
+    <main>
+
+      <!-- 1. VUE "AUJOURD'HUI" : ÉDITORIAL MAGAZINE DU JOUR (RÉFÉRENCE PHOTO) -->
+      <section id="tab-today" class="tab-page-view active">
+        
+        <!-- Titre Editorial du Jour -->
+        <div class="day-focus-header">
+          <div>
+            <h1 class="day-focus-headline" id="day-headline">Jour 1 • Lyon</h1>
+            <div class="day-focus-meta">
+              <span id="day-date-text">Lundi 12 Octobre</span>
+              <span class="weather-pill" id="day-weather-pill"><i class="fa-solid fa-cloud-sun"></i> 22°C • 14:15</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sélecteur rapide des jours -->
+        <div class="day-selector-scroll" id="days-pill-strip"></div>
+
+        <!-- Carte Événement Clé "NEXT / À VENIR" (Olive Green) -->
+        <div class="next-event-card" id="next-event-box">
+          <div class="next-tag">NEXT / ÉTAPE À VENIR</div>
+          <h2 class="next-event-title" id="next-title">Envol pour Johannesburg</h2>
+          <div class="next-event-sub" id="next-sub">Convocation à l'aéroport de Lyon (13h05)</div>
+          <button class="btn-qr-action" id="btn-show-qr">
+            <i class="fa-solid fa-qrcode"></i> Voir le Vœu / QR Code
+          </button>
+        </div>
+
+        <!-- Fil du Jour / Timeline Style Magazine -->
+        <div class="timeline-stream-container" id="timeline-stream"></div>
+
+      </section>
+
+      <!-- 2. VUE "CIRCUIT COMPLET" (Tous les jours en un coup d'œil) -->
+      <section id="tab-programme" class="tab-page-view" style="padding: 16px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h2 style="font-size:1.3rem; font-weight:800; color:var(--primary-dark);">
+            <i class="fa-solid fa-route" style="color:var(--accent-gold); margin-right:6px;"></i> Circuit complet
+          </h2>
+          <span id="total-days-badge" style="font-size:0.75rem; background:#e2e8f0; padding:4px 10px; border-radius:12px; font-weight:700;"></span>
+        </div>
+        <div id="full-days-container"></div>
+      </section>
+
+      <!-- 3. VUE "MA CARTE" (Leaflet interactive + Tracé des vols) -->
+      <section id="tab-carte" class="tab-page-view" style="padding: 16px 20px;">
+        <div style="margin-bottom:12px;">
+          <h2 style="font-size:1.3rem; font-weight:800; color:var(--primary-dark); margin-bottom:4px;">
+            <i class="fa-solid fa-map-location-dot" style="color:var(--accent-gold); margin-right:6px;"></i> Carte du Voyage
+          </h2>
+          <p style="font-size:0.82rem; color:var(--text-muted);">
+            Localisation précise des étapes, hôtels et liaisons aériennes intérieures.
+          </p>
+        </div>
+
+        <div class="map-filters">
+          <button class="filter-btn active" data-filter="all"><i class="fa-solid fa-layer-group"></i> Tout</button>
+          <button class="filter-btn" data-filter="itinerary"><i class="fa-solid fa-route"></i> Étapes</button>
+          <button class="filter-btn" data-filter="flights"><i class="fa-solid fa-plane"></i> Vols intérieurs</button>
+          <button class="filter-btn" data-filter="hotels"><i class="fa-solid fa-hotel"></i> Hôtels</button>
+          <button class="filter-btn" data-filter="freetime"><i class="fa-solid fa-star"></i> Coups de cœur</button>
+        </div>
+
+        <div id="travel-map"></div>
+
+        <div style="margin-top:14px; padding:12px; background:white; border-radius:var(--radius-sm); font-size:0.8rem; color:#475569; border:1px solid var(--border-light);">
+          <i class="fa-solid fa-location-arrow" style="color:#0284c7; margin-right:4px;"></i>
+          <strong>Guidage GPS :</strong> Cliquez sur n'importe quel repère pour lancer directement votre itinéraire sur Google Maps, Waze ou Apple Plans.
+        </div>
+      </section>
+
+      <!-- 4. VUE "MES SOUVENIRS / TEMPS LIBRE" (Capture de photos et carnet) -->
+      <section id="tab-souvenirs" class="tab-page-view" style="padding: 16px 20px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+          <h2 style="font-size:1.3rem; font-weight:800; color:var(--primary-dark);">
+            <i class="fa-solid fa-images" style="color:var(--accent-gold); margin-right:6px;"></i> Mes Souvenirs
+          </h2>
+          <button id="add-souvenir-btn" class="btn-entry-gps" style="background:var(--primary-color); color:white; padding:6px 14px;">
+            <i class="fa-solid fa-camera"></i> Ajouter une photo
+          </button>
+        </div>
+        <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
+          Vos clichés et anecdotes capturés pendant votre périple (conservés sur votre smartphone).
+        </p>
+
+        <!-- Zone de saisie d'un nouveau souvenir -->
+        <input type="file" id="camera-file-input" accept="image/*" style="display:none;">
+
+        <!-- Galerie des souvenirs -->
+        <div class="souvenirs-grid" id="souvenirs-list"></div>
+
+        <!-- Coups de cœur & Suggestions temps libre -->
+        <h3 style="font-size:1.1rem; font-weight:800; color:var(--primary-dark); margin:28px 0 10px;">
+          <i class="fa-solid fa-heart" style="color:#ef4444; margin-right:6px;"></i> Coups de cœur de nos guides
+        </h3>
+        <div id="freetime-compact-container"></div>
+      </section>
+
+      <!-- 5. VUE "CONCIERGERIE IA & TEMPS LIBRE" (100% Hors-Ligne & Embarquée) -->
+      <section id="tab-conciergerie" class="tab-page-view" style="padding: 16px 20px;">
+        
+        <div class="concierge-hero-header">
+          <span class="concierge-badge"><i class="fa-solid fa-sparkles"></i> Service Concierge Girardot</span>
+          <h2 style="font-size:1.45rem; font-weight:800; line-height:1.2; margin-bottom:4px;">Conciergerie Personnelle</h2>
+          <p style="font-size:0.84rem; color:#d1e0d7;">
+            Recommandations sur-mesure de nos guides pour vos moments de liberté.
+          </p>
+        </div>
+
+        <div class="concierge-offline-notice">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>100% Embarqué • Fonctionne sans connexion Internet</span>
+        </div>
+
+        <!-- Barre de Recherche Intelligente (Voix & Texte) -->
+        <div style="background:white; border-radius:18px; padding:6px 8px 6px 14px; box-shadow:var(--shadow-subtle); border:1px solid var(--border-color); display:flex; align-items:center; gap:8px; margin-bottom:14px;">
+          <i class="fa-solid fa-magnifying-glass" style="color:var(--text-muted); font-size:0.95rem;"></i>
+          <input type="text" id="concierge-query-input" placeholder="Ex: Restaurant de poissons demain soir à 19h..." style="border:none; outline:none; font-family:inherit; font-size:0.86rem; flex:1; background:transparent;">
+          <button id="concierge-mic-btn" style="background:#f1f5f9; border:none; width:36px; height:36px; border-radius:50%; color:var(--primary-color); display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Parler au micro">
+            <i class="fa-solid fa-microphone"></i>
+          </button>
+          <button id="concierge-send-btn" style="background:var(--primary-color); border:none; width:36px; height:36px; border-radius:50%; color:white; display:flex; align-items:center; justify-content:center; cursor:pointer;" title="Envoyer">
+            <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+
+        <!-- Suggestion de questions rapides -->
+        <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:14px; scrollbar-width:none;">
+          <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où manger du poisson demain soir à 19h ?')">🐟 Poisson demain soir 19h</button>
+          <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Comment rejoindre la Montagne de la Table depuis l\'hôtel ?')">🚡 Aller à Table Mountain</button>
+          <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où trouver un distributeur ou faire du change ?')">💵 Bureau de change / DAB</button>
+        </div>
+
+        <!-- Bulle d'accueil IA -->
+        <div class="concierge-welcome-bubble" id="concierge-main-bubble">
+          <div class="concierge-avatar">
+            <i class="fa-solid fa-robot"></i>
+          </div>
+          <div>
+            <div class="concierge-prompt-title" id="concierge-welcome-title">Comment puis-je vous aider ?</div>
+            <div class="concierge-prompt-sub" id="concierge-welcome-sub">
+              Posez votre question à voix haute ou par écrit, ou explorez nos sélections ci-dessous :
+            </div>
+          </div>
+        </div>
+
+        <!-- Thématiques clés -->
+        <div class="concierge-themes-grid" id="concierge-themes-list"></div>
+
+        <!-- Résultats de la conciergerie -->
+        <div id="concierge-results-container" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+            <h3 id="concierge-results-title" style="font-size:1.1rem; font-weight:800; color:var(--primary-dark);"></h3>
+            <button onclick="resetConciergeView()" class="btn-entry-gps" style="background:#f1f5f9; color:#475569; font-size:0.75rem;">
+              <i class="fa-solid fa-arrow-left"></i> Retour
+            </button>
+          </div>
+          <div id="concierge-places-list"></div>
+        </div>
+
+      </section>
+
+      <!-- 6. VUE "PRATIQUE & URGENCES" (Hôtels, Vols, Contacts SOS) -->
+      <section id="tab-pratique" class="tab-page-view" style="padding: 16px 20px;">
+        <h2 style="font-size:1.3rem; font-weight:800; color:var(--primary-dark); margin-bottom:16px;">
+          <i class="fa-solid fa-circle-info" style="color:var(--accent-gold); margin-right:6px;"></i> Informations & Urgences
+        </h2>
+        
+        <div id="alert-banner-box"></div>
+        <div id="contacts-container"></div>
+        <div id="flights-container" style="margin-top:20px;"></div>
+        <div id="hotels-container" style="margin-top:20px;"></div>
+        <div id="practical-container" style="margin-top:20px;"></div>
+      </section>
+
+    </main>
+
+    <!-- FLOATING MAGAZINE BOTTOM NAVIGATION BAR -->
+    <nav class="magazine-bottom-nav">
+      <button class="nav-tab-btn active" data-tab="tab-today">
+        <i class="fa-regular fa-calendar-check"></i>
+        <span>Aujourd'hui</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="tab-carte">
+        <i class="fa-solid fa-map-location-dot"></i>
+        <span>Carte</span>
+      </button>
+
+      <!-- Bouton central Capture (Orange & Turquoise inspiré de la photo) -->
+      <div class="center-capture-wrapper">
+        <button class="center-capture-btn" id="btn-quick-capture" title="Capturer un souvenir">
+          <i class="fa-solid fa-camera"></i>
+          <span>CAPTURE</span>
+        </button>
+      </div>
+
+      <button class="nav-tab-btn" data-tab="tab-conciergerie">
+        <i class="fa-solid fa-bell-concierge"></i>
+        <span>Concierge</span>
+      </button>
+
+      <button class="nav-tab-btn" data-tab="tab-pratique">
+        <i class="fa-solid fa-circle-info"></i>
+        <span>Pratique</span>
+      </button>
+    </nav>
+
+    <!-- QR CODE / VOUCHER MODAL DIALOG -->
+    <div class="qr-modal-backdrop" id="qr-modal">
+      <div class="qr-modal-sheet">
+        <h3 id="qr-modal-title">Votre Bon de Voyage</h3>
+        <p id="qr-modal-sub">Présentez ce QR Code au guide ou au comptoir d'enregistrement</p>
+        <div class="qr-box">
+          <img id="qr-modal-img" src="" alt="QR Code d'accès">
+        </div>
+        <button class="btn-close-modal" onclick="closeQrModal()">Fermer</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Leaflet JS -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Data & Application Logic -->
+  <script src="voyages/index_voyages.js"></script>
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

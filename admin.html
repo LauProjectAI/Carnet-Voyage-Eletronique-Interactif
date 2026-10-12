@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Administration Carnet de Voyage — Voyages Girardot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .admin-body {
+      background: #f1f5f9;
+      padding: 20px 12px 60px;
+    }
+    .admin-container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: white;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-md);
+    }
+    .admin-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e2e8f0;
+      padding-bottom: 16px;
+      margin-bottom: 24px;
+    }
+    .admin-nav {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+      overflow-x: auto;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 8px;
+    }
+    .admin-nav button {
+      background: none;
+      border: none;
+      padding: 8px 16px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      border-radius: var(--radius-sm);
+      white-space: nowrap;
+    }
+    .admin-nav button.active {
+      background: var(--primary-color);
+      color: white;
+    }
+    .form-group {
+      margin-bottom: 16px;
+    }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 6px;
+    }
+    .form-control {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid #cbd5e1;
+      font-size: 0.9rem;
+      font-family: inherit;
+    }
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .section-box {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 20px;
+      position: relative;
+    }
+    .btn-delete {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: #fee2e2;
+      color: #dc2626;
+      border: none;
+      padding: 6px 10px;
+      border-radius: var(--radius-sm);
+      font-size: 0.78rem;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .btn-save-main {
+      background: var(--primary-color);
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(20,69,52,0.25);
+    }
+    .btn-secondary {
+      background: white;
+      border: 1px solid #cbd5e1;
+      color: #334155;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .share-box {
+      background: #ecfdf5;
+      border: 1px solid #a7f3d0;
+      border-radius: var(--radius-md);
+      padding: 16px;
+      margin-bottom: 24px;
+    }
+  </style>
+</head>
+<body class="admin-body">
+
+  <div class="admin-container">
+    
+    <div class="admin-header">
+      <div>
+        <h1 style="font-size:1.5rem; font-weight:800; color:var(--primary-dark);">
+          <i class="fa-solid fa-feather-pointed" style="color:var(--accent-gold); margin-right:8px;"></i>
+          Gestion de Carnet de Voyage
+        </h1>
+        <p style="font-size:0.85rem; color:#64748b;">Espace d'administration Voyages Girardot — Créez et personnalisez vos carnets clients sans coder.</p>
+      </div>
+      <div>
+        <a href="index.html" target="_blank" class="btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-eye"></i> Voir le carnet client
+        </a>
+      </div>
+    </div>
+
+    <!-- BARRE DE GESTION MULTI-VOYAGES -->
+    <div style="background:#f8fafc; border:2px solid #cbd5e1; border-radius:var(--radius-md); padding:16px 20px; margin-bottom:20px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:12px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <label style="font-weight:800; color:var(--primary-dark); font-size:0.95rem; display:flex; align-items:center; gap:6px;">
+            <i class="fa-solid fa-folder-open" style="color:var(--accent-gold);"></i> Voyage en cours d'édition :
+          </label>
+          <select id="adm-trip-selector" class="form-control" style="font-weight:700; min-width:280px; max-width:380px; background:white;" onchange="onSelectTripChange(this.value)">
+          </select>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" onclick="createNewTripPrompt()" class="btn-secondary" style="background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:800;">
+            <i class="fa-solid fa-plus"></i> Nouveau voyage
+          </button>
+          <button type="button" onclick="duplicateCurrentTrip()" class="btn-secondary" title="Dupliquer pour créer une variante">
+            <i class="fa-solid fa-copy"></i> Dupliquer
+          </button>
+          <button type="button" onclick="deleteCurrentTripPrompt()" class="btn-secondary" style="color:#dc2626; border-color:#fca5a5;" title="Supprimer ce carnet">
+            <i class="fa-solid fa-trash"></i> Supprimer
+          </button>
+        </div>
+      </div>
+
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; border-top:1px dashed #cbd5e1; padding-top:10px;">
+        <span style="font-size:0.8rem; color:#64748b;">
+          <i class="fa-solid fa-cloud-arrow-down"></i> Sauvegarde automatique dans le navigateur + export de fichiers <code>.json</code>
+        </span>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="exportTripJsonFile()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px;">
+            <i class="fa-solid fa-download"></i> Télécharger le fichier (.json)
+          </button>
+          <button type="button" onclick="document.getElementById('import-json-file').click()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px;">
+            <i class="fa-solid fa-upload"></i> Importer un fichier (.json)
+          </button>
+          <input type="file" id="import-json-file" accept=".json" style="display:none;" onchange="importTripJsonFile(event)">
+        </div>
+      </div>
+    </div>
+
+    <!-- Direct Share Link Box -->
+    <div class="share-box">
+      <h3 style="font-size:0.95rem; font-weight:800; color:#065f46; margin-bottom:6px;">
+        <i class="fa-solid fa-link"></i> Lien direct pour vos clients
+      </h3>
+      <p style="font-size:0.82rem; color:#047857; margin-bottom:10px;">
+        Ce lien contient l'ensemble du voyage sélectionné. Vous pouvez le copier et l'envoyer par e-mail, SMS ou l'intégrer sous forme de QR Code dans vos courriers.
+      </p>
+      <div style="display:flex; gap:10px;">
+        <input type="text" id="client-share-link" class="form-control" readonly style="background:white; font-size:0.8rem; font-family:monospace;">
+        <button id="copy-share-btn" class="btn-secondary" style="white-space:nowrap; padding:6px 14px; font-size:0.8rem;">
+          <i class="fa-solid fa-copy"></i> Copier le lien
+        </button>
+        <a id="preview-client-link" href="index.html" target="_blank" class="btn-save-main" style="white-space:nowrap; padding:8px 16px; font-size:0.85rem; text-decoration:none;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Tester le carnet
+        </a>
+      </div>
+      <div id="copy-feedback" style="font-size:0.75rem; color:#059669; font-weight:bold; margin-top:4px;"></div>
+    </div>
+
+    <!-- Navigation tabs inside admin -->
+    <div class="admin-nav">
+      <button class="active" onclick="switchAdminTab('general')"><i class="fa-solid fa-circle-info"></i> Général & Vols</button>
+      <button onclick="switchAdminTab('itinerary')"><i class="fa-solid fa-route"></i> Programme (Jours)</button>
+      <button onclick="switchAdminTab('hotels')"><i class="fa-solid fa-hotel"></i> Hôtels</button>
+      <button onclick="switchAdminTab('freetime')"><i class="fa-solid fa-compass"></i> Suggestions</button>
+      <button onclick="switchAdminTab('concierge')"><i class="fa-solid fa-bell-concierge"></i> Conciergerie IA</button>
+      <button onclick="switchAdminTab('contacts')"><i class="fa-solid fa-phone"></i> Contacts & Pratique</button>
+    </div>
+
+    <!-- FORM -->
+    <form id="admin-form">
+
+      <!-- 1. GENERAL & VOLS -->
+      <div id="adm-sec-general" class="admin-section">
+        <h3 style="font-size:1.1rem; color:var(--primary-dark); margin-bottom:14px;">1. Informations Générales du Séjour</h3>
+        
+        <div class="form-row">
+          <div class="form-group">
+            <label>Titre de la destination :</label>
+            <input type="text" id="adm-title" class="form-control" placeholder="Ex: Afrique du Sud">
+          </div>
+          <div class="form-group">
+            <label>Sous-titre / Thématique :</label>
+            <input type="text" id="adm-subtitle" class="form-control" placeholder="Ex: Du Parc Kruger au Cap">
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>Dates du voyage :</label>
+            <input type="text" id="adm-dates" class="form-control" placeholder="Ex: Du 12 au 22 octobre 2026">
+          </div>
+          <div class="form-group">
+            <label>Image de couverture (Chemin ou URL) :</label>
+            <input type="text" id="adm-cover" class="form-control" placeholder="Ex: Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Texte de présentation / Introduction :</label>
+          <textarea id="adm-intro" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="section-box">
+          <h4 style="font-size:0.95rem; font-weight:700; color:#b45309; margin-bottom:10px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Alerte / Notification Spéciale (formalité prioritaire)
+          </h4>
+          <div class="form-group">
+            <label>Titre de l'alerte :</label>
+            <input type="text" id="adm-alert-title" class="form-control">
+          </div>
+          <div class="form-group">
+            <label>Détails du message :</label>
+            <textarea id="adm-alert-text" class="form-control" rows="2"></textarea>
+          </div>
+          <div class="form-group">
+            <label>Lien web (ex: formulaire officiel douane) :</label>
+            <input type="text" id="adm-alert-link" class="form-control">
+          </div>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:24px 0 14px;">
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--primary-dark); margin:0;">
+              <i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:6px;"></i> Plan de Vol & Itinéraires Aériens
+            </h3>
+            <p style="font-size:0.8rem; color:#64748b; margin:2px 0 0;">Ajoutez tous les vols du séjour : vols aller/retour, vols intérieurs et vols avec escale ("via").</p>
+          </div>
+          <button type="button" onclick="addNewFlight()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
+            <i class="fa-solid fa-plus"></i> Ajouter un vol
+          </button>
+        </div>
+        <div id="adm-flights-list"></div>
+      </div>
+
+      <!-- 2. ITINERAIRE -->
+      <div id="adm-sec-itinerary" class="admin-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--primary-dark); margin:0;">2. Programme Jour par Jour</h3>
+            <p style="font-size:0.8rem; color:#64748b; margin:2px 0 0;">Gérez chaque journée et détaillez les visites et horaires précis.</p>
+          </div>
+          <button type="button" onclick="addNewDay()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
+            <i class="fa-solid fa-plus"></i> Ajouter un jour
+          </button>
+        </div>
+        <div id="adm-days-list"></div>
+      </div>
+
+      <!-- 3. HOTELS -->
+      <div id="adm-sec-hotels" class="admin-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:1.1rem; color:var(--primary-dark);">3. Hébergements & Hôtels</h3>
+          <button type="button" onclick="addNewHotel()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
+            <i class="fa-solid fa-plus"></i> Ajouter un hôtel
+          </button>
+        </div>
+        <div id="adm-hotels-list"></div>
+      </div>
+
+      <!-- 4. SUGGESTIONS TEMPS LIBRE -->
+      <div id="adm-sec-freetime" class="admin-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <h3 style="font-size:1.1rem; color:var(--primary-dark);">4. Coups de Cœur & Visites Libres</h3>
+          <button type="button" onclick="addNewSuggestion()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
+            <i class="fa-solid fa-plus"></i> Ajouter une suggestion
+          </button>
+        </div>
+        <div id="adm-freetime-list"></div>
+      </div>
+
+      <!-- 4. BIS CONCIERGERIE IA & ACTIVATION DES THÈMES -->
+      <div id="adm-sec-concierge" class="admin-section" style="display:none;">
+        <div style="margin-bottom:18px;">
+          <h3 style="font-size:1.15rem; color:var(--primary-dark); margin-bottom:4px;">
+            <i class="fa-solid fa-bell-concierge" style="color:var(--accent-gold); margin-right:6px;"></i>
+            Génération & Personnalisation de la Conciergerie
+          </h3>
+          <p style="font-size:0.82rem; color:#64748b;">
+            Déroulez chaque thématique pour consulter, modifier, supprimer ou ajouter manuellement des adresses locales vérifiées.
+          </p>
+        </div>
+
+        <!-- Bouton Générateur IA Administrateur -->
+        <div style="background:linear-gradient(135deg, #184232 0%, #0d281e 100%); color:white; border-radius:16px; padding:18px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <div style="font-size:1rem; font-weight:800; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-wand-magic-sparkles" style="color:var(--accent-gold);"></i> Générateur IA de Bonnes Adresses
+            </div>
+            <p style="font-size:0.8rem; color:#d1e0d7; margin-top:2px;">
+              Génère ou met à jour les adresses de restaurants, visites libres, change et transports pour la destination en cours.
+            </p>
+          </div>
+          <button type="button" onclick="triggerAiConciergeGeneration()" class="btn-save-main" style="background:var(--accent-gold); color:var(--primary-dark); padding:10px 18px; font-size:0.88rem; box-shadow:none;">
+            <i class="fa-solid fa-robot"></i> Régénérer via IA
+          </button>
+        </div>
+
+        <div id="adm-concierge-modules-list"></div>
+      </div>
+
+      <!-- 5. CONTACTS & INFOS PRATIQUES -->
+      <div id="adm-sec-contacts" class="admin-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--primary-dark); margin:0;">5. Contacts Clés & Urgences</h3>
+            <p style="font-size:0.8rem; color:#64748b; margin:2px 0 0;">Correspondant local réceptif, agence de voyage, ambassade, assistance...</p>
+          </div>
+          <button type="button" onclick="addNewContact()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
+            <i class="fa-solid fa-plus"></i> Ajouter un contact
+          </button>
+        </div>
+        <div id="adm-contacts-list"></div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:28px 0 14px; border-top:1px solid #e2e8f0; padding-top:20px;">
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--primary-dark); margin:0;">Conseils Pratiques du Voyageur</h3>
+            <p style="font-size:0.8rem; color:#64748b; margin:2px 0 0;">Monnaie, électricité, tenues conseillées, décalage horaire, pourboires...</p>
+          </div>
+          <button type="button" onclick="addNewPracticalTip()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
+            <i class="fa-solid fa-plus"></i> Ajouter un conseil pratique
+          </button>
+        </div>
+        <div id="adm-practical-list"></div>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; border-top:1px solid #e2e8f0; padding-top:20px;">
+        <button type="button" onclick="resetToDefaultData()" class="btn-secondary" style="color:#dc2626; border-color:#fca5a5;">
+          <i class="fa-solid fa-rotate-left"></i> Rétablir l'exemple complet
+        </button>
+        <button type="button" onclick="saveAllCarnet()" class="btn-save-main">
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+  <script src="voyages/index_voyages.js"></script>
+  <script src="data.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

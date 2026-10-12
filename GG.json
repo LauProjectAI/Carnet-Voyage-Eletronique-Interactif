@@ -1,0 +1,79 @@
+{
+  "name": "Girardot Groupe",
+  "overview": "Girardot Groupe is a French family-owned company operating in tourism and mobility since 1920. Based in Bourgogne-Franche-Comté, it provides travel agency services, custom trip organization, business travel management, and diverse transportation solutions including regular daily transit, group trips, and tourist coaches.",
+  "websiteUrl": "https://www.girardot-groupe.com/",
+  "brandValues": ["Excellence", "Family Heritage", "Collective Spirit", "Closeness"],
+  "visualAesthetics": ["Verdant Heritage", "Landscape-Centric Mobility", "Familial Warmth", "Archival Continuity", "Earth-Grounded Elegance"],
+  "toneOfVoice": ["Professional", "Warm", "Committed", "Trustworthy"],
+  "fonts": ["Archivo"],
+  "campaigns": [{
+    "description": "Highlighting over a century of local transport mastery and family heritage, this campaign grounds Girardot Groupe in the rich textures and winding scenic landscapes of Bourgogne-Franche-Comté to position the brand as the undisputed expert in seamless regional mobility.",
+    "creatives": [{
+      "title": "Navigating Burgundy Since 1920",
+      "versions": [{
+        "fileName": "resource_atKV0GRzzlHfARUCYbAOW1.png"
+      }]
+    }, {
+      "title": "Every Curve Mastered",
+      "versions": [{
+        "fileName": "resource_8GQ36VNCK_YcrQFKCPJO1-.png"
+      }]
+    }, {
+      "title": "Seamless Transport Expertise",
+      "versions": [{
+        "fileName": "resource_8eAu9992X5g1jiM2V7JOUw.png"
+      }]
+    }, {
+      "title": "Your Trusted Local Partner",
+      "versions": [{
+        "fileName": "resource_avO6W-qSxrgar9s2glxkly.png"
+      }]
+    }]
+  }, {
+    "description": "Experience the quiet elegance of Bourgogne-Franche-Comté as autumn turns to winter. Book tailored group excursions and regional transit designed to bring family, friends, and communities together.",
+    "creatives": [{
+      "title": "Timeless Routes, Seasonal Beauty",
+      "versions": [{
+        "fileName": "resource_aDcf_Xjng8-dtlf3n_pO6E.png"
+      }]
+    }, {
+      "title": "Golden Hills, Winter Whispers",
+      "versions": [{
+        "fileName": "resource_9sLT46qaTjA2qI2MEDG_vl.png"
+      }]
+    }, {
+      "title": "Togetherness on Every Turn",
+      "versions": [{
+        "fileName": "resource_8mybD0A2B545LnL-QCoOAC.png"
+      }]
+    }, {
+      "title": "Your Tailored Winter Escape",
+      "versions": [{
+        "fileName": "resource_8driM--xe0EdevNsY3I49c.png"
+      }]
+    }]
+  }, {
+    "description": "Celebrate over a century of shared moments, scenic escapes, and human connection. This campaign highlights our commitment to bringing families, friends, and local communities closer on every trip.",
+    "creatives": [{
+      "title": "Journeys That Bring Us Together",
+      "versions": [{
+        "fileName": "resource_bgQ7b928Kd0bXBB0Vl7_-o.png"
+      }]
+    }, {
+      "title": "Escape into Shared Moments",
+      "versions": [{
+        "fileName": "resource_8DFYXww-r4h3aZUatcjOtO.png"
+      }]
+    }, {
+      "title": "Feel the Joy of the Road",
+      "versions": [{
+        "fileName": "resource_81SHDV3ufg44rvmTPYt_h0.png"
+      }]
+    }, {
+      "title": "Connecting Generations Since 1920",
+      "versions": [{
+        "fileName": "resource_8G-rXt7oh4N90vCY_aEOIc.png"
+      }]
+    }]
+  }]
+}
