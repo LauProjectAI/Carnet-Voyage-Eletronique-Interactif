@@ -1185,8 +1185,8 @@ function renderMapMarkers(filterCategory = 'all') {
     }
   }
 
-  // 2. Domestic flight line & Plane icon
-  if (filterCategory === 'all' || filterCategory === 'flights' || filterCategory === 'itinerary') {
+  // 2. Domestic flight line & Plane icon (vols intérieurs uniquement si demandé ou vue globale)
+  if (filterCategory === 'all' || filterCategory === 'flights') {
     const domesticFlights = (currentTrip.flights && currentTrip.flights.domesticFlights) ? currentTrip.flights.domesticFlights : [];
     domesticFlights.forEach((flight) => {
       const fLat = parseFloat(flight.fromLat);
@@ -1298,7 +1298,26 @@ function renderMapMarkers(filterCategory = 'all') {
       if (bounds.length === 1) {
         leafletMap.setView(bounds[0], 13);
       } else {
-        leafletMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        // Détecter si les points sont aberrants / mondiaux (> 50 degrés d'écart, ex: Chicago + Afrique du Sud)
+        let minLat = 90, maxLat = -90, minLng = 180, maxLng = -180;
+        bounds.forEach(pt => {
+          if (pt[0] < minLat) minLat = pt[0];
+          if (pt[0] > maxLat) maxLat = pt[0];
+          if (pt[1] < minLng) minLng = pt[1];
+          if (pt[1] > maxLng) maxLng = pt[1];
+        });
+
+        // Si l'écart est gigantesque (deux continents distincts), on se focalise sur les étapes du voyage
+        if ((maxLat - minLat > 50) || (maxLng - minLng > 80)) {
+          const itPt = (currentTrip.itinerary || []).find(it => parseFloat(it.lat) && parseFloat(it.lng));
+          if (itPt) {
+            leafletMap.setView([parseFloat(itPt.lat), parseFloat(itPt.lng)], 12);
+          } else {
+            leafletMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+          }
+        } else {
+          leafletMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
+        }
       }
     } catch(e) {
       console.warn('fitBounds error:', e);
@@ -1307,16 +1326,16 @@ function renderMapMarkers(filterCategory = 'all') {
     // Si aucun point dans ce filtre, recentrer sur le voyage (hôtel ou étape) pour éviter la carte du monde
     if (currentTrip) {
       let fallbackPoint = null;
-      if (currentTrip.hotels && currentTrip.hotels.length) {
-        const h = currentTrip.hotels.find(x => parseFloat(x.lat) && parseFloat(x.lng));
-        if (h) fallbackPoint = [parseFloat(h.lat), parseFloat(h.lng)];
-      }
-      if (!fallbackPoint && currentTrip.itinerary && currentTrip.itinerary.length) {
+      if (currentTrip.itinerary && currentTrip.itinerary.length) {
         const it = currentTrip.itinerary.find(x => parseFloat(x.lat) && parseFloat(x.lng));
         if (it) fallbackPoint = [parseFloat(it.lat), parseFloat(it.lng)];
       }
+      if (!fallbackPoint && currentTrip.hotels && currentTrip.hotels.length) {
+        const h = currentTrip.hotels.find(x => parseFloat(x.lat) && parseFloat(x.lng));
+        if (h) fallbackPoint = [parseFloat(h.lat), parseFloat(h.lng)];
+      }
       if (fallbackPoint) {
-        leafletMap.setView(fallbackPoint, 11);
+        leafletMap.setView(fallbackPoint, 12);
       }
     }
   }

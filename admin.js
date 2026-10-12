@@ -146,6 +146,13 @@ function createNewTripPrompt() {
       ]
     }
   ];
+  newTrip.flights = {
+    outbound: null,
+    inbound: null,
+    domesticFlights: []
+  };
+  newTrip.flightsList = [];
+  newTrip.hotels = [];
 
   // Enregistrer
   saveTripToCatalogAndStorage(newTrip);
