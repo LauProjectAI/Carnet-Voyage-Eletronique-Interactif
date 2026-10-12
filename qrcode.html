@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flashez pour tester sur Smartphone — Voyages Girardot</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Archivo', sans-serif;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      color: #1e293b;
+    }
+    .card {
+      background: white;
+      border-radius: 24px;
+      padding: 36px 32px;
+      max-width: 460px;
+      width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      border: 1px solid #e2e8f0;
+    }
+    .brand {
+      color: #144534;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    .subbrand {
+      font-size: 0.8rem;
+      color: #c29958;
+      font-weight: 700;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    .qr-wrapper {
+      background: #f8fafc;
+      padding: 20px;
+      border-radius: 16px;
+      display: inline-block;
+      margin: 10px auto 20px;
+      border: 2px solid #e2e8f0;
+    }
+    .qr-img {
+      display: block;
+      width: 230px;
+      height: 230px;
+      margin: 0 auto;
+    }
+    .url-box {
+      background: #eef7f2;
+      color: #144534;
+      font-family: monospace;
+      font-size: 1.05rem;
+      font-weight: 700;
+      padding: 10px 14px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      word-break: break-all;
+      border: 1px dashed #236c53;
+    }
+    .instructions {
+      font-size: 0.85rem;
+      color: #64748b;
+      line-height: 1.5;
+      text-align: left;
+      background: #f8fafc;
+      padding: 14px 18px;
+      border-radius: 12px;
+    }
+    .btn-pc {
+      display: inline-block;
+      margin-top: 18px;
+      background: #144534;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-weight: 700;
+      font-size: 0.88rem;
+      transition: background 0.2s;
+    }
+    .btn-pc:hover {
+      background: #236c53;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <div class="brand">Voyages Girardot</div>
+    <div class="subbrand">CARNET DE VOYAGE ÉLECTRONIQUE</div>
+    
+    <p style="font-size:0.95rem; margin-bottom:12px; font-weight:600;">
+      Scannez ce QR Code avec l'appareil photo de votre smartphone :
+    </p>
+
+    <div class="qr-wrapper">
+      <img src="https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=http://192.168.0.42:8080/&color=14-69-52" alt="QR Code d'accès smartphone" class="qr-img">
+    </div>
+
+    <div class="url-box">http://192.168.0.42:8080/</div>
+
+    <div class="instructions">
+      <strong>📱 Instructions :</strong><br>
+      1. Vérifiez que votre smartphone est connecté au <strong>même Wi-Fi</strong> que ce PC.<br>
+      2. Ouvrez l'appareil photo du téléphone et pointez-le sur le QR Code.<br>
+      3. Cliquez sur le lien pour ouvrir l'application.
+    </div>
+
+    <a href="index.html" class="btn-pc">Ouvrir sur ce PC</a>
+  </div>
+
+</body>
+</html>

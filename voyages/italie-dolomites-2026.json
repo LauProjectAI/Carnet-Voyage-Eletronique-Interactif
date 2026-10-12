@@ -1,0 +1,333 @@
+{
+  "id": "italie-dolomites-2026",
+  "title": "Italie du Nord & Dolomites",
+  "subtitle": "Des Grands Lacs aux Sommets Alpins",
+  "dates": "Du samedi 6 juin au samedi 13 juin 2026",
+  "startDate": "2026-06-06",
+  "endDate": "2026-06-13",
+  "coverImage": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=1200&auto=format&fit=crop&q=80",
+  "intro": "Laissez-vous envoûter par la majesté des Dolomites classées à l'UNESCO, les eaux scintillantes des lacs de Garde et de Côme, et la douceur de vivre italienne entre villages pittoresques et panoramas alpins grandioses.",
+  "alert": {
+    "title": "Conseil Voyageur : Vignettes et Chaussures de Randonnée",
+    "text": "Prévoyez de bonnes chaussures de marche adhérentes pour les belvédères d'altitude ainsi qu'une petite veste coupe-vent pour les cols.",
+    "link": "https://www.dolomiti.org"
+  },
+  "flights": {
+    "outbound": {
+      "date": "06/06/2026",
+      "departureAirport": "Lyon Saint-Exupéry (LYS)",
+      "meetingTime": "06h30",
+      "meetingPlace": "Terminal 1 - Hall Départs",
+      "flightNumber": "AF1412",
+      "departureTime": "08h15",
+      "layover": "Vol direct vers Milan Malpensa (MXP)",
+      "arrivalAirport": "Milan Malpensa (MXP)",
+      "arrivalTime": "09h25",
+      "airline": "Air France"
+    },
+    "inbound": {
+      "date": "13/06/2026",
+      "departureAirport": "Venise Marco Polo (VCE)",
+      "flightNumber": "AF1127",
+      "departureTime": "17h40",
+      "layover": "Vol direct vers Lyon Saint-Exupéry (LYS)",
+      "arrivalAirport": "Lyon Saint-Exupéry (LYS)",
+      "arrivalTime": "19h00",
+      "airline": "Air France"
+    },
+    "luggage": {
+      "cabin": "1 bagage cabine de 10 kg max (55 x 35 x 25 cm).",
+      "checked": "1 bagage en soute de 23 kg max par personne."
+    },
+    "domesticFlights": []
+  },
+  "contacts": {
+    "receptif": {
+      "name": "Dolomiti Discovery Incoming & Girardot Assistance",
+      "emergency": "+39 0471 998877 (24h/24 en français)",
+      "phone": "+39 0471 998800",
+      "address": "Piazza Walther 12, 39100 Bolzano, Italie"
+    },
+    "consulate": {
+      "name": "Consulat Général de France à Milan",
+      "phone": "+39 02 6559141",
+      "emergency": "+39 335 710 6428",
+      "address": "Via Manzoni 38, 20121 Milano, Italie"
+    },
+    "assistance": {
+      "name": "Mutuaide Assistance Voyages Girardot",
+      "phone": "+33 1 45 16 66 66",
+      "police": "Contrat N° 7894-GIR-2026"
+    }
+  },
+  "itinerary": [
+    {
+      "day": 1,
+      "city": "Milan - Lac de Garde",
+      "title": "Arrivée en Lombardie & Rives du Lac de Garde",
+      "highlight": "Accueil & Dolce Vita au bord du Lac",
+      "dateStr": "Samedi 6 juin 2026",
+      "weather": "25°C • Ensoleillé",
+      "lat": 45.4929,
+      "lng": 10.6083,
+      "description": "Vol matinal vers Milan. Accueil par votre guide-accompagnateur et départ en autocar grand tourisme vers le Lac de Garde. Découverte de la presqu'île fortifiée de Sirmione avec le château des Scaliger. Dîner de bienvenue.",
+      "timeline": [
+        {
+          "time": "09:30",
+          "title": "Atterrissage à Milan Malpensa",
+          "subtitle": "Accueil par le guide Girardot et installation dans notre autocar grand tourisme.",
+          "lat": 45.6301,
+          "lng": 8.7231,
+          "icon": "plane-arrival"
+        },
+        {
+          "time": "12:30",
+          "title": "Déjeuner au bord de l'eau à Sirmione",
+          "subtitle": "Spécialités de poissons du lac et pasta artisanale avec vue panoramique.",
+          "lat": 45.4929,
+          "lng": 10.6083,
+          "icon": "utensils"
+        },
+        {
+          "time": "15:00",
+          "title": "Visite guidée de Sirmione & Château Scaliger",
+          "subtitle": "Promenade dans les ruelles médiévales et découverte des vestiges romains des Grottes de Catulle.",
+          "lat": 45.4936,
+          "lng": 10.6062,
+          "image": "https://images.unsplash.com/photo-1533105079780-92b9be482077?w=800&auto=format&fit=crop&q=80",
+          "icon": "camera"
+        },
+        {
+          "time": "19:30",
+          "title": "Installation à l'hôtel & Dîner de bienvenue",
+          "subtitle": "Apéritif Prosecco et présentation détaillée du séjour.",
+          "lat": 45.4929,
+          "lng": 10.6083,
+          "icon": "hotel"
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "city": "Lac de Garde - Bolzano",
+      "title": "Remontée vers le Sud-Tyrol & Portes des Dolomites",
+      "highlight": "Contrastes alpins et architecture tyrolienne",
+      "dateStr": "Dimanche 7 juin 2026",
+      "weather": "23°C • Ensoleillé",
+      "lat": 46.4983,
+      "lng": 11.3548,
+      "description": "Route panoramique le long de la vallée de l'Adige. Arrivée à Bolzano, capitale du Haut-Adige mêlant cultures italienne et autrichienne. Visite du centre historique et du musée d'archéologie d'Ötzi.",
+      "timeline": [
+        {
+          "time": "09:00",
+          "title": "Départ pour Bolzano",
+          "subtitle": "Traversée des vignobles réputés du Trentin et vergers alpins.",
+          "lat": 45.8900,
+          "lng": 11.0400,
+          "icon": "bus"
+        },
+        {
+          "time": "11:30",
+          "title": "Balade sous les arcades de Bolzano",
+          "subtitle": "Découverte des façades pastel, de la place Walther et des échoppes d'artisans.",
+          "lat": 46.4983,
+          "lng": 11.3548,
+          "image": "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800&auto=format&fit=crop&q=80",
+          "icon": "person-walking"
+        },
+        {
+          "time": "14:30",
+          "title": "Musée archéologique d'Ötzi",
+          "subtitle": "Visite passionnante dédiée à l'homme des glaces préhistorique découvert dans les glaciers.",
+          "lat": 46.5002,
+          "lng": 11.3508,
+          "icon": "landmark"
+        },
+        {
+          "time": "19:00",
+          "title": "Dîner gastronomique tyrolien",
+          "subtitle": "Dégustation de canederli faits maison et strudel aux pommes.",
+          "lat": 46.4983,
+          "lng": 11.3548,
+          "icon": "utensils"
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "city": "Dolomites - Cortina d'Ampezzo",
+      "title": "Le Cœur des Dolomites & Les Tre Cime di Lavaredo",
+      "highlight": "Spectacle grandiose des Trois Cimes",
+      "dateStr": "Lundi 8 juin 2026",
+      "weather": "20°C • Ciel pur",
+      "lat": 46.5383,
+      "lng": 12.1376,
+      "description": "Journée inoubliable au col de Falzarego et face aux mythiques tours calcaires des Tre Cime di Lavaredo et au lac turquoise de Misurina.",
+      "timeline": [
+        {
+          "time": "08:30",
+          "title": "Route des Grandes Dolomites",
+          "subtitle": "Ascension en autocar offrant des points de vue spectaculaires sur les massifs du Catinaccio.",
+          "lat": 46.5200,
+          "lng": 11.8500,
+          "icon": "mountain"
+        },
+        {
+          "time": "11:00",
+          "title": "Panoramas aux Tre Cime di Lavaredo",
+          "subtitle": "Balade accessible face aux trois géants de pierre s'élevant à près de 3000 mètres.",
+          "lat": 46.6186,
+          "lng": 12.3028,
+          "image": "https://images.unsplash.com/photo-1519681393784-d120267933ba?w=800&auto=format&fit=crop&q=80",
+          "icon": "mountain-sun"
+        },
+        {
+          "time": "13:30",
+          "title": "Déjeuner en refuge alpin au Lac de Misurina",
+          "subtitle": "Polenta aux cèpes et fromages d'alpage face au miroir des eaux cristallines.",
+          "lat": 46.5828,
+          "lng": 12.2536,
+          "icon": "utensils"
+        },
+        {
+          "time": "16:00",
+          "title": "Temps libre à Cortina d'Ampezzo",
+          "subtitle": "Flânerie sur le Corso Italia dans la perle historique des Dolomites.",
+          "lat": 46.5383,
+          "lng": 12.1376,
+          "icon": "bag-shopping"
+        }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "name": "Hotel Sirmione & Promessi Sposi 4*",
+      "city": "Sirmione - Lac de Garde",
+      "nights": "Nuit 1",
+      "phone": "+39 030 916101",
+      "address": "Piazza Castello 19, 25019 Sirmione BS, Italie",
+      "lat": 45.4929,
+      "lng": 10.6083,
+      "wifi": "Code: SIRMIONE2026",
+      "breakfast": "Buffet continental chaud/froid servi de 07h00 à 10h00",
+      "photo": "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&auto=format&fit=crop&q=80"
+    },
+    {
+      "name": "Parkhotel Laurin 4* Sup",
+      "city": "Bolzano",
+      "nights": "Nuits 2 et 3",
+      "phone": "+39 0471 311000",
+      "address": "Via Laurin 4, 39100 Bolzano BZ, Italie",
+      "lat": 46.4983,
+      "lng": 11.3548,
+      "wifi": "Réseau Laurin-Guest (sans mot de passe)",
+      "breakfast": "Service au jardin ou sous la verrière de 07h00 à 10h30",
+      "photo": "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&auto=format&fit=crop&q=80"
+    }
+  ],
+  "freeTimeSuggestions": [
+    {
+      "name": "Téléphérique du Renon (Rittner Seilbahn)",
+      "location": "Bolzano",
+      "tag": "Incontournable",
+      "description": "Vue aérienne panoramique à 360° reliant Bolzano au plateau du Renon en seulement 12 minutes.",
+      "address": "Via Renon 12, Bolzano",
+      "lat": 46.5008,
+      "lng": 11.3592
+    },
+    {
+      "name": "Glacier & Pâtisserie Eisdiele Avalon",
+      "location": "Bolzano Centre",
+      "tag": "Gourmandise",
+      "description": "Les meilleures glaces artisanales du Tyrol du Sud avec des parfums locaux aux baies des bois.",
+      "address": "Via dei Portici, Bolzano",
+      "lat": 46.4990,
+      "lng": 11.3550
+    }
+  ],
+  "conciergeModules": {
+    "restaurants": true,
+    "visits": true,
+    "shopping": true,
+    "transport": true
+  },
+  "conciergeDirectory": {
+    "restaurants": [
+      {
+        "name": "Wirtshaus Vögele",
+        "category": "Cuisine traditionnelle tyrolienne",
+        "location": "Bolzano centre",
+        "tag": "Coup de cœur guide",
+        "description": "Auberge historique depuis 1870 servant les meilleurs Knödel et goulash de cerf de la région.",
+        "phone": "+39 0471 973938",
+        "bookingUrl": "https://www.voegele.it",
+        "lat": 46.4995,
+        "lng": 11.3538,
+        "openingDays": ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"],
+        "openingHours": "12:00-14:30, 19:00-22:30",
+        "keywords": ["viande", "knodel", "goulash", "terroir", "vin"]
+      },
+      {
+        "name": "Ristorante Il Bacio da Ciro",
+        "category": "Pizzas au feu de bois & poissons frais",
+        "location": "Bolzano",
+        "tag": "Cuisine italienne",
+        "description": "Ambiance chaleureuse et spécialités méditerranéennes avec arrivages de poissons frais.",
+        "phone": "+39 0471 977990",
+        "bookingUrl": "https://www.ilbaciodaciro.it",
+        "lat": 46.5010,
+        "lng": 11.3560,
+        "openingDays": ["Tous les jours"],
+        "openingHours": "11:45-14:30, 18:30-23:00",
+        "keywords": ["pizza", "poisson", "pates", "fruits de mer", "italien"]
+      }
+    ],
+    "visits": [
+      {
+        "name": "Château Mareccio (Schloss Maretsch)",
+        "category": "Monument & Vignobles",
+        "location": "Bolzano",
+        "tag": "Patrimoine",
+        "description": "Château Renaissance entouré de vignes de cépage Lagrein au pied des montagnes.",
+        "phone": "+39 0471 976615",
+        "lat": 46.5042,
+        "lng": 11.3512,
+        "keywords": ["chateau", "histoire", "vignes", "culture"]
+      }
+    ],
+    "shopping": [
+      {
+        "name": "Puchler Delikatessen",
+        "category": "Épicerie fine & Produits régionaux",
+        "location": "Bolzano Piazza delle Erbe",
+        "tag": "Gourmet",
+        "description": "Le temple du Speck AOP, des fromages alpins affinés et des vins locaux de caractère.",
+        "phone": "+39 0471 972173",
+        "lat": 46.4998,
+        "lng": 11.3532,
+        "keywords": ["speck", "fromage", "vin", "produits locaux", "souvenirs"]
+      }
+    ],
+    "transport": [
+      {
+        "name": "Radio Taxi Bolzano",
+        "category": "Taxis officiels 24/7",
+        "location": "Gare et centre-ville",
+        "tag": "Pratique",
+        "description": "Service de taxi officiel avec réservation rapide et véhicules spacieux.",
+        "phone": "+39 0471 981111",
+        "lat": 46.4970,
+        "lng": 11.3580,
+        "keywords": ["taxi", "gare", "aeroport", "deplacement"]
+      }
+    ]
+  },
+  "practicalInfo": {
+    "money": "Monnaie : Euro (€). Cartes bancaires acceptées partout.",
+    "electricity": "Courant 230V, prises européennes standard type C et F.",
+    "clothing": "Vêtements confortables, pull chaud ou polaire pour les altitudes en soirée.",
+    "tips": "Le service est généralement inclus sur l'addition ('coperto'). Pourboire facultatif mais apprécié de 5 à 10%.",
+    "wifi": "Connexion gratuite dans tous les hôtels du circuit."
+  }
+}

@@ -1,0 +1,825 @@
+const initialCarnetAfriqueDuSud = {
+  id: "afrique-du-sud-2026",
+  title: "Afrique du Sud",
+  subtitle: "Du Parc Kruger au Cap",
+  dates: "Du lundi 12 octobre au samedi 24 octobre 2026",
+  startDate: "2026-10-12",
+  endDate: "2026-10-24",
+  coverImage: "Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png",
+  intro: "Un voyage en Afrique du Sud c'est partir à la rencontre de paysages remarquables, d'une mosaïque culturelle unique, d'une nature sauvage et préservée... Nation du rugby, pays arc-en-ciel, l'Afrique du Sud vous séduira par ses diversités naturelles. Cap de Bonne Espérance, pays Zoulou, parc Kruger, Soweto... Autant de lieux légendaires qu'il n'appartient qu'à vous de venir voir de vos propres yeux.",
+  alert: {
+    title: "Formalité indispensable : Déclaration douanière électronique SARS",
+    text: "Obligatoire dans les 24h avant l'entrée ET la sortie du pays. Formulaire gratuit en ligne sur le portail SARS ou via l'application SARS MobiApp.",
+    link: "https://www.sars.gov.za/travellerdeclaration/"
+  },
+  flights: {
+    outbound: {
+      date: "12/10/2026",
+      departureAirport: "Lyon Saint-Exupéry (LYS)",
+      meetingTime: "13h05",
+      meetingPlace: "Comptoir d'enregistrement du vol",
+      flightNumber: "EK82",
+      departureTime: "15h35",
+      layover: "Escale à Dubaï à 23h55 — Redécollage à 04h05 le 13/10 (Vol EK761)",
+      arrivalAirport: "Johannesburg (JNB)",
+      arrivalTime: "10h15 (le 13/10/2026)",
+      airline: "Emirates"
+    },
+    inbound: {
+      date: "23/10/2026",
+      departureAirport: "Cape Town International (CPT)",
+      flightNumber: "EK771",
+      departureTime: "18h25",
+      layover: "Escale à Dubaï à 05h50 le 24/10 — Redécollage à 08h55 (Vol EK81)",
+      arrivalAirport: "Lyon Saint-Exupéry (LYS)",
+      arrivalTime: "13h50 (le 24/10/2026)",
+      airline: "Emirates"
+    },
+    luggage: {
+      cabin: "1 bagage cabine de 7 kg max (55 x 38 x 20 cm). Aucun flacon > 100 ml.",
+      checked: "1 bagage en soute de 20 kg max par personne."
+    },
+    domesticFlights: [
+      {
+        id: "dom-1",
+        day: 8,
+        label: "Vol Intérieur Durban (DUR) ➔ Le Cap (CPT)",
+        airline: "FlySafair / CemAir",
+        flightNumber: "FA168",
+        departureCity: "Durban",
+        departureAirport: "Durban King Shaka (DUR)",
+        departureTime: "En fin d'après-midi",
+        fromLat: -29.6144,
+        fromLng: 31.1197,
+        arrivalCity: "Le Cap",
+        arrivalAirport: "Cape Town International (CPT)",
+        arrivalTime: "En soirée",
+        toLat: -33.9715,
+        toLng: 18.6021,
+        notes: "Vol inclus avec transfert direct vers votre hôtel au Cap."
+      }
+    ]
+  },
+  contacts: {
+    receptif: {
+      name: "GO TOURISM",
+      address: "P.O BOX 32076 Camps Bay, Cape Town 8040 - South Africa",
+      phone: "+27 (0)21 686 0444",
+      emergency: "+27 (0)83 254 5813"
+    },
+    agence: {
+      name: "Voyages Girardot",
+      address: "Bourgogne-Franche-Comté, France",
+      phone: "+33 (0)3 85 42 82 50",
+      email: "contact@voyages-girardot.com"
+    },
+    ambassade: {
+      name: "Ambassade de France en Afrique du Sud",
+      address: "250 Melk Street, Nieuw Muckleneuk, Pretoria",
+      phone: "+27 12 425 1600"
+    },
+    assistance: {
+      name: "Assurance Multirisque & Rapatriement",
+      details: "Reportez-vous à votre carte d'assistance remise avec votre carnet. En cas d'urgence médicale vitale, contacter immédiatement l'assureur avant engagement de frais majeurs."
+    }
+  },
+  hotels: [
+    {
+      id: "h1",
+      name: "RH Hotel & Apartments Pretoria",
+      dates: "Du 13 au 14 octobre",
+      address: "14 Trevenna St, Sunnyside, Pretoria, 0002",
+      phone: "+27 12 444 1000",
+      lat: -25.7533,
+      lng: 28.2045,
+      notes: "Wifi à la réception. Prises type M (adaptateur conseillé)."
+    },
+    {
+      id: "h2",
+      name: "Floreat Riverside Lodge",
+      dates: "Du 14 au 15 octobre",
+      address: "103 Ou Lydenburg Rd, Sabie, 1260",
+      phone: "+27 13 764 2160",
+      lat: -25.0974,
+      lng: 30.7788,
+      notes: "Au cœur de la nature, bord de rivière."
+    },
+    {
+      id: "h3",
+      name: "Nkambeni Safari Camp",
+      dates: "Du 15 au 17 octobre",
+      address: "139 Numbi Rd, Numbi Gate Kruger National Park, Hazyview, 1350",
+      phone: "+27 13 590 1011",
+      lat: -25.1501,
+      lng: 31.1989,
+      notes: "Tentes de safari tout confort à l'entrée du Parc Kruger. Dîner boma sous les étoiles."
+    },
+    {
+      id: "h4",
+      name: "Mantenga Lodge",
+      dates: "Du 17 au 18 octobre",
+      address: "5 Tivakashi St, Ezulwini H106, Eswatini",
+      phone: "+268 2416 1049",
+      lat: -26.4388,
+      lng: 31.1802,
+      notes: "Vue spectaculaire sur la vallée d'Ezulwini et Execution Rock."
+    },
+    {
+      id: "h5",
+      name: "Zulu Nyala Heritage Safari Lodge",
+      dates: "Du 18 au 19 octobre",
+      address: "Hluhluwe, Ngweni Road, Hluhluwe, 3960",
+      phone: "+27 35 562 0169",
+      lat: -27.9942,
+      lng: 32.2748,
+      notes: "Dîner avec spectacle de danses tribales zouloues."
+    },
+    {
+      id: "h6",
+      name: "ANEW Hotel Green Point",
+      dates: "Du 19 au 23 octobre",
+      address: "181 Main Rd, Green Point, Cape Town, 8005",
+      phone: "+27 21 180 2570",
+      lat: -33.9084,
+      lng: 18.4068,
+      notes: "Idéalement situé à proximité du V&A Waterfront et des restaurants."
+    }
+  ],
+  itinerary: [
+    {
+      day: 1,
+      dateStr: "Lundi 12 Octobre",
+      title: "Votre région • Lyon • Envol vers Johannesburg",
+      highlight: "Acheminement et vol de nuit",
+      description: "Transfert à l'aéroport de Lyon Saint-Exupéry. Formalités d'embarquement et envol pour Johannesburg via Dubaï sur vol Emirates. Dîner et nuit à bord.",
+      lat: 45.7256,
+      lng: 5.0811,
+      city: "Lyon / Envol",
+      weather: "16°C • Ensoleillé",
+      hotelName: "Nuit à bord",
+      nextEvent: {
+        title: "Vol EK82 : Départ Lyon ➔ Dubaï",
+        time: "15:35",
+        badge: "Convocation aéroport 13h05",
+        qrCodeText: "BILLET-VOL-EK82-GIRARDOT-01M23B7Q4R3X"
+      },
+      timeline: [
+        { time: "13:05", title: "Rendez-vous aéroport de Lyon", subtitle: "Comptoir d'enregistrement Emirates", type: "transport", icon: "plane", lat: 45.7256, lng: 5.0811 },
+        { time: "15:35", title: "Décollage Vol EK82", subtitle: "Vers Dubaï (Boeing 777)", type: "transport", icon: "plane" },
+        { time: "23:55", title: "Escale internationale à Dubaï", subtitle: "Correspondance vol EK761 vers Johannesburg", type: "transit", icon: "clock" }
+      ]
+    },
+    {
+      day: 2,
+      dateStr: "Mardi 13 Octobre",
+      title: "Johannesburg • Soweto • Pretoria",
+      highlight: "Immersion culturelle et découverte de la capitale",
+      description: "Arrivée à Johannesburg (10h15). Accueil par votre guide local francophone. Visite du mythique Township de Soweto (maison de Desmond Tutu). Déjeuner typique dans un shebeen. Continuation vers Pretoria pour un tour panoramique de la capitale administrative. Installation et dîner à l'hôtel.",
+      lat: -25.7533,
+      lng: 28.2045,
+      city: "Pretoria & Soweto",
+      weather: "24°C • Ciel bleu",
+      hotelName: "RH Hotel & Apartments Pretoria",
+      nextEvent: {
+        title: "Visite guidée de Soweto & Maison Tutu",
+        time: "11:30",
+        badge: "Accueil guide francophone",
+        qrCodeText: "VOUCHER-SOWETO-GUIDE-GIRARDOT"
+      },
+      timeline: [
+        { time: "10:15", title: "Atterrissage à Johannesburg", subtitle: "Accueil par votre guide local GO Tourism", type: "arrival", icon: "plane-arrival", lat: -26.1367, lng: 28.2411 },
+        { time: "11:30", title: "Township de Soweto & Maison de Desmond Tutu", subtitle: "Visite respectueuse de la communauté", type: "visit", icon: "monument", image: "Business Profile Girardot/resource_bgQ7b928Kd0bXBB0Vl7_-o.png", lat: -26.2485, lng: 27.9089 },
+        { time: "13:00", title: "Déjeuner traditionnel dans un Shebeen", subtitle: "Saveurs locales sud-africaines", type: "meal", icon: "utensils", lat: -26.2400, lng: 27.9100 },
+        { time: "15:30", title: "Tour panoramique de Pretoria", subtitle: "Capitale administrative et Union Buildings", type: "visit", icon: "landmark", lat: -25.7461, lng: 28.1881 },
+        { time: "18:00", title: "Installation à l'hôtel RH Pretoria", subtitle: "Dîner et nuit reposante", type: "hotel", icon: "bed", lat: -25.7533, lng: 28.2045 }
+      ]
+    },
+    {
+      day: 3,
+      dateStr: "Mercredi 14 Octobre",
+      title: "Pretoria • Région du Blyde",
+      highlight: "Culture Ndébélé & Ruée vers l'or",
+      description: "Départ pour la région de Sabie. Halte déjeuner à la ferme 'Corn and Cob' et rencontre avec le peuple Ndébélé réputé pour ses peintures murales géométriques. Visite du village historique de Pilgrim's Rest, préservé depuis l'époque des chercheurs d'or. Dîner logement.",
+      lat: -24.9067,
+      lng: 30.7562,
+      city: "Pilgrim's Rest & Sabie",
+      weather: "22°C • Ensoleillé",
+      hotelName: "Floreat Riverside Lodge",
+      nextEvent: {
+        title: "Rencontre village Ndébélé • Corn and Cob",
+        time: "12:00",
+        badge: "Déjeuner inclus à la ferme",
+        qrCodeText: "VOUCHER-NDEBELE-FERME-CORNCOB"
+      },
+      timeline: [
+        { time: "08:00", title: "Départ en autocar vers le Mpumalanga", subtitle: "Traversée des hauts plateaux", type: "transport", icon: "bus" },
+        { time: "12:00", title: "Ferme Corn and Cob & Culture Ndébélé", subtitle: "Architecture et artisanat traditionnel", type: "visit", icon: "palette", image: "Business Profile Girardot/resource_8mybD0A2B545LnL-QCoOAC.png", lat: -25.8500, lng: 29.2000 },
+        { time: "15:30", title: "Pilgrim's Rest, village musée de l'or", subtitle: "Bâtiments en bois du XIXe siècle préservés", type: "visit", icon: "landmark", lat: -24.9067, lng: 30.7562 },
+        { time: "18:30", title: "Arrivée Floreat Riverside Lodge (Sabie)", subtitle: "Installation en bord de rivière et dîner", type: "hotel", icon: "bed", lat: -25.0974, lng: 30.7788 }
+      ]
+    },
+    {
+      day: 4,
+      dateStr: "Jeudi 15 Octobre",
+      title: "Blyde River Canyon • Parc Kruger",
+      highlight: "Panoramas grandioses & Premières traces sauvages",
+      description: "Exploration des merveilles géologiques du Blyde River Canyon : God's Window, les marmites géantes de Bourke's Luck Potholes et les Trois Rondavelles. Déjeuner puis entrée dans la région du parc Kruger.",
+      lat: -24.5772,
+      lng: 30.8142,
+      city: "Blyde River & Kruger",
+      weather: "26°C • Soleil radieux",
+      hotelName: "Nkambeni Safari Camp",
+      nextEvent: {
+        title: "Panorama God's Window & Potholes",
+        time: "10:30",
+        badge: "Point de vue spectaculaire",
+        qrCodeText: "VOUCHER-BLYDE-CANYON-GIRARDOT"
+      },
+      timeline: [
+        { time: "09:00", title: "Découverte des Trois Rondavelles", subtitle: "Canyon spectaculaire au-dessus du lac", type: "visit", icon: "mountain", lat: -24.5772, lng: 30.8142 },
+        { time: "11:00", title: "Bourke's Luck Potholes & God's Window", subtitle: "Marmites des géants creusées par l'eau", type: "visit", icon: "camera", image: "Business Profile Girardot/resource_9sLT46qaTjA2qI2MEDG_vl.png", lat: -24.6725, lng: 30.8105 },
+        { time: "13:00", title: "Déjeuner panoramique", subtitle: "Cuisine locale du canyon", type: "meal", icon: "utensils" },
+        { time: "16:30", title: "Arrivée Nkambeni Safari Camp (Kruger)", subtitle: "Tentes safari tout confort & dîner", type: "hotel", icon: "campground", lat: -25.1501, lng: 31.1989 }
+      ]
+    },
+    {
+      day: 5,
+      dateStr: "Vendredi 16 Octobre",
+      title: "Parc Kruger • Journée Safari 4x4",
+      highlight: "Sur la piste des 'Big Five'",
+      description: "Départ matinal au lever du jour en 4x4 découvert dans le parc Kruger avec rangers expérimentés. Recherche des lions, léopards, éléphants, rhinocéros et buffles. Déjeuner en brousse en cours de safari. Soirée magique : dîner boma traditionnel autour du feu à ciel ouvert.",
+      lat: -24.9948,
+      lng: 31.5925,
+      city: "Parc Kruger",
+      weather: "28°C • Chaleur agréable",
+      hotelName: "Nkambeni Safari Camp",
+      nextEvent: {
+        title: "Grand Safari 4x4 'Big Five' au Kruger",
+        time: "06:00",
+        badge: "Départ aube avec rangers",
+        qrCodeText: "PERMIT-KRUGER-SAFARI-4X4-GIRARDOT"
+      },
+      timeline: [
+        { time: "05:45", title: "Embarquement en véhicules 4x4 ouverts", subtitle: "Départ à l'aube, jumelles conseillées", type: "safari", icon: "binoculars", image: "Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png", lat: -25.1501, lng: 31.1989 },
+        { time: "09:30", title: "Sur la trace des félins et éléphants", subtitle: "Safari guidé par un ranger pisteur", type: "safari", icon: "paw", lat: -24.9948, lng: 31.5925 },
+        { time: "13:00", title: "Déjeuner au cœur de la réserve", subtitle: "Halte ombragée en cours de safari", type: "meal", icon: "utensils" },
+        { time: "16:00", title: "Poursuite du safari vers le crépuscule", subtitle: "Observation des oiseaux et troupeaux", type: "safari", icon: "camera" },
+        { time: "19:30", title: "Dîner Boma sous la voûte étoilée", subtitle: "Barbecue traditionnel autour du feu de camp", type: "dinner", icon: "fire", lat: -25.1501, lng: 31.1989 }
+      ]
+    },
+    {
+      day: 6,
+      dateStr: "Samedi 17 Octobre",
+      title: "Parc Kruger • Royaume d'Eswatini",
+      highlight: "L'artisanat et la culture du peuple Swazi",
+      description: "Passage de la frontière vers le petit royaume d'Eswatini. Visite du village traditionnel de Matsamo, démonstrations de chants et danses. Déjeuner local et découverte d'un atelier réputé de souffleurs de verre.",
+      lat: -26.4388,
+      lng: 31.1802,
+      city: "Eswatini (Ezulwini)",
+      weather: "23°C • Doux",
+      hotelName: "Mantenga Lodge",
+      nextEvent: {
+        title: "Village culturel de Matsamo & danses Swazi",
+        time: "11:00",
+        badge: "Passage frontière Eswatini",
+        qrCodeText: "VOUCHER-MATSAMO-ESWATINI"
+      },
+      timeline: [
+        { time: "08:30", title: "Route vers la frontière d'Eswatini", subtitle: "Formalités douanières (passeport requis)", type: "transport", icon: "passport" },
+        { time: "11:00", title: "Village culturel Matsamo & Spectacle Swazi", subtitle: "Démonstration de danses indigènes", type: "visit", icon: "music", image: "Business Profile Girardot/resource_8G-rXt7oh4N90vCY_aEOIc.png", lat: -25.7500, lng: 31.3000 },
+        { time: "13:00", title: "Déjeuner typique swazi", subtitle: "Produits du terroir", type: "meal", icon: "utensils" },
+        { time: "15:30", title: "Atelier de verrerie de Ngwenya", subtitle: "Artisans verriers renommés", type: "visit", icon: "wine-glass", lat: -26.2167, lng: 31.0500 },
+        { time: "18:00", title: "Arrivée au Mantenga Lodge", subtitle: "Installation face à la vallée d'Ezulwini", type: "hotel", icon: "bed", lat: -26.4388, lng: 31.1802 }
+      ]
+    },
+    {
+      day: 7,
+      dateStr: "Dimanche 18 Octobre",
+      title: "Eswatini • Région de Hluhluwe (Zululand)",
+      highlight: "Artisanat d'exception & Terres zouloues",
+      description: "Visite de la célèbre fabrique de bougies artisanales faites main à Malkerns et du marché d'artisanat swazi. Route vers le Zululand. Installation au lodge et dîner accompagné d'un spectacle de danses tribales rythmées.",
+      lat: -27.9942,
+      lng: 32.2748,
+      city: "Hluhluwe & Zululand",
+      weather: "25°C • Ensoleillé",
+      hotelName: "Zulu Nyala Heritage Safari Lodge",
+      nextEvent: {
+        title: "Fabrique de bougies Swazi & Marché d'art",
+        time: "09:30",
+        badge: "Artisanat d'art exceptionnel",
+        qrCodeText: "VOUCHER-SWAZI-CANDLES-GIRARDOT"
+      },
+      timeline: [
+        { time: "09:30", title: "Fabrique de bougies de Malkerns", subtitle: "Objets sculptés à la main uniques au monde", type: "visit", icon: "wand-magic-sparkles", lat: -26.5400, lng: 31.2200 },
+        { time: "12:30", title: "Déjeuner puis route vers le Zululand", subtitle: "Retour en Afrique du Sud", type: "transport", icon: "bus" },
+        { time: "17:30", title: "Arrivée Zulu Nyala Heritage Lodge", subtitle: "Cocktail d'accueil en terre zouloue", type: "hotel", icon: "bed", lat: -27.9942, lng: 32.2748 },
+        { time: "19:30", title: "Dîner et grand spectacle de danses zouloues", subtitle: "Rythmes tribaux et chants traditionnels", type: "dinner", icon: "drum", lat: -27.9942, lng: 32.2748 }
+      ]
+    },
+    {
+      day: 8,
+      dateStr: "Lundi 19 Octobre",
+      title: "Safari Zulu Nyala • Ste-Lucie • Vol vers Le Cap",
+      highlight: "Croisière aux hippopotames & Arrivée dans la Cité Mère",
+      description: "Safari matinal à la rencontre des rhinocéros blancs dans la réserve de Zulu Nyala. Croisière sur l'estuaire de Sainte-Lucie pour observer crocodiles et hippopotames. Transfert à l'aéroport de Durban et vol intérieur vers Le Cap. Dîner et logement.",
+      lat: -28.3756,
+      lng: 32.4144,
+      city: "Sainte-Lucie & Le Cap",
+      weather: "21°C • Brise océanique",
+      hotelName: "ANEW Hotel Green Point",
+      nextEvent: {
+        title: "Vol Intérieur Durban (DUR) ➔ Le Cap (CPT)",
+        time: "17:45",
+        badge: "Vol inclus FA168",
+        qrCodeText: "BOARDING-PASS-FLYSAFAIR-FA168"
+      },
+      timeline: [
+        { time: "06:30", title: "Safari 4x4 Zulu Nyala", subtitle: "Recherche des rhinocéros blancs", type: "safari", icon: "shield-halved", lat: -27.9942, lng: 32.2748 },
+        { time: "10:30", title: "Croisière sur le lac de Sainte-Lucie", subtitle: "Observation des hippopotames et crocodiles", type: "visit", icon: "ship", image: "Business Profile Girardot/resource_8DFYXww-r4h3aZUatcjOtO.png", lat: -28.3756, lng: 32.4144 },
+        { time: "13:00", title: "Déjeuner de poissons au bord de l'estuaire", subtitle: "Détente avant départ", type: "meal", icon: "utensils" },
+        { time: "17:45", title: "Vol Intérieur Durban ➔ Le Cap", subtitle: "Compagnie FlySafair / CemAir • Vol FA168", type: "flight", icon: "plane", lat: -29.6144, lng: 31.1197 },
+        { time: "21:00", title: "Arrivée ANEW Hotel Green Point", subtitle: "Installation dans la Cité Mère (4 nuits)", type: "hotel", icon: "bed", lat: -33.9084, lng: 18.4068 }
+      ]
+    },
+    {
+      day: 9,
+      dateStr: "Mardi 20 Octobre",
+      title: "Le Cap • Robben Island • V&A Waterfront",
+      highlight: "Mémoire de Nelson Mandela & Ambiance portuaire",
+      description: "Traversée en bateau vers Robben Island, lieu émouvant de captivité de Nelson Mandela, classé à l'Unesco. Retour au Cap pour le déjeuner sur le vibrant Victoria & Alfred Waterfront. Temps de détente au bord des quais entre galeries et boutiques marines.",
+      lat: -33.8076,
+      lng: 18.3698,
+      city: "Le Cap (Waterfront)",
+      weather: "22°C • Ciel dégagé",
+      hotelName: "ANEW Hotel Green Point",
+      nextEvent: {
+        title: "Embarquement Ferry vers Robben Island",
+        time: "09:00",
+        badge: "Patrimoine Mondial UNESCO",
+        qrCodeText: "ROBBEN-ISLAND-TICKET-FERRY-UNESCO"
+      },
+      timeline: [
+        { time: "09:00", title: "Ferry vers Robben Island", subtitle: "Visite de la prison et cellule de Nelson Mandela", type: "visit", icon: "monument", image: "Business Profile Girardot/resource_8GQ36VNCK_YcrQFKCPJO1-.png", lat: -33.8076, lng: 18.3698 },
+        { time: "13:00", title: "Déjeuner sur le V&A Waterfront", subtitle: "Terrasse face au port historique", type: "meal", icon: "utensils", lat: -33.9056, lng: 18.4208 },
+        { time: "15:00", title: "Temps libre sur les quais & The Watershed", subtitle: "Galeries d'art et artisans créateurs", type: "free", icon: "bag-shopping", lat: -33.9056, lng: 18.4208 },
+        { time: "19:30", title: "Dîner au bord de l'eau sur le Waterfront", subtitle: "Vue sur la Table Mountain illuminée", type: "dinner", icon: "utensils" }
+      ]
+    },
+    {
+      day: 10,
+      dateStr: "Mercredi 21 Octobre",
+      title: "Péninsule du Cap • Cap de Bonne Espérance",
+      highlight: "Manchots de Boulders Beach & Bout du Monde",
+      description: "Excursion à Hout Bay et mini-croisière vers l'île aux phoques de Duiker Island. Route spectaculaire de Chapman's Peak. Visite de la colonie de manchots de Boulders Beach. Découverte de la réserve naturelle et pointe du Cap de Bonne Espérance avec temps libre.",
+      lat: -34.3572,
+      lng: 18.4984,
+      city: "Pointe du Cap",
+      weather: "20°C • Vent marin vivifiant",
+      hotelName: "ANEW Hotel Green Point",
+      nextEvent: {
+        title: "Manchots de Boulders Beach & Cape Point",
+        time: "11:30",
+        badge: "Incontournable mythique",
+        qrCodeText: "BOULDERS-BEACH-CAPE-POINT-PASS"
+      },
+      timeline: [
+        { time: "08:30", title: "Hout Bay & Mini-croisière vers Duiker Island", subtitle: "Observation des phoques à fourrure", type: "visit", icon: "ship", lat: -34.0536, lng: 18.3553 },
+        { time: "10:15", title: "Route panoramique de Chapman's Peak Drive", subtitle: "Corniche à flanc de falaise océanique", type: "scenic", icon: "road", lat: -34.0883, lng: 18.3611 },
+        { time: "11:30", title: "Plage des manchots de Boulders Beach", subtitle: "Colonie de manchots africains sur le sable", type: "visit", icon: "crow", image: "Business Profile Girardot/resource_81SHDV3ufg44rvmTPYt_h0.png", lat: -34.1973, lng: 18.4513 },
+        { time: "13:00", title: "Déjeuner de poissons à Simon's Town", subtitle: "Spécialités de la baie", type: "meal", icon: "utensils" },
+        { time: "15:00", title: "Réserve du Cap de Bonne Espérance & Cape Point", subtitle: "Temps libre à la rencontre des deux océans", type: "visit", icon: "compass", lat: -34.3572, lng: 18.4984 }
+      ]
+    },
+    {
+      day: 11,
+      dateStr: "Jeudi 22 Octobre",
+      title: "Route des Vins • Stellenbosch & Franschhoek",
+      highlight: "Dégustations raffinées & Histoire huguenote",
+      description: "Journée dans les vallées verdoyantes du vignoble sud-africain. Visite de Stellenbosch aux demeures Cape-Dutch. Dégustations de vins d'exception et déjeuner traditionnel Afrikaans. Arrêt à Franschhoek et mémorial des pionniers français. Retour au Cap.",
+      lat: -33.9321,
+      lng: 18.8602,
+      city: "Stellenbosch & Franschhoek",
+      weather: "25°C • Ciel bleu",
+      hotelName: "ANEW Hotel Green Point",
+      nextEvent: {
+        title: "Dégustation grands crus & Déjeuner Afrikaans",
+        time: "11:30",
+        badge: "Domaine viticole historique",
+        qrCodeText: "STELLENBOSCH-WINE-TASTING-GIRARDOT"
+      },
+      timeline: [
+        { time: "09:30", title: "Visite de Stellenbosch", subtitle: "Chênes centenaires et architecture Cape-Dutch", type: "visit", icon: "tree", lat: -33.9321, lng: 18.8602 },
+        { time: "11:30", title: "Première dégustation et déjeuner Afrikaans", subtitle: "Propriété viticole de prestige", type: "wine", icon: "wine-bottle", image: "Business Profile Girardot/resource_aDcf_Xjng8-dtlf3n_pO6E.png", lat: -33.8800, lng: 18.8500 },
+        { time: "14:30", title: "Deuxième dégustation au cœur des vignes", subtitle: "Cépages réputés (Pinotage, Chenin Blanc)", type: "wine", icon: "champagne-glasses" },
+        { time: "16:00", title: "Franschhoek, le 'Coin Français'", subtitle: "Mémorial et musée des pionniers huguenots", type: "visit", icon: "monument", lat: -33.9111, lng: 19.1247 },
+        { time: "18:30", title: "Retour à l'hôtel au Cap & Dîner", subtitle: "Soirée libre dans la Cité Mère", type: "hotel", icon: "bed" }
+      ]
+    },
+    {
+      day: 12,
+      dateStr: "Vendredi 23 Octobre",
+      title: "Le Cap • Quartier Bo-Kaap • Vol retour",
+      highlight: "Maisons colorées & Envol vers la France",
+      description: "Visite du pittoresque quartier malais du Bo-Kaap aux façades multicolores au pied de la Table Mountain. Déjeuner d'adieu puis transfert à l'aéroport du Cap pour votre vol de retour Emirates vers Lyon via Dubaï.",
+      lat: -33.9213,
+      lng: 18.4132,
+      city: "Le Cap ➔ Départ",
+      weather: "23°C • Ensoleillé",
+      hotelName: "Nuit à bord",
+      nextEvent: {
+        title: "Vol retour EK771 vers Lyon (via Dubaï)",
+        time: "18:25",
+        badge: "Décollage aéroport du Cap",
+        qrCodeText: "BOARDING-PASS-EMIRATES-EK771"
+      },
+      timeline: [
+        { time: "09:30", title: "Balade dans le quartier multicolore du Bo-Kaap", subtitle: "Façades pastel et culture malaise", type: "visit", icon: "camera-retro", image: "Business Profile Girardot/resource_8driM--xe0EdevNsY3I49c.png", lat: -33.9213, lng: 18.4132 },
+        { time: "12:30", title: "Déjeuner d'adieu convivial", subtitle: "Derniers instants de dégustation", type: "meal", icon: "utensils" },
+        { time: "15:00", title: "Transfert aéroport international du Cap (CPT)", subtitle: "Formalités douanières et détaxe", type: "transport", icon: "plane-departure", lat: -33.9715, lng: 18.6021 },
+        { time: "18:25", title: "Décollage Vol EK771 Emirates vers Dubaï", subtitle: "Dîner et nuit à bord", type: "transport", icon: "plane" }
+      ]
+    },
+    {
+      day: 13,
+      dateStr: "Samedi 24 Octobre",
+      title: "Lyon • Retour dans votre région",
+      highlight: "Arrivée et réacheminement",
+      description: "Atterrissage à Lyon Saint-Exupéry en début d'après-midi. Transfert retour vers votre localité. Fin de cette inoubliable aventure sud-africaine.",
+      lat: 45.7256,
+      lng: 5.0811,
+      city: "Lyon Saint-Exupéry",
+      weather: "15°C • Automne",
+      hotelName: "Fin du voyage",
+      nextEvent: {
+        title: "Arrivée finale à Lyon Saint-Exupéry",
+        time: "13:50",
+        badge: "Transfert car Girardot",
+        qrCodeText: "REACHEMINEMENT-GIRARDOT-BOURGOGNE"
+      },
+      timeline: [
+        { time: "08:55", title: "Décollage correspondance Dubaï (Vol EK81)", subtitle: "Direction la France", type: "transport", icon: "plane" },
+        { time: "13:50", title: "Atterrissage à Lyon Saint-Exupéry", subtitle: "Récupération des bagages", type: "arrival", icon: "plane-arrival", lat: 45.7256, lng: 5.0811 },
+        { time: "15:00", title: "Transfert retour vers votre localité", subtitle: "Autocar Grand Tourisme Girardot", type: "transport", icon: "bus" }
+      ]
+    }
+  ],
+  freeTimeSuggestions: [
+    {
+      id: "s1",
+      category: "Visite & Panorama",
+      name: "Ascension de la Table Mountain (Montagne de la Table)",
+      location: "Le Cap",
+      description: "Prenez le téléphérique rotatif ou partez en balade pour admirer un panorama à 360° sur toute la baie du Cap et l'océan Atlantique. Incontournable lors d'une fin d'après-midi ensoleillée !",
+      lat: -33.9573,
+      lng: 18.4031,
+      tips: "Vérifiez la météo avant de monter car la nappe de nuages (« la nappe ») peut recouvrir le sommet."
+    },
+    {
+      id: "s2",
+      category: "Visite & Nature",
+      name: "Jardin Botanique National de Kirstenbosch",
+      location: "Newlands, Le Cap",
+      description: "L'un des plus beaux jardins botaniques au monde au pied du flanc oriental de la Montagne de la Table. Ne manquez pas la passerelle aérienne 'Centenary Tree Canopy Walkway' (Boomslang).",
+      lat: -33.9877,
+      lng: 18.4326,
+      tips: "Idéal pour une promenade relaxante au milieu de la flore unique du Fynbos sud-africain."
+    },
+    {
+      id: "s3",
+      category: "Restaurant",
+      name: "The Pot Luck Club",
+      location: "The Old Biscuit Mill, Woodstock, Le Cap",
+      description: "Restaurant gastronomique avec vue panoramique sur les toits. Cuisine créative sous forme de petites assiettes à partager, orchestrée par le chef Luke Dale-Roberts.",
+      lat: -33.9275,
+      lng: 18.4571,
+      tips: "Réservation vivement recommandée plusieurs jours à l'avance."
+    },
+    {
+      id: "s4",
+      category: "Restaurant & Ambiance",
+      name: "Gold Restaurant",
+      location: "Green Point, Le Cap",
+      description: "Expérience culinaire africaine immersive en 14 plats avec dégustations de spécialités de tout le continent, spectacles de percussion djembe et chants traditionnels.",
+      lat: -33.9161,
+      lng: 18.4182,
+      tips: "Situé à seulement quelques minutes à pied de votre hôtel à Green Point !"
+    },
+    {
+      id: "s5",
+      category: "Balade & Shopping",
+      name: "Victoria & Alfred Waterfront - The Watershed",
+      location: "V&A Waterfront, Le Cap",
+      description: "Un immense marché couvert dédié aux créateurs sud-africains : céramiques, bijoux artisanaux, cuir, textiles et œuvres d'art contemporain de grande qualité.",
+      lat: -33.9056,
+      lng: 18.4208,
+      tips: "Parfait pour trouver des souvenirs authentiques tout en soutenant l'artisanat local."
+    },
+    {
+      id: "s6",
+      category: "Café & Détente",
+      name: "Truth Coffee Roasting",
+      location: "Buitenkant St, Le Cap",
+      description: "Élu meilleur café au monde à plusieurs reprises par The Telegraph. Décoration rétrofuturiste 'steampunk' spectaculaire et cafés d'exception torréfiés sur place.",
+      lat: -33.9282,
+      lng: 18.4237,
+      tips: "Commandez leur blend signature et un croissant chaud le matin."
+    }
+  ],
+  conciergerie: {
+    welcomeMessage: "Bonjour ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre aujourd'hui ?",
+    themes: [
+      {
+        id: "resto",
+        label: "Où bien manger ?",
+        icon: "utensils",
+        color: "#ea580c",
+        description: "Tables gourmandes, spécialités africaines et rooftops d'exception sélectionnés par nos guides.",
+        places: [
+          {
+            name: "Gold Restaurant",
+            category: "Dîner Spectacle Africain",
+            location: "Green Point, Le Cap",
+            tag: "À 5 min de votre hôtel",
+            phone: "+27 21 421 4656",
+            bookingUrl: "https://goldrestaurant.co.za/",
+            description: "Festin en 14 dégustations des meilleures recettes du continent africain avec percussions djembe et chants traditionnels en direct.",
+            tips: "Idéal pour une immersion festive. Réservez la veille.",
+            lat: -33.9161,
+            lng: 18.4182
+          },
+          {
+            name: "The Pot Luck Club",
+            category: "Gastronomie & Vue panoramique",
+            location: "Old Biscuit Mill, Woodstock, Le Cap",
+            tag: "Coup de cœur Chef",
+            phone: "+27 21 447 0804",
+            bookingUrl: "https://thepotluckclub.co.za/",
+            description: "Plats créatifs à partager au 6ème étage d'un ancien silo rénové avec vue à 360° sur le port et la Table Mountain.",
+            tips: "Demandez une table près des baies vitrées au coucher du soleil.",
+            lat: -33.9275,
+            lng: 18.4571
+          },
+          {
+            name: "Moyo Kirstenbosch",
+            category: "Cuisine Sud-Africaine au grand air",
+            location: "Jardins de Kirstenbosch, Le Cap",
+            tag: "Cadre verdoyant",
+            phone: "+27 21 762 9585",
+            bookingUrl: "https://www.moyo.co.za/",
+            description: "Restaurant chaleureux niché au cœur du jardin botanique. Grillades savoureuses et ambiance détendue après la balade.",
+            tips: "Parfait pour un déjeuner ou un goûter thé/café après avoir exploré la canopée.",
+            lat: -33.9877,
+            lng: 18.4326
+          },
+          {
+            name: "Harbour House V&A",
+            category: "Poissons & Fruits de mer frais",
+            location: "Quay 4, V&A Waterfront",
+            tag: "Vue portuaire",
+            phone: "+27 21 418 4744",
+            bookingUrl: "https://www.harbourhouse.co.za/",
+            description: "Les meilleurs arrivages de poissons de l'océan Atlantique servis les pieds dans l'eau avec un verre de Sauvignon blanc du Cap.",
+            tips: "Terrasse extérieure très agréable en fin d'après-midi.",
+            lat: -33.9038,
+            lng: 18.4221
+          }
+        ]
+      },
+      {
+        id: "visites",
+        label: "Que visiter en temps libre ?",
+        icon: "compass",
+        color: "#059669",
+        description: "Monuments, panoramas incontournables et trésors naturels hors des sentiers battus.",
+        places: [
+          {
+            name: "Téléphérique de Table Mountain",
+            category: "Panorama 360° Incontournable",
+            location: "Tafelberg Rd, Le Cap",
+            tag: "Merveille naturelle",
+            description: "Cabine rotative montant au sommet du plateau rocheux pour une vue époustouflante sur toute la péninsule.",
+            tips: "À faire dès que le ciel est dégagé sans nuages (« la nappe »). Billets coupe-file disponibles.",
+            lat: -33.9573,
+            lng: 18.4031
+          },
+          {
+            name: "Passerelle de Kirstenbosch (Boomslang)",
+            category: "Jardin Botanique Mondial",
+            location: "Newlands, Le Cap",
+            tag: "Balade suspendue",
+            description: "Pont serpentant au sommet des arbres au-dessus de la flore unique du Fynbos sud-africain.",
+            tips: "Comptez 1h30 pour une promenade très reposante.",
+            lat: -33.9877,
+            lng: 18.4326
+          },
+          {
+            name: "Zeitz MOCAA (Art Contemporain Africain)",
+            category: "Musée d'Art Moderne",
+            location: "Silo District, V&A Waterfront",
+            tag: "Architecture spectaculaire",
+            description: "Le plus grand musée d'art contemporain d'Afrique, sculpté à l'intérieur d'un immense silo à grains historique.",
+            tips: "L'atrium en forme d'épi de maïs est une merveille photographique.",
+            lat: -33.9082,
+            lng: 18.4223
+          },
+          {
+            name: "Phare de Green Point",
+            category: "Patrimoine Maritime",
+            location: "Mouille Point promenade",
+            tag: "À deux pas de l'hôtel",
+            description: "Le plus ancien phare opérationnel d'Afrique du Sud, reconnaissable à ses rayures rouges et blanches le long de l'océan.",
+            tips: "Idéal pour une marche vivifiante au coucher du soleil le long de la jetée.",
+            lat: -33.8999,
+            lng: 18.4022
+          }
+        ]
+      },
+      {
+        id: "shopping",
+        label: "Boutiques & Souvenirs locaux",
+        icon: "bag-shopping",
+        color: "#c29958",
+        description: "Artisanat d'art, marchés authentiques, épiceries fines et créateurs sud-africains.",
+        places: [
+          {
+            name: "The Watershed au Waterfront",
+            category: "Marché Artisanal Couvert",
+            location: "17 Dock Rd, V&A Waterfront",
+            tag: "150 créateurs locaux",
+            description: "Halle lumineuse regroupant le meilleur du design africain : céramiques, sculptures en bois, bijoux, sacs en cuir et textiles éthiques.",
+            tips: "Prix fixes affichés, qualité supérieure garantie et paiement par carte sans souci.",
+            lat: -33.9056,
+            lng: 18.4208
+          },
+          {
+            name: "Greenmarket Square",
+            category: "Marché aux Puces Historique",
+            location: "Burg St, Centre-ville du Cap",
+            tag: "Ambiance animée",
+            description: "Place pavée historique où trouver peintures sur toile, tissus wax, batiks et sculptures traditionnelles d'animaux.",
+            tips: "Le marchandage avec le sourire fait partie intégrante de l'expérience.",
+            lat: -33.9229,
+            lng: 18.4198
+          },
+          {
+            name: "Cape Town Diamond Museum",
+            category: "Bijoux & Joaillerie",
+            location: "Clock Tower, V&A Waterfront",
+            tag: "Histoire des gemmes",
+            description: "Espace retraçant la ruée vers le diamant sud-africain et boutique officielle de tanzanite et diamants certifiés.",
+            tips: "Pensez à demander votre formulaire de détaxe TVA (Tax Free) pour l'aéroport.",
+            lat: -33.9077,
+            lng: 18.4229
+          }
+        ]
+      },
+      {
+        id: "pratique",
+        label: "Bureaux de change, Banques & Santé",
+        icon: "landmark",
+        color: "#2563eb",
+        description: "Distributeurs fiables, bureaux de change certifiés, pharmacies et supermarchés de proximité.",
+        places: [
+          {
+            name: "Travelex Currency Exchange Waterfront",
+            category: "Bureau de Change Officiel",
+            location: "Victoria Wharf Mall (RDC), V&A Waterfront",
+            tag: "Taux officiels & Reçus",
+            description: "Change euros/rand rapide et sécurisé. Accepte les espèces et chèques de voyage.",
+            tips: "Passeport original obligatoire pour toute opération de change de devises.",
+            lat: -33.9045,
+            lng: 18.4215
+          },
+          {
+            name: "Distributeur FNB / Standard Bank Green Point",
+            category: "Retrait d'espèces (DAB)",
+            location: "Main Road (face à l'hôtel ANEW Green Point)",
+            tag: "Ouvert 24/7",
+            description: "DAB bancaire sécurisé situé dans un sas fermé. Accepte Visa, Mastercard et Maestro.",
+            tips: "Toujours refuser la conversion dynamique proposée par le DAB et choisir 'Débit en devise locale ZAR' pour un meilleur taux.",
+            lat: -33.9088,
+            lng: 18.4065
+          },
+          {
+            name: "Clicks Pharmacy & Parapharmacie Green Point",
+            category: "Pharmacie & Soins quotidiens",
+            location: "Somerset Road, Green Point",
+            tag: "À 400m de l'hôtel",
+            description: "Grande enseigne pharmaceutique : pansements, anti-moustiques locaux, crèmes solaires, médicaments de base et adaptateurs.",
+            tips: "Conseil en anglais disponible. Personnel accueillant.",
+            lat: -33.9125,
+            lng: 18.4121
+          },
+          {
+            name: "Supermarché Woolworths Food Green Point",
+            category: "Supermarché de qualité",
+            location: "Main Rd, Green Point",
+            tag: "Produits frais & Encas",
+            description: "L'équivalent d'une épicerie fine : fruits frais découpés, bouteilles d'eau minérale, biscuits sud-africains (Rusks) et chocolats.",
+            tips: "Parfait pour acheter des en-cas pour les journées d'excursion.",
+            lat: -33.9095,
+            lng: 18.4072
+          }
+        ]
+      },
+      {
+        id: "detente",
+        label: "Bars branchés, Cafés & Rooftops",
+        icon: "martini-glass",
+        color: "#9333ea",
+        description: "Prendre un verre face au coucher de soleil sur l'Atlantique ou savourer un café d'exception.",
+        places: [
+          {
+            name: "The Gilt Rooftop Bar (Hôtel ANEW)",
+            category: "Rooftop avec piscine",
+            location: "Toit de l'hôtel ANEW Green Point",
+            tag: "Sur place à l'hôtel",
+            description: "Bar sur le toit avec vue panoramique sur Signal Hill et le Cape Town Stadium. Cocktails signatures et vins locaux.",
+            tips: "Idéal pour décompresser après une longue journée sans avoir à reprendre un taxi.",
+            lat: -33.9084,
+            lng: 18.4068
+          },
+          {
+            name: "Truth Coffee Roasting",
+            category: "Meilleur Café Steampunk",
+            location: "36 Buitenkant St, Le Cap",
+            tag: "Référence mondiale",
+            description: "Élu parmi les cafés les plus spectaculaires au monde avec son décor d'usine victorienne et ses torréfactions maison.",
+            tips: "Prenez un Flat White ou un café filtre signature accompagné d'un scone.",
+            lat: -33.9282,
+            lng: 18.4237
+          },
+          {
+            name: "The Grand Africa Café & Beach",
+            category: "Beach Club les pieds dans le sable",
+            location: "Granger Bay, près du V&A Waterfront",
+            tag: "Coucher de soleil",
+            description: "Immense terrasse sur le sable face aux vagues de l'océan Atlantique. Ambiance bohème chic et vue imprenable sur Robben Island.",
+            tips: "Magnifique en début de soirée vers 18h30 pour trinquer au coucher du soleil.",
+            lat: -33.8995,
+            lng: 18.4190
+          }
+        ]
+      },
+      {
+        id: "transports",
+        enabled: true,
+        label: "Transports & Déplacements urbains",
+        icon: "taxi",
+        color: "#0891b2",
+        description: "Taxis officiels, VTC sécurisés, bus MyCiTi et conseils de mobilité urbaine dans la ville.",
+        places: [
+          {
+            name: "VTC Uber & Bolt (Recommandé)",
+            category: "VTC & Déplacement sécurisé",
+            location: "Partout au Cap et dans les grandes villes",
+            tag: "Option n°1 conseillée",
+            description: "Le moyen le plus sûr, fiable et économique pour circuler en ville, de jour comme de nuit. Prix et itinéraire fixés à l'avance dans l'application.",
+            tips: "Vérifiez toujours la plaque d'immatriculation et le nom du chauffeur avant de monter. Paiement directement via l'application.",
+            lat: -33.9084,
+            lng: 18.4068
+          },
+          {
+            name: "Bus MyCiTi (Réseau de Bus Urbain Moderne)",
+            category: "Bus à haut niveau de service",
+            location: "Station Green Point (à 200m de l'hôtel)",
+            tag: "Carte myconnect requise",
+            description: "Réseau de bus rapide et sécurisé reliant Green Point, Camps Bay, le centre-ville et l'aéroport du Cap.",
+            tips: "Achetez une carte rechargeable 'myconnect card' dans une station principale (les chauffeurs ne vendent pas de tickets à bord).",
+            lat: -33.9079,
+            lng: 18.4095
+          },
+          {
+            name: "Bus Panoramique Hop-On Hop-Off (City Sightseeing)",
+            category: "Bus Touristique à impériale",
+            location: "Arrêt officiel V&A Waterfront (Tour de l'Horloge)",
+            tag: "Idéal temps libre",
+            description: "Circuit complet commenté en français desservant Camps Bay, Kirstenbosch, Table Mountain et le front de mer.",
+            tips: "Montez et descendez librement à chaque arrêt à votre propre rythme toute la journée.",
+            lat: -33.9072,
+            lng: 18.4211
+          },
+          {
+            name: "Taxis officiels avec compteur",
+            category: "Taxis de ville agréés",
+            location: "Stations d'hôtels et V&A Waterfront",
+            tag: "Compteur obligatoire",
+            description: "Taxis traditionnels disponibles devant votre hôtel ANEW ou aux bornes officielles du Waterfront.",
+            tips: "Exigez toujours l'enclenchement du compteur ('meter') dès le départ pour éviter toute surtarification.",
+            lat: -33.9045,
+            lng: 18.4215
+          }
+        ]
+      }
+    ]
+  },
+  practicalInfo: {
+    money: "Monnaie : Rand sud-africain (ZAR). Environ 1 ZAR = 0,05 €. Les cartes de crédit (Visa, Mastercard) sont acceptées presque partout.",
+    electricity: "Courant 220V. Prises de type M (trois grosses broches rondes). Prévoir un adaptateur adéquat ou disponible en réception.",
+    clothing: "Tenue décontractée en journée, vêtements chauds/coupe-vent pour les safaris matinaux et les soirées. Couleurs neutres (kaki, beige) recommandées pour les safaris.",
+    tips: "Pourboires indicatifs : 2 €/jour/personne pour le guide, 1 €/jour/personne pour le chauffeur, 2 €/jour/personne pour les rangers lors des safaris.",
+    wifi: "Disponible gratuitement dans tous les hôtels à la réception et généralement dans les chambres."
+  }
+};
+
+window.defaultTravelData = initialCarnetAfriqueDuSud;
