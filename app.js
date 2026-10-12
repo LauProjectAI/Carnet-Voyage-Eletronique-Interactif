@@ -156,6 +156,7 @@ function refreshAppAfterTripChange() {
   renderConciergerie();
   renderHotelsAndFlights();
   renderContactsAndAlert();
+  updateMapFilterButtonsVisibility();
   if (leafletMap) {
     renderMapMarkers('all');
   }
@@ -1037,6 +1038,7 @@ function initMap() {
   if (!mapElement) return;
 
   if (leafletMap) {
+    updateMapFilterButtonsVisibility();
     setTimeout(() => {
       leafletMap.invalidateSize(true);
     }, 100);
@@ -1205,14 +1207,36 @@ function renderMapMarkers(filterCategory = 'all') {
   }
 }
 
+function hasDomesticFlights() {
+  if (!currentTrip) return false;
+  const legacyDomestic = (currentTrip.flights && currentTrip.flights.domesticFlights && currentTrip.flights.domesticFlights.length > 0);
+  const listDomestic = (currentTrip.flightsList && currentTrip.flightsList.some(f => f.type === 'Intérieur'));
+  return Boolean(legacyDomestic || listDomestic);
+}
+
+function updateMapFilterButtonsVisibility() {
+  const flightBtn = document.querySelector('.filter-btn[data-filter="flights"]');
+  if (!flightBtn) return;
+  const showFlightBtn = hasDomesticFlights();
+  flightBtn.style.display = showFlightBtn ? 'inline-flex' : 'none';
+
+  // Si le bouton était sélectionné mais n'existe plus, revenir à 'Tout'
+  if (!showFlightBtn && flightBtn.classList.contains('active')) {
+    flightBtn.classList.remove('active');
+    const allBtn = document.querySelector('.filter-btn[data-filter="all"]');
+    if (allBtn) allBtn.classList.add('active');
+  }
+}
+
 function setupMapFilterButtons() {
+  updateMapFilterButtonsVisibility();
   const filterBtns = document.querySelectorAll('.filter-btn');
   filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
+    btn.onclick = () => {
       filterBtns.forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderMapMarkers(btn.getAttribute('data-filter'));
-    });
+    };
   });
 }
 
