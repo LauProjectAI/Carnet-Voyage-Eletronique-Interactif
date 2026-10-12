@@ -1045,19 +1045,46 @@ function initMap() {
     return;
   }
 
-  // Trouver le centre initial selon les étapes ou hôtels du voyage
+  // Trouver le centre initial selon les étapes, visites ou hôtels du voyage
   let initialCenter = [46.2276, 2.2137]; // Défaut France
   let initialZoom = 5;
 
-  if (currentTrip && currentTrip.itinerary) {
-    const firstWithGps = currentTrip.itinerary.find(it => {
-      const lat = parseFloat(it.lat);
-      const lng = parseFloat(it.lng);
-      return !isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0);
-    });
-    if (firstWithGps) {
-      initialCenter = [parseFloat(firstWithGps.lat), parseFloat(firstWithGps.lng)];
-      initialZoom = 10;
+  if (currentTrip) {
+    // 1. Chercher dans l'itinéraire (étapes ou visites)
+    if (currentTrip.itinerary && Array.isArray(currentTrip.itinerary)) {
+      for (const it of currentTrip.itinerary) {
+        const lat = parseFloat(it.lat);
+        const lng = parseFloat(it.lng);
+        if (!isNaN(lat) && !isNaN(lng) && (lat !== 0 || lng !== 0)) {
+          initialCenter = [lat, lng];
+          initialZoom = 11;
+          break;
+        }
+        if (it.timeline && Array.isArray(it.timeline)) {
+          const v = it.timeline.find(t => {
+            const vlat = parseFloat(t.lat);
+            const vlng = parseFloat(t.lng);
+            return !isNaN(vlat) && !isNaN(vlng) && (vlat !== 0 || vlng !== 0);
+          });
+          if (v) {
+            initialCenter = [parseFloat(v.lat), parseFloat(v.lng)];
+            initialZoom = 12;
+            break;
+          }
+        }
+      }
+    }
+    // 2. Si pas encore trouvé, chercher dans les hôtels
+    if (initialZoom === 5 && currentTrip.hotels && Array.isArray(currentTrip.hotels)) {
+      const hWithGps = currentTrip.hotels.find(h => {
+        const hlat = parseFloat(h.lat);
+        const hlng = parseFloat(h.lng);
+        return !isNaN(hlat) && !isNaN(hlng) && (hlat !== 0 || hlng !== 0);
+      });
+      if (hWithGps) {
+        initialCenter = [parseFloat(hWithGps.lat), parseFloat(hWithGps.lng)];
+        initialZoom = 12;
+      }
     }
   }
 
@@ -1080,9 +1107,11 @@ function initMap() {
   setTimeout(() => {
     leafletMap.invalidateSize(true);
     if (mapMarkers.length > 0) {
-      renderMapMarkers('all');
+      const activeBtn = document.querySelector('.map-filters .filter-btn.active');
+      const cat = activeBtn ? activeBtn.getAttribute('data-filter') : 'all';
+      renderMapMarkers(cat);
     }
-  }, 300);
+  }, 250);
 }
 
 function renderMapMarkers(filterCategory = 'all') {
@@ -1267,12 +1296,28 @@ function renderMapMarkers(filterCategory = 'all') {
   if (bounds.length > 0) {
     try {
       if (bounds.length === 1) {
-        leafletMap.setView(bounds[0], 12);
+        leafletMap.setView(bounds[0], 13);
       } else {
         leafletMap.fitBounds(bounds, { padding: [40, 40], maxZoom: 14 });
       }
     } catch(e) {
       console.warn('fitBounds error:', e);
+    }
+  } else {
+    // Si aucun point dans ce filtre, recentrer sur le voyage (hôtel ou étape) pour éviter la carte du monde
+    if (currentTrip) {
+      let fallbackPoint = null;
+      if (currentTrip.hotels && currentTrip.hotels.length) {
+        const h = currentTrip.hotels.find(x => parseFloat(x.lat) && parseFloat(x.lng));
+        if (h) fallbackPoint = [parseFloat(h.lat), parseFloat(h.lng)];
+      }
+      if (!fallbackPoint && currentTrip.itinerary && currentTrip.itinerary.length) {
+        const it = currentTrip.itinerary.find(x => parseFloat(x.lat) && parseFloat(x.lng));
+        if (it) fallbackPoint = [parseFloat(it.lat), parseFloat(it.lng)];
+      }
+      if (fallbackPoint) {
+        leafletMap.setView(fallbackPoint, 11);
+      }
     }
   }
 }
@@ -1335,7 +1380,9 @@ function switchMainTab(targetId) {
   if (targetId === 'tab-carte') {
     initMap();
     if (leafletMap) {
-      renderMapMarkers('all');
+      const activeFilterBtn = document.querySelector('.map-filters .filter-btn.active');
+      const currentFilter = activeFilterBtn ? activeFilterBtn.getAttribute('data-filter') : 'all';
+      renderMapMarkers(currentFilter);
       setTimeout(() => {
         leafletMap.invalidateSize(true);
       }, 150);

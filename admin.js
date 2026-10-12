@@ -539,11 +539,11 @@ function renderAdminDays() {
       <div class="form-row" style="margin-bottom:14px;">
         <div class="form-group">
           <label>Latitude étape :</label>
-          <input type="number" step="any" id="day-lat-${dayIndex}" class="form-control" value="${item.lat || ''}" placeholder="Ex: 45.4929" onchange="updateDayField(${dayIndex}, 'lat', parseFloat(this.value))">
+          <input type="number" step="any" id="day-lat-${dayIndex}" class="form-control" value="${item.lat || ''}" placeholder="Ex: 41.8781" oninput="updateDayCoordinates(${dayIndex})" onchange="updateDayCoordinates(${dayIndex})">
         </div>
         <div class="form-group">
           <label>Longitude étape :</label>
-          <input type="number" step="any" id="day-lng-${dayIndex}" class="form-control" value="${item.lng || ''}" placeholder="Ex: 10.6083" onchange="updateDayField(${dayIndex}, 'lng', parseFloat(this.value))">
+          <input type="number" step="any" id="day-lng-${dayIndex}" class="form-control" value="${item.lng || ''}" placeholder="Ex: -87.6298" oninput="updateDayCoordinates(${dayIndex})" onchange="updateDayCoordinates(${dayIndex})">
         </div>
       </div>
 
@@ -742,6 +742,27 @@ function autoGeocodeDay(dayIndex) {
 
 function updateDayField(index, field, value) {
   tripData.itinerary[index][field] = value;
+}
+
+function updateDayCoordinates(dayIndex) {
+  const latInp = document.getElementById(`day-lat-${dayIndex}`);
+  const lngInp = document.getElementById(`day-lng-${dayIndex}`);
+  const statusEl = document.getElementById(`day-geocode-status-${dayIndex}`);
+
+  const lat = latInp && latInp.value !== '' ? parseFloat(latInp.value) : null;
+  const lng = lngInp && lngInp.value !== '' ? parseFloat(lngInp.value) : null;
+
+  tripData.itinerary[dayIndex].lat = (!isNaN(lat) && lat !== null) ? lat : 0;
+  tripData.itinerary[dayIndex].lng = (!isNaN(lng) && lng !== null) ? lng : 0;
+
+  if (statusEl) {
+    if (!isNaN(lat) && !isNaN(lng) && lat !== null && lng !== null && (lat !== 0 || lng !== 0)) {
+      statusEl.innerHTML = `<i class="fa-solid fa-check"></i> Fixé (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+      statusEl.style.color = '#059669';
+    } else {
+      statusEl.innerHTML = '<span style="color:#b45309;"><i class="fa-solid fa-triangle-exclamation"></i> Non géolocalisé</span>';
+    }
+  }
 }
 
 function addNewDay() {
