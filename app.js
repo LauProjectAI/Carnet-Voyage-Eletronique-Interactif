@@ -698,43 +698,135 @@ function executeConciergeQuery(query) {
     return;
   }
 
-  // 2. Détection par type : POISSON / RESTAURANT / BARS / CHANGE
+function selectConciergeTheme(themeId) {
+  const c = currentTrip.conciergerie;
+  if (!c || !c.themes) return;
+
+  const theme = c.themes.find(t => t.id === themeId);
+  if (!theme) return;
+
+  const resultsBox = document.getElementById('concierge-results-container');
+  const titleEl = document.getElementById('concierge-results-title');
+  const listEl = document.getElementById('concierge-places-list');
+
+  // Highlight pill
+  document.querySelectorAll('.concierge-theme-pill').forEach(p => p.classList.remove('active'));
+
+  titleEl.innerHTML = `<i class="fa-solid fa-${theme.icon || 'star'}" style="color:${theme.color || 'var(--primary-color)'}; margin-right:8px;"></i> ${theme.label} (${(theme.places || []).length} adresses)`;
+
+  listEl.innerHTML = `
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; font-size:0.85rem; color:#475569; margin-bottom:14px;">
+      ${theme.description}
+    </div>
+  `;
+
+  if (!theme.places || theme.places.length === 0) {
+    listEl.innerHTML += `
+      <div style="background:white; border-radius:14px; padding:16px; text-align:center; color:#94a3b8; font-size:0.85rem; border:1px dashed #cbd5e1;">
+        Aucune adresse renseignée pour le moment dans cette thématique.
+      </div>
+    `;
+  } else {
+    theme.places.forEach(place => {
+      listEl.appendChild(createConciergePlaceCard(place));
+    });
+  }
+
+  resultsBox.style.display = 'block';
+  resultsBox.scrollIntoView({ behavior: 'smooth' });
+}
+
+  // 2. Détection par type de cuisine et catégorie : BURGER / VÉGÉTARIEN / ASIATIQUE / GASTRONOMIQUE / POISSON etc.
   let filteredPlaces = [];
   let filterContext = "";
 
   activeThemes.forEach(theme => {
     theme.places.forEach(place => {
-      const pText = (place.name + " " + place.category + " " + place.description + " " + place.tips).toLowerCase();
+      const pText = (place.name + " " + place.category + " " + (place.tag || "") + " " + place.description + " " + (place.tips || "")).toLowerCase();
       let matchScore = 0;
 
+      // Filtre Burger / Fast-food gourmet
+      if (q.includes('burger') || q.includes('cheeseburger') || q.includes('frite')) {
+        if (pText.includes('burger') || pText.includes('cheeseburger') || pText.includes('cheval')) matchScore += 20;
+        filterContext = "burgers gourmets";
+      }
+
+      // Filtre Végétarien / Végane / Végétal / Bio
+      if (q.includes('végé') || q.includes('vege') || q.includes('vegan') || q.includes('végan') || q.includes('salade') || q.includes('bio') || q.includes('plante')) {
+        if (pText.includes('végé') || pText.includes('vege') || pText.includes('vegan') || pText.includes('sans viande') || pText.includes('végétal')) matchScore += 20;
+        filterContext = "végétarien & végane";
+      }
+
+      // Filtre Asiatique / Japonais / Chinois / Wok / Dim Sum / Sushi / Ramen
+      if (q.includes('asiatique') || q.includes('asie') || q.includes('chinois') || q.includes('japonais') || q.includes('sushi') || q.includes('wok') || q.includes('dim sum') || q.includes('ramen') || q.includes('canard') || q.includes('nouille')) {
+        if (pText.includes('asiatique') || pText.includes('asie') || pText.includes('sushi') || pText.includes('wok') || pText.includes('dim sum') || pText.includes('duck') || pText.includes('chinois') || pText.includes('japonais')) matchScore += 20;
+        filterContext = "cuisine asiatique & dim sum";
+      }
+
+      // Filtre Gastronomique / Étoilé / Michelin / Raffiné / Haut de gamme
+      if (q.includes('gastro') || q.includes('gastronomique') || q.includes('étoilé') || q.includes('etoile') || q.includes('michelin') || q.includes('raffiné') || q.includes('chef') || q.includes('chic') || q.includes('haut de gamme')) {
+        if (pText.includes('gastronomique') || pText.includes('michelin') || pText.includes('étoil') || pText.includes('etoil') || pText.includes('alinea') || pText.includes('chef') || pText.includes('d\'exception')) matchScore += 20;
+        filterContext = "haute gastronomie & tables d'exception";
+      }
+
+      // Filtre Pizza / Pâtes / Italien
+      if (q.includes('pizza') || q.includes('deep dish') || q.includes('italien') || q.includes('pâte') || q.includes('pate')) {
+        if (pText.includes('pizza') || pText.includes('deep dish') || pText.includes('italien') || pText.includes('pâte')) matchScore += 20;
+        filterContext = "pizzas & spécialités italiennes";
+      }
+
+      // Filtre Viande / Steak / Steakhouse / Grillade / Bœuf
+      if (q.includes('viande') || q.includes('steak') || q.includes('bœuf') || q.includes('boeuf') || q.includes('grill') || q.includes('barbecue') || q.includes('bbq')) {
+        if (pText.includes('steak') || pText.includes('viande') || pText.includes('angus') || pText.includes('bœuf') || pText.includes('gibsons')) matchScore += 20;
+        filterContext = "steakhouses & viandes d'exception";
+      }
+
       // Filtre Poisson / Fruits de mer
-      if (q.includes('poisson') || q.includes('fish') || q.includes('mer')) {
-        if (pText.includes('poisson') || pText.includes('mer') || pText.includes('harbour')) matchScore += 10;
+      if (q.includes('poisson') || q.includes('fish') || q.includes('mer') || q.includes('crabe') || q.includes('homard') || q.includes('huître') || q.includes('huitre') || q.includes('seafood')) {
+        if (pText.includes('poisson') || pText.includes('mer') || pText.includes('harbour') || pText.includes('crabe') || pText.includes('crab') || pText.includes('huître') || pText.includes('huitre')) matchScore += 20;
         filterContext = "poissons & fruits de mer";
       }
 
-      // Filtre Restaurant / Manger / Dîner
-      if (q.includes('restaurant') || q.includes('manger') || q.includes('dîner') || q.includes('diner') || q.includes('repas') || q.includes('midi') || q.includes('soir')) {
+      // Filtre Restaurant / Manger / Dîner généraliste
+      if (q.includes('restaurant') || q.includes('manger') || q.includes('dîner') || q.includes('diner') || q.includes('repas') || q.includes('midi') || q.includes('soir') || q.includes('table')) {
         if (theme.id === 'resto') matchScore += 5;
       }
 
-      // Filtre Bars / Boire / Café
-      if (q.includes('bar') || q.includes('boire') || q.includes('café') || q.includes('cafe') || q.includes('verre') || q.includes('rooftop')) {
-        if (theme.id === 'detente') matchScore += 5;
-        filterContext = "bars & cafés";
+      // Filtre Bars / Boire / Café / Rooftop
+      if (q.includes('bar') || q.includes('boire') || q.includes('café') || q.includes('cafe') || q.includes('verre') || q.includes('rooftop') || q.includes('cocktail') || q.includes('jazz')) {
+        if (theme.id === 'detente' || pText.includes('rooftop') || pText.includes('bar') || pText.includes('cocktail')) matchScore += 15;
+        filterContext = "bars, cafés & rooftops";
       }
 
-      // Filtre Change / Banque / Argent
-      if (q.includes('change') || q.includes('argent') || q.includes('banque') || q.includes('dab') || q.includes('distributeur') || q.includes('devises') || q.includes('rand')) {
-        if (theme.id === 'pratique') matchScore += 5;
+      // Filtre Change / Banque / Argent / DAB
+      if (q.includes('change') || q.includes('argent') || q.includes('banque') || q.includes('dab') || q.includes('distributeur') || q.includes('devises') || q.includes('dollar') || q.includes('rand') || q.includes('euro')) {
+        if (theme.id === 'pratique' || pText.includes('dab') || pText.includes('banque') || pText.includes('change')) matchScore += 15;
         filterContext = "change & distributeurs";
       }
 
-      // Filtre Visites / Balade
-      if (q.includes('visite') || q.includes('voir') || q.includes('musée') || q.includes('musee') || q.includes('balade') || q.includes('monument')) {
-        if (theme.id === 'visites') matchScore += 5;
-        filterContext = "visites";
+      // Filtre Pharmacie / Santé
+      if (q.includes('pharmacie') || q.includes('santé') || q.includes('sante') || q.includes('médicament') || q.includes('pansement')) {
+        if (pText.includes('pharmacie') || pText.includes('santé')) matchScore += 20;
+        filterContext = "pharmacies & santé";
       }
+
+      // Filtre Visites / Balade / Monuments
+      if (q.includes('visite') || q.includes('voir') || q.includes('musée') || q.includes('musee') || q.includes('balade') || q.includes('monument') || q.includes('panorama') || q.includes('tour')) {
+        if (theme.id === 'visites' || pText.includes('musée') || pText.includes('monument') || pText.includes('croisière') || pText.includes('croisiere')) matchScore += 15;
+        filterContext = "visites & panoramas";
+      }
+
+      // Filtre Shopping / Magasins / Boutiques
+      if (q.includes('shopping') || q.includes('magasin') || q.includes('boutique') || q.includes('souvenir') || q.includes('achat')) {
+        if (theme.id === 'shopping' || pText.includes('shopping') || pText.includes('boutique')) matchScore += 15;
+        filterContext = "boutiques & shopping";
+      }
+
+      // Match textuel direct si un mot de la requête est présent dans le nom ou la catégorie
+      const qWords = q.split(/\s+/).filter(w => w.length > 3);
+      qWords.forEach(w => {
+        if (pText.includes(w)) matchScore += 3;
+      });
 
       if (matchScore > 0) {
         filteredPlaces.push({ place: place, score: matchScore, theme: theme });

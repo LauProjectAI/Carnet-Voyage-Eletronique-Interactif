@@ -1190,13 +1190,25 @@ async function triggerAiConciergeGeneration() {
             lng: -87.6343
           },
           {
+            name: "Au Cheval",
+            category: "Burger Gourmet & Brasserie",
+            location: "800 W Randolph St, Chicago",
+            tag: "Meilleur burger des USA",
+            phone: "+1 312-929-4580",
+            bookingUrl: "http://auchevaldiner.com",
+            description: "Classé régulièrement meilleur cheeseburger d'Amérique (double patty croustillant, cheddar fondu, œuf au plat et bacon épais). Ambiance diner rétro branchée.",
+            tips: "Ne prend pas de réservations. Venez dès l'ouverture à 11h ou en milieu d'après-midi pour limiter l'attente.",
+            lat: 41.8841,
+            lng: -87.6479
+          },
+          {
             name: "The Purple Pig",
-            category: "Petites assiettes & Vins de terroir",
+            category: "Petites assiettes & Méditerranéen",
             location: "444 N Michigan Ave, Chicago",
             tag: "Sur la Magnificent Mile",
             phone: "+1 312-464-1744",
             bookingUrl: "https://thepurplepigchicago.com",
-            description: "Institution primée au Michelin Bib Gourmand, célèbre pour ses spécialités méditerranéennes à partager et sa terrasse animée.",
+            description: "Institution primée au Michelin Bib Gourmand, célèbre pour ses spécialités méditerranéennes à partager, charcuteries artisanales et terrasse animée.",
             tips: "Idéal pour un déjeuner raffiné pendant votre shopping sur Michigan Avenue.",
             lat: 41.8906,
             lng: -87.6243
@@ -1208,10 +1220,58 @@ async function triggerAiConciergeGeneration() {
             tag: "Classique légendaire",
             phone: "+1 312-266-8999",
             bookingUrl: "https://www.gibsonssteakhouse.com",
-            description: "Le steakhouse le plus emblématique de Chicago : bœuf certifié Gibsons Prime Angus, portions généreuses et ambiance rétro.",
+            description: "Le steakhouse le plus emblématique de Chicago : bœuf certifié Gibsons Prime Angus, portions généreuses, cocktails martini et ambiance vintage.",
             tips: "Pensez à réserver plusieurs jours à l'avance pour le service du soir.",
             lat: 41.9016,
             lng: -87.6277
+          },
+          {
+            name: "Alinea",
+            category: "Haute Gastronomie (3 Étoiles Michelin)",
+            location: "1723 N Halsted St, Chicago",
+            tag: "3 étoiles Michelin mondial",
+            phone: "+1 312-867-0110",
+            bookingUrl: "https://www.alinearestaurant.com",
+            description: "Temple de la cuisine moderniste et moléculaire du Chef Grant Achatz. Une expérience multisensorielle inoubliable élue parmi les meilleures tables du monde.",
+            tips: "Réservation indispensable plusieurs mois à l'avance via leur billetterie en ligne.",
+            lat: 41.9134,
+            lng: -87.6481
+          },
+          {
+            name: "The Chicago Diner (Meat Free Since '83)",
+            category: "Végétarien & Végane Gourmand",
+            location: "3411 N Halsted St, Chicago",
+            tag: "100% Végétarien & Végane",
+            phone: "+1 773-935-6696",
+            bookingUrl: "https://www.veggiediner.com",
+            description: "Pionnier de la cuisine végétale à Chicago : version végane bluffante du sandwich Reuben, poutines végétales, burgers bios et milkshakes sans lactose récompensés.",
+            tips: "Ne manquez pas leur célèbre milkshake au beurre de cacahuète végétal !",
+            lat: 41.9442,
+            lng: -87.6491
+          },
+          {
+            name: "Duck Duck Goat (Chef Stephanie Izard)",
+            category: "Cuisine Asiatique & Dim Sum créatifs",
+            location: "857 W Fulton Market, Chicago",
+            tag: "Saveurs asiatiques & Wok",
+            phone: "+1 312-902-3825",
+            bookingUrl: "https://www.duckduckgoatchicago.com",
+            description: "Table asiatique vibrante au cœur du quartier branché de Fulton Market : nouilles fraîches tirées à la main, dumplings vapeur et canard laqué pékinois d'exception.",
+            tips: "Commandez plusieurs dim sum à partager au centre de la table.",
+            lat: 41.8867,
+            lng: -87.6496
+          },
+          {
+            name: "Shaw's Crab House",
+            category: "Poissons, Huîtres & Fruits de mer frais",
+            location: "21 E Hubbard St, Chicago",
+            tag: "Fruits de mer & Oyster Bar",
+            phone: "+1 312-527-2722",
+            bookingUrl: "https://www.shawscrabhouse.com",
+            description: "Bar à huîtres et restaurant de poissons haut de gamme style rétro : crabes royaux de l'Alaska, homards du Maine, sushis de maître et arrivages de l'Atlantique.",
+            tips: "L'Oyster Bar côté taverne propose d'excellentes formules happy hour en fin d'après-midi.",
+            lat: 41.8899,
+            lng: -87.6271
           }
         ];
       } else if (th.id === 'visites') {
@@ -1368,6 +1428,54 @@ async function triggerAiConciergeGeneration() {
             tips: "Excellente option pour changer des spécialités de montagne.",
             lat: 46.5010,
             lng: 11.3560
+          },
+          {
+            name: "Restaurant Zur Kaiserkron",
+            category: "Haute Gastronomie Italienne & Étoilé",
+            location: "Piazza della Mostra 1, Bolzano",
+            tag: "Gastronomique & Raffiné",
+            phone: "+39 0471 028000",
+            bookingUrl: "https://www.zurkaiserkron.com",
+            description: "Haute cuisine raffinée mêlant produits alpins et créations méditerranéennes dans un somptueux palais baroque avec cave à vin prestigieuse.",
+            tips: "Menu dégustation hautement recommandé pour un dîner d'exception.",
+            lat: 46.4991,
+            lng: 11.3551
+          },
+          {
+            name: "Lokal & Burger Bar 1838",
+            category: "Burger Gourmet & Viandes du Tyrol",
+            location: "Via Museo 24, Bolzano",
+            tag: "Burgers artisanaux",
+            phone: "+39 0471 974000",
+            bookingUrl: "",
+            description: "Burgers gourmets préparés avec de la viande de bœuf alpine locale, pains au levain briochés et frites maison croustillantes.",
+            tips: "Essayez le burger au fromage d'alpage affiné et speck croustillant.",
+            lat: 46.5002,
+            lng: 11.3510
+          },
+          {
+            name: "Green Garden & Veg Bistro",
+            category: "Végétarien & Végane Méditerranéen",
+            location: "Via Bottai 15, Bolzano",
+            tag: "100% Bio & Végétal",
+            phone: "+39 0471 982555",
+            bookingUrl: "",
+            description: "Cuisine végétale créative, bols de saison, risottos aux herbes des Dolomites et desserts sans gluten.",
+            tips: "Terrasse intime parfaite pour un déjeuner léger et sain.",
+            lat: 46.5008,
+            lng: 11.3548
+          },
+          {
+            name: "Koisan Asian Fusion & Sushi",
+            category: "Cuisine Asiatique, Wok & Sushis",
+            location: "Via Claudia Augusta 19, Bolzano",
+            tag: "Saveurs d'Asie & Sushis frais",
+            phone: "+39 0471 289111",
+            bookingUrl: "https://www.koisan.it",
+            description: "Cuisine fusion asiatique de haute volée : sushis et sashimis ultra-frais, plats sautés au wok et gyozas faits maison.",
+            tips: "Option à emporter ou sur place dans un cadre zen et soigné.",
+            lat: 46.4885,
+            lng: 11.3472
           }
         ];
       } else if (th.id === 'visites') {
@@ -1458,25 +1566,61 @@ async function triggerAiConciergeGeneration() {
       if (th.id === 'resto') {
         th.places = [
           {
-            name: `Restaurant Gastronomique & Terroir de ${detectedCity}`,
-            category: "Cuisine locale & Spécialités",
-            location: `Centre-ville, ${detectedCity}`,
-            tag: "Coup de cœur Chef",
+            name: `Restaurant Gastronomique Étoilé de ${detectedCity}`,
+            category: "Haute Gastronomie & Produits d'exception",
+            location: `Centre historique, ${detectedCity}`,
+            tag: "Table d'exception",
             phone: "+33 00 00 00 00",
             bookingUrl: "",
-            description: `Table réputée servant les mets traditionnels et spécialités culinaires incontournables de ${detectedCity}.`,
-            tips: "Demandez conseil à votre guide Girardot pour réserver votre table.",
+            description: `Table renommée primée par les guides gastronomiques, sublimant les trésors culinaires et accords mets-vins de ${detectedCity}.`,
+            tips: "Pensez à réserver à l'avance pour le service du soir.",
             lat: null,
             lng: null
           },
           {
-            name: `Brasserie & Terrasse Historique de ${detectedCity}`,
-            category: "Brasserie & Convivialité",
+            name: `Burger Gourmet & Viandes Rôties de ${detectedCity}`,
+            category: "Burger Gourmet & Grill",
+            location: `Quartier animé, ${detectedCity}`,
+            tag: "Burgers artisanaux",
+            phone: "",
+            bookingUrl: "",
+            description: `Burgers maison généreux, pains artisanaux briochés, sauces signatures et frites croustillantes préparés avec des viandes locales.`,
+            tips: "Option conviviale et rapide pour un déjeuner décontracté.",
+            lat: null,
+            lng: null
+          },
+          {
+            name: `Bistro Végétarien & Saveurs du Jardin de ${detectedCity}`,
+            category: "Végétarien, Végane & Produits Frais",
+            location: `Quartier commerçant, ${detectedCity}`,
+            tag: "100% Frais & Végétal",
+            phone: "",
+            bookingUrl: "",
+            description: `Cuisine végétale créative, plats colorés de saison, risottos gourmands et pâtisseries saines élaborés à partir de récoltes locales.`,
+            tips: "Idéal pour une pause gourmande légère et ressourçante.",
+            lat: null,
+            lng: null
+          },
+          {
+            name: `Table Asiatique, Dim Sum & Wok de ${detectedCity}`,
+            category: "Cuisine Asiatique & Saveurs d'Asie",
+            location: `Centre-ville, ${detectedCity}`,
+            tag: "Saveurs d'Asie & Wok",
+            phone: "",
+            bookingUrl: "",
+            description: `Spécialités asiatiques parfumées : nouilles sautées au wok, dim sum vapeur, woks croustillants et sushis frais.`,
+            tips: "Parfait pour partager plusieurs plats au centre de la table.",
+            lat: null,
+            lng: null
+          },
+          {
+            name: `Brasserie Traditionnelle & Terroir de ${detectedCity}`,
+            category: "Cuisine Locale & Spécialités Régionales",
             location: `Place principale, ${detectedCity}`,
             tag: "Ambiance chaleureuse",
             phone: "",
             bookingUrl: "",
-            description: `Établissement apprécié des locaux pour ses produits frais et son atmosphère typique.`,
+            description: `Établissement apprécié des locaux pour ses recettes de tradition, ses poissons ou viandes mijotées et son atmosphère typique.`,
             tips: "Terrasse très agréable à l'heure du déjeuner ou pour dîner.",
             lat: null,
             lng: null
