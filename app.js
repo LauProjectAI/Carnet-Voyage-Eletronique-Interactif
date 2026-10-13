@@ -689,6 +689,27 @@ function executeConciergeQuery(query) {
     `;
 
     // Ajouter les modules de transport disponibles
+    if (transportTheme.transitMapUrl) {
+      listEl.innerHTML += `
+        <div style="background:white; border-radius:14px; border:1px solid #bae6fd; padding:14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <strong style="color:#0369a1; font-size:0.92rem;"><i class="fa-solid fa-map-location-dot"></i> Carte interactive des transports en commun</strong>
+            <div style="font-size:0.8rem; color:#64748b;">Plan complet des lignes de métro, bus et trains de la ville</div>
+          </div>
+          <a href="${transportTheme.transitMapUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:6px 14px;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir le plan
+          </a>
+        </div>
+      `;
+    }
+    if (transportTheme.guideHtml) {
+      listEl.innerHTML += `
+        <div style="background:#f8fafc; border:1px solid #e2e8f0; border-left:4px solid #0284c7; border-radius:14px; padding:16px; margin-bottom:16px; font-size:0.86rem; color:#334155; line-height:1.55;">
+          ${transportTheme.guideHtml}
+        </div>
+      `;
+    }
+
     transportTheme.places.forEach(place => {
       listEl.appendChild(createConciergePlaceCard(place));
     });
@@ -697,44 +718,6 @@ function executeConciergeQuery(query) {
     resultsBox.scrollIntoView({ behavior: 'smooth' });
     return;
   }
-
-function selectConciergeTheme(themeId) {
-  const c = currentTrip.conciergerie;
-  if (!c || !c.themes) return;
-
-  const theme = c.themes.find(t => t.id === themeId);
-  if (!theme) return;
-
-  const resultsBox = document.getElementById('concierge-results-container');
-  const titleEl = document.getElementById('concierge-results-title');
-  const listEl = document.getElementById('concierge-places-list');
-
-  // Highlight pill
-  document.querySelectorAll('.concierge-theme-pill').forEach(p => p.classList.remove('active'));
-
-  titleEl.innerHTML = `<i class="fa-solid fa-${theme.icon || 'star'}" style="color:${theme.color || 'var(--primary-color)'}; margin-right:8px;"></i> ${theme.label} (${(theme.places || []).length} adresses)`;
-
-  listEl.innerHTML = `
-    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; font-size:0.85rem; color:#475569; margin-bottom:14px;">
-      ${theme.description}
-    </div>
-  `;
-
-  if (!theme.places || theme.places.length === 0) {
-    listEl.innerHTML += `
-      <div style="background:white; border-radius:14px; padding:16px; text-align:center; color:#94a3b8; font-size:0.85rem; border:1px dashed #cbd5e1;">
-        Aucune adresse renseignée pour le moment dans cette thématique.
-      </div>
-    `;
-  } else {
-    theme.places.forEach(place => {
-      listEl.appendChild(createConciergePlaceCard(place));
-    });
-  }
-
-  resultsBox.style.display = 'block';
-  resultsBox.scrollIntoView({ behavior: 'smooth' });
-}
 
   // 2. Détection par type de cuisine et catégorie : BURGER / VÉGÉTARIEN / ASIATIQUE / GASTRONOMIQUE / POISSON etc.
   let filteredPlaces = [];
@@ -861,6 +844,71 @@ function selectConciergeTheme(themeId) {
         • <strong>Pratique :</strong> Demandez « où faire du change » ou « une pharmacie ».</p>
       </div>
     `;
+  }
+
+  resultsBox.style.display = 'block';
+  resultsBox.scrollIntoView({ behavior: 'smooth' });
+}
+
+function selectConciergeTheme(themeId) {
+  const c = currentTrip.conciergerie;
+  if (!c || !c.themes) return;
+
+  const theme = c.themes.find(t => t.id === themeId);
+  if (!theme) return;
+
+  const resultsBox = document.getElementById('concierge-results-container');
+  const titleEl = document.getElementById('concierge-results-title');
+  const listEl = document.getElementById('concierge-places-list');
+
+  // Highlight pill
+  document.querySelectorAll('.concierge-theme-pill').forEach(p => p.classList.remove('active'));
+
+  titleEl.innerHTML = `<i class="fa-solid fa-${theme.icon || 'star'}" style="color:${theme.color || 'var(--primary-color)'}; margin-right:8px;"></i> ${theme.label} (${(theme.places || []).length} adresses)`;
+
+  listEl.innerHTML = `
+    <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px 14px; font-size:0.85rem; color:#475569; margin-bottom:14px;">
+      ${theme.description}
+    </div>
+  `;
+
+  // 1. Bouton vers la Carte Officielle des Transports si disponible
+  if (theme.transitMapUrl) {
+    listEl.innerHTML += `
+      <div style="background:white; border-radius:14px; border:1px solid #bae6fd; padding:14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+        <div>
+          <strong style="color:#0369a1; font-size:0.95rem;"><i class="fa-solid fa-map-location-dot"></i> Carte & Plan officiel des Transports</strong>
+          <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">Plan interactif complet du réseau (métro, bus, trams)</div>
+        </div>
+        <a href="${theme.transitMapUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:6px 14px;">
+          <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir le plan
+        </a>
+      </div>
+    `;
+  }
+
+  // 2. Paragraphe explicatif / Guide d'utilisation des transports en commun
+  if (theme.guideHtml) {
+    listEl.innerHTML += `
+      <div style="background:#f0f9ff; border:1px solid #bae6fd; border-left:4px solid #0284c7; border-radius:14px; padding:16px; margin-bottom:16px; font-size:0.86rem; color:#1e293b; line-height:1.6;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:#0369a1; margin-bottom:8px;">
+          <i class="fa-solid fa-circle-question"></i> Guide pratique des transports en commun
+        </h4>
+        ${theme.guideHtml}
+      </div>
+    `;
+  }
+
+  if (!theme.places || theme.places.length === 0) {
+    listEl.innerHTML += `
+      <div style="background:white; border-radius:14px; padding:16px; text-align:center; color:#94a3b8; font-size:0.85rem; border:1px dashed #cbd5e1;">
+        Aucune adresse ou société répertoriée pour le moment dans cette thématique.
+      </div>
+    `;
+  } else {
+    theme.places.forEach(place => {
+      listEl.appendChild(createConciergePlaceCard(place));
+    });
   }
 
   resultsBox.style.display = 'block';

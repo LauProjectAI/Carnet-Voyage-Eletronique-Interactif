@@ -965,6 +965,22 @@ function renderAdminConcierge() {
         <summary style="font-weight:700; font-size:0.85rem; color:var(--primary-dark); cursor:pointer; padding:4px 0;">
           <i class="fa-solid fa-layer-group" style="color:var(--accent-gold); margin-right:6px;"></i> Voir et personnaliser les sites (${th.places.length})
         </summary>
+
+        ${th.id === 'transports' ? `
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:8px; padding:12px; margin:10px 0;">
+            <h5 style="margin:0 0 6px 0; font-size:0.85rem; color:#1e40af; font-weight:800;">
+              <i class="fa-solid fa-map-location-dot"></i> Carte officielle & Guide d'utilisation des transports
+            </h5>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Lien vers le plan / carte interactive des transports :</label>
+              <input type="text" class="form-control" style="font-size:0.82rem;" placeholder="https://..." value="${th.transitMapUrl || ''}" onchange="updateThemeField(${thIdx}, 'transitMapUrl', this.value)">
+            </div>
+            <div>
+              <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Guide d'utilisation (achat billets, métro, bus, pass) :</label>
+              <textarea class="form-control" rows="3" style="font-size:0.82rem;" placeholder="Expliquez comment acheter un ticket, quel pass privilégier, le fonctionnement du métro/bus..." onchange="updateThemeField(${thIdx}, 'guideHtml', this.value)">${th.guideHtml || ''}</textarea>
+            </div>
+          </div>
+        ` : ''}
         
         <div style="margin-top:12px;" id="theme-places-list-${thIdx}">
           ${renderThemePlacesHtml(thIdx, th.places)}
@@ -973,6 +989,10 @@ function renderAdminConcierge() {
     `;
     container.appendChild(box);
   });
+}
+
+function updateThemeField(thIdx, field, value) {
+  tripData.conciergerie.themes[thIdx][field] = value;
 }
 
 function renderThemePlacesHtml(thIdx, places) {
@@ -1163,8 +1183,24 @@ async function triggerAiConciergeGeneration() {
       { id: "visites", label: "Que visiter en temps libre ?", icon: "compass", color: "#059669", description: "Monuments incontournables et panoramas hors des sentiers battus.", enabled: true, places: [] },
       { id: "shopping", label: "Boutiques & Souvenirs locaux", icon: "bag-shopping", color: "#c29958", description: "Artisanat, créateurs locaux et marchés typiques.", enabled: true, places: [] },
       { id: "pratique", label: "Bureaux de change, Banques & Santé", icon: "landmark", color: "#2563eb", description: "DAB bancaires sécurisés, pharmacies et commerces utiles.", enabled: true, places: [] },
-      { id: "detente", label: "Bars branchés, Cafés & Rooftops", icon: "martini-glass", color: "#9333ea", description: "Prendre un verre avec vue ou savourer un café d'exception.", enabled: true, places: [] }
+      { id: "detente", label: "Bars branchés, Cafés & Rooftops", icon: "martini-glass", color: "#9333ea", description: "Prendre un verre avec vue ou savourer un café d'exception.", enabled: true, places: [] },
+      { id: "transports", label: "Transports en commun, Taxis & VTC", icon: "train-subway", color: "#0284c7", description: "Plans du réseau, pass illimités, métros 'L', bus, taxis et VTC.", enabled: true, transitMapUrl: "", guideHtml: "", places: [] }
     ];
+  } else {
+    // Si la thématique transports manque dans un voyage existant, l'ajouter
+    if (!tripData.conciergerie.themes.some(t => t.id === 'transports')) {
+      tripData.conciergerie.themes.push({
+        id: "transports",
+        label: "Transports en commun, Taxis & VTC",
+        icon: "train-subway",
+        color: "#0284c7",
+        description: "Plans du réseau, pass illimités, métros 'L', bus, taxis et VTC.",
+        enabled: true,
+        transitMapUrl: "",
+        guideHtml: "",
+        places: []
+      });
+    }
   }
 
   const lowerCity = detectedCity.toLowerCase();
@@ -1175,6 +1211,82 @@ async function triggerAiConciergeGeneration() {
     
     tripData.conciergerie.themes.forEach(th => {
       th.enabled = true;
+      if (th.id === 'transports') {
+        th.transitMapUrl = "https://www.transitchicago.com/maps/";
+        th.guideHtml = `
+          <strong>🚇 Comment utiliser les transports à Chicago (Réseau CTA - Métro 'L' & Bus) :</strong><br>
+          • <strong>Le Métro 'L' (Elevated Train) :</strong> 8 lignes identifiées par des couleurs (Red, Blue, Brown, Green...). Toutes convergent vers le centre historique (The Loop). Les lignes Blue et Orange relient directement les aéroports O'Hare et Midway au centre-ville.<br>
+          • <strong>Acheter son titre & Payer sans contact :</strong> Vous pouvez payer <em>directement</em> aux portillons du métro et à bord des bus en posant votre <strong>carte bancaire sans contact</strong> (ou Apple Pay / Google Pay sur smartphone). Tarif : 2,50 $ par trajet en métro, 2,25 $ en bus.<br>
+          • <strong>Pass Illimités Ventra (Très économiques) :</strong><br>
+          &nbsp;&nbsp;- <strong>1-Day CTA Pass :</strong> 5,00 $ (trajets illimités bus + métro pendant 24h)<br>
+          &nbsp;&nbsp;- <strong>3-Day CTA Pass :</strong> 15,00 $ (idéal pour un séjour week-end/court circuit)<br>
+          &nbsp;&nbsp;- <strong>7-Day CTA Pass :</strong> 20,00 $ (le meilleur rapport qualité/prix de la ville)<br>
+          Ces pass s'achètent en 1 minute sur les bornes automatiques tactiles <em>Ventra</em> présentes dans chaque station de métro (CB acceptée) ou directement sur l'application mobile gratuite <em>Ventra App</em>.<br>
+          • <strong>En bus :</strong> Montez obligatoirement par la porte avant et validez votre pass ou carte sans contact sur le lecteur du chauffeur.
+        `;
+        th.places = [
+          {
+            name: "Carte officielle & Horaires en direct CTA",
+            category: "Réseau Métro & Bus de Chicago",
+            location: "Ensemble de la métropole de Chicago",
+            tag: "Plan officiel & Tarifs",
+            phone: "+1 888-968-7282",
+            bookingUrl: "https://www.transitchicago.com/maps/",
+            description: "Accédez au plan officiel complet interactif du métro aérien 'L' et des lignes de bus de Chicago avec calcul d'itinéraire en temps réel.",
+            tips: "Téléchargez l'application Ventra pour suivre l'arrivée des rames à la minute près.",
+            lat: 41.8818,
+            lng: -87.6298
+          },
+          {
+            name: "VTC Uber & Lyft (Chicago)",
+            category: "VTC avec chauffeur 24/7",
+            location: "Disponible partout immédiatement",
+            tag: "Rapide & Prix fixé",
+            phone: "",
+            bookingUrl: "https://www.uber.com/global/fr/cities/chicago/",
+            description: "Les deux géants du VTC américain sont omniprésents à Chicago. Temps d'attente moyen inférieur à 3 minutes dans tout le centre.",
+            tips: "Application indispensable pour rentrer le soir. Le tarif est débité automatiquement sans pourboire obligatoire en cash.",
+            lat: 41.8845,
+            lng: -87.6278
+          },
+          {
+            name: "CURB Chicago Taxis (Taxis officiels Jaunes & Verts)",
+            category: "Compagnie de Taxis Officiels Agréés",
+            location: "Gares, hôtels, aéroports et maraude en rue",
+            tag: "Taxis officiels de la ville",
+            phone: "+1 312-829-4222",
+            bookingUrl: "https://www.gocurb.com/cities/chicago",
+            description: "Plus de 3 000 taxis agréés par la ville de Chicago. Hélables d'un geste de la main dans la rue (voyant lumineux allumé sur le toit) ou réservables via l'application CURB.",
+            tips: "Tous les taxis acceptent obligatoirement la carte bancaire. Compteur officiel affiché sur l'écran du tableau de bord.",
+            lat: 41.8837,
+            lng: -87.6324
+          },
+          {
+            name: "Water Taxi Chicago (Bateaux-Bus sur la rivière)",
+            category: "Navette fluviale panoramique",
+            location: "Quais de Michigan Ave, Willis Tower et Chinatown",
+            tag: "Trajet ludique & panoramique",
+            phone: "+1 312-337-1446",
+            bookingUrl: "https://www.chicagowatertaxi.com",
+            description: "Navettes fluviales jaunes reliant les grands pôles de la ville sur la rivière Chicago. Moyen magique et sans embouteillage pour rejoindre Chinatown ou la Willis Tower.",
+            tips: "Billet simple à 6 $ ou pass journée à 10 $. Très agréable entre avril et novembre.",
+            lat: 41.8890,
+            lng: -87.6235
+          },
+          {
+            name: "Divvy Bikes (Vélos en libre-service & Électriques)",
+            category: "Vélos en libre-service (Bikeshare)",
+            location: "Plus de 600 stations dans toute la ville",
+            tag: "Pistes cyclables du lac",
+            phone: "+1 855-553-4889",
+            bookingUrl: "https://divvybikes.com",
+            description: "Le système de vélos partagés de la ville. Idéal pour parcourir les 30 kilomètres de pistes cyclables aménagées du 'Lakefront Trail' au bord du lac Michigan.",
+            tips: "Déverrouillage directement depuis l'application Lyft ou Divvy.",
+            lat: 41.8817,
+            lng: -87.6247
+          }
+        ];
+      }
       if (th.id === 'resto') {
         th.places = [
           {
@@ -1550,6 +1662,40 @@ async function triggerAiConciergeGeneration() {
             lng: 11.3540
           }
         ];
+      } else if (th.id === 'transports') {
+        th.transitMapUrl = "https://www.suedtirolmobil.info/fr/";
+        th.guideHtml = `
+          <strong>🚌 Transports en commun du Sud-Tyrol & Dolomites (Südtirol Mobil) :</strong><br>
+          • <strong>Réseau intégré :</strong> Bus urbains SASA, trains régionaux et téléphériques (Renon, San Genesio...).<br>
+          • <strong>Billetterie :</strong> Billet simple à 1,50 € (valable 60 min) disponible sur les bornes ou par carte sans contact. La carte <em>Mobilcard Südtirol</em> (1, 3 ou 7 jours) permet des voyages illimités sur l'ensemble du réseau public.<br>
+          • <strong>Taxis & VTC :</strong> Radio Taxi Bolzano disponible 24/7 au +39 0471 981111 (station principale face à la gare).
+        `;
+        th.places = [
+          {
+            name: "Südtirol Mobil (Carte & Lignes de Bus/Train)",
+            category: "Réseau Transports Publics du Tyrol",
+            location: "Gare centrale de Bolzano (Bozen)",
+            tag: "Réseau officiel",
+            phone: "+39 0471 220880",
+            bookingUrl: "https://www.suedtirolmobil.info/fr/",
+            description: "Carte interactive et calculateur d'itinéraires pour tous les bus, trains régionaux et téléphériques des vallées alpines.",
+            tips: "Application officielle 'südtirolmobil' recommandée pour les horaires de passage en temps réel.",
+            lat: 46.4969,
+            lng: 11.3575
+          },
+          {
+            name: "Radio Taxi Bolzano 24/7",
+            category: "Centrale de Taxis Officiels",
+            location: "Piazza Stazione, Bolzano",
+            tag: "Taxis officiels agréés",
+            phone: "+39 0471 981111",
+            bookingUrl: "https://www.radiotaxibolzano.it",
+            description: "Centrale officielle de taxis disponible 24h/24 pour les déplacements en ville et transferts vers les cols alpins.",
+            tips: "Paiement par carte bancaire accepté dans tous les véhicules.",
+            lat: 46.4970,
+            lng: 11.3580
+          }
+        ];
       }
     });
 
@@ -1706,6 +1852,40 @@ async function triggerAiConciergeGeneration() {
             bookingUrl: "",
             description: `Pause idéale pour savourer un café, un thé ou une boisson rafraîchissante dans un décor élégant.`,
             tips: "Idéal pour faire une pause détente entre deux visites libres.",
+            lat: null,
+            lng: null
+          }
+        ];
+      } else if (th.id === 'transports') {
+        th.transitMapUrl = `https://www.google.com/maps/search/transports+publics+${encodeURIComponent(detectedCity)}`;
+        th.guideHtml = `
+          <strong>🚌 Conseils transports en commun à ${detectedCity} :</strong><br>
+          • <strong>Réseau urbain :</strong> Privilégiez le réseau officiel de métros, trams ou bus pour vous déplacer rapidement dans l'agglomération.<br>
+          • <strong>Achat des billets & Pass :</strong> Des pass 24h ou carnets de tickets sont généralement vendus aux distributeurs automatiques des stations ou via l'application mobile locale de transport.<br>
+          • <strong>Taxis & VTC :</strong> Utilisez les stations de taxis officielles ou les applications de VTC (Uber, Bolt) pour vos retours nocturnes en toute sécurité.
+        `;
+        th.places = [
+          {
+            name: `Réseau de transports en commun de ${detectedCity}`,
+            category: "Transports publics urbains",
+            location: `Gare centrale, ${detectedCity}`,
+            tag: "Lignes & Horaires",
+            phone: "",
+            bookingUrl: `https://www.google.com/maps/search/transports+publics+${encodeURIComponent(detectedCity)}`,
+            description: `Réseau de bus, trams et métros desservant le centre-ville et les sites touristiques majeurs de ${detectedCity}.`,
+            tips: "Pensez à composter ou valider votre titre de transport dès la montée.",
+            lat: null,
+            lng: null
+          },
+          {
+            name: `Taxis Officiels & VTC (Uber / Bolt) de ${detectedCity}`,
+            category: "Taxis & VTC sécurisés",
+            location: `Stations d'hôtels et gares`,
+            tag: "Disponible 24/7",
+            phone: "",
+            bookingUrl: "",
+            description: `Services de taxis officiels agréés et applications de chauffeurs privés pour vos transferts rapides en ville.`,
+            tips: "Vérifiez que le chauffeur enclenche le compteur ou réservez votre trajet via l'application.",
             lat: null,
             lng: null
           }
