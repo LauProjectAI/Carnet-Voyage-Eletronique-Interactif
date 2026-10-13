@@ -43,6 +43,11 @@ function loadTripData() {
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(tripParam))));
       currentTrip = decoded;
+      // Sauvegarder dans le stockage du navigateur sous son ID sans toucher aux documents du client
+      if (decoded && decoded.id) {
+        localStorage.setItem(`girardot_trip_data_${decoded.id}`, JSON.stringify(decoded));
+        localStorage.setItem('girardot_active_trip_id', decoded.id);
+      }
       return;
     } catch (e) {
       console.warn('Impossible de charger le voyage depuis l URL:', e);
