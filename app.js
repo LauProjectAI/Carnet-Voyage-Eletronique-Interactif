@@ -352,6 +352,35 @@ function closeQrModal() {
   document.getElementById('qr-modal').classList.remove('open');
 }
 
+// Transit / Metro Map Modal Dialog
+function openTransitMapModal(imageUrl, title = "Plan du Réseau de Métro & Transports") {
+  const modal = document.getElementById('transit-map-modal');
+  if (!modal) return;
+  const modalTitle = document.getElementById('transit-map-modal-title');
+  const modalImg = document.getElementById('transit-map-modal-img');
+  const downloadBtn = document.getElementById('transit-map-modal-download-btn');
+
+  if (modalTitle) modalTitle.innerText = title;
+  if (modalImg) {
+    modalImg.src = imageUrl;
+    modalImg.style.maxWidth = '100%';
+  }
+  if (downloadBtn) {
+    downloadBtn.href = imageUrl;
+    downloadBtn.setAttribute('download', `Plan-Transports-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.png`);
+  }
+  modal.style.display = 'flex';
+  modal.classList.add('open');
+}
+
+function closeTransitMapModal() {
+  const modal = document.getElementById('transit-map-modal');
+  if (modal) {
+    modal.style.display = 'none';
+    modal.classList.remove('open');
+  }
+}
+
 // 3. RENDER FULL CIRCUIT TAB
 function renderFullCircuit() {
   const container = document.getElementById('full-days-container');
@@ -689,7 +718,41 @@ function executeConciergeQuery(query) {
     `;
 
     // Ajouter les modules de transport disponibles
-    if (transportTheme.transitMapUrl) {
+    // Ajouter les modules de transport disponibles (Carte du métro directement affichée & Téléchargement)
+    if (transportTheme.transitMapImageUrl) {
+      listEl.innerHTML += `
+        <div style="background:white; border-radius:16px; border:1px solid #bae6fd; padding:16px; margin-bottom:16px; box-shadow:0 4px 15px rgba(2,132,199,0.06);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+            <div>
+              <strong style="color:#0369a1; font-size:1rem;"><i class="fa-solid fa-train-subway"></i> Plan officiel du Réseau de Métro</strong>
+              <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">Consultez directement le plan ou téléchargez-le pour y accéder hors-connexion</div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="${transportTheme.transitMapImageUrl}" download="Plan-Metro-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.png" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.82rem; padding:7px 14px; text-decoration:none;">
+                <i class="fa-solid fa-download"></i> Télécharger le plan
+              </a>
+              <button type="button" onclick="openTransitMapModal('${transportTheme.transitMapImageUrl}', 'Plan du réseau de métro')" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
+                <i class="fa-solid fa-expand"></i> Agrandir / Plein écran
+              </button>
+            </div>
+          </div>
+
+          <div onclick="openTransitMapModal('${transportTheme.transitMapImageUrl}', 'Plan du réseau de métro')" style="position:relative; width:100%; max-height:280px; overflow:hidden; border-radius:12px; border:1px solid #e2e8f0; cursor:pointer; background:#f8fafc; text-align:center;">
+            <img src="${transportTheme.transitMapImageUrl}" alt="Plan du métro" style="width:100%; height:auto; max-height:280px; object-fit:cover; object-position:center top; transition:transform 0.3s ease;">
+            <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.75); color:white; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:700; backdrop-filter:blur(4px);">
+              <i class="fa-solid fa-magnifying-glass-plus"></i> Cliquer pour agrandir
+            </div>
+          </div>
+          ${transportTheme.transitMapUrl ? `
+            <div style="margin-top:10px; text-align:right;">
+              <a href="${transportTheme.transitMapUrl}" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem; color:#0284c7; text-decoration:none; font-weight:700;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Accéder au site web & horaires officiels en direct
+              </a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else if (transportTheme.transitMapUrl) {
       listEl.innerHTML += `
         <div style="background:white; border-radius:14px; border:1px solid #bae6fd; padding:14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
@@ -872,8 +935,41 @@ function selectConciergeTheme(themeId) {
     </div>
   `;
 
-  // 1. Bouton vers la Carte Officielle des Transports si disponible
-  if (theme.transitMapUrl) {
+  // 1. Carte Officielle du Réseau de Métro & Transports si disponible (Affichage direct & Téléchargement)
+  if (theme.transitMapImageUrl) {
+    listEl.innerHTML += `
+      <div style="background:white; border-radius:16px; border:1px solid #bae6fd; padding:16px; margin-bottom:16px; box-shadow:0 4px 15px rgba(2,132,199,0.06);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:12px;">
+          <div>
+            <strong style="color:#0369a1; font-size:1rem;"><i class="fa-solid fa-train-subway"></i> Plan officiel du Réseau de Métro</strong>
+            <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">Consultez directement le plan ci-dessous ou téléchargez-le pour un accès hors-ligne</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="${theme.transitMapImageUrl}" download="Plan-Metro-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.png" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.82rem; padding:7px 14px; text-decoration:none;">
+              <i class="fa-solid fa-download"></i> Télécharger le plan
+            </a>
+            <button type="button" onclick="openTransitMapModal('${theme.transitMapImageUrl}', 'Plan du réseau de métro')" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
+              <i class="fa-solid fa-expand"></i> Agrandir / Plein écran
+            </button>
+          </div>
+        </div>
+
+        <div onclick="openTransitMapModal('${theme.transitMapImageUrl}', 'Plan du réseau de métro')" style="position:relative; width:100%; max-height:280px; overflow:hidden; border-radius:12px; border:1px solid #e2e8f0; cursor:pointer; background:#f8fafc; text-align:center;">
+          <img src="${theme.transitMapImageUrl}" alt="Plan du métro" style="width:100%; height:auto; max-height:280px; object-fit:cover; object-position:center top; transition:transform 0.3s ease;">
+          <div style="position:absolute; bottom:8px; right:8px; background:rgba(15,23,42,0.75); color:white; padding:5px 12px; border-radius:20px; font-size:0.75rem; font-weight:700; backdrop-filter:blur(4px);">
+            <i class="fa-solid fa-magnifying-glass-plus"></i> Cliquer pour agrandir
+          </div>
+        </div>
+        ${theme.transitMapUrl ? `
+          <div style="margin-top:10px; text-align:right;">
+            <a href="${theme.transitMapUrl}" target="_blank" rel="noopener noreferrer" style="font-size:0.78rem; color:#0284c7; text-decoration:none; font-weight:700;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Accéder au site web & horaires officiels en direct
+            </a>
+          </div>
+        ` : ''}
+      </div>
+    `;
+  } else if (theme.transitMapUrl) {
     listEl.innerHTML += `
       <div style="background:white; border-radius:14px; border:1px solid #bae6fd; padding:14px; margin-bottom:14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
         <div>

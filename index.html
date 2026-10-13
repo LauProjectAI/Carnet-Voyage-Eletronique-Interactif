@@ -269,6 +269,34 @@
       </div>
     </div>
 
+    <!-- TRANSIT / METRO MAP FULLSCREEN LIGHTBOX MODAL -->
+    <div class="qr-modal-backdrop" id="transit-map-modal" onclick="if(event.target === this) closeTransitMapModal()" style="display:none; z-index:9999; background:rgba(15,23,42,0.85); backdrop-filter:blur(6px); align-items:center; justify-content:center; padding:12px;">
+      <div style="background:#ffffff; border-radius:18px; width:100%; max-width:960px; max-height:92vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 25px 50px -12px rgba(0,0,0,0.4);">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 20px; background:#0f172a; color:#ffffff; border-bottom:1px solid #334155;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <div style="background:#0284c7; width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#ffffff;">
+              <i class="fa-solid fa-train-subway"></i>
+            </div>
+            <div>
+              <h4 id="transit-map-modal-title" style="margin:0; font-size:1.05rem; font-weight:800; color:#ffffff;">Plan du Réseau de Métro & Transports</h4>
+              <p style="margin:0; font-size:0.75rem; color:#94a3b8;">Consultez les lignes ou téléchargez le plan pour votre voyage hors-ligne</p>
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:10px;">
+            <a id="transit-map-modal-download-btn" href="#" download="plan-transports.png" target="_blank" rel="noopener noreferrer" class="btn-primary" style="background:#059669; color:#ffffff; text-decoration:none; padding:8px 14px; font-size:0.82rem; font-weight:700; border-radius:8px; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-download"></i> Télécharger le plan
+            </a>
+            <button onclick="closeTransitMapModal()" style="background:#334155; border:none; color:#ffffff; width:34px; height:34px; border-radius:8px; cursor:pointer; font-size:1.1rem; display:flex; align-items:center; justify-content:center;">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          </div>
+        </div>
+        <div style="overflow:auto; padding:16px; background:#f8fafc; text-align:center; flex:1; max-height:calc(92vh - 75px); display:flex; align-items:center; justify-content:center;">
+          <img id="transit-map-modal-img" src="" alt="Plan du métro" style="max-width:100%; height:auto; border-radius:10px; box-shadow:0 4px 15px rgba(0,0,0,0.08); object-fit:contain; cursor:zoom-in;" onclick="this.style.maxWidth = this.style.maxWidth === '100%' ? '200%' : '100%';" title="Cliquez pour zoomer / dézoomer">
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Leaflet JS -->

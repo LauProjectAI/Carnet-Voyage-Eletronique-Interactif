@@ -972,7 +972,12 @@ function renderAdminConcierge() {
               <i class="fa-solid fa-map-location-dot"></i> Carte officielle & Guide d'utilisation des transports
             </h5>
             <div style="margin-bottom:8px;">
-              <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Lien vers le plan / carte interactive des transports :</label>
+              <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Lien vers l'image du plan de métro / réseau (Affichage direct & téléchargement dans l'appli) :</label>
+              <input type="text" class="form-control" style="font-size:0.82rem;" placeholder="https://.../plan-metro.png ou .jpg ou .svg" value="${th.transitMapImageUrl || ''}" onchange="updateThemeField(${thIdx}, 'transitMapImageUrl', this.value)">
+              <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">Permet aux voyageurs de visualiser directement le plan de métro en haute résolution dans l'application et de le télécharger pour y accéder hors-ligne.</div>
+            </div>
+            <div style="margin-bottom:8px;">
+              <label style="font-size:0.75rem; font-weight:700; color:#1e3a8a;">Lien vers la carte interactive / site web officiel des transports :</label>
               <input type="text" class="form-control" style="font-size:0.82rem;" placeholder="https://..." value="${th.transitMapUrl || ''}" onchange="updateThemeField(${thIdx}, 'transitMapUrl', this.value)">
             </div>
             <div>
@@ -1213,6 +1218,7 @@ async function triggerAiConciergeGeneration() {
       th.enabled = true;
       if (th.id === 'transports') {
         th.transitMapUrl = "https://www.transitchicago.com/maps/";
+        th.transitMapImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Chicago_L_diagram_sb.svg/1200px-Chicago_L_diagram_sb.svg.png";
         th.guideHtml = `
           <strong>🚇 Comment utiliser les transports à Chicago (Réseau CTA - Métro 'L' & Bus) :</strong><br>
           • <strong>Le Métro 'L' (Elevated Train) :</strong> 8 lignes identifiées par des couleurs (Red, Blue, Brown, Green...). Toutes convergent vers le centre historique (The Loop). Les lignes Blue et Orange relient directement les aéroports O'Hare et Midway au centre-ville.<br>
