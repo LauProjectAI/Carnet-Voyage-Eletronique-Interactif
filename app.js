@@ -510,7 +510,7 @@ function renderTodayFocus() {
           </div>
         ` : ''}
 
-        <div class="entry-actions-row">
+        <div class="entry-actions-row" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
           <div>
             ${gpsUrl ? `
               <a href="${gpsUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps">
@@ -518,6 +518,13 @@ function renderTodayFocus() {
               </a>
             ` : '<span style="font-size:0.7rem; color:#94a3b8;"><i class="fa-regular fa-clock"></i> Visite organisée</span>'}
           </div>
+
+          ${entry.qrCodeText ? `
+            <button class="btn-entry-gps" style="background:#0284c7; color:white; border:none; cursor:pointer;" onclick="openQrModal('${entry.title.replace(/'/g, "\\'")}', '${entry.qrCodeText}')">
+              <i class="fa-solid fa-qrcode"></i> Bon d'échange
+            </button>
+          ` : ''}
+
           <button class="btn-entry-note" onclick="quickAddPhotoForEntry('${entry.title}')">
             <i class="fa-solid fa-camera"></i> Souvenir
           </button>

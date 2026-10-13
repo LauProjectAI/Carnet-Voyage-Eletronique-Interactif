@@ -805,6 +805,35 @@ function renderDayVisitsHtml(dayIndex, visits) {
         </div>
       </div>
       <div id="geocode-status-${dayIndex}-${vIdx}" style="font-size:0.72rem; color:#059669; margin-top:3px; font-weight:bold;"></div>
+
+      <!-- LIAISON BON D'ÉCHANGE & QR CODE -->
+      <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #cbd5e1; background:#ffffff; border-radius:6px; padding:8px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+        <div style="flex:1; min-width:240px;">
+          <label style="font-size:0.75rem; font-weight:800; color:#065f46; display:flex; align-items:center; gap:5px; margin-bottom:3px;">
+            <i class="fa-solid fa-qrcode" style="color:var(--accent-gold);"></i> Relier un Bon d'échange / Billet QR Code :
+          </label>
+          <select class="form-control" style="font-size:0.8rem; padding:4px 8px; border-color:#86efac; background:#f0fdf4;" onchange="updateVisitDocumentLink(${dayIndex}, ${vIdx}, this.value)">
+            <option value="">-- Aucun bon d'échange lié --</option>
+            ${(tripData.documents || []).map(doc => `
+              <option value="${doc.id}" ${(v.docId === doc.id || (doc.qrCode && v.qrCodeText === doc.qrCode)) ? 'selected' : ''}>
+                ${doc.type === 'flight' ? '✈️' : (doc.type === 'voucher' ? '🏨' : '🎟️')} ${doc.title} ${doc.reference ? `(${doc.reference})` : ''}
+              </option>
+            `).join('')}
+          </select>
+        </div>
+
+        <div style="flex:1; min-width:180px;">
+          <label style="font-size:0.75rem; font-weight:700; color:#64748b; margin-bottom:3px;">Texte ou Code QR personnalisé :</label>
+          <input type="text" class="form-control" style="font-size:0.78rem; padding:4px 8px;" placeholder="Ex: VOUCHER-SOWETO-01" value="${v.qrCodeText || ''}" onchange="updateVisitField(${dayIndex}, ${vIdx}, 'qrCodeText', this.value)">
+        </div>
+
+        <div style="display:flex; align-items:center; gap:6px; margin-top:16px;">
+          <label style="font-size:0.75rem; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:5px; cursor:pointer;" title="Ce bon d'échange s'affichera également dans la carte prioritaire 'NEXT / À VENIR' en haut de journée">
+            <input type="radio" name="day-nextevent-${dayIndex}" ${((tripData.itinerary[dayIndex].nextEvent && tripData.itinerary[dayIndex].nextEvent.visitIndex === vIdx) || (!tripData.itinerary[dayIndex].nextEvent && vIdx === 0)) ? 'checked' : ''} onchange="setDayPrimaryNextEvent(${dayIndex}, ${vIdx})">
+            <span style="font-size:0.75rem; color:#0369a1;"><i class="fa-solid fa-star" style="color:var(--accent-gold);"></i> Clé du jour ("NEXT")</span>
+          </label>
+        </div>
+      </div>
     </div>
   `).join('');
 }
@@ -832,6 +861,40 @@ function removeVisitFromDay(dayIndex, visitIndex) {
 
 function updateVisitField(dayIndex, visitIndex, field, value) {
   tripData.itinerary[dayIndex].timeline[visitIndex][field] = value;
+}
+
+function updateVisitDocumentLink(dayIndex, visitIndex, docId) {
+  const visit = tripData.itinerary[dayIndex].timeline[visitIndex];
+  if (!visit) return;
+
+  visit.docId = docId;
+  if (docId) {
+    const doc = (tripData.documents || []).find(d => d.id === docId);
+    if (doc) {
+      visit.qrCodeText = doc.qrCode || doc.reference || doc.title;
+      // Mettre à jour automatiquement le champ de saisie
+      renderAdminDays();
+      return;
+    }
+  } else {
+    visit.qrCodeText = '';
+    renderAdminDays();
+  }
+}
+
+function setDayPrimaryNextEvent(dayIndex, visitIndex) {
+  const day = tripData.itinerary[dayIndex];
+  if (!day || !day.timeline || !day.timeline[visitIndex]) return;
+
+  const visit = day.timeline[visitIndex];
+  day.nextEvent = {
+    visitIndex: visitIndex,
+    title: visit.title,
+    time: visit.time,
+    badge: visit.subtitle || "Programme clé Girardot",
+    qrCodeText: visit.qrCodeText || `GIRARDOT-JOUR-${day.day}`
+  };
+  renderAdminDays();
 }
 
 // Géocodage automatique gratuit via OpenStreetMap / Nominatim
