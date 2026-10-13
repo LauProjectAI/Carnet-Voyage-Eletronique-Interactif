@@ -144,6 +144,47 @@ function getAirlineLogoUrl(airlineName = "", flightNumber = "") {
   return null;
 }
 
+// Génère les liens directs de suivi de vol en direct (FlightAware & Flightradar24)
+function getFlightTrackingLinks(flightNumber = "", airlineName = "") {
+  if (!flightNumber && !airlineName) return null;
+
+  // Nettoyage du numéro de vol (ex: "EK 82" -> "EK82")
+  let cleanNum = (flightNumber || "").trim().toUpperCase().replace(/\s+/g, '');
+
+  // Si on a un numéro de vol bien formé (ex: EK82, AF136, FA168)
+  if (cleanNum && /^[A-Z0-9]{2,3}\d+$/.test(cleanNum)) {
+    return {
+      flightNumber: cleanNum,
+      flightAwareUrl: `https://www.flightaware.com/live/flight/${encodeURIComponent(cleanNum)}`,
+      flightradar24Url: `https://www.flightradar24.com/${encodeURIComponent(cleanNum)}`
+    };
+  }
+
+  // Si le code IATA est déductible mais absent du numéro de vol
+  const logoInfo = getAirlineLogoUrl(airlineName, flightNumber);
+  if (logoInfo && logoInfo.code) {
+    const numOnly = cleanNum.replace(/[^0-9]/g, '');
+    if (numOnly) {
+      const fullCallsign = `${logoInfo.code}${numOnly}`;
+      return {
+        flightNumber: fullCallsign,
+        flightAwareUrl: `https://www.flightaware.com/live/flight/${encodeURIComponent(fullCallsign)}`,
+        flightradar24Url: `https://www.flightradar24.com/${encodeURIComponent(fullCallsign)}`
+      };
+    }
+  }
+
+  if (cleanNum) {
+    return {
+      flightNumber: cleanNum,
+      flightAwareUrl: `https://www.flightaware.com/live/flight/${encodeURIComponent(cleanNum)}`,
+      flightradar24Url: `https://www.flightradar24.com/${encodeURIComponent(cleanNum)}`
+    };
+  }
+
+  return null;
+}
+
 // Catalogue des voyages pour le client
 function getClientAvailableTrips() {
   const customList = JSON.parse(localStorage.getItem('girardot_trips_catalog') || '[]');
@@ -1318,6 +1359,7 @@ function renderHotelsAndFlights() {
     currentTrip.flightsList.forEach(f => {
       const isDomestic = f.type === 'Intérieur';
       const logoInfo = getAirlineLogoUrl(f.airline, f.flightNumber);
+      const trackingLinks = getFlightTrackingLinks(f.flightNumber, f.airline);
       const card = document.createElement('div');
       card.style = `background:${isDomestic ? '#f0f9ff' : 'white'}; border-radius:16px; border:1px solid ${isDomestic ? '#bae6fd' : 'var(--border-light)'}; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.03);`;
       
@@ -1356,6 +1398,23 @@ function renderHotelsAndFlights() {
           </div>
         ` : ''}
         ${f.notes ? `<div style="font-size:0.75rem; color:#64748b; margin-top:2px;">${f.notes}</div>` : ''}
+
+        ${trackingLinks ? `
+          <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #e2e8f0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.75rem; color:#64748b; display:flex; align-items:center; gap:5px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,0.2); animation:pulse 2s infinite;"></span>
+              <strong>Suivi en temps réel :</strong>
+            </div>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <a href="${trackingLinks.flightAwareUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.75rem; padding:4px 10px; border-radius:6px; text-decoration:none;" title="Suivre l'avancement, retards et porte sur FlightAware">
+                <i class="fa-solid fa-satellite-dish"></i> Statut FlightAware
+              </a>
+              <a href="${trackingLinks.flightradar24Url}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#1e293b; color:white; font-size:0.75rem; padding:4px 10px; border-radius:6px; text-decoration:none;" title="Radar direct sur Flightradar24">
+                <i class="fa-solid fa-radar"></i> Radar Flightradar24
+              </a>
+            </div>
+          </div>
+        ` : ''}
       `;
       flightsContainer.appendChild(card);
     });
@@ -1363,6 +1422,7 @@ function renderHotelsAndFlights() {
     // Rétrocompatibilité avec l'ancien format d'origine
     const f = currentTrip.flights;
     const outboundLogo = getAirlineLogoUrl(f.outbound.airline, f.outbound.flightNumber);
+    const outboundTracking = getFlightTrackingLinks(f.outbound.flightNumber, f.outbound.airline);
     flightsContainer.innerHTML = `
       <h3 style="font-size:1.1rem; font-weight:800; color:var(--primary-dark); margin-bottom:10px;">
         <i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:6px;"></i> Vols Internationaux & Intérieurs
@@ -1385,10 +1445,28 @@ function renderHotelsAndFlights() {
           ${f.outbound.date} • ${f.outbound.departureAirport} (${f.outbound.departureTime}) ➔ ${f.outbound.arrivalAirport}
         </div>
         <div style="font-size:0.76rem; color:#64748b;">${f.outbound.layover}</div>
+
+        ${outboundTracking ? `
+          <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #e2e8f0; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+            <div style="font-size:0.75rem; color:#64748b; display:flex; align-items:center; gap:5px;">
+              <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,0.2);"></span>
+              <strong>Suivi en temps réel :</strong>
+            </div>
+            <div style="display:flex; gap:6px;">
+              <a href="${outboundTracking.flightAwareUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.75rem; padding:4px 10px; border-radius:6px; text-decoration:none;">
+                <i class="fa-solid fa-satellite-dish"></i> FlightAware
+              </a>
+              <a href="${outboundTracking.flightradar24Url}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#1e293b; color:white; font-size:0.75rem; padding:4px 10px; border-radius:6px; text-decoration:none;">
+                <i class="fa-solid fa-radar"></i> Flightradar24
+              </a>
+            </div>
+          </div>
+        ` : ''}
       </div>
 
       ${(f.domesticFlights && f.domesticFlights.length) ? f.domesticFlights.map(df => {
         const dfLogo = getAirlineLogoUrl(df.airline, df.flightNumber);
+        const dfTracking = getFlightTrackingLinks(df.flightNumber, df.airline);
         return `
           <div style="background:#f0f9ff; border-radius:16px; border:1px solid #bae6fd; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
@@ -1408,6 +1486,23 @@ function renderHotelsAndFlights() {
               ${df.departureAirport} ➔ ${df.arrivalAirport}
             </div>
             <div style="font-size:0.76rem; color:#0284c7;">${df.notes}</div>
+
+            ${dfTracking ? `
+              <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #bae6fd; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                <div style="font-size:0.75rem; color:#0369a1; display:flex; align-items:center; gap:5px;">
+                  <span style="display:inline-block; width:8px; height:8px; border-radius:50%; background:#16a34a; box-shadow:0 0 0 2px rgba(22,163,74,0.2);"></span>
+                  <strong>Suivi en temps réel :</strong>
+                </div>
+                <div style="display:flex; gap:6px;">
+                  <a href="${dfTracking.flightAwareUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.75rem; padding:4px 10px; border-radius:6px; text-decoration:none;">
+                    <i class="fa-solid fa-satellite-dish"></i> FlightAware
+                  </a>
+                  <a href="${dfTracking.flightradar24Url}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#1e293b; color:white; font-size:0.75rem; padding:4px 10px; border-radius:6px; text-decoration:none;">
+                    <i class="fa-solid fa-radar"></i> Flightradar24
+                  </a>
+                </div>
+              </div>
+            ` : ''}
           </div>
         `;
       }).join('') : ''}
@@ -2124,6 +2219,15 @@ function renderClientDocuments() {
       ` : ''}
 
       <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px dashed #e2e8f0; padding-top:10px;">
+        ${doc.type === 'flight' ? (() => {
+          const tLinks = getFlightTrackingLinks(doc.reference, doc.title + " " + (doc.notes || ''));
+          return tLinks ? `
+            <a href="${tLinks.flightAwareUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.8rem; padding:6px 12px; text-decoration:none;" title="Suivre ce vol en direct">
+              <i class="fa-solid fa-satellite-dish"></i> Suivi Live
+            </a>
+          ` : '';
+        })() : ''}
+
         ${doc.qrCode ? `
           <button type="button" onclick="openDocQrModal('${doc.id}')" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.8rem; padding:6px 14px; border:none; cursor:pointer;">
             <i class="fa-solid fa-qrcode"></i> Présenter le QR Code
