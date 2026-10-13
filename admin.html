@@ -211,6 +211,7 @@
     <div class="admin-nav">
       <button class="active" onclick="switchAdminTab('general')"><i class="fa-solid fa-circle-info"></i> Général & Vols</button>
       <button onclick="switchAdminTab('itinerary')"><i class="fa-solid fa-route"></i> Programme (Jours)</button>
+      <button onclick="switchAdminTab('documents')"><i class="fa-solid fa-ticket"></i> Billets & Documents</button>
       <button onclick="switchAdminTab('hotels')"><i class="fa-solid fa-hotel"></i> Hôtels</button>
       <button onclick="switchAdminTab('freetime')"><i class="fa-solid fa-compass"></i> Suggestions</button>
       <button onclick="switchAdminTab('concierge')"><i class="fa-solid fa-bell-concierge"></i> Conciergerie IA</button>
@@ -295,6 +296,22 @@
           </button>
         </div>
         <div id="adm-days-list"></div>
+      </div>
+
+      <!-- 2. bis DOCUMENTS & BILLETS DU VOYAGE (AGENCE) -->
+      <div id="adm-sec-documents" class="admin-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+          <div>
+            <h3 style="font-size:1.1rem; color:var(--primary-dark); margin:0;">
+              <i class="fa-solid fa-ticket" style="color:var(--accent-gold); margin-right:6px;"></i> Billets, Bons d'Échange & Documents de Voyage
+            </h3>
+            <p style="font-size:0.8rem; color:#64748b; margin:2px 0 0;">Ces documents officiels seront consultables et téléchargeables hors-ligne par le client dans son carnet.</p>
+          </div>
+          <button type="button" onclick="addNewAdminDocument()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
+            <i class="fa-solid fa-plus"></i> Ajouter un document / billet
+          </button>
+        </div>
+        <div id="adm-documents-list"></div>
       </div>
 
       <!-- 3. HOTELS -->

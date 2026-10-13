@@ -201,6 +201,7 @@ document.addEventListener('DOMContentLoaded', () => {
   renderConciergerie();
   renderHotelsAndFlights();
   renderContactsAndAlert();
+  renderClientDocuments();
   initNavigation();
   initCaptureFeature();
 });
@@ -1742,4 +1743,434 @@ function switchMainTab(targetId) {
       }, 150);
     }
   }
+
+  if (targetId === 'tab-documents') {
+    renderClientDocuments();
+  }
+}
+
+// -----------------------------------------------------------------------------
+// 8. GESTION DES DOCUMENTS DE VOYAGE (AGENCE + SCANNER PERSONNEL CLIENT)
+// -----------------------------------------------------------------------------
+let activeDocFilter = 'all';
+let currentPendingScan = null; // Données en cours de validation dans le modal d'ajout
+
+function getClientPersonalDocsKey() {
+  return `girardot_personal_docs_${currentTrip ? currentTrip.id : 'default'}`;
+}
+
+function getClientPersonalDocs() {
+  try {
+    return JSON.parse(localStorage.getItem(getClientPersonalDocsKey()) || '[]');
+  } catch(e) {
+    return [];
+  }
+}
+
+function saveClientPersonalDocs(list) {
+  localStorage.setItem(getClientPersonalDocsKey(), JSON.stringify(list));
+}
+
+// Détection automatique intelligente du type de document
+function detectDocTypeFromTextAndFilename(text = "", filename = "") {
+  const combined = (text + " " + filename).toLowerCase();
+
+  // 1. Passeport / Pièce d'identité
+  if (combined.includes('passeport') || combined.includes('passport') || combined.includes('cni') || combined.includes('identit') || combined.includes('republique') || combined.includes('nationalite') || combined.includes('naissance')) {
+    return {
+      type: "identity",
+      label: "Passeport / Pièce d'identité",
+      icon: "fa-passport",
+      color: "#0369a1",
+      suggestedTitle: "Passeport / Pièce d'identité"
+    };
+  }
+
+  // 2. Visa électronique / Autorisation
+  if (combined.includes('visa') || combined.includes('esta') || combined.includes('eta') || combined.includes('evisa') || combined.includes('consul') || combined.includes('immigration') || combined.includes('sars')) {
+    return {
+      type: "visa",
+      label: "Visa électronique / Autorisation",
+      icon: "fa-id-card-clip",
+      color: "#7c3aed",
+      suggestedTitle: "Visa électronique d'entrée"
+    };
+  }
+
+  // 3. Billets d'avion / Boarding pass
+  if (combined.includes('vol') || combined.includes('flight') || combined.includes('air') || combined.includes('embarquement') || combined.includes('boarding') || combined.includes('pnr') || combined.includes('ticket') && combined.includes('plane') || combined.includes('aeroport') || combined.includes('airport')) {
+    return {
+      type: "flight",
+      label: "Billet d'avion / Carte d'embarquement",
+      icon: "fa-plane-departure",
+      color: "#0284c7",
+      suggestedTitle: "Billet d'avion / Carte d'embarquement"
+    };
+  }
+
+  // 4. Billets d'entrée / Activités
+  if (combined.includes('entree') || combined.includes('billet') || combined.includes('musee') || combined.includes('museum') || combined.includes('pass') || combined.includes('monument') || combined.includes('croisiere') || combined.includes('spectacle')) {
+    return {
+      type: "ticket",
+      label: "Billet d'entrée / Activité",
+      icon: "fa-ticket",
+      color: "#ea580c",
+      suggestedTitle: "Billet d'entrée visite / activité"
+    };
+  }
+
+  // 5. Bon d'échange / Voucher hôtel ou transport
+  if (combined.includes('voucher') || combined.includes('echange') || combined.includes('hotel') || combined.includes('booking') || combined.includes('reservation') || combined.includes('chambre') || combined.includes('location')) {
+    return {
+      type: "voucher",
+      label: "Bon d'échange (Voucher)",
+      icon: "fa-hotel",
+      color: "#059669",
+      suggestedTitle: "Bon d'échange / Voucher"
+    };
+  }
+
+  // 6. Autre document
+  return {
+    type: "other",
+    label: "Document personnel",
+    icon: "fa-file-lines",
+    color: "#475569",
+    suggestedTitle: filename ? filename.replace(/\.[^/.]+$/, "") : "Document personnel de voyage"
+  };
+}
+
+function getDocTypeInfo(type) {
+  const map = {
+    flight: { label: "Billet d'avion", icon: "fa-plane-departure", color: "#0284c7" },
+    voucher: { label: "Bon d'échange", icon: "fa-hotel", color: "#059669" },
+    ticket: { label: "Billet d'entrée", icon: "fa-ticket", color: "#ea580c" },
+    identity: { label: "Passeport / CNI", icon: "fa-passport", color: "#0369a1" },
+    visa: { label: "Visa électronique", icon: "fa-id-card-clip", color: "#7c3aed" },
+    guide: { label: "Plan & Guide", icon: "fa-map-location-dot", color: "#0891b2" },
+    other: { label: "Document", icon: "fa-file-lines", color: "#475569" }
+  };
+  return map[type] || map.other;
+}
+
+function renderClientDocuments() {
+  const container = document.getElementById('client-documents-list');
+  if (!container) return;
+
+  const agencyDocs = (currentTrip && currentTrip.documents) ? currentTrip.documents.map(d => ({ ...d, source: 'agency' })) : [];
+  const personalDocs = getClientPersonalDocs().map(d => ({ ...d, source: 'personal' }));
+  const allDocs = [...agencyDocs, ...personalDocs];
+
+  // Mettre à jour les compteurs des badges de filtre
+  const counts = {
+    all: allDocs.length,
+    agency: agencyDocs.length,
+    flight: allDocs.filter(d => d.type === 'flight').length,
+    voucher: allDocs.filter(d => d.type === 'voucher').length,
+    identity: allDocs.filter(d => d.type === 'identity').length,
+    visa: allDocs.filter(d => d.type === 'visa').length,
+    ticket: allDocs.filter(d => d.type === 'ticket').length
+  };
+
+  for (const k in counts) {
+    const el = document.getElementById(`count-docs-${k}`);
+    if (el) el.innerText = counts[k];
+  }
+
+  // Filtrer la liste
+  let filtered = allDocs;
+  if (activeDocFilter === 'agency') {
+    filtered = allDocs.filter(d => d.source === 'agency');
+  } else if (activeDocFilter !== 'all') {
+    filtered = allDocs.filter(d => d.type === activeDocFilter);
+  }
+
+  if (filtered.length === 0) {
+    container.innerHTML = `
+      <div style="background:white; border-radius:18px; padding:32px 20px; text-align:center; border:1px dashed #cbd5e1; box-shadow:var(--shadow-subtle);">
+        <div style="background:#f0f9ff; width:64px; height:64px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#0284c7; font-size:1.8rem; margin-bottom:12px;">
+          <i class="fa-solid fa-folder-open"></i>
+        </div>
+        <h4 style="font-size:1.05rem; font-weight:800; color:var(--primary-dark); margin-bottom:4px;">Aucun document dans cette catégorie</h4>
+        <p style="font-size:0.84rem; color:#64748b; margin-bottom:16px;">
+          Vous pouvez scanner votre passeport, visa, carte d'embarquement ou billets pour les conserver hors-ligne.
+        </p>
+        <button type="button" onclick="triggerClientDocScanner()" class="btn-entry-gps" style="background:#0284c7; color:white; padding:8px 18px; font-size:0.85rem; border:none; cursor:pointer;">
+          <i class="fa-solid fa-camera"></i> Scanner ou ajouter un document
+        </button>
+      </div>
+    `;
+    return;
+  }
+
+  container.innerHTML = '';
+  filtered.forEach(doc => {
+    const typeInfo = getDocTypeInfo(doc.type);
+    const isAgency = doc.source === 'agency';
+    const card = document.createElement('div');
+    card.className = `client-doc-card ${isAgency ? 'agency-doc' : 'personal-doc'}`;
+
+    card.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px;">
+        <span class="doc-badge-source ${isAgency ? 'doc-badge-agency' : 'doc-badge-personal'}">
+          <i class="fa-solid ${isAgency ? 'fa-building' : 'fa-user-shield'}"></i>
+          ${isAgency ? 'Document Agence' : 'Mon Coffre-Fort'}
+        </span>
+        <span style="font-size:0.75rem; font-weight:700; color:${typeInfo.color}; display:inline-flex; align-items:center; gap:4px;">
+          <i class="fa-solid ${typeInfo.icon}"></i> ${typeInfo.label}
+        </span>
+      </div>
+
+      <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-main); margin-bottom:4px;">${doc.title}</h3>
+      ${doc.reference ? `<div style="font-size:0.82rem; font-family:monospace; font-weight:700; color:#0284c7; margin-bottom:4px;"><i class="fa-solid fa-barcode"></i> ${doc.reference}</div>` : ''}
+      
+      <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:0.8rem; color:#64748b; margin:6px 0 10px;">
+        ${doc.beneficiary ? `<span><i class="fa-solid fa-user"></i> ${doc.beneficiary}</span>` : ''}
+        ${doc.date ? `<span><i class="fa-regular fa-calendar"></i> ${doc.date}</span>` : ''}
+      </div>
+
+      ${doc.notes ? `
+        <div style="background:#f8fafc; border-radius:8px; padding:8px 10px; font-size:0.78rem; color:#475569; margin-bottom:12px; border-left:3px solid #cbd5e1;">
+          ${doc.notes}
+        </div>
+      ` : ''}
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; border-top:1px dashed #e2e8f0; padding-top:10px;">
+        ${doc.qrCode ? `
+          <button type="button" onclick="openDocQrModal('${doc.id}')" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.8rem; padding:6px 14px; border:none; cursor:pointer;">
+            <i class="fa-solid fa-qrcode"></i> Présenter le QR Code
+          </button>
+        ` : ''}
+
+        <button type="button" onclick="viewClientDocDetails('${doc.id}')" class="btn-entry-gps" style="background:#f1f5f9; color:#334155; font-size:0.8rem; padding:6px 14px; border:none; cursor:pointer;">
+          <i class="fa-solid fa-eye"></i> Voir le document
+        </button>
+
+        ${doc.fileUrl ? `
+          <button type="button" onclick="downloadTransitMapFile('${doc.fileUrl}', '${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.png')" class="btn-entry-gps" style="background:#eef7f2; color:#16a34a; font-size:0.8rem; padding:6px 12px; border:none; cursor:pointer;" title="Télécharger hors-ligne">
+            <i class="fa-solid fa-download"></i>
+          </button>
+        ` : ''}
+      </div>
+    `;
+
+    container.appendChild(card);
+  });
+}
+
+function filterClientDocuments(filterKey) {
+  activeDocFilter = filterKey;
+  document.querySelectorAll('.doc-filter-pill').forEach(btn => {
+    btn.classList.toggle('active', btn.getAttribute('data-filter') === filterKey);
+  });
+  renderClientDocuments();
+}
+
+// Déclencheur du scanner / sélecteur photo
+function triggerClientDocScanner() {
+  const input = document.getElementById('client-doc-file-input');
+  if (input) input.click();
+}
+
+function handleClientDocFileSelected(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    const base64Data = evt.target.result;
+    
+    // Détection auto intelligente
+    const detected = detectDocTypeFromTextAndFilename(file.name, file.name);
+
+    currentPendingScan = {
+      id: 'doc_user_' + Date.now(),
+      fileData: base64Data,
+      fileName: file.name,
+      fileSize: file.size,
+      detectedType: detected.type
+    };
+
+    // Pré-remplir le modal d'ajout
+    const previewImg = document.getElementById('add-doc-preview-img');
+    const badgeLabel = document.getElementById('add-doc-detected-label');
+    const typeSelect = document.getElementById('add-doc-type');
+    const titleInp = document.getElementById('add-doc-title');
+    const refInp = document.getElementById('add-doc-ref');
+    const dateInp = document.getElementById('add-doc-date');
+    const qrInp = document.getElementById('add-doc-qr');
+    const notesInp = document.getElementById('add-doc-notes');
+
+    if (previewImg) previewImg.src = base64Data;
+    if (badgeLabel) badgeLabel.innerText = detected.label;
+    if (typeSelect) typeSelect.value = detected.type;
+    if (titleInp) titleInp.value = detected.suggestedTitle;
+    if (refInp) refInp.value = "";
+    if (dateInp) dateInp.value = "";
+    if (qrInp) qrInp.value = "";
+    if (notesInp) notesInp.value = "";
+
+    // Ouvrir le modal
+    const modal = document.getElementById('doc-add-modal');
+    if (modal) modal.style.display = 'flex';
+  };
+  reader.readAsDataURL(file);
+}
+
+function onManualDocTypeChange(val) {
+  const typeInfo = getDocTypeInfo(val);
+  const badgeLabel = document.getElementById('add-doc-detected-label');
+  if (badgeLabel) badgeLabel.innerText = typeInfo.label;
+}
+
+function closeDocAddModal() {
+  const modal = document.getElementById('doc-add-modal');
+  if (modal) modal.style.display = 'none';
+  currentPendingScan = null;
+  const input = document.getElementById('client-doc-file-input');
+  if (input) input.value = '';
+}
+
+function saveNewClientDocument() {
+  if (!currentPendingScan) return;
+
+  const titleInp = document.getElementById('add-doc-title');
+  const typeSelect = document.getElementById('add-doc-type');
+  const refInp = document.getElementById('add-doc-ref');
+  const dateInp = document.getElementById('add-doc-date');
+  const qrInp = document.getElementById('add-doc-qr');
+  const notesInp = document.getElementById('add-doc-notes');
+
+  const title = (titleInp && titleInp.value.trim()) ? titleInp.value.trim() : "Document personnel";
+  const type = typeSelect ? typeSelect.value : "other";
+
+  const newDoc = {
+    id: currentPendingScan.id,
+    type: type,
+    title: title,
+    reference: refInp ? refInp.value.trim() : "",
+    beneficiary: "Moi",
+    date: dateInp ? dateInp.value.trim() : "",
+    qrCode: qrInp ? qrInp.value.trim() : "",
+    notes: notesInp ? notesInp.value.trim() : "",
+    fileUrl: currentPendingScan.fileData
+  };
+
+  const list = getClientPersonalDocs();
+  list.unshift(newDoc);
+  saveClientPersonalDocs(list);
+
+  closeDocAddModal();
+  renderClientDocuments();
+}
+
+function findDocById(docId) {
+  const agencyDocs = (currentTrip && currentTrip.documents) ? currentTrip.documents.map(d => ({ ...d, source: 'agency' })) : [];
+  const personalDocs = getClientPersonalDocs().map(d => ({ ...d, source: 'personal' }));
+  return [...agencyDocs, ...personalDocs].find(d => d.id === docId);
+}
+
+function openDocQrModal(docId) {
+  const doc = findDocById(docId);
+  if (!doc) return;
+  viewClientDocDetails(docId, true);
+}
+
+function viewClientDocDetails(docId, focusQr = false) {
+  const doc = findDocById(docId);
+  if (!doc) return;
+
+  const modal = document.getElementById('doc-viewer-modal');
+  const titleEl = document.getElementById('doc-modal-title');
+  const subEl = document.getElementById('doc-modal-sub');
+  const badgeIcon = document.getElementById('doc-modal-icon-badge');
+  const qrBox = document.getElementById('doc-modal-qr-container');
+  const qrImg = document.getElementById('doc-modal-qr-img');
+  const qrText = document.getElementById('doc-modal-qr-text');
+  const fileBox = document.getElementById('doc-modal-file-container');
+  const fileImg = document.getElementById('doc-modal-file-img');
+  const benRow = document.getElementById('doc-modal-beneficiary-row');
+  const benEl = document.getElementById('doc-modal-beneficiary');
+  const dateRow = document.getElementById('doc-modal-date-row');
+  const dateEl = document.getElementById('doc-modal-date');
+  const notesRow = document.getElementById('doc-modal-notes-row');
+  const notesEl = document.getElementById('doc-modal-notes');
+  const downloadBtn = document.getElementById('doc-modal-download-btn');
+  const deleteBtn = document.getElementById('doc-modal-delete-btn');
+
+  const typeInfo = getDocTypeInfo(doc.type);
+
+  if (titleEl) titleEl.innerText = doc.title;
+  if (subEl) subEl.innerText = (doc.reference ? `${doc.reference} • ` : '') + (doc.source === 'agency' ? "Document officiel Agence" : "Coffre-fort personnel");
+  if (badgeIcon) {
+    badgeIcon.style.background = typeInfo.color;
+    badgeIcon.innerHTML = `<i class="fa-solid ${typeInfo.icon}"></i>`;
+  }
+
+  // QR Code
+  if (doc.qrCode) {
+    qrBox.style.display = 'block';
+    qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(doc.qrCode)}&color=2-132-199`;
+    qrText.innerText = doc.qrCode;
+  } else {
+    qrBox.style.display = 'none';
+  }
+
+  // Fichier / Image jointe
+  if (doc.fileUrl) {
+    fileBox.style.display = 'block';
+    fileImg.src = doc.fileUrl;
+    downloadBtn.style.display = 'inline-flex';
+    downloadBtn.onclick = (e) => {
+      e.preventDefault();
+      downloadTransitMapFile(doc.fileUrl, `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.png`);
+    };
+  } else {
+    fileBox.style.display = 'none';
+    downloadBtn.style.display = 'none';
+  }
+
+  // Informations
+  if (doc.beneficiary) {
+    benRow.style.display = 'block';
+    benEl.innerText = doc.beneficiary;
+  } else {
+    benRow.style.display = 'none';
+  }
+
+  if (doc.date) {
+    dateRow.style.display = 'block';
+    dateEl.innerText = doc.date;
+  } else {
+    dateRow.style.display = 'none';
+  }
+
+  if (doc.notes) {
+    notesRow.style.display = 'block';
+    notesEl.innerText = doc.notes;
+  } else {
+    notesRow.style.display = 'none';
+  }
+
+  // Bouton suppression (uniquement pour les documents personnels du client)
+  if (doc.source === 'personal') {
+    deleteBtn.style.display = 'block';
+    deleteBtn.onclick = () => {
+      if (confirm("Supprimer définitivement ce document de votre coffre-fort ?")) {
+        const list = getClientPersonalDocs().filter(d => d.id !== doc.id);
+        saveClientPersonalDocs(list);
+        closeDocViewerModal();
+        renderClientDocuments();
+      }
+    };
+  } else {
+    deleteBtn.style.display = 'none';
+  }
+
+  modal.style.display = 'flex';
+}
+
+function closeDocViewerModal() {
+  const modal = document.getElementById('doc-viewer-modal');
+  if (modal) modal.style.display = 'none';
 }

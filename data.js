@@ -819,7 +819,42 @@ const initialCarnetAfriqueDuSud = {
     clothing: "Tenue décontractée en journée, vêtements chauds/coupe-vent pour les safaris matinaux et les soirées. Couleurs neutres (kaki, beige) recommandées pour les safaris.",
     tips: "Pourboires indicatifs : 2 €/jour/personne pour le guide, 1 €/jour/personne pour le chauffeur, 2 €/jour/personne pour les rangers lors des safaris.",
     wifi: "Disponible gratuitement dans tous les hôtels à la réception et généralement dans les chambres."
-  }
+  },
+  documents: [
+    {
+      id: "doc-flight-out",
+      type: "flight",
+      title: "Billet d'avion Aller Lyon ➔ Johannesburg",
+      reference: "EK82 / EK761 • PNR: GIR892A",
+      beneficiary: "M. & Mme Passager",
+      date: "12 Octobre 2026",
+      qrCode: "E-TICKET-EK82-LYS-JNB-GIRARDOT",
+      notes: "Présentation 3h avant au comptoir Emirates Terminal 1. Bagage soute 20 kg inclus.",
+      fileUrl: ""
+    },
+    {
+      id: "doc-voucher-safari",
+      type: "voucher",
+      title: "Bon d'échange • Safari Privé Réserve Kruger",
+      reference: "VOUCHER-KRUGER-7782",
+      beneficiary: "Tous les participants",
+      date: "16 Octobre 2026",
+      qrCode: "VOUCHER-KRUGER-BIGFIVE-GIRARDOT",
+      notes: "À présenter au ranger Nkambeni Safari Camp au départ du 4x4 matinal à 05h30.",
+      fileUrl: ""
+    },
+    {
+      id: "doc-ticket-tablemt",
+      type: "ticket",
+      title: "Billets d'entrée • Téléphérique de Table Mountain",
+      reference: "TICKET-CPT-TMT-994",
+      beneficiary: "Accès groupe coupe-file",
+      date: "20 Octobre 2026",
+      qrCode: "TICKET-TABLE-MOUNTAIN-GIRARDOT-2026",
+      notes: "Valable toute la journée selon conditions météo favorables. Embarquement express.",
+      fileUrl: ""
+    }
+  ]
 };
 
 window.defaultTravelData = initialCarnetAfriqueDuSud;

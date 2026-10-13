@@ -893,3 +893,71 @@ body {
     border-bottom-right-radius: 28px;
   }
 }
+
+/* -------------------------------------------------------------
+   ESPACE DOCUMENTS DE VOYAGE & COFFRE-FORT CLIENT
+-------------------------------------------------------------- */
+.doc-filter-pill {
+  border: 1px solid #cbd5e1;
+  background: #ffffff;
+  color: #475569;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s ease;
+}
+
+.doc-filter-pill.active {
+  background: #0284c7;
+  color: #ffffff;
+  border-color: #0284c7;
+  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
+}
+
+.client-doc-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 14px;
+  box-shadow: var(--shadow-subtle);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.client-doc-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.client-doc-card.agency-doc {
+  border-left: 4px solid var(--accent-gold);
+}
+
+.client-doc-card.personal-doc {
+  border-left: 4px solid #0284c7;
+}
+
+.doc-badge-source {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.doc-badge-agency {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+.doc-badge-personal {
+  background: #e0f2fe;
+  color: #0369a1;
+}

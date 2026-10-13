@@ -272,7 +272,7 @@ function importTripJsonFile(event) {
 }
 
 function switchAdminTab(tabName) {
-  const sections = ['general', 'itinerary', 'hotels', 'freetime', 'concierge', 'contacts'];
+  const sections = ['general', 'itinerary', 'documents', 'hotels', 'freetime', 'concierge', 'contacts'];
   sections.forEach(sec => {
     const el = document.getElementById(`adm-sec-${sec}`);
     if (el) el.style.display = (sec === tabName) ? 'block' : 'none';
@@ -310,6 +310,9 @@ function populateForm() {
 
   // 2. Itinerary & Visits
   renderAdminDays();
+
+  // 2. bis Billets & Documents Agence
+  renderAdminDocuments();
 
   // 3. Hotels & Free time
   renderAdminHotels();
@@ -799,6 +802,140 @@ function removeDay(index) {
     tripData.itinerary.splice(index, 1);
     renderAdminDays();
   }
+}
+
+// -----------------------------------------------------------------------------
+// 2. bis GESTION DES BILLETS & DOCUMENTS DE VOYAGE (AGENCE)
+// -----------------------------------------------------------------------------
+function ensureDocumentsStructure() {
+  if (!tripData.documents || !Array.isArray(tripData.documents)) {
+    tripData.documents = [];
+  }
+}
+
+function renderAdminDocuments() {
+  ensureDocumentsStructure();
+  const container = document.getElementById('adm-documents-list');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (tripData.documents.length === 0) {
+    container.innerHTML = `
+      <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:24px; text-align:center; color:#64748b; font-size:0.85rem;">
+        <i class="fa-solid fa-ticket" style="font-size:1.8rem; color:#94a3b8; margin-bottom:8px; display:block;"></i>
+        Aucun document de voyage pour le moment.<br>
+        Cliquez sur <strong>"+ Ajouter un document / billet"</strong> ci-dessus pour associer des e-billets d'avion, vouchers ou billets d'entrée.
+      </div>
+    `;
+    return;
+  }
+
+  tripData.documents.forEach((doc, idx) => {
+    const card = document.createElement('div');
+    card.className = 'section-box';
+    card.style = "margin-bottom:14px; border-left:4px solid var(--accent-gold);";
+
+    card.innerHTML = `
+      <button type="button" class="btn-delete" onclick="removeAdminDocument(${idx})"><i class="fa-solid fa-trash"></i> Supprimer</button>
+
+      <div class="form-row" style="margin-bottom:10px;">
+        <div class="form-group" style="max-width:200px;">
+          <label style="font-weight:700; font-size:0.8rem;">Type de document :</label>
+          <select class="form-control" onchange="updateAdminDocumentField(${idx}, 'type', this.value)">
+            <option value="flight" ${doc.type === 'flight' ? 'selected' : ''}>✈️ Billet d'avion</option>
+            <option value="voucher" ${doc.type === 'voucher' ? 'selected' : ''}>🏨 Bon d'échange (Voucher)</option>
+            <option value="ticket" ${doc.type === 'ticket' ? 'selected' : ''}>🎟️ Billet d'entrée / Activité</option>
+            <option value="guide" ${doc.type === 'guide' ? 'selected' : ''}>🗺️ Plan / Guide officiel</option>
+            <option value="other" ${doc.type === 'other' ? 'selected' : ''}>📁 Autre document officiel</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:700; font-size:0.8rem;">Titre / Désignation :</label>
+          <input type="text" class="form-control" placeholder="Ex: Billet d'avion Aller Lyon ➔ Johannesburg" value="${doc.title || ''}" onchange="updateAdminDocumentField(${idx}, 'title', this.value)">
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-bottom:10px;">
+        <div class="form-group">
+          <label style="font-weight:700; font-size:0.8rem;">Référence / N° dossier / PNR :</label>
+          <input type="text" class="form-control" placeholder="Ex: PNR: EK8294B ou VOUCHER-7782" value="${doc.reference || ''}" onchange="updateAdminDocumentField(${idx}, 'reference', this.value)">
+        </div>
+        <div class="form-group">
+          <label style="font-weight:700; font-size:0.8rem;">Bénéficiaire / Voyageur(s) :</label>
+          <input type="text" class="form-control" placeholder="Ex: M. & Mme Passager ou Tous les participants" value="${doc.beneficiary || ''}" onchange="updateAdminDocumentField(${idx}, 'beneficiary', this.value)">
+        </div>
+        <div class="form-group" style="max-width:180px;">
+          <label style="font-weight:700; font-size:0.8rem;">Date de validité / Jour :</label>
+          <input type="text" class="form-control" placeholder="Ex: 12 Octobre 2026" value="${doc.date || ''}" onchange="updateAdminDocumentField(${idx}, 'date', this.value)">
+        </div>
+      </div>
+
+      <div class="form-row" style="margin-bottom:10px;">
+        <div class="form-group">
+          <label style="font-weight:700; font-size:0.8rem;">Code QR / Code-barres à scanner (Texte du QR) :</label>
+          <input type="text" class="form-control" placeholder="Ex: E-TICKET-EK82-LYS-JNB" value="${doc.qrCode || ''}" onchange="updateAdminDocumentField(${idx}, 'qrCode', this.value)">
+          <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">Le voyageur pourra faire apparaître ce QR Code en plein écran pour les contrôles et bornes.</div>
+        </div>
+        <div class="form-group">
+          <label style="font-weight:700; font-size:0.8rem;">Fichier ou lien du document (PDF ou image) :</label>
+          <div style="display:flex; gap:6px;">
+            <input type="text" id="adm-doc-file-${idx}" class="form-control" placeholder="Chemin local, base64 ou URL https://..." value="${doc.fileUrl || ''}" onchange="updateAdminDocumentField(${idx}, 'fileUrl', this.value)">
+            <button type="button" class="btn-secondary" style="font-size:0.75rem; white-space:nowrap;" onclick="document.getElementById('adm-doc-upload-${idx}').click()">
+              <i class="fa-solid fa-upload"></i> Joindre
+            </button>
+            <input type="file" id="adm-doc-upload-${idx}" accept="image/*,.pdf" style="display:none;" onchange="handleAdminDocFileUpload(event, ${idx})">
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label style="font-weight:700; font-size:0.8rem;">Consignes & Instructions pour le voyageur :</label>
+        <input type="text" class="form-control" placeholder="Ex: À présenter 3h avant au comptoir d'enregistrement Terminal 1 avec passeport." value="${doc.notes || ''}" onchange="updateAdminDocumentField(${idx}, 'notes', this.value)">
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function addNewAdminDocument() {
+  ensureDocumentsStructure();
+  tripData.documents.push({
+    id: "doc_" + Date.now(),
+    type: "flight",
+    title: "Nouveau billet / bon de réservation",
+    reference: "",
+    beneficiary: "Tous les passagers",
+    date: "",
+    qrCode: "",
+    notes: "",
+    fileUrl: ""
+  });
+  renderAdminDocuments();
+}
+
+function removeAdminDocument(idx) {
+  if (confirm("Supprimer ce document de voyage ?")) {
+    tripData.documents.splice(idx, 1);
+    renderAdminDocuments();
+  }
+}
+
+function updateAdminDocumentField(idx, field, value) {
+  ensureDocumentsStructure();
+  tripData.documents[idx][field] = value;
+}
+
+function handleAdminDocFileUpload(e, idx) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    updateAdminDocumentField(idx, 'fileUrl', evt.target.result);
+    const input = document.getElementById(`adm-doc-file-${idx}`);
+    if (input) input.value = evt.target.result.slice(0, 50) + '... (fichier joint)';
+    renderAdminDocuments();
+  };
+  reader.readAsDataURL(file);
 }
 
 // -----------------------------------------------------------------------------
