@@ -15,6 +15,135 @@ let activeDayIndex = 0; // Index of the selected day (0 for Day 1)
 let leafletMap = null;
 let mapMarkers = [];
 
+// Recherche et récupération automatique du logo de compagnie aérienne
+function getAirlineLogoUrl(airlineName = "", flightNumber = "") {
+  if (!airlineName && !flightNumber) return null;
+
+  const cleanName = (airlineName || "").trim().toLowerCase();
+  const cleanFlight = (flightNumber || "").trim().toUpperCase();
+
+  // Dictionnaire IATA des compagnies majeures
+  const airlineCodes = {
+    // France & Europe
+    'air france': 'AF',
+    'airfrance': 'AF',
+    'transavia': 'TO',
+    'easyjet': 'U2',
+    'lufthansa': 'LH',
+    'swiss': 'LX',
+    'austrian': 'OS',
+    'british airways': 'BA',
+    'klm': 'KL',
+    'iberia': 'IB',
+    'tap': 'TP',
+    'tap air portugal': 'TP',
+    'ita airways': 'AZ',
+    'alitalia': 'AZ',
+    'brussels airlines': 'SN',
+    'volotea': 'V7',
+    'vueling': 'VY',
+    'ryanair': 'FR',
+    'wizz': 'W6',
+    'wizz air': 'W6',
+    'aer lingus': 'EI',
+    'sas': 'SK',
+    'scandinavian airlines': 'SK',
+    'finnair': 'AY',
+    'icelandair': 'FI',
+    'norwegian': 'DY',
+    'corsair': 'SS',
+    'air caraibes': 'TX',
+    'air caraïbes': 'TX',
+    'french bee': 'BF',
+    
+    // Moyen-Orient & Golfe
+    'emirates': 'EK',
+    'qatar airways': 'QR',
+    'qatar': 'QR',
+    'etihad': 'EY',
+    'etihad airways': 'EY',
+    'saudia': 'SV',
+    'gulf air': 'GF',
+    'oman air': 'WY',
+    'el al': 'LY',
+    'turkish airlines': 'TK',
+    'turkish': 'TK',
+    'pegasus': 'PC',
+
+    // Afrique
+    'flysafair': 'FA',
+    'safair': 'FA',
+    'cemair': '5Z',
+    'south african airways': 'SA',
+    'airlink': '4Z',
+    'ethiopian airlines': 'ET',
+    'ethiopian': 'ET',
+    'royal air maroc': 'AT',
+    'tunisair': 'TU',
+    'air algerie': 'AH',
+    'air algérie': 'AH',
+    'egyptair': 'MS',
+    'kenya airways': 'KQ',
+    'air mauritius': 'MK',
+    'air madagascar': 'MD',
+    'air seychelles': 'HM',
+
+    // Amérique du Nord
+    'delta': 'DL',
+    'delta air lines': 'DL',
+    'american airlines': 'AA',
+    'united': 'UA',
+    'united airlines': 'UA',
+    'air canada': 'AC',
+    'air transat': 'TS',
+
+    // Asie & Pacifique
+    'singapore airlines': 'SQ',
+    'cathay pacific': 'CX',
+    'thai airways': 'TG',
+    'vietnam airlines': 'VN',
+    'japan airlines': 'JL',
+    'jal': 'JL',
+    'ana': 'NH',
+    'all nippon airways': 'NH',
+    'korean air': 'KE',
+    'air china': 'CA',
+    'china eastern': 'MU',
+    'china southern': 'CZ',
+    'qantas': 'QF',
+    'air new zealand': 'NZ'
+  };
+
+  let code = null;
+
+  // 1. Recherche par nom exact ou partiel
+  for (const [key, c] of Object.entries(airlineCodes)) {
+    if (cleanName.includes(key)) {
+      code = c;
+      break;
+    }
+  }
+
+  // 2. Si non trouvé, tentative d'extraction par préfixe du n° de vol (ex: EK82 -> EK, FA168 -> FA)
+  if (!code && cleanFlight) {
+    const match = cleanFlight.match(/^([A-Z0-9]{2})\s*\d+/);
+    if (match && match[1]) {
+      code = match[1];
+    }
+  }
+
+  if (code) {
+    // Source Duffel haute résolution vectorielle / SVG ou CDN Kiwi 64px
+    return {
+      code: code,
+      svg: `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${code}.svg`,
+      png: `https://images.kiwi.com/airlines/64/${code}.png`
+    };
+  }
+
+  return null;
+}
+
 // Catalogue des voyages pour le client
 function getClientAvailableTrips() {
   const customList = JSON.parse(localStorage.getItem('girardot_trips_catalog') || '[]');
@@ -1188,16 +1317,38 @@ function renderHotelsAndFlights() {
 
     currentTrip.flightsList.forEach(f => {
       const isDomestic = f.type === 'Intérieur';
+      const logoInfo = getAirlineLogoUrl(f.airline, f.flightNumber);
       const card = document.createElement('div');
-      card.style = `background:${isDomestic ? '#f0f9ff' : 'white'}; border-radius:16px; border:1px solid ${isDomestic ? '#bae6fd' : 'var(--border-light)'}; padding:14px; margin-bottom:12px;`;
+      card.style = `background:${isDomestic ? '#f0f9ff' : 'white'}; border-radius:16px; border:1px solid ${isDomestic ? '#bae6fd' : 'var(--border-light)'}; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.03);`;
       
       card.innerHTML = `
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.9rem; color:${isDomestic ? '#0369a1' : 'var(--primary-dark)'};">
-          <span><i class="fa-solid fa-plane"></i> ${f.type || 'Vol'} : ${f.airline || ''}</span>
-          <span style="color:var(--primary-color);">${f.flightNumber || ''}</span>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            ${logoInfo ? `
+              <div style="background:white; border:1px solid #e2e8f0; border-radius:8px; padding:3px 6px; display:flex; align-items:center; justify-content:center; min-width:44px; height:32px; box-shadow:0 1px 3px rgba(0,0,0,0.06);">
+                <img src="${logoInfo.svg}" alt="${f.airline}" onerror="this.onerror=null; this.src='${logoInfo.png}'; this.parentElement.style.display='inline-flex';" style="max-height:22px; max-width:54px; object-fit:contain;">
+              </div>
+            ` : `
+              <div style="background:#eef7f2; border-radius:8px; width:32px; height:32px; display:flex; align-items:center; justify-content:center; color:var(--primary-color);">
+                <i class="fa-solid fa-plane"></i>
+              </div>
+            `}
+            <div>
+              <div style="font-weight:800; font-size:0.92rem; color:${isDomestic ? '#0369a1' : 'var(--primary-dark)'};">
+                ${f.airline || 'Compagnie Aérienne'}
+              </div>
+              <div style="font-size:0.75rem; color:#64748b; font-weight:600;">
+                ${f.type || 'Vol'}
+              </div>
+            </div>
+          </div>
+          <span style="color:var(--primary-color); font-weight:800; font-family:monospace; font-size:0.95rem; background:#f1f5f9; padding:3px 8px; border-radius:6px;">
+            ${f.flightNumber || ''}
+          </span>
         </div>
-        <div style="font-size:0.82rem; color:#0f172a; margin:4px 0;">
-          ${f.date ? `${f.date} • ` : ''}${f.departureAirport || 'Départ'} ${f.departureTime ? `(${f.departureTime})` : ''} ➔ ${f.arrivalAirport || 'Arrivée'} ${f.arrivalTime ? `(${f.arrivalTime})` : ''}
+
+        <div style="font-size:0.84rem; color:#0f172a; margin:6px 0; font-weight:600;">
+          ${f.date ? `<span style="color:#64748b; font-weight:normal;">${f.date} • </span>` : ''}<strong>${f.departureAirport || 'Départ'}</strong> ${f.departureTime ? `(${f.departureTime})` : ''} ➔ <strong>${f.arrivalAirport || 'Arrivée'}</strong> ${f.arrivalTime ? `(${f.arrivalTime})` : ''}
         </div>
         ${f.via ? `
           <div style="font-size:0.78rem; color:#b45309; background:#fffbeb; padding:4px 8px; border-radius:6px; margin:4px 0; display:inline-block;">
@@ -1211,33 +1362,55 @@ function renderHotelsAndFlights() {
   } else if (currentTrip.flights) {
     // Rétrocompatibilité avec l'ancien format d'origine
     const f = currentTrip.flights;
+    const outboundLogo = getAirlineLogoUrl(f.outbound.airline, f.outbound.flightNumber);
     flightsContainer.innerHTML = `
       <h3 style="font-size:1.1rem; font-weight:800; color:var(--primary-dark); margin-bottom:10px;">
         <i class="fa-solid fa-plane-departure" style="color:var(--accent-gold); margin-right:6px;"></i> Vols Internationaux & Intérieurs
       </h3>
-      <div style="background:white; border-radius:16px; border:1px solid var(--border-light); padding:14px; margin-bottom:12px;">
-        <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.9rem;">
-          <span>Vol Aller : ${f.outbound.airline}</span>
-          <span style="color:var(--primary-color);">${f.outbound.flightNumber}</span>
+      <div style="background:white; border-radius:16px; border:1px solid var(--border-light); padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            ${outboundLogo ? `
+              <div style="background:white; border:1px solid #e2e8f0; border-radius:8px; padding:3px 6px; display:flex; align-items:center; justify-content:center; min-width:44px; height:32px;">
+                <img src="${outboundLogo.svg}" alt="${f.outbound.airline}" onerror="this.onerror=null; this.src='${outboundLogo.png}';" style="max-height:22px; max-width:54px; object-fit:contain;">
+              </div>
+            ` : ''}
+            <div>
+              <div style="font-weight:800; font-size:0.92rem; color:var(--primary-dark);">Vol Aller : ${f.outbound.airline}</div>
+            </div>
+          </div>
+          <span style="color:var(--primary-color); font-weight:800; font-family:monospace; font-size:0.95rem; background:#f1f5f9; padding:3px 8px; border-radius:6px;">${f.outbound.flightNumber}</span>
         </div>
-        <div style="font-size:0.8rem; color:#475569; margin:4px 0;">
+        <div style="font-size:0.84rem; color:#0f172a; margin:4px 0;">
           ${f.outbound.date} • ${f.outbound.departureAirport} (${f.outbound.departureTime}) ➔ ${f.outbound.arrivalAirport}
         </div>
         <div style="font-size:0.76rem; color:#64748b;">${f.outbound.layover}</div>
       </div>
 
-      ${(f.domesticFlights && f.domesticFlights.length) ? f.domesticFlights.map(df => `
-        <div style="background:#f0f9ff; border-radius:16px; border:1px solid #bae6fd; padding:14px; margin-bottom:12px;">
-          <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.9rem; color:#0369a1;">
-            <span><i class="fa-solid fa-plane"></i> Vol Intérieur (Jour ${df.day})</span>
-            <span>${df.airline} • ${df.flightNumber}</span>
+      ${(f.domesticFlights && f.domesticFlights.length) ? f.domesticFlights.map(df => {
+        const dfLogo = getAirlineLogoUrl(df.airline, df.flightNumber);
+        return `
+          <div style="background:#f0f9ff; border-radius:16px; border:1px solid #bae6fd; padding:14px; margin-bottom:12px; box-shadow:0 2px 8px rgba(0,0,0,0.03);">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; gap:10px;">
+              <div style="display:flex; align-items:center; gap:10px;">
+                ${dfLogo ? `
+                  <div style="background:white; border:1px solid #e2e8f0; border-radius:8px; padding:3px 6px; display:flex; align-items:center; justify-content:center; min-width:44px; height:32px;">
+                    <img src="${dfLogo.svg}" alt="${df.airline}" onerror="this.onerror=null; this.src='${dfLogo.png}';" style="max-height:22px; max-width:54px; object-fit:contain;">
+                  </div>
+                ` : ''}
+                <div>
+                  <div style="font-weight:800; font-size:0.9rem; color:#0369a1;"><i class="fa-solid fa-plane"></i> Vol Intérieur (Jour ${df.day}) : ${df.airline}</div>
+                </div>
+              </div>
+              <span style="color:#0284c7; font-weight:800; font-family:monospace; font-size:0.9rem; background:white; padding:3px 8px; border-radius:6px;">${df.flightNumber}</span>
+            </div>
+            <div style="font-size:0.82rem; color:#0f172a; margin:4px 0;">
+              ${df.departureAirport} ➔ ${df.arrivalAirport}
+            </div>
+            <div style="font-size:0.76rem; color:#0284c7;">${df.notes}</div>
           </div>
-          <div style="font-size:0.82rem; color:#0f172a; margin:4px 0;">
-            ${df.departureAirport} ➔ ${df.arrivalAirport}
-          </div>
-          <div style="font-size:0.76rem; color:#0284c7;">${df.notes}</div>
-        </div>
-      `).join('') : ''}
+        `;
+      }).join('') : ''}
     `;
   }
 
@@ -1926,7 +2099,17 @@ function renderClientDocuments() {
         </span>
       </div>
 
-      <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-main); margin-bottom:4px;">${doc.title}</h3>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; gap:8px;">
+        <h3 style="font-size:1.05rem; font-weight:800; color:var(--text-main); margin:0;">${doc.title}</h3>
+        ${doc.type === 'flight' ? (() => {
+          const lInfo = getAirlineLogoUrl(doc.title + " " + (doc.notes || ''), doc.reference);
+          return lInfo ? `
+            <div style="background:white; border:1px solid #e2e8f0; border-radius:6px; padding:2px 6px; display:inline-flex; align-items:center; justify-content:center; height:26px; box-shadow:0 1px 2px rgba(0,0,0,0.05);">
+              <img src="${lInfo.svg}" alt="Logo" onerror="this.onerror=null; this.src='${lInfo.png}';" style="max-height:18px; max-width:44px; object-fit:contain;">
+            </div>
+          ` : '';
+        })() : ''}
+      </div>
       ${doc.reference ? `<div style="font-size:0.82rem; font-family:monospace; font-weight:700; color:#0284c7; margin-bottom:4px;"><i class="fa-solid fa-barcode"></i> ${doc.reference}</div>` : ''}
       
       <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:0.8rem; color:#64748b; margin:6px 0 10px;">

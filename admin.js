@@ -382,6 +382,151 @@ function ensureFlightsListStructure() {
   }
 }
 
+// Recherche et récupération automatique du logo de compagnie aérienne
+function getAirlineLogoUrl(airlineName = "", flightNumber = "") {
+  if (!airlineName && !flightNumber) return null;
+
+  const cleanName = (airlineName || "").trim().toLowerCase();
+  const cleanFlight = (flightNumber || "").trim().toUpperCase();
+
+  const airlineCodes = {
+    // France & Europe
+    'air france': 'AF',
+    'airfrance': 'AF',
+    'transavia': 'TO',
+    'easyjet': 'U2',
+    'lufthansa': 'LH',
+    'swiss': 'LX',
+    'austrian': 'OS',
+    'british airways': 'BA',
+    'klm': 'KL',
+    'iberia': 'IB',
+    'tap': 'TP',
+    'tap air portugal': 'TP',
+    'ita airways': 'AZ',
+    'alitalia': 'AZ',
+    'brussels airlines': 'SN',
+    'volotea': 'V7',
+    'vueling': 'VY',
+    'ryanair': 'FR',
+    'wizz': 'W6',
+    'wizz air': 'W6',
+    'aer lingus': 'EI',
+    'sas': 'SK',
+    'scandinavian airlines': 'SK',
+    'finnair': 'AY',
+    'icelandair': 'FI',
+    'norwegian': 'DY',
+    'corsair': 'SS',
+    'air caraibes': 'TX',
+    'air caraïbes': 'TX',
+    'french bee': 'BF',
+    
+    // Moyen-Orient & Golfe
+    'emirates': 'EK',
+    'qatar airways': 'QR',
+    'qatar': 'QR',
+    'etihad': 'EY',
+    'etihad airways': 'EY',
+    'saudia': 'SV',
+    'gulf air': 'GF',
+    'oman air': 'WY',
+    'el al': 'LY',
+    'turkish airlines': 'TK',
+    'turkish': 'TK',
+    'pegasus': 'PC',
+
+    // Afrique
+    'flysafair': 'FA',
+    'safair': 'FA',
+    'cemair': '5Z',
+    'south african airways': 'SA',
+    'airlink': '4Z',
+    'ethiopian airlines': 'ET',
+    'ethiopian': 'ET',
+    'royal air maroc': 'AT',
+    'tunisair': 'TU',
+    'air algerie': 'AH',
+    'air algérie': 'AH',
+    'egyptair': 'MS',
+    'kenya airways': 'KQ',
+    'air mauritius': 'MK',
+    'air madagascar': 'MD',
+    'air seychelles': 'HM',
+
+    // Amérique du Nord
+    'delta': 'DL',
+    'delta air lines': 'DL',
+    'american airlines': 'AA',
+    'united': 'UA',
+    'united airlines': 'UA',
+    'air canada': 'AC',
+    'air transat': 'TS',
+
+    // Asie & Pacifique
+    'singapore airlines': 'SQ',
+    'cathay pacific': 'CX',
+    'thai airways': 'TG',
+    'vietnam airlines': 'VN',
+    'japan airlines': 'JL',
+    'jal': 'JL',
+    'ana': 'NH',
+    'all nippon airways': 'NH',
+    'korean air': 'KE',
+    'air china': 'CA',
+    'china eastern': 'MU',
+    'china southern': 'CZ',
+    'qantas': 'QF',
+    'air new zealand': 'NZ'
+  };
+
+  let code = null;
+
+  // 1. Recherche par nom exact ou partiel
+  for (const [key, c] of Object.entries(airlineCodes)) {
+    if (cleanName.includes(key)) {
+      code = c;
+      break;
+    }
+  }
+
+  // 2. Si non trouvé, tentative d'extraction par préfixe du n° de vol
+  if (!code && cleanFlight) {
+    const match = cleanFlight.match(/^([A-Z0-9]{2})\s*\d+/);
+    if (match && match[1]) {
+      code = match[1];
+    }
+  }
+
+  if (code) {
+    return {
+      code: code,
+      svg: `https://assets.duffel.com/img/airlines/for-light-background/full-color-logo/${code}.svg`,
+      png: `https://images.kiwi.com/airlines/64/${code}.png`
+    };
+  }
+
+  return null;
+}
+
+function updateFlightLogoPreview(idx) {
+  const f = tripData.flightsList[idx];
+  const previewEl = document.getElementById(`adm-flight-logo-${idx}`);
+  if (!f || !previewEl) return;
+
+  const logoInfo = getAirlineLogoUrl(f.airline, f.flightNumber);
+  if (logoInfo) {
+    previewEl.innerHTML = `
+      <img src="${logoInfo.svg}" alt="${logoInfo.code}" onerror="this.onerror=null; this.src='${logoInfo.png}';" style="max-height:22px; max-width:60px; object-fit:contain;">
+      <span style="font-size:0.7rem; font-weight:700; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${logoInfo.code}</span>
+    `;
+    previewEl.style.display = 'inline-flex';
+  } else {
+    previewEl.innerHTML = `<span style="font-size:0.75rem; color:#94a3b8;"><i class="fa-solid fa-plane"></i> Aucun logo détecté</span>`;
+    previewEl.style.display = 'inline-flex';
+  }
+}
+
 function renderAdminFlights() {
   const container = document.getElementById('adm-flights-list');
   if (!container) return;
@@ -397,6 +542,7 @@ function renderAdminFlights() {
   }
 
   tripData.flightsList.forEach((f, idx) => {
+    const logoInfo = getAirlineLogoUrl(f.airline, f.flightNumber);
     const card = document.createElement('div');
     card.className = 'section-box';
     card.style = "margin-bottom:14px; border-left:4px solid var(--primary-color);";
@@ -414,10 +560,20 @@ function renderAdminFlights() {
           </select>
         </div>
         <div class="form-group">
-          <label>Compagnie & N° de vol :</label>
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <label style="margin:0;">Compagnie & N° de vol :</label>
+            <div id="adm-flight-logo-${idx}" style="display:inline-flex; align-items:center; gap:6px; background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:2px 8px; min-height:26px;">
+              ${logoInfo ? `
+                <img src="${logoInfo.svg}" alt="${logoInfo.code}" onerror="this.onerror=null; this.src='${logoInfo.png}';" style="max-height:22px; max-width:60px; object-fit:contain;">
+                <span style="font-size:0.7rem; font-weight:700; color:#0284c7; background:#e0f2fe; padding:2px 6px; border-radius:4px;">${logoInfo.code}</span>
+              ` : `
+                <span style="font-size:0.75rem; color:#94a3b8;"><i class="fa-solid fa-plane"></i> Auto-détection</span>
+              `}
+            </div>
+          </div>
           <div style="display:flex; gap:8px;">
-            <input type="text" class="form-control" placeholder="Ex: Emirates ou Air France" value="${f.airline || ''}" onchange="updateFlightField(${idx}, 'airline', this.value)">
-            <input type="text" class="form-control" placeholder="N° ex: EK82" style="max-width:140px;" value="${f.flightNumber || ''}" onchange="updateFlightField(${idx}, 'flightNumber', this.value)">
+            <input type="text" class="form-control" placeholder="Ex: Emirates ou Air France" value="${f.airline || ''}" oninput="updateFlightField(${idx}, 'airline', this.value); updateFlightLogoPreview(${idx});" onchange="updateFlightField(${idx}, 'airline', this.value); updateFlightLogoPreview(${idx});">
+            <input type="text" class="form-control" placeholder="N° ex: EK82" style="max-width:140px;" value="${f.flightNumber || ''}" oninput="updateFlightField(${idx}, 'flightNumber', this.value); updateFlightLogoPreview(${idx});" onchange="updateFlightField(${idx}, 'flightNumber', this.value); updateFlightLogoPreview(${idx});">
           </div>
         </div>
       </div>
