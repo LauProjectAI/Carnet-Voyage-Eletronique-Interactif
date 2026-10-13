@@ -296,6 +296,7 @@ function populateForm() {
   document.getElementById('adm-dates').value = tripData.dates || '';
   document.getElementById('adm-cover').value = tripData.coverImage || '';
   document.getElementById('adm-intro').value = tripData.intro || '';
+  updateCoverPreview(tripData.coverImage || '');
 
   // Alert
   if (tripData.alert) {
@@ -686,6 +687,28 @@ function renderAdminDays() {
       <div class="form-group">
         <label>Description globale du programme :</label>
         <textarea class="form-control" rows="2" onchange="updateDayField(${dayIndex}, 'description', this.value)">${item.description || ''}</textarea>
+      </div>
+
+      <div class="form-group" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:14px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+          <label style="margin:0; font-weight:700; color:var(--primary-dark); font-size:0.85rem;">
+            <i class="fa-solid fa-camera" style="color:var(--accent-gold); margin-right:4px;"></i> Photo d'illustration de cette étape (Jour ${item.day}) :
+          </label>
+          <button type="button" onclick="openPhotoPickerModal('day', ${dayIndex})" class="btn-secondary" style="font-size:0.75rem; padding:3px 10px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Proposer une photo
+          </button>
+        </div>
+        <div style="display:flex; gap:8px; align-items:center;">
+          <input type="text" id="day-image-${dayIndex}" class="form-control" placeholder="Chemin local ou URL de la photo..." value="${item.image || ''}" oninput="updateDayField(${dayIndex}, 'image', this.value); updateDayImagePreview(${dayIndex}, this.value);" onchange="updateDayField(${dayIndex}, 'image', this.value); updateDayImagePreview(${dayIndex}, this.value);">
+          <div id="day-image-preview-${dayIndex}" style="width:64px; height:42px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+            ${item.image ? `<img src="${item.image}" alt="Aperçu" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-triangle-exclamation\\' style=\\'color:#f59e0b; font-size:0.8rem;\\'></i>';">` : `<i class="fa-solid fa-image" style="color:#94a3b8; font-size:0.9rem;"></i>`}
+          </div>
+          ${item.image ? `
+            <button type="button" onclick="clearDayImage(${dayIndex})" class="btn-delete" style="position:static; padding:6px 8px;" title="Retirer l'image">
+              <i class="fa-solid fa-xmark"></i>
+            </button>
+          ` : ''}
+        </div>
       </div>
 
       <div class="form-row" style="margin-bottom:8px;">
@@ -2578,5 +2601,193 @@ function updateShareLink() {
         }
       });
     };
+  }
+}
+
+// -----------------------------------------------------------------------------
+// MODULE DE RECHERCHE & PROPOSITION DE PHOTOS LIBRES (Wikimedia Commons)
+// -----------------------------------------------------------------------------
+let currentPhotoTarget = { type: null, dayIndex: null };
+
+function updateCoverPreview(url) {
+  const preview = document.getElementById('adm-cover-preview');
+  if (!preview) return;
+  if (url && url.trim()) {
+    preview.innerHTML = `<img src="${url.trim()}" alt="Couverture" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-triangle-exclamation\\' style=\\'color:#f59e0b; font-size:0.8rem;\\'></i>';">`;
+  } else {
+    preview.innerHTML = `<i class="fa-solid fa-image" style="color:#94a3b8; font-size:0.9rem;"></i>`;
+  }
+}
+
+function updateDayImagePreview(dayIndex, url) {
+  const preview = document.getElementById(`day-image-preview-${dayIndex}`);
+  if (!preview) return;
+  if (url && url.trim()) {
+    preview.innerHTML = `<img src="${url.trim()}" alt="Aperçu" style="width:100%; height:100%; object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-triangle-exclamation\\' style=\\'color:#f59e0b; font-size:0.8rem;\\'></i>';">`;
+  } else {
+    preview.innerHTML = `<i class="fa-solid fa-image" style="color:#94a3b8; font-size:0.9rem;"></i>`;
+  }
+}
+
+function clearDayImage(dayIndex) {
+  updateDayField(dayIndex, 'image', '');
+  const input = document.getElementById(`day-image-${dayIndex}`);
+  if (input) input.value = '';
+  updateDayImagePreview(dayIndex, '');
+  renderAdminDays();
+}
+
+function openPhotoPickerModal(targetType, dayIndex = null) {
+  currentPhotoTarget = { type: targetType, dayIndex: dayIndex };
+  const modal = document.getElementById('photo-picker-modal');
+  const titleEl = document.getElementById('photo-modal-title');
+  const subtitleEl = document.getElementById('photo-modal-subtitle');
+  const searchInput = document.getElementById('photo-search-input');
+  const grid = document.getElementById('photo-results-grid');
+
+  if (!modal) return;
+
+  // Déterminer le terme de recherche par défaut
+  let defaultQuery = '';
+  if (targetType === 'general') {
+    titleEl.innerHTML = `<i class="fa-solid fa-earth-americas" style="color:var(--accent-gold);"></i> Proposer une photo de destination générale`;
+    subtitleEl.innerText = `Cette photo apparaîtra en couverture et en en-tête principal du carnet.`;
+    defaultQuery = (tripData && tripData.title) ? tripData.title : 'Voyage paysage';
+  } else if (targetType === 'day' && dayIndex !== null) {
+    const day = tripData.itinerary[dayIndex];
+    titleEl.innerHTML = `<i class="fa-solid fa-camera-retro" style="color:var(--accent-gold);"></i> Proposer une photo pour le Jour ${day ? day.day : ''}`;
+    subtitleEl.innerText = `Cette photo illustrera la carte de cette étape dans le carnet et le circuit.`;
+    defaultQuery = (day && day.city) ? day.city : (day && day.title ? day.title : (tripData ? tripData.title : ''));
+  }
+
+  // Nettoyage de la requête pour retirer les puces ou tirets superflus
+  defaultQuery = defaultQuery.split('•')[0].split('—')[0].trim();
+  if (searchInput) searchInput.value = defaultQuery;
+
+  modal.style.display = 'flex';
+
+  // Lancer la recherche automatiquement
+  if (defaultQuery) {
+    searchWikimediaPhotos(defaultQuery);
+  } else if (grid) {
+    grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Saisissez un mot-clé ci-dessus pour lancer la recherche.</div>`;
+  }
+}
+
+function closePhotoPickerModal() {
+  const modal = document.getElementById('photo-picker-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function triggerPhotoSearch() {
+  const input = document.getElementById('photo-search-input');
+  const q = input ? input.value.trim() : '';
+  if (q) {
+    searchWikimediaPhotos(q);
+  }
+}
+
+function searchWikimediaPhotos(query) {
+  const grid = document.getElementById('photo-results-grid');
+  if (!grid) return;
+
+  grid.innerHTML = `
+    <div style="grid-column:1/-1; text-align:center; padding:40px; color:#0284c7;">
+      <i class="fa-solid fa-spinner fa-spin" style="font-size:2rem; margin-bottom:12px;"></i>
+      <div style="font-size:0.9rem; font-weight:700;">Recherche de photos panoramiques en cours...</div>
+      <div style="font-size:0.75rem; color:#64748b; margin-top:4px;">Interrogation de la médiathèque Wikimedia Commons</div>
+    </div>
+  `;
+
+  const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=6&gsrlimit=12&prop=imageinfo&iiprop=url|dimensions&iiurlwidth=800`;
+
+  fetch(url)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.query || !data.query.pages) {
+        grid.innerHTML = `
+          <div style="grid-column:1/-1; text-align:center; padding:40px; color:#64748b;">
+            <i class="fa-regular fa-image" style="font-size:2rem; color:#cbd5e1; margin-bottom:8px;"></i>
+            <div style="font-weight:700;">Aucune photo trouvée pour "${query}".</div>
+            <div style="font-size:0.8rem; margin-top:4px;">Essayez avec le nom en anglais ou un mot-clé plus général (ex: "Cape Town", "Kruger", "Safari").</div>
+          </div>
+        `;
+        return;
+      }
+
+      const pages = Object.values(data.query.pages);
+      // Filtrer pour ne garder que les vraies images (jpg, jpeg, png, webp)
+      const validImages = pages.filter(p => {
+        const title = (p.title || '').toLowerCase();
+        return (title.endsWith('.jpg') || title.endsWith('.jpeg') || title.endsWith('.png') || title.endsWith('.webp')) && !title.includes('icon') && !title.includes('flag');
+      });
+
+      if (validImages.length === 0) {
+        grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:30px; color:#64748b;">Aucune photo exploitable trouvée pour "${query}".</div>`;
+        return;
+      }
+
+      grid.innerHTML = '';
+      validImages.forEach(page => {
+        const info = (page.imageinfo && page.imageinfo[0]) ? page.imageinfo[0] : null;
+        if (!info) return;
+
+        const thumbUrl = info.thumburl || info.url;
+        const cleanTitle = page.title.replace('File:', '').replace(/_/g, ' ');
+
+        const card = document.createElement('div');
+        card.style = `border:1px solid #e2e8f0; border-radius:12px; overflow:hidden; background:white; display:flex; flex-direction:column; box-shadow:0 1px 3px rgba(0,0,0,0.05); transition:transform 0.15s, box-shadow 0.15s;`;
+        card.onmouseover = () => { card.style.transform = 'translateY(-2px)'; card.style.boxShadow = '0 6px 12px rgba(0,0,0,0.1)'; };
+        card.onmouseout = () => { card.style.transform = 'none'; card.style.boxShadow = '0 1px 3px rgba(0,0,0,0.05)'; };
+
+        card.innerHTML = `
+          <div style="height:120px; width:100%; background:#f1f5f9; overflow:hidden; position:relative;">
+            <img src="${thumbUrl}" alt="${cleanTitle}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+          <div style="padding:10px; display:flex; flex-direction:column; justify-content:space-between; flex:1;">
+            <div style="font-size:0.75rem; color:#334155; font-weight:600; line-height:1.3; margin-bottom:8px; max-height:2.6em; overflow:hidden; text-overflow:ellipsis;">
+              ${cleanTitle}
+            </div>
+            <button type="button" class="btn-save-main" style="width:100%; padding:6px 10px; font-size:0.75rem; justify-content:center; border-radius:6px; box-shadow:none;">
+              <i class="fa-solid fa-check"></i> Valider cette photo
+            </button>
+          </div>
+        `;
+
+        card.querySelector('button').onclick = () => {
+          applySelectedPhoto(thumbUrl);
+        };
+
+        grid.appendChild(card);
+      });
+    })
+    .catch(err => {
+      console.warn("Erreur recherche Wikimedia:", err);
+      grid.innerHTML = `
+        <div style="grid-column:1/-1; text-align:center; padding:30px; color:#dc2626;">
+          <i class="fa-solid fa-triangle-exclamation" style="font-size:1.8rem; margin-bottom:6px;"></i>
+          <div>Connexion impossible à la médiathèque. Vous pouvez saisir l'adresse URL manuellement.</div>
+        </div>
+      `;
+    });
+}
+
+function applySelectedPhoto(photoUrl) {
+  if (currentPhotoTarget.type === 'general') {
+    const input = document.getElementById('adm-cover');
+    if (input) input.value = photoUrl;
+    tripData.coverImage = photoUrl;
+    updateCoverPreview(photoUrl);
+    closePhotoPickerModal();
+    alert("✓ Photo de destination générale validée avec succès ! Pensez à enregistrer vos modifications.");
+  } else if (currentPhotoTarget.type === 'day' && currentPhotoTarget.dayIndex !== null) {
+    const idx = currentPhotoTarget.dayIndex;
+    updateDayField(idx, 'image', photoUrl);
+    const input = document.getElementById(`day-image-${idx}`);
+    if (input) input.value = photoUrl;
+    updateDayImagePreview(idx, photoUrl);
+    closePhotoPickerModal();
+    renderAdminDays();
+    alert(`✓ Photo du Jour ${tripData.itinerary[idx].day} validée avec succès ! Pensez à enregistrer vos modifications.`);
   }
 }

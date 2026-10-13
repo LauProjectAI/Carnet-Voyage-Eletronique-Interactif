@@ -417,6 +417,34 @@ function renderTodayFocus() {
   const currentDay = currentTrip.itinerary[activeDayIndex];
   if (!currentDay) return;
 
+  // 1. Bannière générale de la destination (En haut du carnet)
+  const heroBanner = document.getElementById('destination-hero-banner');
+  const heroImg = document.getElementById('destination-hero-img');
+  const heroTitle = document.getElementById('destination-hero-title');
+  const heroSub = document.getElementById('destination-hero-sub');
+
+  if (heroBanner && currentTrip.coverImage) {
+    heroImg.src = currentTrip.coverImage;
+    heroTitle.innerText = currentTrip.title || "Votre Voyage";
+    heroSub.innerText = currentTrip.subtitle || "Voyages Girardot";
+    heroBanner.style.display = 'block';
+  } else if (heroBanner) {
+    heroBanner.style.display = 'none';
+  }
+
+  // 2. Photo d'illustration spécifique de l'étape (Jour sélectionné)
+  const dayPhotoBox = document.getElementById('day-focus-photo-box');
+  const dayPhotoImg = document.getElementById('day-focus-photo-img');
+  const dayPhotoCaption = document.getElementById('day-focus-photo-caption');
+
+  if (dayPhotoBox && currentDay.image) {
+    dayPhotoImg.src = currentDay.image;
+    dayPhotoCaption.innerText = currentDay.highlight || currentDay.title || `Étape Jour ${currentDay.day}`;
+    dayPhotoBox.style.display = 'block';
+  } else if (dayPhotoBox) {
+    dayPhotoBox.style.display = 'none';
+  }
+
   // Header Title & Weather
   document.getElementById('day-headline').innerText = `Jour ${currentDay.day} • ${currentDay.city || ''}`;
   document.getElementById('day-date-text').innerText = currentDay.dateStr || `Étape ${currentDay.day}`;
@@ -618,6 +646,14 @@ function renderFullCircuit() {
     const gpsUrl = (item.lat && item.lng) ? getGpsUrl(item.lat, item.lng, item.title) : null;
 
     card.innerHTML = `
+      ${item.image ? `
+        <div style="height:140px; margin:-16px -16px 12px -16px; border-radius:18px 18px 0 0; overflow:hidden; position:relative;">
+          <img src="${item.image}" alt="${item.title}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
+          <div style="position:absolute; bottom:8px; left:12px; background:rgba(0,0,0,0.6); color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; backdrop-filter:blur(2px);">
+            <i class="fa-solid fa-camera"></i> ${item.city || `Jour ${item.day}`}
+          </div>
+        </div>
+      ` : ''}
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="background:var(--primary-color); color:white; font-size:0.75rem; font-weight:800; padding:3px 10px; border-radius:20px;">
           Jour ${item.day}

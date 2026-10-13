@@ -49,6 +49,15 @@
       <!-- 1. VUE "AUJOURD'HUI" : ÉDITORIAL MAGAZINE DU JOUR (RÉFÉRENCE PHOTO) -->
       <section id="tab-today" class="tab-page-view active">
         
+        <!-- Bannière Couverture Destination Générale (Haut de page) -->
+        <div id="destination-hero-banner" style="display:none; position:relative; width:100%; height:180px; overflow:hidden; border-radius:0 0 24px 24px; box-shadow:var(--shadow-sm); margin-bottom:12px;">
+          <img id="destination-hero-img" src="" alt="Destination" style="width:100%; height:100%; object-fit:cover;">
+          <div style="position:absolute; inset:0; background:linear-gradient(to top, rgba(15,23,42,0.85) 0%, rgba(15,23,42,0.2) 60%, rgba(0,0,0,0) 100%); display:flex; flex-direction:column; justify-content:flex-end; padding:16px 20px;">
+            <div id="destination-hero-sub" style="color:var(--accent-gold); font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:2px;"></div>
+            <h1 id="destination-hero-title" style="color:white; font-size:1.45rem; font-weight:800; margin:0; line-height:1.2;"></h1>
+          </div>
+        </div>
+
         <!-- Titre Editorial du Jour -->
         <div class="day-focus-header">
           <div>
@@ -58,6 +67,12 @@
               <span class="weather-pill" id="day-weather-pill"><i class="fa-solid fa-cloud-sun"></i> 22°C • 14:15</span>
             </div>
           </div>
+        </div>
+
+        <!-- Photo d'illustration de l'étape sélectionnée (Jour en cours) -->
+        <div id="day-focus-photo-box" style="display:none; margin:4px 20px 14px; border-radius:16px; overflow:hidden; position:relative; max-height:220px; box-shadow:0 4px 14px rgba(0,0,0,0.08);">
+          <img id="day-focus-photo-img" src="" alt="Étape" style="width:100%; height:200px; object-fit:cover; display:block;">
+          <div id="day-focus-photo-caption" style="position:absolute; bottom:0; left:0; right:0; background:linear-gradient(to top, rgba(0,0,0,0.7), transparent); padding:8px 14px; color:white; font-size:0.8rem; font-weight:700;"></div>
         </div>
 
         <!-- Sélecteur rapide des jours -->

@@ -242,8 +242,18 @@
             <input type="text" id="adm-dates" class="form-control" placeholder="Ex: Du 12 au 22 octobre 2026">
           </div>
           <div class="form-group">
-            <label>Image de couverture (Chemin ou URL) :</label>
-            <input type="text" id="adm-cover" class="form-control" placeholder="Ex: Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+              <label style="margin:0;">Photo de la destination générale (Couverture) :</label>
+              <button type="button" onclick="openPhotoPickerModal('general')" class="btn-secondary" style="font-size:0.75rem; padding:3px 10px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> Proposer une photo
+              </button>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="adm-cover" class="form-control" placeholder="Chemin d'image ou URL..." oninput="updateCoverPreview(this.value)">
+              <div id="adm-cover-preview" style="width:52px; height:38px; border-radius:6px; border:1px solid #cbd5e1; background:#f8fafc; overflow:hidden; flex-shrink:0; display:flex; align-items:center; justify-content:center;">
+                <i class="fa-solid fa-image" style="color:#94a3b8; font-size:0.9rem;"></i>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -403,6 +413,38 @@
 
     </form>
 
+  </div>
+
+  <!-- MODALE DE SÉLECTION DE PHOTOS (Destination & Étapes) -->
+  <div id="photo-picker-modal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.65); z-index:99999; backdrop-filter:blur(4px); align-items:center; justify-content:center; padding:16px;">
+    <div style="background:white; border-radius:18px; max-width:680px; width:100%; max-height:90vh; display:flex; flex-direction:column; overflow:hidden; box-shadow:0 20px 25px -5px rgba(0,0,0,0.25);">
+      <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #e2e8f0; background:#f8fafc;">
+        <div>
+          <h3 id="photo-modal-title" style="margin:0; font-size:1.1rem; font-weight:800; color:var(--primary-dark); display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-camera-retro" style="color:var(--accent-gold);"></i> Proposer une photo
+          </h3>
+          <p id="photo-modal-subtitle" style="margin:2px 0 0; font-size:0.78rem; color:#64748b;">Sélectionnez une photo haute définition pour votre étape ou destination.</p>
+        </div>
+        <button type="button" onclick="closePhotoPickerModal()" style="background:none; border:none; font-size:1.3rem; color:#64748b; cursor:pointer;">&times;</button>
+      </div>
+
+      <!-- Barre de recherche -->
+      <div style="padding:14px 20px; background:#ffffff; border-bottom:1px solid #f1f5f9; display:flex; gap:8px;">
+        <input type="text" id="photo-search-input" class="form-control" placeholder="Rechercher un lieu, monument, paysage..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault(); triggerPhotoSearch();}">
+        <button type="button" onclick="triggerPhotoSearch()" class="btn-save-main" style="padding:8px 16px; font-size:0.85rem; border-radius:8px;">
+          <i class="fa-solid fa-magnifying-glass"></i> Rechercher
+        </button>
+      </div>
+
+      <!-- Galerie des résultats -->
+      <div id="photo-results-grid" style="padding:16px 20px; overflow-y:auto; flex:1; min-height:280px; display:grid; grid-template-columns:repeat(auto-fill, minmax(180px, 1fr)); gap:12px;">
+      </div>
+
+      <div style="padding:12px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <span style="font-size:0.75rem; color:#64748b;"><i class="fa-brands fa-wikipedia-w"></i> Photos libres de droits issues de Wikimedia Commons</span>
+        <button type="button" onclick="closePhotoPickerModal()" class="btn-secondary" style="padding:6px 14px; font-size:0.8rem;">Fermer</button>
+      </div>
+    </div>
   </div>
 
   <script src="voyages/index_voyages.js"></script>
