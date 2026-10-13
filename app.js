@@ -820,7 +820,7 @@ function executeConciergeQuery(query) {
     }
 
     transportTheme.places.forEach(place => {
-      listEl.appendChild(createConciergePlaceCard(place));
+      listEl.appendChild(createConciergePlaceCard(place, 'transports'));
     });
 
     resultsBox.style.display = 'block';
@@ -940,7 +940,7 @@ function executeConciergeQuery(query) {
     `;
 
     filteredPlaces.forEach(item => {
-      listEl.appendChild(createConciergePlaceCard(item.place));
+      listEl.appendChild(createConciergePlaceCard(item.place, (item.theme && item.theme.id) ? item.theme.id : ''));
     });
   } else {
     // Si aucun mot-clé strict n'est trouvé, afficher un message d'aide
@@ -1049,7 +1049,7 @@ function selectConciergeTheme(themeId) {
     `;
   } else {
     theme.places.forEach(place => {
-      listEl.appendChild(createConciergePlaceCard(place));
+      listEl.appendChild(createConciergePlaceCard(place, theme.id));
     });
   }
 
@@ -1057,7 +1057,7 @@ function selectConciergeTheme(themeId) {
   resultsBox.scrollIntoView({ behavior: 'smooth' });
 }
 
-function createConciergePlaceCard(place) {
+function createConciergePlaceCard(place, themeId = '') {
   const card = document.createElement('div');
   card.className = 'concierge-place-card';
   const gpsUrl = (place.lat && place.lng) ? getGpsUrl(place.lat, place.lng, place.name) : '#';
@@ -1088,17 +1088,70 @@ function createConciergePlaceCard(place) {
     ` : ''}
 
     <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
-      ${place.phone ? `
-        <a href="tel:${place.phone.replace(/[^0-9+]/g, '')}" class="btn-entry-gps" style="background:#16a34a; color:white;">
-          <i class="fa-solid fa-phone"></i> Appeler le restaurant
-        </a>
-      ` : ''}
+      ${place.phone ? (() => {
+        const text = (place.name + " " + place.category + " " + (themeId || '')).toLowerCase();
+        let phoneLabel = "Appeler";
+        let phoneIcon = "fa-phone";
+        if (themeId === 'resto' || text.includes('resto') || text.includes('dîner') || text.includes('gastronom') || text.includes('pizza') || text.includes('burger') || text.includes('brasserie') || text.includes('cuisine') || text.includes('bistro')) {
+          phoneLabel = "Appeler le restaurant";
+          phoneIcon = "fa-phone";
+        } else if (text.includes('taxi') || text.includes('vtc') || text.includes('chauffeur')) {
+          phoneLabel = "Commander / Appeler taxi";
+          phoneIcon = "fa-taxi";
+        } else if (text.includes('bus') || text.includes('métro') || text.includes('navette') || text.includes('transport') || text.includes('train')) {
+          phoneLabel = "Infos & Contact réseau";
+          phoneIcon = "fa-headset";
+        } else if (text.includes('pharmacie') || text.includes('santé') || text.includes('médic')) {
+          phoneLabel = "Appeler la pharmacie";
+          phoneIcon = "fa-notes-medical";
+        } else if (text.includes('banque') || text.includes('change') || text.includes('dab')) {
+          phoneLabel = "Contacter l'agence";
+          phoneIcon = "fa-building-columns";
+        } else if (text.includes('musée') || text.includes('visite') || text.includes('croisière') || text.includes('monument')) {
+          phoneLabel = "Contacter le site";
+          phoneIcon = "fa-circle-info";
+        } else if (text.includes('vélo') || text.includes('bike')) {
+          phoneLabel = "Service assistance";
+          phoneIcon = "fa-bicycle";
+        } else {
+          phoneLabel = "Appeler l'établissement";
+          phoneIcon = "fa-phone";
+        }
 
-      ${place.bookingUrl ? `
-        <a href="${place.bookingUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#ea580c; color:white;">
-          <i class="fa-solid fa-calendar-check"></i> Réserver en ligne
-        </a>
-      ` : ''}
+        return `
+          <a href="tel:${place.phone.replace(/[^0-9+]/g, '')}" class="btn-entry-gps" style="background:#16a34a; color:white;">
+            <i class="fa-solid ${phoneIcon}"></i> ${phoneLabel}
+          </a>
+        `;
+      })() : ''}
+
+      ${place.bookingUrl ? (() => {
+        const text = (place.name + " " + place.category + " " + (themeId || '')).toLowerCase();
+        let bookLabel = "Réserver en ligne";
+        let bookIcon = "fa-calendar-check";
+        if (text.includes('taxi') || text.includes('vtc') || text.includes('uber') || text.includes('curb') || text.includes('bolt') || text.includes('lyft')) {
+          bookLabel = "Commander en ligne / App";
+          bookIcon = "fa-mobile-screen-button";
+        } else if (text.includes('vélo') || text.includes('bike') || text.includes('divvy')) {
+          bookLabel = "Louer / Déverrouiller";
+          bookIcon = "fa-bicycle";
+        } else if (text.includes('horaire') || text.includes('plan') || text.includes('carte') || text.includes('cta') || text.includes('ligne')) {
+          bookLabel = "Site officiel & Horaires";
+          bookIcon = "fa-arrow-up-right-from-square";
+        } else if (text.includes('billet') || text.includes('musée') || text.includes('croisière') || text.includes('skydeck') || text.includes('tour')) {
+          bookLabel = "Billetterie officielle";
+          bookIcon = "fa-ticket";
+        } else if (themeId === 'resto' || text.includes('resto') || text.includes('table') || text.includes('dîner')) {
+          bookLabel = "Réserver une table";
+          bookIcon = "fa-utensils";
+        }
+
+        return `
+          <a href="${place.bookingUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#ea580c; color:white;">
+            <i class="fa-solid ${bookIcon}"></i> ${bookLabel}
+          </a>
+        `;
+      })() : ''}
 
       <a href="${gpsUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:var(--primary-color); color:white;">
         <i class="fa-solid fa-location-arrow"></i> S'y rendre (GPS)
