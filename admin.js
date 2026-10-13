@@ -1218,7 +1218,7 @@ async function triggerAiConciergeGeneration() {
       th.enabled = true;
       if (th.id === 'transports') {
         th.transitMapUrl = "https://www.transitchicago.com/maps/";
-        th.transitMapImageUrl = "https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Chicago_L_diagram_sb.svg/1200px-Chicago_L_diagram_sb.svg.png";
+        th.transitMapImageUrl = "assets/chicago-metro-map.svg";
         th.guideHtml = `
           <strong>🚇 Comment utiliser les transports à Chicago (Réseau CTA - Métro 'L' & Bus) :</strong><br>
           • <strong>Le Métro 'L' (Elevated Train) :</strong> 8 lignes identifiées par des couleurs (Red, Blue, Brown, Green...). Toutes convergent vers le centre historique (The Loop). Les lignes Blue et Orange relient directement les aéroports O'Hare et Midway au centre-ville.<br>

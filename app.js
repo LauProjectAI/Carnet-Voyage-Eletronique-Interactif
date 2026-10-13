@@ -353,6 +353,50 @@ function closeQrModal() {
 }
 
 // Transit / Metro Map Modal Dialog
+function downloadTransitMapFile(url, fileName) {
+  if (!url) return;
+  // Déterminer l'extension
+  let ext = 'png';
+  if (url.includes('.svg')) ext = 'svg';
+  else if (url.includes('.jpg') || url.includes('.jpeg')) ext = 'jpg';
+  else if (url.includes('.pdf')) ext = 'pdf';
+
+  const defaultName = fileName || `Plan-Transports-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.${ext}`;
+
+  // Si c'est un chemin local ou de même origine
+  if (!url.startsWith('http://') && !url.startsWith('https://')) {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = defaultName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    return;
+  }
+
+  // Si c'est une URL distante, tenter le fetch blob pour forcer le téléchargement local sans blocage navigateur
+  fetch(url)
+    .then(res => {
+      if (!res.ok) throw new Error("HTTP error " + res.status);
+      return res.blob();
+    })
+    .then(blob => {
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = defaultName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2000);
+    })
+    .catch(err => {
+      console.warn("Téléchargement direct via Blob impossible, ouverture de la ressource :", err);
+      // Fallback : ouverture directe de l'image
+      window.open(url, '_blank');
+    });
+}
+
 function openTransitMapModal(imageUrl, title = "Plan du Réseau de Métro & Transports") {
   const modal = document.getElementById('transit-map-modal');
   if (!modal) return;
@@ -366,8 +410,10 @@ function openTransitMapModal(imageUrl, title = "Plan du Réseau de Métro & Tran
     modalImg.style.maxWidth = '100%';
   }
   if (downloadBtn) {
-    downloadBtn.href = imageUrl;
-    downloadBtn.setAttribute('download', `Plan-Transports-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.png`);
+    downloadBtn.onclick = (e) => {
+      e.preventDefault();
+      downloadTransitMapFile(imageUrl);
+    };
   }
   modal.style.display = 'flex';
   modal.classList.add('open');
@@ -728,9 +774,9 @@ function executeConciergeQuery(query) {
               <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">Consultez directement le plan ou téléchargez-le pour y accéder hors-connexion</div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap;">
-              <a href="${transportTheme.transitMapImageUrl}" download="Plan-Metro-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.png" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.82rem; padding:7px 14px; text-decoration:none;">
+              <button type="button" onclick="downloadTransitMapFile('${transportTheme.transitMapImageUrl}')" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
                 <i class="fa-solid fa-download"></i> Télécharger le plan
-              </a>
+              </button>
               <button type="button" onclick="openTransitMapModal('${transportTheme.transitMapImageUrl}', 'Plan du réseau de métro')" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
                 <i class="fa-solid fa-expand"></i> Agrandir / Plein écran
               </button>
@@ -945,9 +991,9 @@ function selectConciergeTheme(themeId) {
             <div style="font-size:0.8rem; color:#64748b; margin-top:2px;">Consultez directement le plan ci-dessous ou téléchargez-le pour un accès hors-ligne</div>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <a href="${theme.transitMapImageUrl}" download="Plan-Metro-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.png" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.82rem; padding:7px 14px; text-decoration:none;">
+            <button type="button" onclick="downloadTransitMapFile('${theme.transitMapImageUrl}')" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
               <i class="fa-solid fa-download"></i> Télécharger le plan
-            </a>
+            </button>
             <button type="button" onclick="openTransitMapModal('${theme.transitMapImageUrl}', 'Plan du réseau de métro')" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
               <i class="fa-solid fa-expand"></i> Agrandir / Plein écran
             </button>
