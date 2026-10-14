@@ -197,29 +197,53 @@
     </div>
 
     <!-- Direct Share Link Box -->
-    <div class="share-box">
-      <h3 style="font-size:0.95rem; font-weight:800; color:#065f46; margin-bottom:6px;">
-        <i class="fa-solid fa-link"></i> Lien direct pour vos clients
-      </h3>
-      <p style="font-size:0.82rem; color:#047857; margin-bottom:10px;">
-        Ce lien contient l'ensemble du voyage sélectionné. Vous pouvez le copier et l'envoyer par e-mail, SMS ou l'intégrer sous forme de QR Code dans vos courriers.
-      </p>
-      <div style="display:flex; gap:10px;">
-        <input type="text" id="client-share-link" class="form-control" readonly style="background:white; font-size:0.8rem; font-family:monospace;">
-        <button id="copy-share-btn" class="btn-secondary" style="white-space:nowrap; padding:6px 14px; font-size:0.8rem;">
-          <i class="fa-solid fa-copy"></i> Copier le lien
-        </button>
-        <a id="preview-client-link" href="index.html" target="_blank" class="btn-save-main" style="white-space:nowrap; padding:8px 16px; font-size:0.85rem; text-decoration:none;">
-          <i class="fa-solid fa-arrow-up-right-from-square"></i> Tester le carnet
-        </a>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:24px;">
+      <!-- Lien Voyageur -->
+      <div class="share-box" style="margin-bottom:0;">
+        <h3 style="font-size:0.95rem; font-weight:800; color:#065f46; margin-bottom:6px;">
+          <i class="fa-solid fa-user"></i> Lien Carnet Voyageur (Client)
+        </h3>
+        <p style="font-size:0.8rem; color:#047857; margin-bottom:8px;">
+          Lien complet pour vos clients (étapes, conciergerie, coffre-fort, météo).
+        </p>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="client-share-link" class="form-control" readonly style="background:white; font-size:0.75rem; font-family:monospace;">
+          <button id="copy-share-btn" class="btn-secondary" style="white-space:nowrap; padding:5px 12px; font-size:0.78rem;">
+            <i class="fa-solid fa-copy"></i> Copier
+          </button>
+          <a id="preview-client-link" href="index.html" target="_blank" class="btn-save-main" style="white-space:nowrap; padding:6px 12px; font-size:0.8rem; text-decoration:none;">
+            <i class="fa-solid fa-eye"></i> Ouvrir
+          </a>
+        </div>
+        <div id="copy-feedback" style="font-size:0.72rem; color:#059669; font-weight:bold; margin-top:4px;"></div>
       </div>
-      <div id="copy-feedback" style="font-size:0.75rem; color:#059669; font-weight:bold; margin-top:4px;"></div>
+
+      <!-- Lien Conducteur / Accompagnateur -->
+      <div class="share-box" style="margin-bottom:0; background:#f0f9ff; border-color:#bae6fd;">
+        <h3 style="font-size:0.95rem; font-weight:800; color:#0369a1; margin-bottom:6px;">
+          <i class="fa-solid fa-bus"></i> Lien Dossier Conducteur & Accompagnateur
+        </h3>
+        <p style="font-size:0.8rem; color:#0284c7; margin-bottom:8px;">
+          Lien technique pro (Rooming list, plan de car, vouchers groupe, guidage GPS).
+        </p>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="driver-share-link" class="form-control" readonly style="background:white; font-size:0.75rem; font-family:monospace;">
+          <button id="copy-driver-share-btn" class="btn-secondary" style="white-space:nowrap; padding:5px 12px; font-size:0.78rem;">
+            <i class="fa-solid fa-copy"></i> Copier
+          </button>
+          <a id="preview-driver-link" href="conducteur.html" target="_blank" class="btn-save-main" style="background:#0284c7; white-space:nowrap; padding:6px 12px; font-size:0.8rem; text-decoration:none;">
+            <i class="fa-solid fa-id-badge"></i> Ouvrir
+          </a>
+        </div>
+        <div id="copy-driver-feedback" style="font-size:0.72rem; color:#0284c7; font-weight:bold; margin-top:4px;"></div>
+      </div>
     </div>
 
     <!-- Navigation tabs inside admin -->
     <div class="admin-nav">
       <button class="active" onclick="switchAdminTab('general')"><i class="fa-solid fa-circle-info"></i> Général & Vols</button>
       <button onclick="switchAdminTab('itinerary')"><i class="fa-solid fa-route"></i> Programme (Jours)</button>
+      <button onclick="switchAdminTab('driver')"><i class="fa-solid fa-bus"></i> Dossier Conducteur (Pro)</button>
       <button onclick="switchAdminTab('documents')"><i class="fa-solid fa-ticket"></i> Billets & Documents</button>
       <button onclick="switchAdminTab('hotels')"><i class="fa-solid fa-hotel"></i> Hôtels</button>
       <button onclick="switchAdminTab('freetime')"><i class="fa-solid fa-compass"></i> Suggestions</button>
@@ -315,6 +339,121 @@
           </button>
         </div>
         <div id="adm-days-list"></div>
+      </div>
+
+      <!-- 2. ter DOSSIER CONDUCTEUR & ACCOMPAGNATEUR (PRO) -->
+      <div id="adm-sec-driver" class="admin-section" style="display:none;">
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:16px; margin-bottom:20px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <h3 style="font-size:1.15rem; color:#0369a1; margin:0 0 4px;">
+              <i class="fa-solid fa-bus" style="color:#0284c7; margin-right:6px;"></i>
+              Dossier Conducteur & Accompagnateur
+            </h3>
+            <p style="font-size:0.82rem; color:#0c4a6e; margin:0;">
+              Outils logistiques terrain : plan de car, rooming list des hôtels, liste d'émargement et bons d'échange réservés au personnel.
+            </p>
+          </div>
+          <a href="conducteur.html" target="_blank" class="btn-save-main" style="background:#0284c7; font-size:0.85rem; padding:8px 16px; text-decoration:none;">
+            <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir la vue Conducteur
+          </a>
+        </div>
+
+        <!-- 1. PLAN DE CAR -->
+        <div class="section-box" style="border-left:4px solid #0284c7; margin-bottom:20px;">
+          <h4 style="font-size:1rem; font-weight:800; color:#1e293b; margin:0 0 10px; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-chair" style="color:#0284c7;"></i> 1. Plan de Car & Attribution des Sièges
+          </h4>
+          <div class="form-row" style="margin-bottom:10px;">
+            <div class="form-group">
+              <label>Immatriculation / Modèle du Car :</label>
+              <input type="text" id="adm-driver-bus-model" class="form-control" placeholder="Ex: Mercedes Tourismo • 53 Places (Immat: EX-942-GR)" onchange="updateDriverField('busModel', this.value)">
+            </div>
+            <div class="form-group">
+              <label>Capacité totale (sièges) :</label>
+              <input type="number" id="adm-driver-bus-capacity" class="form-control" placeholder="Ex: 53" onchange="updateDriverField('busCapacity', this.value)">
+            </div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:10px;">
+            <label>Fichier ou schéma du Plan de car (PDF ou image) :</label>
+            <div style="display:flex; gap:8px;">
+              <input type="text" id="adm-driver-bus-file" class="form-control" placeholder="Lien vers image ou fichier joint..." onchange="updateDriverField('busPlanUrl', this.value)">
+              <button type="button" class="btn-secondary" style="font-size:0.78rem; white-space:nowrap;" onclick="document.getElementById('adm-driver-bus-upload').click()">
+                <i class="fa-solid fa-upload"></i> Joindre le plan
+              </button>
+              <input type="file" id="adm-driver-bus-upload" accept="image/*,.pdf" style="display:none;" onchange="handleDriverBusUpload(event)">
+            </div>
+            <div id="adm-driver-bus-status" style="font-size:0.75rem; color:#16a34a; margin-top:4px;"></div>
+          </div>
+
+          <div class="form-group" style="margin-bottom:0;">
+            <label>Notes & Consignes spécifiques pour le placement autocar :</label>
+            <input type="text" id="adm-driver-bus-notes" class="form-control" placeholder="Ex: Sièges 1 à 4 réservés pour personnes à mobilité réduite." onchange="updateDriverField('busNotes', this.value)">
+          </div>
+        </div>
+
+        <!-- 2. ROOMING LIST -->
+        <div class="section-box" style="border-left:4px solid #10b981; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+            <h4 style="font-size:1rem; font-weight:800; color:#1e293b; margin:0; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-bed" style="color:#10b981;"></i> 2. Rooming List des Hôtels
+            </h4>
+            <div style="display:flex; gap:6px;">
+              <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px;" onclick="document.getElementById('adm-driver-rooming-upload').click()">
+                <i class="fa-solid fa-file-pdf"></i> Joindre PDF Rooming
+              </button>
+              <input type="file" id="adm-driver-rooming-upload" accept="image/*,.pdf" style="display:none;" onchange="handleDriverRoomingUpload(event)">
+              <button type="button" onclick="addNewRoomingEntry()" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:700;">
+                <i class="fa-solid fa-plus"></i> Ajouter une chambre
+              </button>
+            </div>
+          </div>
+
+          <div id="adm-driver-rooming-file-status" style="font-size:0.75rem; color:#059669; margin-bottom:10px; font-weight:bold;"></div>
+
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.8rem; background:white; border-radius:8px; overflow:hidden;">
+              <thead>
+                <tr style="background:#f1f5f9; color:#475569; text-align:left; border-bottom:1px solid #cbd5e1;">
+                  <th style="padding:8px 10px; width:70px;">Chambre</th>
+                  <th style="padding:8px 10px; width:120px;">Type</th>
+                  <th style="padding:8px 10px;">Occupants / Noms des passagers</th>
+                  <th style="padding:8px 10px; width:180px;">Régimes / Remarques</th>
+                  <th style="padding:8px 10px; width:40px;"></th>
+                </tr>
+              </thead>
+              <tbody id="adm-driver-rooming-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- 3. LISTE DES PASSAGERS & ÉMARGEMENT -->
+        <div class="section-box" style="border-left:4px solid #8b5cf6; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
+            <h4 style="font-size:1rem; font-weight:800; color:#1e293b; margin:0; display:flex; align-items:center; gap:8px;">
+              <i class="fa-solid fa-clipboard-user" style="color:#8b5cf6;"></i> 3. Liste des Passagers (Pointage & Arrêts)
+            </h4>
+            <button type="button" onclick="addNewPassengerEntry()" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;">
+              <i class="fa-solid fa-user-plus"></i> Ajouter un passager
+            </button>
+          </div>
+
+          <div style="overflow-x:auto;">
+            <table style="width:100%; border-collapse:collapse; font-size:0.8rem; background:white; border-radius:8px; overflow:hidden;">
+              <thead>
+                <tr style="background:#f1f5f9; color:#475569; text-align:left; border-bottom:1px solid #cbd5e1;">
+                  <th style="padding:8px 10px;">Nom & Prénom</th>
+                  <th style="padding:8px 10px; width:140px;">Lieu de montée</th>
+                  <th style="padding:8px 10px; width:120px;">Téléphone</th>
+                  <th style="padding:8px 10px; width:80px;">N° Siège</th>
+                  <th style="padding:8px 10px; width:140px;">Remarques / Allergies</th>
+                  <th style="padding:8px 10px; width:40px;"></th>
+                </tr>
+              </thead>
+              <tbody id="adm-driver-passengers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <!-- 2. bis DOCUMENTS & BILLETS DU VOYAGE (AGENCE) -->

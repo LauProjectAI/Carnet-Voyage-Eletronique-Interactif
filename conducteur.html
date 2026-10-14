@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Dossier Conducteur & Accompagnateur — Voyages Girardot</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0f172a">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Leaflet CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css">
+  <style>
+    :root {
+      --driver-primary: #0284c7;
+      --driver-dark: #0f172a;
+      --driver-surface: #1e293b;
+      --driver-accent: #38bdf8;
+      --driver-border: #334155;
+    }
+
+    body {
+      background: #0b1120;
+      color: #f1f5f9;
+      font-family: 'Archivo', sans-serif;
+    }
+
+    .driver-topbar {
+      background: #0f172a;
+      border-bottom: 2px solid #0284c7;
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+    }
+
+    .driver-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: #ffffff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .driver-nav {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: #0f172a;
+      border-top: 1px solid #334155;
+      display: flex;
+      justify-content: space-around;
+      padding: 8px 4px calc(8px + env(safe-area-inset-bottom, 0px));
+      z-index: 1000;
+    }
+
+    .driver-nav-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #94a3b8;
+      background: none;
+      border: none;
+      font-size: 0.72rem;
+      font-weight: 700;
+      gap: 3px;
+      cursor: pointer;
+      flex: 1;
+      padding: 4px;
+    }
+
+    .driver-nav-item i {
+      font-size: 1.15rem;
+    }
+
+    .driver-nav-item.active {
+      color: #38bdf8;
+    }
+
+    .driver-container {
+      max-width: 680px;
+      margin: 0 auto;
+      padding: 14px 14px 90px;
+    }
+
+    .driver-card {
+      background: #1e293b;
+      border: 1px solid #334155;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .driver-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #334155;
+    }
+
+    .btn-gps-direct {
+      background: #0284c7;
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-waze-direct {
+      background: #06b6d4;
+      color: #042f2e;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-call-direct {
+      background: #16a34a;
+      color: white;
+      text-decoration: none;
+      padding: 8px 14px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .passenger-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 12px;
+      border-bottom: 1px solid #334155;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.15s;
+    }
+
+    .passenger-row:last-child {
+      border-bottom: none;
+    }
+
+    .passenger-row.boarded {
+      background: rgba(16, 185, 129, 0.15);
+    }
+
+    .passenger-check {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 2px solid #64748b;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      color: transparent;
+      margin-right: 10px;
+      flex-shrink: 0;
+    }
+
+    .passenger-row.boarded .passenger-check {
+      border-color: #10b981;
+      background: #10b981;
+      color: white;
+    }
+
+    .driver-tab-pane {
+      display: none;
+    }
+
+    .driver-tab-pane.active {
+      display: block;
+    }
+
+    .bus-seat-pill {
+      background: #334155;
+      color: #38bdf8;
+      font-weight: 800;
+      font-size: 0.75rem;
+      padding: 2px 8px;
+      border-radius: 6px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar -->
+  <header class="driver-topbar">
+    <div class="driver-title">
+      <i class="fa-solid fa-bus" style="color:#38bdf8;"></i>
+      <div>
+        <div style="line-height:1.1;">Dossier Exploitation</div>
+        <div style="font-size:0.68rem; color:#94a3b8; font-weight:600;">ESPACE CONDUCTEUR & ACCOMPAGNATEUR</div>
+      </div>
+    </div>
+    <div style="display:flex; align-items:center; gap:8px;">
+      <a href="index.html" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; border-radius:14px; background:#1e293b; color:#94a3b8; border-color:#334155; text-decoration:none;">
+        <i class="fa-solid fa-user"></i> Vue Voyageur
+      </a>
+      <a href="admin.html" class="admin-icon-btn" style="background:#1e293b; color:#cbd5e1; border:1px solid #334155;" title="Administration">
+        <i class="fa-solid fa-gear"></i>
+      </a>
+    </div>
+  </header>
+
+  <!-- Container -->
+  <div class="driver-container">
+
+    <!-- En-tête Circuit & Info Car -->
+    <div class="driver-card" style="border-left:4px solid #38bdf8; background:linear-gradient(135deg, #1e293b 0%, #0f172a 100%);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px;">
+        <span style="background:#0369a1; color:#ffffff; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:4px; text-transform:uppercase;">
+          Dossier de Route
+        </span>
+        <span id="driver-trip-dates" style="font-size:0.75rem; color:#94a3b8; font-weight:600;"></span>
+      </div>
+      <h1 id="driver-trip-title" style="font-size:1.35rem; font-weight:800; color:white; margin:0 0 4px; line-height:1.2;"></h1>
+      <div id="driver-trip-subtitle" style="font-size:0.85rem; color:#38bdf8; margin-bottom:12px;"></div>
+
+      <!-- Informations Véhicule -->
+      <div style="background:#0b1120; border-radius:10px; padding:10px 12px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <div>
+          <div style="font-size:0.7rem; color:#64748b; font-weight:700;">AUTOCAR ASSIGNÉ :</div>
+          <div id="driver-bus-model" style="font-size:0.88rem; font-weight:800; color:#f8fafc;">Mercedes Tourismo</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:0.7rem; color:#64748b; font-weight:700;">CAPACITÉ :</div>
+          <div id="driver-bus-capacity" style="font-size:0.88rem; font-weight:800; color:#38bdf8;">53 Fauteuils</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 1. ONGLET ROUTE & ITINÉRAIRE TECHNIQUE -->
+    <div id="driver-tab-itinerary" class="driver-tab-pane active">
+      <!-- Sélecteur de jour -->
+      <div style="display:flex; gap:6px; overflow-x:auto; padding-bottom:8px; margin-bottom:12px;" id="driver-day-pills"></div>
+
+      <!-- Fiche Journée en cours -->
+      <div class="driver-card" id="driver-day-content">
+      </div>
+    </div>
+
+    <!-- 2. ONGLET PASSAGERS & ÉMARGEMENT -->
+    <div id="driver-tab-passengers" class="driver-tab-pane">
+      <div class="driver-card">
+        <div class="driver-card-header">
+          <div>
+            <h3 style="margin:0; font-size:1rem; font-weight:800; color:white;">
+              <i class="fa-solid fa-clipboard-user" style="color:#10b981; margin-right:6px;"></i> Pointage des Passagers
+            </h3>
+            <div id="driver-boarded-count" style="font-size:0.75rem; color:#94a3b8;">0 / 0 passagers à bord</div>
+          </div>
+          <button type="button" onclick="resetBoarding()" style="background:#334155; color:#cbd5e1; border:none; padding:4px 10px; border-radius:8px; font-size:0.72rem; cursor:pointer;">
+            <i class="fa-solid fa-rotate-left"></i> Réinitialiser
+          </button>
+        </div>
+
+        <!-- Recherche rapide de passager -->
+        <div style="margin-bottom:10px;">
+          <input type="text" id="driver-passenger-search" class="form-control" placeholder="Rechercher un passager (nom, arrêt, siège)..." style="background:#0b1120; border-color:#334155; color:white; font-size:0.82rem;" oninput="filterDriverPassengers(this.value)">
+        </div>
+
+        <!-- Liste déroulante -->
+        <div id="driver-passengers-list" style="background:#0b1120; border-radius:12px; overflow:hidden;"></div>
+      </div>
+    </div>
+
+    <!-- 3. ONGLET PLAN DE CAR -->
+    <div id="driver-tab-bus" class="driver-tab-pane">
+      <div class="driver-card">
+        <div class="driver-card-header">
+          <h3 style="margin:0; font-size:1rem; font-weight:800; color:white;">
+            <i class="fa-solid fa-chair" style="color:#38bdf8; margin-right:6px;"></i> Plan de Car & Attribution
+          </h3>
+          <span id="driver-bus-plan-badge" style="font-size:0.75rem; color:#38bdf8; font-weight:700;"></span>
+        </div>
+
+        <div id="driver-bus-plan-container" style="text-align:center; padding:10px 0;">
+          <!-- Schéma ou image du plan de car -->
+        </div>
+
+        <div id="driver-bus-notes-box" style="background:#0b1120; border-radius:10px; padding:12px; margin-top:12px; font-size:0.82rem; color:#cbd5e1; border-left:3px solid #38bdf8;">
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. ONGLET ROOMING LIST HÔTELS -->
+    <div id="driver-tab-rooming" class="driver-tab-pane">
+      <div class="driver-card">
+        <div class="driver-card-header">
+          <div>
+            <h3 style="margin:0; font-size:1rem; font-weight:800; color:white;">
+              <i class="fa-solid fa-bed" style="color:#f59e0b; margin-right:6px;"></i> Rooming List Hôtels
+            </h3>
+            <div id="driver-rooming-total" style="font-size:0.75rem; color:#94a3b8;">Répartition des chambres</div>
+          </div>
+          <div id="driver-rooming-pdf-btn"></div>
+        </div>
+
+        <!-- Recherche par nom ou n° chambre -->
+        <div style="margin-bottom:10px;">
+          <input type="text" id="driver-rooming-search" class="form-control" placeholder="Rechercher une chambre ou un voyageur..." style="background:#0b1120; border-color:#334155; color:white; font-size:0.82rem;" oninput="filterDriverRooming(this.value)">
+        </div>
+
+        <!-- Liste des chambres -->
+        <div id="driver-rooming-list"></div>
+      </div>
+    </div>
+
+    <!-- 5. ONGLET DOCUMENTS & BONS PRO -->
+    <div id="driver-tab-docs" class="driver-tab-pane">
+      <div class="driver-card">
+        <div class="driver-card-header">
+          <h3 style="margin:0; font-size:1rem; font-weight:800; color:white;">
+            <i class="fa-solid fa-file-shield" style="color:#ec4899; margin-right:6px;"></i> Vouchers & Billetterie Groupe
+          </h3>
+          <span style="font-size:0.72rem; color:#94a3b8;">À présenter sur place</span>
+        </div>
+        <p style="font-size:0.78rem; color:#94a3b8; margin:0 0 12px;">
+          Retrouvez tous les vouchers d'hôtels, réservations de restaurants et billets coupe-file avec QR Codes plein écran.
+        </p>
+
+        <div id="driver-docs-list"></div>
+      </div>
+    </div>
+
+    <!-- 6. ONGLET CONTACTS & ASSISTANCE PRO -->
+    <div id="driver-tab-contacts" class="driver-tab-pane">
+      <div class="driver-card">
+        <div class="driver-card-header">
+          <h3 style="margin:0; font-size:1rem; font-weight:800; color:#ef4444;">
+            <i class="fa-solid fa-phone" style="margin-right:6px;"></i> Répertoire Urgences & Assistance
+          </h3>
+          <span style="font-size:0.72rem; color:#94a3b8;">Liaison 24h/7j</span>
+        </div>
+        <div id="driver-contacts-list"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Navigation Pro -->
+  <nav class="driver-nav">
+    <button class="driver-nav-item active" onclick="switchDriverTab('itinerary')">
+      <i class="fa-solid fa-route"></i>
+      <span>Route</span>
+    </button>
+    <button class="driver-nav-item" onclick="switchDriverTab('passengers')">
+      <i class="fa-solid fa-clipboard-user"></i>
+      <span>Passagers</span>
+    </button>
+    <button class="driver-nav-item" onclick="switchDriverTab('bus')">
+      <i class="fa-solid fa-chair"></i>
+      <span>Plan Car</span>
+    </button>
+    <button class="driver-nav-item" onclick="switchDriverTab('rooming')">
+      <i class="fa-solid fa-bed"></i>
+      <span>Rooming</span>
+    </button>
+    <button class="driver-nav-item" onclick="switchDriverTab('docs')">
+      <i class="fa-solid fa-ticket"></i>
+      <span>Vouchers</span>
+    </button>
+    <button class="driver-nav-item" onclick="switchDriverTab('contacts')">
+      <i class="fa-solid fa-phone"></i>
+      <span>Contacts</span>
+    </button>
+  </nav>
+
+  <!-- Modal Visualisation Document / QR Code -->
+  <div id="driver-doc-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.85); backdrop-filter:blur(6px); z-index:99999; align-items:center; justify-content:center; padding:16px;" onclick="if(event.target===this) closeDriverDocModal()">
+    <div style="background:#1e293b; border:1px solid #334155; border-radius:18px; width:100%; max-width:540px; max-height:90vh; display:flex; flex-direction:column; overflow:hidden;">
+      <div style="padding:14px 18px; background:#0f172a; border-bottom:1px solid #334155; display:flex; justify-content:space-between; align-items:center;">
+        <h4 id="driver-modal-doc-title" style="margin:0; font-size:1rem; color:white;">Détail Voucher</h4>
+        <button type="button" onclick="closeDriverDocModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;">&times;</button>
+      </div>
+      <div style="padding:18px; overflow-y:auto; flex:1; text-align:center;">
+        <div id="driver-modal-qr-box" style="margin-bottom:14px;">
+          <img id="driver-modal-qr-img" src="" alt="QR" style="width:220px; height:220px; background:white; padding:10px; border-radius:12px;">
+          <div id="driver-modal-qr-text" style="font-family:monospace; font-size:0.85rem; color:#38bdf8; margin-top:8px; font-weight:700;"></div>
+        </div>
+        <div id="driver-modal-file-box" style="margin-bottom:14px; display:none;">
+          <img id="driver-modal-file-img" src="" alt="Fichier" style="max-width:100%; max-height:260px; border-radius:8px;">
+        </div>
+        <div id="driver-modal-notes" style="font-size:0.82rem; color:#cbd5e1; text-align:left; background:#0b1120; border-radius:10px; padding:12px;"></div>
+      </div>
+      <div style="padding:12px 18px; background:#0f172a; border-top:1px solid #334155; display:flex; justify-content:flex-end;">
+        <button type="button" onclick="closeDriverDocModal()" class="btn-secondary" style="padding:6px 16px; font-size:0.82rem; background:#334155; color:white; border:none;">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="data.js"></script>
+  <script src="conducteur.js"></script>
+</body>
+</html>

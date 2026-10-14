@@ -509,7 +509,7 @@ function importTripJsonFile(event) {
 }
 
 function switchAdminTab(tabName) {
-  const sections = ['general', 'itinerary', 'documents', 'hotels', 'freetime', 'concierge', 'contacts'];
+  const sections = ['general', 'itinerary', 'driver', 'documents', 'hotels', 'freetime', 'concierge', 'contacts'];
   sections.forEach(sec => {
     const el = document.getElementById(`adm-sec-${sec}`);
     if (el) el.style.display = (sec === tabName) ? 'block' : 'none';
@@ -548,6 +548,10 @@ function populateForm() {
 
   // 2. Itinerary & Visits
   renderAdminDays();
+
+  // 2. ter Dossier Conducteur & Accompagnateur
+  ensureDriverStructure();
+  renderAdminDriver();
 
   // 2. bis Billets & Documents Agence
   renderAdminDocuments();
@@ -1288,6 +1292,202 @@ function removeDay(index) {
     tripData.itinerary.splice(index, 1);
     renderAdminDays();
   }
+}
+
+// -----------------------------------------------------------------------------
+// 2. ter DOSSIER CONDUCTEUR & ACCOMPAGNATEUR (PRO)
+// -----------------------------------------------------------------------------
+function ensureDriverStructure() {
+  if (!tripData.driverDossier || typeof tripData.driverDossier !== 'object') {
+    tripData.driverDossier = {
+      busModel: "Mercedes Tourismo 16 RHD • 53 Places",
+      busCapacity: 53,
+      busPlanUrl: "",
+      busNotes: "1er rang réservé aux personnes sensibles au mal des transports.",
+      roomingList: [
+        { roomNumber: "101", type: "Double (Grand Lit)", occupants: "M. & Mme Passager", notes: "Chambre calme côté jardin" },
+        { roomNumber: "102", type: "Twin (2 lits séparés)", occupants: "M. Dupont / M. Martin", notes: "Régime sans gluten" },
+        { roomNumber: "103", type: "Individuelle (Single)", occupants: "Mme Leroy", notes: "" }
+      ],
+      roomingFileUrl: "",
+      passengersList: [
+        { name: "Passager Jean", pickup: "Chalon-sur-Saône (Gare)", phone: "+33 6 12 34 56 78", seatNumber: "3A", notes: "" },
+        { name: "Passager Marie", pickup: "Chalon-sur-Saône (Gare)", phone: "+33 6 12 34 56 79", seatNumber: "3B", notes: "" },
+        { name: "Dupont Alain", pickup: "Beaune (Péage)", phone: "+33 6 22 33 44 55", seatNumber: "5C", notes: "Végétarien" },
+        { name: "Martin Bernard", pickup: "Beaune (Péage)", phone: "+33 6 33 44 55 66", seatNumber: "5D", notes: "Sans gluten" },
+        { name: "Leroy Sophie", pickup: "Dijon (Palais des Congrès)", phone: "+33 6 98 76 54 32", seatNumber: "7A", notes: "" }
+      ]
+    };
+  }
+  if (!Array.isArray(tripData.driverDossier.roomingList)) tripData.driverDossier.roomingList = [];
+  if (!Array.isArray(tripData.driverDossier.passengersList)) tripData.driverDossier.passengersList = [];
+}
+
+function renderAdminDriver() {
+  ensureDriverStructure();
+  const d = tripData.driverDossier;
+
+  // Plan de car
+  const busModelInp = document.getElementById('adm-driver-bus-model');
+  const busCapInp = document.getElementById('adm-driver-bus-capacity');
+  const busFileInp = document.getElementById('adm-driver-bus-file');
+  const busNotesInp = document.getElementById('adm-driver-bus-notes');
+  const busStatus = document.getElementById('adm-driver-bus-status');
+
+  if (busModelInp) busModelInp.value = d.busModel || '';
+  if (busCapInp) busCapInp.value = d.busCapacity || '';
+  if (busFileInp) busFileInp.value = (d.busPlanUrl && d.busPlanUrl.startsWith('data:')) ? '(Schéma ou plan joint enregistré)' : (d.busPlanUrl || '');
+  if (busNotesInp) busNotesInp.value = d.busNotes || '';
+  if (busStatus) {
+    busStatus.innerHTML = d.busPlanUrl ? `<i class="fa-solid fa-check"></i> Plan de car disponible (${d.busPlanUrl.includes('pdf') ? 'Format PDF' : 'Image'}) <button type="button" onclick="updateDriverField('busPlanUrl', ''); renderAdminDriver();" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.75rem; text-decoration:underline;">Supprimer</button>` : '';
+  }
+
+  // Rooming list
+  const roomingStatus = document.getElementById('adm-driver-rooming-file-status');
+  if (roomingStatus) {
+    roomingStatus.innerHTML = d.roomingFileUrl ? `<i class="fa-solid fa-file-pdf"></i> Document PDF Rooming List joint <button type="button" onclick="updateDriverField('roomingFileUrl', ''); renderAdminDriver();" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.75rem; text-decoration:underline; font-weight:normal;">Retirer le fichier PDF</button>` : '';
+  }
+
+  const roomingTbody = document.getElementById('adm-driver-rooming-tbody');
+  if (roomingTbody) {
+    roomingTbody.innerHTML = '';
+    d.roomingList.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = "1px solid #f1f5f9";
+      tr.innerHTML = `
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 6px; font-size:0.78rem;" value="${r.roomNumber || ''}" placeholder="101" onchange="updateRoomingField(${idx}, 'roomNumber', this.value)">
+        </td>
+        <td style="padding:6px 8px;">
+          <select class="form-control" style="padding:4px 6px; font-size:0.78rem;" onchange="updateRoomingField(${idx}, 'type', this.value)">
+            <option value="Double (Grand Lit)" ${r.type.includes('Double') ? 'selected' : ''}>Double (1 lit)</option>
+            <option value="Twin (2 lits séparés)" ${r.type.includes('Twin') ? 'selected' : ''}>Twin (2 lits)</option>
+            <option value="Individuelle (Single)" ${r.type.includes('Single') || r.type.includes('Individuelle') ? 'selected' : ''}>Single</option>
+            <option value="Triple" ${r.type.includes('Triple') ? 'selected' : ''}>Triple</option>
+            <option value="Autre" ${r.type.includes('Autre') ? 'selected' : ''}>Autre</option>
+          </select>
+        </td>
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 8px; font-size:0.8rem; font-weight:600;" value="${r.occupants || ''}" placeholder="Ex: M. & Mme Dupont" onchange="updateRoomingField(${idx}, 'occupants', this.value)">
+        </td>
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 6px; font-size:0.78rem;" value="${r.notes || ''}" placeholder="Ex: RDC, sans gluten..." onchange="updateRoomingField(${idx}, 'notes', this.value)">
+        </td>
+        <td style="padding:6px 8px; text-align:center;">
+          <button type="button" onclick="removeRoomingEntry(${idx})" style="background:#fee2e2; color:#dc2626; border:none; border-radius:4px; padding:3px 6px; cursor:pointer;" title="Supprimer">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      `;
+      roomingTbody.appendChild(tr);
+    });
+  }
+
+  // Liste des passagers
+  const passTbody = document.getElementById('adm-driver-passengers-tbody');
+  if (passTbody) {
+    passTbody.innerHTML = '';
+    d.passengersList.forEach((p, idx) => {
+      const tr = document.createElement('tr');
+      tr.style.borderBottom = "1px solid #f1f5f9";
+      tr.innerHTML = `
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 8px; font-size:0.8rem; font-weight:700;" value="${p.name || ''}" placeholder="NOM Prénom" onchange="updatePassengerField(${idx}, 'name', this.value)">
+        </td>
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 6px; font-size:0.78rem;" value="${p.pickup || ''}" placeholder="Ex: Gare Chalon" onchange="updatePassengerField(${idx}, 'pickup', this.value)">
+        </td>
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 6px; font-size:0.78rem;" value="${p.phone || ''}" placeholder="06..." onchange="updatePassengerField(${idx}, 'phone', this.value)">
+        </td>
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 6px; font-size:0.78rem; text-align:center;" value="${p.seatNumber || ''}" placeholder="3A" onchange="updatePassengerField(${idx}, 'seatNumber', this.value)">
+        </td>
+        <td style="padding:6px 8px;">
+          <input type="text" class="form-control" style="padding:4px 6px; font-size:0.78rem;" value="${p.notes || ''}" placeholder="Régime, PMR..." onchange="updatePassengerField(${idx}, 'notes', this.value)">
+        </td>
+        <td style="padding:6px 8px; text-align:center;">
+          <button type="button" onclick="removePassengerEntry(${idx})" style="background:#fee2e2; color:#dc2626; border:none; border-radius:4px; padding:3px 6px; cursor:pointer;" title="Supprimer">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        </td>
+      `;
+      passTbody.appendChild(tr);
+    });
+  }
+}
+
+function updateDriverField(field, val) {
+  ensureDriverStructure();
+  tripData.driverDossier[field] = val;
+}
+
+function handleDriverBusUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    updateDriverField('busPlanUrl', evt.target.result);
+    renderAdminDriver();
+  };
+  reader.readAsDataURL(file);
+}
+
+function handleDriverRoomingUpload(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    updateDriverField('roomingFileUrl', evt.target.result);
+    renderAdminDriver();
+  };
+  reader.readAsDataURL(file);
+}
+
+function addNewRoomingEntry() {
+  ensureDriverStructure();
+  const nextNum = 100 + (tripData.driverDossier.roomingList.length + 1);
+  tripData.driverDossier.roomingList.push({
+    roomNumber: String(nextNum),
+    type: "Double (Grand Lit)",
+    occupants: "",
+    notes: ""
+  });
+  renderAdminDriver();
+}
+
+function removeRoomingEntry(idx) {
+  ensureDriverStructure();
+  tripData.driverDossier.roomingList.splice(idx, 1);
+  renderAdminDriver();
+}
+
+function updateRoomingField(idx, field, val) {
+  ensureDriverStructure();
+  tripData.driverDossier.roomingList[idx][field] = val;
+}
+
+function addNewPassengerEntry() {
+  ensureDriverStructure();
+  tripData.driverDossier.passengersList.push({
+    name: "",
+    pickup: "Départ circuit",
+    phone: "",
+    seatNumber: "",
+    notes: ""
+  });
+  renderAdminDriver();
+}
+
+function removePassengerEntry(idx) {
+  ensureDriverStructure();
+  tripData.driverDossier.passengersList.splice(idx, 1);
+  renderAdminDriver();
+}
+
+function updatePassengerField(idx, field, val) {
+  ensureDriverStructure();
+  tripData.driverDossier.passengersList[idx][field] = val;
 }
 
 // -----------------------------------------------------------------------------
@@ -3476,12 +3676,14 @@ function resetToDefaultData() {
   }
 }
 
-// Generate share link
+// Generate share links (Client & Conducteur)
 function updateShareLink() {
   const jsonString = JSON.stringify(tripData);
   const encoded = btoa(unescape(encodeURIComponent(jsonString)));
-  const basePath = window.location.href.replace('admin.html', 'index.html');
-  const fullShareUrl = `${basePath.split('?')[0]}?trip=${encoded}`;
+  
+  // 1. Lien Voyageur (Client)
+  const clientBasePath = window.location.href.replace('admin.html', 'index.html');
+  const fullShareUrl = `${clientBasePath.split('?')[0]}?trip=${encoded}`;
 
   const linkInput = document.getElementById('client-share-link');
   if (linkInput) linkInput.value = fullShareUrl;
@@ -3495,7 +3697,7 @@ function updateShareLink() {
       navigator.clipboard.writeText(fullShareUrl).then(() => {
         const feedback = document.getElementById('copy-feedback');
         if (feedback) {
-          feedback.innerText = 'Lien copié dans le presse-papier !';
+          feedback.innerText = 'Lien client copié !';
           setTimeout(() => { feedback.innerText = ''; }, 3000);
         }
       }).catch(err => {
@@ -3503,10 +3705,33 @@ function updateShareLink() {
           linkInput.select();
           document.execCommand('copy');
         }
-        const feedback = document.getElementById('copy-feedback');
+      });
+    };
+  }
+
+  // 2. Lien Dossier Conducteur & Accompagnateur
+  const driverBasePath = window.location.href.replace('admin.html', 'conducteur.html');
+  const fullDriverUrl = `${driverBasePath.split('?')[0]}?trip=${encoded}`;
+
+  const driverInput = document.getElementById('driver-share-link');
+  if (driverInput) driverInput.value = fullDriverUrl;
+
+  const driverPreviewBtn = document.getElementById('preview-driver-link');
+  if (driverPreviewBtn) driverPreviewBtn.href = fullDriverUrl;
+
+  const copyDriverBtn = document.getElementById('copy-driver-share-btn');
+  if (copyDriverBtn) {
+    copyDriverBtn.onclick = () => {
+      navigator.clipboard.writeText(fullDriverUrl).then(() => {
+        const feedback = document.getElementById('copy-driver-feedback');
         if (feedback) {
-          feedback.innerText = 'Lien copié !';
+          feedback.innerText = 'Lien conducteur copié !';
           setTimeout(() => { feedback.innerText = ''; }, 3000);
+        }
+      }).catch(err => {
+        if (driverInput) {
+          driverInput.select();
+          document.execCommand('copy');
         }
       });
     };

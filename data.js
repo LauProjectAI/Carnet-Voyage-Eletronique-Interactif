@@ -854,7 +854,39 @@ const initialCarnetAfriqueDuSud = {
       notes: "Valable toute la journée selon conditions météo favorables. Embarquement express.",
       fileUrl: ""
     }
-  ]
+  ],
+  driverDossier: {
+    coachModel: "Mercedes-Benz Tourismo L (Grand Tourisme)",
+    coachPlate: "GF-492-VG (71)",
+    coachCapacity: "48 sièges",
+    driverName: "Marc V. & Sophie D.",
+    driverPhone: "+33 6 12 34 56 78",
+    busPlanNotes: "Plan de disposition en 48 sièges grand confort. Prises USB individuelles à chaque rangée.",
+    busPlanPdfUrl: "",
+    roomingNotes: "Distribution des clés effectuée à chaque étape par le guide accompagnateur en coordination avec la réception.",
+    roomingPdfUrl: "",
+    emergencyContacts: [
+      { role: "Exploitation & Planning Girardot (24/7)", name: "Permanence Chalon", phone: "+33 3 85 42 82 50", notes: "Astreinte technique et dépannage carnet de route" },
+      { role: "Responsable Parc Roulant & Mécanique", name: "Atelier Central Girardot", phone: "+33 3 85 42 82 55", notes: "Assistance crevaison, mécanique et dépannage autocar" },
+      { role: "Correspondant local réceptif", name: "GO TOURISM Assistance", phone: "+27 83 254 5813", notes: "Liaison réceptif en Afrique du Sud 24h/24" },
+      { role: "Assurance Rapatriement Groupe", name: "Europ Assistance Pro", phone: "+33 1 41 85 85 85", notes: "Dossier groupe Girardot n° 7729-AFR" }
+    ],
+    roomingList: [
+      { roomNum: "101", hotelName: "RH Hotel Pretoria", type: "DBL", guest1: "M. DUPONT Jean", guest2: "Mme DUPONT Marie", diet: "Sans gluten (Mme)", notes: "Chambre calme côté cour demandée" },
+      { roomNum: "102", hotelName: "RH Hotel Pretoria", type: "TWIN", guest1: "M. MARTIN Pierre", guest2: "M. BERNARD Paul", diet: "", notes: "Lits jumeaux séparés impératif" },
+      { roomNum: "104", hotelName: "RH Hotel Pretoria", type: "SGL", guest1: "Mme MOREAU Sophie", guest2: "", diet: "Végétarienne", notes: "Chambre individuelle non-fumeur" },
+      { roomNum: "105", hotelName: "RH Hotel Pretoria", type: "DBL", guest1: "M. GIRARD Alain", guest2: "Mme GIRARD Sylvie", diet: "", notes: "" }
+    ],
+    passengers: [
+      { seat: "1A", name: "M. DUPONT Jean", pickup: "Chalon-sur-Saône (Dépôt Girardot)", phone: "06 01 02 03 04", notes: "Valise cabine + 1 bagage soute" },
+      { seat: "1B", name: "Mme DUPONT Marie", pickup: "Chalon-sur-Saône (Dépôt Girardot)", phone: "06 01 02 03 05", notes: "Régime sans gluten" },
+      { seat: "2A", name: "M. MARTIN Pierre", pickup: "Mâcon (Gare TGV)", phone: "06 11 22 33 44", notes: "Montée Mâcon à 09h15" },
+      { seat: "2B", name: "M. BERNARD Paul", pickup: "Mâcon (Gare TGV)", phone: "06 22 33 44 55", notes: "" },
+      { seat: "3A", name: "Mme MOREAU Sophie", pickup: "Lyon Aéroport St-Exupéry", phone: "06 33 44 55 66", notes: "Rdv direct comptoir Emirates" },
+      { seat: "4A", name: "M. GIRARD Alain", pickup: "Chalon-sur-Saône (Dépôt Girardot)", phone: "06 44 55 66 77", notes: "" },
+      { seat: "4B", name: "Mme GIRARD Sylvie", pickup: "Chalon-sur-Saône (Dépôt Girardot)", phone: "06 55 66 77 88", notes: "" }
+    ]
+  }
 };
 
 window.defaultTravelData = initialCarnetAfriqueDuSud;
