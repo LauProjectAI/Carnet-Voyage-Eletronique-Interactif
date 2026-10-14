@@ -3700,3 +3700,368 @@ function applySelectedPhoto(photoUrl) {
     alert(`✓ Photo du Jour ${tripData.itinerary[idx].day} validée avec succès ! Pensez à enregistrer vos modifications.`);
   }
 }
+
+// -----------------------------------------------------------------------------
+// 6. CONVERTISSEUR INTELLIGENT DE PROGRAMME PDF / TEXTE EN VOYAGE (.JSON)
+// -----------------------------------------------------------------------------
+let currentParsedTrip = null;
+
+function openPdfImportModal() {
+  const modal = document.getElementById('pdf-import-modal');
+  if (modal) modal.style.display = 'flex';
+  resetPdfModalState();
+}
+
+function closePdfImportModal() {
+  const modal = document.getElementById('pdf-import-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function resetPdfModalState() {
+  currentParsedTrip = null;
+  const status = document.getElementById('pdf-import-status');
+  const preview = document.getElementById('pdf-preview-container');
+  const btnDownload = document.getElementById('btn-download-parsed-json');
+  const btnApply = document.getElementById('btn-apply-parsed-trip');
+  const rawInput = document.getElementById('pdf-raw-text-input');
+  const fileInput = document.getElementById('pdf-file-input');
+
+  if (status) status.style.display = 'none';
+  if (preview) preview.style.display = 'none';
+  if (btnDownload) btnDownload.style.display = 'none';
+  if (btnApply) btnApply.style.display = 'none';
+  if (rawInput) rawInput.value = '';
+  if (fileInput) fileInput.value = '';
+}
+
+function handlePdfFileSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('pdf-import-status');
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.borderColor = '#93c5fd';
+    statusEl.style.background = '#eff6ff';
+    statusEl.style.color = '#1d4ed8';
+    statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lecture et extraction du texte du fichier "${file.name}" en cours...`;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const typedarray = new Uint8Array(e.target.result);
+    extractTextFromPdfArray(typedarray, file.name);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function extractTextFromPdfArray(typedarray, originalFileName) {
+  const statusEl = document.getElementById('pdf-import-status');
+  
+  if (!window.pdfjsLib) {
+    if (statusEl) {
+      statusEl.style.borderColor = '#fca5a5';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#b91c1c';
+      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> La bibliothèque PDF.js n'a pas pu être chargée. Vous pouvez copier/coller directement le texte de votre PDF dans l'encadré ci-dessous.`;
+    }
+    return;
+  }
+
+  window.pdfjsLib.getDocument({ data: typedarray }).promise.then(async function(pdf) {
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const pageItems = textContent.items.map(item => item.str);
+      fullText += pageItems.join(" ") + "\n\n";
+    }
+
+    if (!fullText.trim()) {
+      if (statusEl) {
+        statusEl.style.borderColor = '#fca5a5';
+        statusEl.style.background = '#fef2f2';
+        statusEl.style.color = '#b91c1c';
+        statusEl.innerHTML = `<i class="fa-solid fa-circle-exclamation"></i> Le PDF semble être un scan sans couche texte sélectionnable. Copiez-collez le texte ou écrivez les étapes manuellement.`;
+      }
+      return;
+    }
+
+    // Afficher dans la zone de texte pour vérification et analyse
+    const rawInput = document.getElementById('pdf-raw-text-input');
+    if (rawInput) rawInput.value = fullText;
+
+    processExtractedTextToTrip(fullText, originalFileName);
+  }).catch(err => {
+    console.error("Erreur PDF.js:", err);
+    if (statusEl) {
+      statusEl.style.borderColor = '#fca5a5';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#b91c1c';
+      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Erreur lors de la lecture du PDF : ${err.message}. Vous pouvez coller le texte directement ci-dessous.`;
+    }
+  });
+}
+
+function parsePastedTextToTrip() {
+  const rawInput = document.getElementById('pdf-raw-text-input');
+  const text = rawInput ? rawInput.value.trim() : '';
+  if (!text) {
+    alert("Veuillez d'abord coller le texte de votre programme de voyage.");
+    return;
+  }
+  processExtractedTextToTrip(text, "Programme importé");
+}
+
+// Moteur heuristique d'analyse et de structuration du programme
+function processExtractedTextToTrip(text, sourceName) {
+  const statusEl = document.getElementById('pdf-import-status');
+  const previewBox = document.getElementById('pdf-preview-container');
+  const previewSummary = document.getElementById('pdf-preview-summary');
+  const btnDownload = document.getElementById('btn-download-parsed-json');
+  const btnApply = document.getElementById('btn-apply-parsed-trip');
+
+  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+  // 1. Détection du Titre et Destination
+  let detectedTitle = "";
+  if (sourceName && !sourceName.toLowerCase().includes("programme importé")) {
+    detectedTitle = sourceName.replace(/\.pdf$/i, "").replace(/[_-]/g, " ").trim();
+  }
+  if (!detectedTitle && lines.length > 0) {
+    detectedTitle = lines[0].slice(0, 60);
+  }
+
+  // 2. Détection des étapes "Jour X" ou "J1 / J2"
+  const itinerary = [];
+  const dayRegex = /(?:^|\b)(?:jour|j)\s*(\d{1,2})\b[:\s\-–—]*(.*)/i;
+  
+  let currentDay = null;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const match = line.match(dayRegex);
+
+    if (match) {
+      const dayNum = parseInt(match[1], 10);
+      const rawTitle = match[2] ? match[2].trim() : `Étape Jour ${dayNum}`;
+
+      if (currentDay) {
+        itinerary.push(currentDay);
+      }
+
+      currentDay = {
+        day: dayNum,
+        title: rawTitle ? `Jour ${dayNum} • ${rawTitle}` : `Jour ${dayNum}`,
+        highlight: rawTitle || `Temps fort du Jour ${dayNum}`,
+        city: extractProbableCity(rawTitle),
+        dateStr: `Jour ${dayNum}`,
+        description: "",
+        lat: 0,
+        lng: 0,
+        timeline: []
+      };
+    } else if (currentDay) {
+      // Si la ligne contient un horaire (ex: 09h30 ou 14:00)
+      const timeMatch = line.match(/(?:^|\b)(\d{1,2}[h:]\d{2})\b[:\s\-–—]*(.*)/i);
+      if (timeMatch) {
+        const timeStr = timeMatch[1].replace('h', ':');
+        const descStr = timeMatch[2] ? timeMatch[2].trim() : "Visite et découverte";
+        currentDay.timeline.push({
+          time: timeStr.length === 4 ? '0' + timeStr : timeStr,
+          title: descStr.slice(0, 50) || "Visite programmée",
+          subtitle: descStr,
+          icon: detectIconForText(descStr)
+        });
+      } else {
+        // Ajouter à la description générale de la journée
+        if (currentDay.description.length < 500) {
+          currentDay.description += (currentDay.description ? " " : "") + line;
+        }
+      }
+    }
+  }
+
+  if (currentDay) {
+    itinerary.push(currentDay);
+  }
+
+  // Si aucune découpe "Jour X" n'a été trouvée, créer au moins une découpe propre
+  if (itinerary.length === 0) {
+    itinerary.push({
+      day: 1,
+      title: "Jour 1 • Rendez-vous et début du circuit",
+      highlight: "Découverte et temps forts",
+      city: "Destination",
+      dateStr: "Jour 1",
+      description: text.slice(0, 400) + "...",
+      timeline: [
+        { time: "09:30", title: "Rendez-vous et accueil", subtitle: "Début des visites du programme.", icon: "location-dot" }
+      ]
+    });
+  }
+
+  // S'assurer que chaque jour a au moins une visite dans sa timeline
+  itinerary.forEach(d => {
+    if (!d.timeline || d.timeline.length === 0) {
+      d.timeline = [
+        {
+          time: "10:00",
+          title: d.highlight || d.title,
+          subtitle: d.description ? d.description.slice(0, 100) : "Programme et déroulé de l'étape.",
+          icon: "route"
+        }
+      ];
+    }
+  });
+
+  // 3. Détection des Hôtels
+  const hotels = [];
+  const hotelRegex = /(?:hôtel|hotel|lodge|camp|auberge)\s+([A-ZÀ-Ý][\w\s'-]{3,35})/gi;
+  let hMatch;
+  const foundHotelNames = new Set();
+  while ((hMatch = hotelRegex.exec(text)) !== null) {
+    const fullHotelName = hMatch[0].trim();
+    if (!foundHotelNames.has(fullHotelName) && fullHotelName.length < 40) {
+      foundHotelNames.add(fullHotelName);
+      hotels.push({
+        name: fullHotelName,
+        city: "Étape du circuit",
+        rating: "Hôtel sélectionné",
+        checkIn: "Pendant le circuit",
+        phone: "",
+        address: fullHotelName,
+        description: "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
+        photos: []
+      });
+    }
+  }
+
+  // 4. Détection des Vols
+  const flightsList = [];
+  if (text.match(/vol|avion|aéroport|terminal|air\s*france|emirates|lufthansa/i)) {
+    flightsList.push({
+      type: "Aller",
+      airline: "Compagnie aérienne régulière",
+      flightNumber: "",
+      departureAirport: "Aéroport de départ",
+      departureTime: "",
+      arrivalAirport: "Aéroport d'arrivée",
+      arrivalTime: "",
+      date: "Jour 1",
+      via: "",
+      notes: "Présentation au comptoir avec passeport en cours de validité."
+    });
+  }
+
+  // 5. Construction de l'objet Voyage final conforme
+  const newTripId = 'voyage-' + Date.now();
+  currentParsedTrip = {
+    id: newTripId,
+    title: detectedTitle || "Nouveau Circuit Girardot",
+    subtitle: "Circuit exclusif Voyages Girardot",
+    dates: "Selon calendrier des départs",
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(Date.now() + (itinerary.length || 7) * 86400000).toISOString().split('T')[0],
+    coverImage: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80",
+    intro: text.slice(0, 320) + "...",
+    alert: {
+      title: "Formalités indispensables",
+      text: "Vérifier la validité de votre passeport biométrique et formalités sanitaires éventuelles avant départ.",
+      link: ""
+    },
+    flightsList: flightsList,
+    itinerary: itinerary,
+    hotels: hotels,
+    documents: [],
+    freeTimeSuggestions: [],
+    practicalInfo: {
+      money: "Monnaie locale : Cartes de crédit acceptées. Prévoir des espèces pour les petits commerces.",
+      electricity: "Courant électrique standard. Prévoir un adaptateur universel.",
+      clothing: "Tenue confortable et chaussures de marche recommandées pour les visites de journée.",
+      tips: "Pourboires indicatifs : 2 à 3 €/jour/personne pour le guide et 1 € pour le chauffeur.",
+      wifi: "Wi-Fi disponible gratuitement dans la majorité des hôtels du circuit."
+    },
+    contactsList: [
+      {
+        category: "Assistance Girardot 24h/7j",
+        name: "Permanence Urgences Girardot",
+        phone: "+33 3 85 00 00 00",
+        address: "Chalon-sur-Saône, France",
+        isEmergency: true
+      }
+    ]
+  };
+
+  // Affichage du résultat dans le modal
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.borderColor = '#86efac';
+    statusEl.style.background = '#f0fdf4';
+    statusEl.style.color = '#15803d';
+    statusEl.innerHTML = `<i class="fa-solid fa-check"></i> Conversion réussie ! <strong>${itinerary.length} étape(s)</strong> et <strong>${hotels.length} hébergement(s)</strong> détectés.`;
+  }
+
+  if (previewBox && previewSummary) {
+    previewBox.style.display = 'block';
+    previewSummary.innerHTML = `
+      <div style="margin-bottom:6px;"><strong>Titre :</strong> ${currentParsedTrip.title}</div>
+      <div style="margin-bottom:6px;"><strong>Nombre de jours :</strong> ${itinerary.length} jours au programme</div>
+      <div style="margin-bottom:6px;"><strong>Étapes détectées :</strong> ${itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.city || d.title.slice(0, 20)}</span>`).join('')}</div>
+      ${hotels.length > 0 ? `<div><strong>Hôtels identifiés :</strong> ${hotels.map(h => h.name).join(', ')}</div>` : ''}
+    `;
+  }
+
+  if (btnDownload) btnDownload.style.display = 'inline-block';
+  if (btnApply) btnApply.style.display = 'inline-block';
+}
+
+function extractProbableCity(text) {
+  if (!text) return "";
+  const words = text.split(/[\s,•–—\/-]+/);
+  for (const w of words) {
+    if (w.length > 3 && /^[A-ZÀ-Ý][a-zà-ÿ]+$/.test(w) && !['Jour', 'Visite', 'Arrivee', 'Depart', 'Matin', 'Apres', 'Etape', 'Circuit', 'Envol'].includes(w)) {
+      return w;
+    }
+  }
+  return words[0] || "";
+}
+
+function detectIconForText(str) {
+  const s = str.toLowerCase();
+  if (s.includes('vol') || s.includes('envol') || s.includes('aeroport') || s.includes('avion')) return 'plane-departure';
+  if (s.includes('hotel') || s.includes('installation') || s.includes('chambre')) return 'hotel';
+  if (s.includes('dejeuner') || s.includes('diner') || s.includes('repas') || s.includes('restaurant')) return 'utensils';
+  if (s.includes('musee') || s.includes('monument') || s.includes('eglise') || s.includes('temple')) return 'monument';
+  if (s.includes('croisiere') || s.includes('bateau') || s.includes('lac') || s.includes('mer')) return 'ship';
+  if (s.includes('safari') || s.includes('faune') || s.includes('animaux')) return 'paw';
+  return 'location-dot';
+}
+
+function downloadParsedTripJson() {
+  if (!currentParsedTrip) return;
+  const filename = `${currentParsedTrip.title.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}.json`;
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentParsedTrip, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", filename);
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+}
+
+function applyParsedTripToAdmin() {
+  if (!currentParsedTrip) return;
+
+  saveTripToCatalogAndStorage(currentParsedTrip);
+  currentTripId = currentParsedTrip.id;
+  tripData = currentParsedTrip;
+
+  renderTripSelectorOptions();
+  populateForm();
+  updateShareLink();
+  closePdfImportModal();
+
+  alert(`✓ Le voyage "${currentParsedTrip.title}" extrait du PDF a été chargé dans l'administration avec succès !`);
+}
+
