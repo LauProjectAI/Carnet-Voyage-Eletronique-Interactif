@@ -57,6 +57,37 @@ function renderTripSelectorOptions() {
   });
 }
 
+function normalizeAdminTripDocuments(trip) {
+  if (!trip) return;
+  const isSouthAfrica = (trip.id === 'afrique-du-sud-2026') || 
+    ((trip.title || '') + ' ' + (trip.destination || '')).toLowerCase().includes('afrique du sud');
+  
+  if (!isSouthAfrica) {
+    const defaultSaDocIds = ['doc-flight-out', 'doc-voucher-safari', 'doc-ticket-tablemt'];
+    if (Array.isArray(trip.documents)) {
+      trip.documents = trip.documents.filter(d => !defaultSaDocIds.includes(d.id));
+    }
+    // Nettoyer les visites et nextEvent qui feraient référence à des codes QR ou documents d'Afrique du Sud résiduels
+    const saQrCodes = ['VOUCHER-SOWETO-01', 'VOUCHER-KRUGER-BIGFIVE-GIRARDOT', 'TICKET-TABLE-MOUNTAIN-GIRARDOT-2026', 'E-TICKET-EK82-LYS-JNB-GIRARDOT', 'VOUCHER-BLYDE-CANYON-04', 'VOUCHER-NDEBELE-VILLAGE-02'];
+    if (Array.isArray(trip.itinerary)) {
+      trip.itinerary.forEach(day => {
+        if (day.nextEvent) {
+          if (defaultSaDocIds.includes(day.nextEvent.docId) || saQrCodes.includes(day.nextEvent.qrCodeText)) {
+            day.nextEvent.docId = '';
+            day.nextEvent.qrCodeText = '';
+          }
+        }
+        if (Array.isArray(day.timeline)) {
+          day.timeline.forEach(v => {
+            if (defaultSaDocIds.includes(v.docId)) v.docId = '';
+            if (saQrCodes.includes(v.qrCodeText)) v.qrCodeText = '';
+          });
+        }
+      });
+    }
+  }
+}
+
 function loadTripById(tripId) {
   currentTripId = tripId;
   localStorage.setItem('girardot_active_trip_id', tripId);
@@ -66,6 +97,7 @@ function loadTripById(tripId) {
   if (storedTrip) {
     try {
       tripData = JSON.parse(storedTrip);
+      normalizeAdminTripDocuments(tripData);
       return;
     } catch (e) {
       console.error(e);
@@ -91,6 +123,7 @@ function loadTripById(tripId) {
       .then(res => res.json())
       .then(data => {
         tripData = data;
+        normalizeAdminTripDocuments(tripData);
         populateForm();
         updateShareLink();
       })
@@ -98,6 +131,8 @@ function loadTripById(tripId) {
         tripData = JSON.parse(JSON.stringify(window.defaultTravelData));
         tripData.id = tripId;
         tripData.title = "Italie du Nord & Dolomites";
+        tripData.documents = [];
+        normalizeAdminTripDocuments(tripData);
         populateForm();
         updateShareLink();
       });
@@ -107,6 +142,8 @@ function loadTripById(tripId) {
   // Par défaut : nouveau squelette
   tripData = JSON.parse(JSON.stringify(window.defaultTravelData));
   tripData.id = tripId;
+  tripData.documents = [];
+  normalizeAdminTripDocuments(tripData);
 }
 
 function onSelectTripChange(newTripId) {
@@ -154,6 +191,7 @@ function createNewTripPrompt() {
   newTrip.flightsList = [];
   newTrip.hotels = [];
   newTrip.freeTimeSuggestions = [];
+  newTrip.documents = [];
 
   // Enregistrer
   saveTripToCatalogAndStorage(newTrip);
@@ -865,22 +903,28 @@ function updateVisitField(dayIndex, visitIndex, field, value) {
 }
 
 function updateVisitDocumentLink(dayIndex, visitIndex, docId) {
-  const visit = tripData.itinerary[dayIndex].timeline[visitIndex];
+  const day = tripData.itinerary[dayIndex];
+  if (!day || !day.timeline) return;
+  const visit = day.timeline[visitIndex];
   if (!visit) return;
 
-  visit.docId = docId;
+  visit.docId = docId || '';
   if (docId) {
     const doc = (tripData.documents || []).find(d => d.id === docId);
     if (doc) {
       visit.qrCodeText = doc.qrCode || doc.reference || doc.title;
-      // Mettre à jour automatiquement le champ de saisie
-      renderAdminDays();
-      return;
     }
   } else {
     visit.qrCodeText = '';
-    renderAdminDays();
   }
+
+  // Si cette visite est l'événement clé 'NEXT' du jour, synchroniser également
+  if (day.nextEvent && day.nextEvent.visitIndex === visitIndex) {
+    day.nextEvent.docId = visit.docId;
+    day.nextEvent.qrCodeText = visit.qrCodeText || (docId ? '' : `GIRARDOT-JOUR-${day.day}`);
+  }
+
+  renderAdminDays();
 }
 
 function setDayPrimaryNextEvent(dayIndex, visitIndex) {
@@ -893,7 +937,8 @@ function setDayPrimaryNextEvent(dayIndex, visitIndex) {
     title: visit.title,
     time: visit.time,
     badge: visit.subtitle || "Programme clé Girardot",
-    qrCodeText: visit.qrCodeText || `GIRARDOT-JOUR-${day.day}`
+    docId: visit.docId || '',
+    qrCodeText: visit.qrCodeText || (visit.docId ? '' : `GIRARDOT-JOUR-${day.day}`)
   };
   renderAdminDays();
 }

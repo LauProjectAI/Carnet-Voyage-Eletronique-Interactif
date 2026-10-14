@@ -265,7 +265,39 @@ function loadTripData() {
   normalizeTripTransitMaps();
 }
 
+function normalizeTripDocuments() {
+  if (!currentTrip) return;
+  const isSouthAfrica = (currentTrip.id === 'afrique-du-sud-2026') || 
+    ((currentTrip.title || '') + ' ' + (currentTrip.destination || '')).toLowerCase().includes('afrique du sud');
+
+  if (!isSouthAfrica) {
+    const defaultSaDocIds = ['doc-flight-out', 'doc-voucher-safari', 'doc-ticket-tablemt'];
+    if (Array.isArray(currentTrip.documents)) {
+      currentTrip.documents = currentTrip.documents.filter(d => !defaultSaDocIds.includes(d.id));
+    }
+    // Nettoyer les reliquats d'Afrique du Sud dans les étapes pour les autres voyages
+    const saQrCodes = ['VOUCHER-SOWETO-01', 'VOUCHER-KRUGER-BIGFIVE-GIRARDOT', 'TICKET-TABLE-MOUNTAIN-GIRARDOT-2026', 'E-TICKET-EK82-LYS-JNB-GIRARDOT', 'VOUCHER-BLYDE-CANYON-04', 'VOUCHER-NDEBELE-VILLAGE-02'];
+    if (Array.isArray(currentTrip.itinerary)) {
+      currentTrip.itinerary.forEach(day => {
+        if (day.nextEvent) {
+          if (defaultSaDocIds.includes(day.nextEvent.docId) || saQrCodes.includes(day.nextEvent.qrCodeText)) {
+            day.nextEvent.docId = '';
+            day.nextEvent.qrCodeText = '';
+          }
+        }
+        if (Array.isArray(day.timeline)) {
+          day.timeline.forEach(v => {
+            if (defaultSaDocIds.includes(v.docId)) v.docId = '';
+            if (saQrCodes.includes(v.qrCodeText)) v.qrCodeText = '';
+          });
+        }
+      });
+    }
+  }
+}
+
 function normalizeTripTransitMaps() {
+  normalizeTripDocuments();
   if (!currentTrip || !currentTrip.conciergerie || !currentTrip.conciergerie.themes) return;
   const transportTheme = currentTrip.conciergerie.themes.find(t => t.id === 'transports');
   if (!transportTheme) return;
@@ -493,7 +525,7 @@ function renderTodayFocus() {
   // Next Event Card
   const nextEvent = currentDay.nextEvent || {
     title: currentDay.highlight || currentDay.title,
-    sub: currentDay.description.slice(0, 75) + '...',
+    sub: currentDay.description ? (currentDay.description.slice(0, 75) + '...') : "Programme de la journée",
     qrCodeText: `GIRARDOT-JOUR-${currentDay.day}`
   };
 
@@ -502,7 +534,11 @@ function renderTodayFocus() {
   
   const qrBtn = document.getElementById('btn-show-qr');
   qrBtn.onclick = () => {
-    openQrModal(nextEvent.title, nextEvent.qrCodeText || `GIRARDOT-JOUR-${currentDay.day}`);
+    if (nextEvent.docId && findDocById(nextEvent.docId)) {
+      viewClientDocDetails(nextEvent.docId, true);
+    } else {
+      openQrModal(nextEvent.title, nextEvent.qrCodeText || `GIRARDOT-JOUR-${currentDay.day}`);
+    }
   };
 
   // Timeline Stream (Liste avec points, lignes pointillées et photos)
@@ -524,6 +560,7 @@ function renderTodayFocus() {
     itemEl.className = 'timeline-entry';
 
     const gpsUrl = (entry.lat && entry.lng) ? getGpsUrl(entry.lat, entry.lng, entry.title) : null;
+    const hasLinkedDoc = entry.docId && findDocById(entry.docId);
 
     itemEl.innerHTML = `
       <div class="timeline-track-col">
@@ -553,8 +590,8 @@ function renderTodayFocus() {
             ` : '<span style="font-size:0.7rem; color:#94a3b8;"><i class="fa-regular fa-clock"></i> Visite organisée</span>'}
           </div>
 
-          ${entry.qrCodeText ? `
-            <button class="btn-entry-gps" style="background:#0284c7; color:white; border:none; cursor:pointer;" onclick="openQrModal('${entry.title.replace(/'/g, "\\'")}', '${entry.qrCodeText}')">
+          ${(hasLinkedDoc || entry.qrCodeText) ? `
+            <button class="btn-entry-gps" style="background:#0284c7; color:white; border:none; cursor:pointer;" onclick="${hasLinkedDoc ? `viewClientDocDetails('${entry.docId}', true)` : `openQrModal('${entry.title.replace(/'/g, "\\'")}', '${entry.qrCodeText}')`}">
               <i class="fa-solid fa-qrcode"></i> Bon d'échange
             </button>
           ` : ''}
