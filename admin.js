@@ -1632,7 +1632,8 @@ async function triggerAiConciergeGeneration() {
 
   // Déterminer la ville ou destination phare
   let detectedCity = "";
-  if (fullText.includes("chicago")) detectedCity = "Chicago";
+  if (fullText.includes("san francisco") || fullText.includes("francisco") || fullText.includes("sfo")) detectedCity = "San Francisco";
+  else if (fullText.includes("chicago")) detectedCity = "Chicago";
   else if (fullText.includes("new york") || fullText.includes("nyc")) detectedCity = "New York";
   else if (fullText.includes("italie") || fullText.includes("dolomite") || fullText.includes("bolzano") || fullText.includes("lac de garde")) detectedCity = "Italie / Dolomites";
   else if (fullText.includes("afrique") || fullText.includes("cap") || fullText.includes("kruger")) detectedCity = "Afrique du Sud / Le Cap";
@@ -1642,7 +1643,7 @@ async function triggerAiConciergeGeneration() {
   else {
     // Si non reconnue dans les mots clés immédiats, extraire le premier mot significatif ou demander
     const candidate = title.split(/[-–—:]/)[0].trim();
-    detectedCity = prompt("Pour quelle ville ou région principale souhaitez-vous générer les adresses de Conciergerie ?", candidate || "Chicago");
+    detectedCity = prompt("Pour quelle ville ou région principale souhaitez-vous générer les adresses de Conciergerie ?", candidate || "San Francisco");
     if (!detectedCity || !detectedCity.trim()) return;
     detectedCity = detectedCity.trim();
   }
@@ -1680,8 +1681,353 @@ async function triggerAiConciergeGeneration() {
 
   const lowerCity = detectedCity.toLowerCase();
 
+  // 0. Pack Spécial SAN FRANCISCO (Calcul par rayons stricts : <1km immédiat, puis 1 à 4km, et visites <5km sans doublons)
+  if (lowerCity.includes("san francisco") || lowerCity.includes("francisco")) {
+    tripData.conciergerie.welcomeMessage = "Bienvenue à San Francisco ! Je suis votre Concierge Voyage Girardot. Retrouvez vos adresses sélectionnées à proximité immédiate de votre hôtel et pour votre temps libre dans la City by the Bay.";
+    
+    // Extraction des titres de visites programmées pour exclure les doublons
+    const plannedTitles = (tripData.itinerary || [])
+      .flatMap(d => (d.timeline || []).map(v => (v.title || '').toLowerCase()))
+      .concat((tripData.itinerary || []).map(d => (d.title || '').toLowerCase()));
+
+    const isAlreadyPlanned = (name) => {
+      const lower = name.toLowerCase();
+      return plannedTitles.some(p => p.includes(lower) || lower.includes(p.replace(/visite|découverte|matin|après-midi/g, '').trim()));
+    };
+
+    tripData.conciergerie.themes.forEach(th => {
+      th.enabled = true;
+
+      if (th.id === 'resto') {
+        th.places = [
+          // RAYON 1 : À PROXIMITÉ IMMÉDIATE DU COEUR HOTELIER (Union Square / Nob Hill / SOMA < 1 km)
+          {
+            name: "John's Grill (Steakhouse historique)",
+            category: "Steakhouse & Fruits de mer (Rayon 400m)",
+            location: "63 Ellis St, Union Square, San Francisco, CA 94102",
+            tag: "Légendaire depuis 1908",
+            phone: "+1 415-986-0069",
+            bookingUrl: "https://www.johnsgrill.com",
+            description: "Table mythique de San Francisco fondée en 1908, immortalisée par Dashiell Hammett dans Le Faucon Maltais. Filets de bœuf grillés, côtes d'agneau et fruits de mer servis dans un somptueux décor boisé d'époque.",
+            tips: "À seulement 3 minutes à pied d'Union Square. Réservez pour dîner au premier étage près des photos historiques de stars.",
+            lat: 37.7858,
+            lng: -122.4082
+          },
+          {
+            name: "Sears Fine Food (Brasserie & Pancakes)",
+            category: "Brasserie américaine & Petit-déjeuner (Rayon 300m)",
+            location: "439 Powell St, Union Square, San Francisco, CA 94102",
+            tag: "Institution depuis 1938",
+            phone: "+1 415-986-0700",
+            bookingUrl: "https://www.searsfinefood.com",
+            description: "Célèbre institution face au passage des mythiques Cable Cars. Connue dans le monde entier pour ses 18 mini-pancakes suédois au beurre fondu, ses omelettes fermières et ses burgers traditionnels.",
+            tips: "Parfait pour un petit-déjeuner copieux ou un déjeuner rapide avant de prendre le Cable Car.",
+            lat: 37.7891,
+            lng: -122.4087
+          },
+          {
+            name: "Super Duper Burgers (Union Square)",
+            category: "Burger Gourmet Local (Rayon 200m)",
+            location: "721 Market St / Union Square, San Francisco, CA 94103",
+            tag: "Meilleurs Burgers 100% Bio",
+            phone: "+1 415-538-3437",
+            bookingUrl: "https://www.superduperburgers.com",
+            description: "La référence californienne du burger artisanal écoresponsable : viande de bœuf bio issue d'élevages locaux sans hormones, buns moelleux cuits le matin même, frites maison au sel de mer et pickles à volonté.",
+            tips: "Service au comptoir ultra-rapide. Ne manquez pas les milkshakes au caramel au beurre salé bio.",
+            lat: 37.7869,
+            lng: -122.4042
+          },
+          {
+            name: "Enjoy Vegetarian Restaurant",
+            category: "Végétarien & Vegan Asiatique (Rayon 800m)",
+            location: "839 Kearny St, Chinatown / Financial, San Francisco, CA 94108",
+            tag: "100% Végétal & Sans OGM",
+            phone: "+1 415-956-7868",
+            bookingUrl: "https://enjoyveggie.com",
+            description: "Table réputée et certifiée bouddhiste proposant une cuisine chinoise entièrement végétarienne et végane sans glutamate : raviolis aux légumes frais, woks de champignons sauvages et tofu braisé savoureux.",
+            tips: "Rapport qualité/prix exceptionnel à deux pas de la porte des Dragons de Chinatown.",
+            lat: 37.7958,
+            lng: -122.4051
+          },
+          {
+            name: "Mister Jiu's (Étoilé Michelin)",
+            category: "Haute Gastronomie Asiatique (Rayon 900m)",
+            location: "28 Waverly Pl, Chinatown, San Francisco, CA 94108",
+            tag: "Étoile Michelin & Cadre somptueux",
+            phone: "+1 415-857-9688",
+            bookingUrl: "https://misterjius.com",
+            description: "Le chef Brandon Jew réinvente la gastronomie cantonaise dans un ancien banquet historique de Waverly Place. Canard laqué rôti au feu de bois réputé dans tous les États-Unis et dim sums de haute voltige.",
+            tips: "Réservation indispensable plusieurs semaines à l'avance en ligne. Bar à cocktails d'exception à l'étage (Moongate Lounge).",
+            lat: 37.7938,
+            lng: -122.4069
+          },
+          {
+            name: "Tadich Grill (Fruits de mer & Grillades)",
+            category: "Fruits de mer & Cuisine locale (Rayon 950m)",
+            location: "240 California St, Financial District, San Francisco, CA 94111",
+            tag: "Plus vieux restaurant de Californie (1849)",
+            phone: "+1 415-391-1849",
+            bookingUrl: "https://tadichgrillsf.com",
+            description: "Le plus ancien restaurant de Californie en activité continue depuis 1849. Spécialiste absolu du célèbre Cioppino (ragoût de fruits de mer et crabe Dungeness typique de San Francisco) et poisson frais grillé au feu de mesquite.",
+            tips: "Prenez place au grand comptoir en bois pour regarder les cuisiniers officier. Service élégant en veste blanche.",
+            lat: 37.7934,
+            lng: -122.3996
+          },
+
+          // RAYON 2 : ENTRE 1 ET 4 KM (Adresses emblématiques accessibles en 5 à 10 min de bus/cable car/taxi)
+          {
+            name: "Original Joe's (North Beach)",
+            category: "Tradition Italo-Américaine (Rayon 1.6 km)",
+            location: "601 Union St, North Beach, San Francisco, CA 94133",
+            tag: "Coup de cœur convivial",
+            phone: "+1 415-775-4877",
+            bookingUrl: "https://originaljoes.com",
+            description: "Temple chaleureux de la cuisine italo-américaine depuis 1937 face au parc Washington Square. Célèbres raviolis maison, escalopes de veau parmigiana, steaks charbon et banquettes en cuir rouge.",
+            tips: "Atmosphère vibrante et généreuse au cœur du quartier italien. Très facile d'accès avec le bus 30 ou 8.",
+            lat: 37.8005,
+            lng: -122.4103
+          },
+          {
+            name: "Shizen Vegan Sushi Bar & Izakaya",
+            category: "Sushis Végans Gastronomiques (Rayon 2.5 km)",
+            location: "370 14th St, Mission District, San Francisco, CA 94103",
+            tag: "Référence mondiale Vegan",
+            phone: "+1 415-678-5767",
+            bookingUrl: "https://www.shizensf.com",
+            description: "Izakaya japonais gastronomique 100% végétalien récompensé par le Guide Michelin (Bib Gourmand). Créations spectaculaires combinant igname de montagne, konjac et champignons pour reproduire des textures marines sans aucune pêche.",
+            tips: "Arrivez dès l'ouverture à 17h ou inscrivez-vous sur leur liste d'attente sur Yelp.",
+            lat: 37.7683,
+            lng: -122.4217
+          },
+          {
+            name: "Greens Restaurant (Fort Mason Waterfront)",
+            category: "Haute Gastronomie Végétarienne (Rayon 3.5 km)",
+            location: "2 Marina Blvd, Fort Mason Center, San Francisco, CA 94123",
+            tag: "Vue baie & Golden Gate Bridge",
+            phone: "+1 415-771-6222",
+            bookingUrl: "https://greensrestaurant.com",
+            description: "Pionnier mondial de la gastronomie végétale fondé en 1979 par le Centre Zen de San Francisco. Situé dans un ancien hangar maritime rénové avec d'immenses baies vitrées offrant une vue féerique sur le Golden Gate Bridge.",
+            tips: "Idéal pour un déjeuner panoramique ou un coucher de soleil mémorable. Produits bio en direct de la ferme Green Gulch.",
+            lat: 37.8066,
+            lng: -122.4318
+          }
+        ];
+      } else if (th.id === 'visites') {
+        const potentialVisits = [
+          {
+            name: "Dragon's Gate & Ruelles de Chinatown",
+            category: "Balade historique & Architecture (Rayon 700m)",
+            location: "Grant Ave & Bush St, San Francisco, CA 94108",
+            tag: "Patrimoine emblématique",
+            phone: "+1 415-982-6306",
+            bookingUrl: "https://www.sanfranciscochinatown.com",
+            description: "Porte monumentale gardée par des lions de pierre sculptés marquant l'entrée de la plus ancienne Chinatown d'Amérique du Nord. Parcourez Grant Avenue et Waverly Place aux façades ornées et balcons multicolores.",
+            tips: "À moins de 10 min à pied d'Union Square. Arrêtez-vous à la Golden Gate Fortune Cookie Factory pour voir fabriquer les biscuits artisanaux.",
+            lat: 37.7907,
+            lng: -122.4058
+          },
+          {
+            name: "Ferry Building Marketplace & Embarcadero",
+            category: "Marché gourmand & Baie panoramique (Rayon 1.5 km)",
+            location: "1 Ferry Building, The Embarcadero, San Francisco, CA 94111",
+            tag: "Halles gourmandes du front de mer",
+            phone: "+1 415-983-8030",
+            bookingUrl: "https://www.ferrybuildingmarketplace.com",
+            description: "Bâtiment historique de 1898 dominé par sa tour de l'horloge. Abrite sous ses verrières les meilleurs artisans culinaires de Californie (fromages artisanaux Cowgirl Creamery, pains au levain Acme Bread, glaces bio et cafés Blue Bottle).",
+            tips: "Grand marché des fermiers en plein air les mardis, jeudis et samedis matins face au Bay Bridge.",
+            lat: 37.7955,
+            lng: -122.3937
+          },
+          {
+            name: "Librairie City Lights & Alley Jack Kerouac",
+            category: "Littérature Beat & Culture (Rayon 1.4 km)",
+            location: "261 Columbus Ave, North Beach, San Francisco, CA 94133",
+            tag: "Monstre sacré de la Beat Generation",
+            phone: "+1 415-362-8193",
+            bookingUrl: "https://citylights.com",
+            description: "Fondée en 1953 par le poète Lawrence Ferlinghetti, cette librairie mythique a publié 'Howl' d'Allen Ginsberg et incarné le cœur de la liberté d'expression et de la Beat Generation.",
+            tips: "Montez au dernier étage dans la 'Poetry Room' pour feuilleter un recueil dans les fauteuils en bois au calme.",
+            lat: 37.7976,
+            lng: -122.4066
+          },
+          {
+            name: "Coit Tower & Télégraphe Hill",
+            category: "Belvédère & Fresques historiques (Rayon 2.1 km)",
+            location: "1 Telegraph Hill Blvd, San Francisco, CA 94133",
+            tag: "Vue 360° sur toute la baie",
+            phone: "+1 415-249-0995",
+            bookingUrl: "https://sfrecpark.org/destination/coit-tower/",
+            description: "Tour art-déco en béton blanc de 64 mètres de haut érigée au sommet de Telegraph Hill. L'intérieur abrite d'exceptionnelles fresques murales des années 1930 peintes par des artistes du New Deal.",
+            tips: "Montez-y à pied via les célèbres escaliers fleuris de Filbert Street pour apercevoir les colonies de perroquets sauvages.",
+            lat: 37.8024,
+            lng: -122.4058
+          },
+          {
+            name: "Palace of Fine Arts",
+            category: "Architecture néo-classique & Parc (Rayon 4.2 km)",
+            location: "3301 Lyon St, Marina District, San Francisco, CA 94123",
+            tag: "Dôme gréco-romain majestueux",
+            phone: "+1 415-563-6504",
+            bookingUrl: "https://palaceoffinearts.org",
+            description: "Monument féerique hérité de l'Exposition Universelle de 1915. Sa monumentale rotonde classique et ses colonnades se reflètent dans une lagune paisible habitée par des cygnes.",
+            tips: "Entrée libre et gratuite. Lieu particulièrement magique et paisible pour une balade au soleil couchant.",
+            lat: 37.8020,
+            lng: -122.4485
+          }
+        ];
+
+        // Filtrer automatiquement les visites qui feraient doublon avec une étape déjà prévue au programme
+        th.places = potentialVisits.filter(v => !isAlreadyPlanned(v.name));
+      } else if (th.id === 'shopping') {
+        th.places = [
+          {
+            name: "Westfield San Francisco Centre",
+            category: "Grandes enseignes & Dôme historique",
+            location: "865 Market St, Union Square, San Francisco, CA 94103",
+            tag: "Accès direct métro Powell St",
+            phone: "+1 415-512-6776",
+            bookingUrl: "https://www.westfield.com",
+            description: "Centre commercial historique abritant des dizaines de boutiques sous une magnifique verrière restaurée de 1908.",
+            tips: "Sous-sol gourmand très pratique avec accès direct aux lignes de métro BART et Muni.",
+            lat: 37.7842,
+            lng: -122.4065
+          },
+          {
+            name: "Union Square Boutiques & Galeries",
+            category: "Mode internationale & Horlogerie",
+            location: "Post St, Geary St & Maiden Lane, San Francisco, CA 94108",
+            tag: "Cœur commerçant piétonnier",
+            phone: "",
+            bookingUrl: "https://visitunionsquaresf.com",
+            description: "Les rues entourant Union Square concentrent les plus grandes maisons de mode, grands magasins (Macy's, Saks) et les jolies boutiques fleuries de Maiden Lane.",
+            tips: "Maiden Lane devient entièrement piétonne l'après-midi, idéale pour flâner en terrasse.",
+            lat: 37.7880,
+            lng: -122.4060
+          }
+        ];
+      } else if (th.id === 'pratique') {
+        th.places = [
+          {
+            name: "Chase Bank & Distributeurs DAB 24/7",
+            category: "Banque & Retraits sécurisés",
+            location: "211 Sutter St, Union Square, San Francisco, CA 94108",
+            tag: "DAB sécurisé multi-cartes",
+            phone: "+1 415-951-1997",
+            bookingUrl: "https://www.chase.com",
+            description: "Agence bancaire officielle disposant d'un hall DAB sécurisé 24h/24 acceptant toutes les cartes internationales (Visa, Mastercard, Amex).",
+            tips: "Refusez le taux de change proposé par le distributeur (Dynamic Currency Conversion) pour laisser votre banque appliquer le taux officiel sans surcoût.",
+            lat: 37.7895,
+            lng: -122.4038
+          },
+          {
+            name: "Walgreens Pharmacy (Powell & Geary)",
+            category: "Pharmacie, Santé & Dépannage quotidien",
+            location: "135 Powell St, San Francisco, CA 94102",
+            tag: "Ouvert 7j/7 en plein centre",
+            phone: "+1 415-391-7222",
+            bookingUrl: "https://www.walgreens.com",
+            description: "Grande pharmacie et supérette de dépannage : produits de premiers soins, paracétamol, pansements, adaptateurs électriques US, bouteilles d'eau et snacks.",
+            tips: "À 200 mètres d'Union Square. Personnel serviable pour vous orienter sur les médicaments en vente libre aux USA.",
+            lat: 37.7865,
+            lng: -122.4080
+          },
+          {
+            name: "CVS Pharmacy (Geary St)",
+            category: "Pharmacie & Parapharmacie",
+            location: "399 Geary St, Union Square, San Francisco, CA 94102",
+            tag: "Face aux théâtres d'Union Square",
+            phone: "+1 415-268-9949",
+            bookingUrl: "https://www.cvs.com",
+            description: "Pharmacie complète proposant soins d'hygiène, cosmétiques, chargeurs de téléphone et en-cas légers.",
+            tips: "Pratique pour trouver des protections solaires et des produits de voyage format cabine.",
+            lat: 37.7871,
+            lng: -122.4101
+          }
+        ];
+      } else if (th.id === 'detente') {
+        th.places = [
+          {
+            name: "Cityscape Sky Bar (Hilton 46e étage)",
+            category: "Rooftop panoramique 360° (Rayon 250m)",
+            location: "333 O'Farrell St, 46th Floor, San Francisco, CA 94102",
+            tag: "Plus haut lounge panoramique de SF",
+            phone: "+1 415-923-5002",
+            bookingUrl: "https://www.cityscapeskybar.com",
+            description: "Perché au 46e étage de la tour Hilton, ce sky bar offre d'immenses baies vitrées avec une vue à couper le souffle à 360° sur toute la skyline de San Francisco, le Golden Gate et le pont d'Oakland.",
+            tips: "Venez 45 minutes avant le coucher du soleil pour voir la ville s'illuminer dans la brume. Tenue correcte exigée.",
+            lat: 37.7861,
+            lng: -122.4111
+          },
+          {
+            name: "The View Lounge (Marriott Marquis 39e étage)",
+            category: "Cocktails & Verrière historique (Rayon 500m)",
+            location: "780 Mission St, 39th Floor, San Francisco, CA 94103",
+            tag: "Célèbre fenêtre en arche",
+            phone: "+1 415-896-1600",
+            bookingUrl: "https://www.marriott.com/en-us/hotels/sfodt-san-francisco-marriott-marquis/dining/",
+            description: "Lounge élégant réputé pour sa spectaculaire baie vitrée en éventail surplombant le sud de San Francisco et Market Street. Cocktails signature artisanaux et planches à partager.",
+            tips: "Entrée libre sans réservation obligatoire. Très prisé en début de soirée, accès par les ascenseurs rapides de l'hôtel.",
+            lat: 37.7854,
+            lng: -122.4045
+          }
+        ];
+      } else if (th.id === 'transports') {
+        th.transitMapUrl = "https://www.sfmta.com/maps";
+        th.transitMapImageUrl = "https://www.sfmta.com/sites/default/files/inline-images/Muni_Metro_Rail_Pocket_Map_Nov_2022.png";
+        th.guideHtml = `
+          <strong>🚊 Guide pratique des transports à San Francisco (Réseau Muni, Cable Cars & BART) :</strong><br>
+          • <strong>Le Réseau Muni (Métro léger & Bus) :</strong> Muni dessert l'intégralité de la ville. Les lignes de métro souterrain/aérien (lignes J, K, L, M, N, T) circulent le long de Market Street et relient tous les quartiers majeurs.<br>
+          • <strong>Les Mythiques Cable Cars :</strong> 3 lignes historiques (Powell-Hyde, Powell-Mason et California St). Le terminus de Powell Street se situe à 200m d'Union Square. Tarif : 8 $ le trajet simple, mais <em>inclus en illimité</em> dans les Visitor Passports !<br>
+          • <strong>Ligne historique F-Market :</strong> De magnifiques tramways anciens venus de Milan, Porto ou Philadelphie qui parcourent toute la rue Market jusqu'au Fisherman's Wharf le long des quais de l'Embarcadero.<br>
+          • <strong>Pass Visiteur Muni (Très avantageux) :</strong><br>
+          &nbsp;&nbsp;- <strong>1-Day Visitor Passport :</strong> 13 $ (trajets illimités bus, métro ET Cable Cars pendant 24h sur smartphone via l'application <em>MuniMobile</em>)<br>
+          &nbsp;&nbsp;- <strong>3-Day Visitor Passport :</strong> 31 $ (idéal pour 3 jours de découverte complète)<br>
+          &nbsp;&nbsp;- <strong>7-Day Visitor Passport :</strong> 41 $<br>
+          • <strong>Payer avec son smartphone (Clipper / Contactless) :</strong> Vous pouvez également poser votre carte bancaire sans contact ou votre Apple Pay sur les bornes d'entrée (tarif 2,50 $ par trajet en bus/métro). Attention, le réseau régional <strong>BART</strong> reliant l'aéroport SFO au centre-ville fonctionne avec une tarification kilométrique séparée.
+        `;
+        th.places = [
+          {
+            name: "Terminus Cable Car de Powell Street (Union Square)",
+            category: "Lignes historiques de Cable Car",
+            location: "Powell St & Market St, San Francisco, CA 94102",
+            tag: "Départ des lignes Powell-Hyde & Powell-Mason",
+            phone: "+1 415-701-2311",
+            bookingUrl: "https://www.sfmta.com/getting-around/muni/cable-cars",
+            description: "Terminus mythique où les wattmen font pivoter manuellement les rames historiques en bois de 1873 sur une plaque tournante. Départ direct pour traverser Nob Hill et rejoindre Fisherman's Wharf.",
+            tips: "Arrivez avant 9h30 le matin pour éviter l'attente aux heures de pointe touristique.",
+            lat: 37.7845,
+            lng: -122.4080
+          },
+          {
+            name: "Application Officielle MuniMobile & Cartes SFMTA",
+            category: "Application mobile & Horaires en direct",
+            location: "Disponible sur smartphone (iOS & Android)",
+            tag: "Pass 1, 3 et 7 jours en ligne",
+            phone: "+1 415-701-2311",
+            bookingUrl: "https://www.sfmta.com/getting-around/muni/fares-passes/munimobile",
+            description: "L'application mobile officielle de la ville de San Francisco pour acheter vos Passports illimités dématérialisés en 1 minute sans faire la queue aux guichets.",
+            tips: "Activez votre pass juste avant de monter à bord pour la première fois.",
+            lat: 37.7879,
+            lng: -122.4075
+          },
+          {
+            name: "VTC Uber, Lyft & Taxis officiels de San Francisco",
+            category: "Taxis & Voitures avec chauffeur 24/7",
+            location: "Disponible immédiatement partout dans la métropole",
+            tag: "Berceau mondial du VTC",
+            phone: "+1 415-333-3333",
+            bookingUrl: "https://www.uber.com/fr/cities/san-francisco/",
+            description: "San Francisco est la ville natale d'Uber et Lyft. Les chauffeurs arrivent en 2 à 4 minutes partout dans la ville. Idéal pour remonter les célèbres collines escarpées sans fatigue le soir.",
+            tips: "Application indispensable pour regagner votre hôtel rapidement après le dîner.",
+            lat: 37.7833,
+            lng: -122.4167
+          }
+        ];
+      }
+    });
+
   // 1. Pack Spécial CHICAGO
-  if (lowerCity.includes("chicago")) {
+  } else if (lowerCity.includes("chicago")) {
     tripData.conciergerie.welcomeMessage = "Bienvenue à Chicago ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre dans la Windy City ?";
     
     tripData.conciergerie.themes.forEach(th => {
