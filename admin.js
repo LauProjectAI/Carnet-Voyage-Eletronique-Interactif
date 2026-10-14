@@ -1196,30 +1196,121 @@ function renderAdminHotels() {
       <div class="form-row">
         <div class="form-group">
           <label>Nom de l'établissement :</label>
-          <input type="text" class="form-control" value="${hotel.name || ''}" onchange="updateHotelField(${index}, 'name', this.value)">
+          <input type="text" id="hotel-name-${index}" class="form-control" value="${hotel.name || ''}" placeholder="Ex: RH Hotel & Apartments Pretoria" onchange="updateHotelField(${index}, 'name', this.value)">
         </div>
         <div class="form-group">
           <label>Dates de séjour :</label>
-          <input type="text" class="form-control" value="${hotel.dates || ''}" onchange="updateHotelField(${index}, 'dates', this.value)">
+          <input type="text" class="form-control" value="${hotel.dates || ''}" placeholder="Ex: Du 13 au 14 octobre" onchange="updateHotelField(${index}, 'dates', this.value)">
         </div>
       </div>
       <div class="form-group">
-        <label>Adresse :</label>
-        <input type="text" class="form-control" value="${hotel.address || ''}" onchange="updateHotelField(${index}, 'address', this.value)">
+        <label>Adresse de l'hôtel (calcul GPS automatique) :</label>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="hotel-addr-${index}" class="form-control" placeholder="Ex: 14 Trevenna St, Sunnyside, Pretoria, 0002" value="${hotel.address || ''}" onchange="updateHotelField(${index}, 'address', this.value)">
+          <button type="button" onclick="autoGeocodeHotel(${index})" class="btn-secondary" style="font-size:0.75rem; padding:6px 12px; white-space:nowrap; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" title="Calculer les coordonnées GPS via OpenStreetMap / Nominatim">
+            <i class="fa-solid fa-location-crosshairs"></i> Calculer GPS
+          </button>
+        </div>
+        <div id="hotel-geocode-status-${index}" style="font-size:0.75rem; color:#059669; margin-top:4px; font-weight:bold;">
+          ${(hotel.lat && hotel.lng) ? `<i class="fa-solid fa-check"></i> Coordonnées GPS : [${Number(hotel.lat).toFixed(4)}, ${Number(hotel.lng).toFixed(4)}]` : ''}
+        </div>
       </div>
       <div class="form-row">
         <div class="form-group">
           <label>Latitude :</label>
-          <input type="number" step="any" class="form-control" value="${hotel.lat || ''}" onchange="updateHotelField(${index}, 'lat', parseFloat(this.value))">
+          <input type="number" step="any" id="hotel-lat-${index}" class="form-control" value="${hotel.lat || ''}" placeholder="Ex: -25.7533" oninput="updateHotelField(${index}, 'lat', parseFloat(this.value))" onchange="updateHotelField(${index}, 'lat', parseFloat(this.value))">
         </div>
         <div class="form-group">
           <label>Longitude :</label>
-          <input type="number" step="any" class="form-control" value="${hotel.lng || ''}" onchange="updateHotelField(${index}, 'lng', parseFloat(this.value))">
+          <input type="number" step="any" id="hotel-lng-${index}" class="form-control" value="${hotel.lng || ''}" placeholder="Ex: 28.2045" oninput="updateHotelField(${index}, 'lng', parseFloat(this.value))" onchange="updateHotelField(${index}, 'lng', parseFloat(this.value))">
         </div>
       </div>
     `;
     container.appendChild(box);
   });
+}
+
+function autoGeocodeHotel(index) {
+  const hotel = tripData.hotels[index];
+  if (!hotel) return;
+
+  const addrInput = document.getElementById(`hotel-addr-${index}`);
+  const nameInput = document.getElementById(`hotel-name-${index}`);
+  const statusEl = document.getElementById(`hotel-geocode-status-${index}`);
+
+  const addrQuery = addrInput ? addrInput.value.trim() : '';
+  const nameQuery = nameInput ? nameInput.value.trim() : '';
+  const query = addrQuery || nameQuery;
+
+  if (!query) {
+    alert("Veuillez saisir au moins l'adresse ou le nom de l'hôtel pour calculer le GPS.");
+    return;
+  }
+
+  if (statusEl) {
+    statusEl.innerHTML = '<span style="color:#0284c7;"><i class="fa-solid fa-spinner fa-spin"></i> Recherche des coordonnées GPS...</span>';
+  }
+
+  const url = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`;
+  fetch(url, { headers: { 'Accept-Language': 'fr' } })
+    .then(res => res.json())
+    .then(data => {
+      if (data && data.length > 0) {
+        const lat = parseFloat(data[0].lat);
+        const lon = parseFloat(data[0].lon);
+
+        tripData.hotels[index].lat = lat;
+        tripData.hotels[index].lng = lon;
+
+        const latInput = document.getElementById(`hotel-lat-${index}`);
+        const lngInput = document.getElementById(`hotel-lng-${index}`);
+        if (latInput) latInput.value = lat;
+        if (lngInput) lngInput.value = lon;
+
+        if (statusEl) {
+          statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> Coordonnées GPS trouvées : [${lat.toFixed(4)}, ${lon.toFixed(4)}]</span>`;
+        }
+      } else {
+        // Tentative secondaire avec le nom uniquement si l'adresse exacte a échoué
+        if (addrQuery && nameQuery && query !== nameQuery) {
+          if (statusEl) statusEl.innerHTML = '<span style="color:#0284c7;"><i class="fa-solid fa-spinner fa-spin"></i> Nouvelle tentative avec le nom de l\'hôtel...</span>';
+          fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(nameQuery)}&limit=1`, { headers: { 'Accept-Language': 'fr' } })
+            .then(r => r.json())
+            .then(data2 => {
+              if (data2 && data2.length > 0) {
+                const lat = parseFloat(data2[0].lat);
+                const lon = parseFloat(data2[0].lon);
+                tripData.hotels[index].lat = lat;
+                tripData.hotels[index].lng = lon;
+                const latInput = document.getElementById(`hotel-lat-${index}`);
+                const lngInput = document.getElementById(`hotel-lng-${index}`);
+                if (latInput) latInput.value = lat;
+                if (lngInput) lngInput.value = lon;
+                if (statusEl) {
+                  statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> Coordonnées GPS trouvées via le nom : [${lat.toFixed(4)}, ${lon.toFixed(4)}]</span>`;
+                }
+              } else {
+                if (statusEl) {
+                  statusEl.innerHTML = '<span style="color:#dc2626;"><i class="fa-solid fa-circle-exclamation"></i> Lieu non localisé automatiquement. Vous pouvez saisir les coordonnées GPS manuellement.</span>';
+                }
+              }
+            })
+            .catch(() => {
+              if (statusEl) statusEl.innerHTML = '<span style="color:#dc2626;">Erreur réseau lors de la recherche GPS.</span>';
+            });
+        } else {
+          if (statusEl) {
+            statusEl.innerHTML = '<span style="color:#dc2626;"><i class="fa-solid fa-circle-exclamation"></i> Lieu non localisé automatiquement. Vous pouvez saisir les coordonnées GPS manuellement.</span>';
+          }
+        }
+      }
+    })
+    .catch(err => {
+      console.warn("Erreur geocoding hôtel:", err);
+      if (statusEl) {
+        statusEl.innerHTML = '<span style="color:#dc2626;">Connexion indisponible. Saisissez les coordonnées GPS manuellement.</span>';
+      }
+    });
 }
 
 function updateHotelField(index, field, value) {
