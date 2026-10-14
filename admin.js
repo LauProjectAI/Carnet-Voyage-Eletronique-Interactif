@@ -1167,12 +1167,19 @@ function renderAdminDocuments() {
         <div class="form-group">
           <label style="font-weight:700; font-size:0.8rem;">Fichier ou lien du document (PDF ou image) :</label>
           <div style="display:flex; gap:6px;">
-            <input type="text" id="adm-doc-file-${idx}" class="form-control" placeholder="Chemin local, base64 ou URL https://..." value="${doc.fileUrl || ''}" onchange="updateAdminDocumentField(${idx}, 'fileUrl', this.value)">
+            <input type="text" id="adm-doc-file-${idx}" class="form-control" placeholder="Chemin local, base64 ou URL https://..." value="${(doc.fileUrl && doc.fileUrl.startsWith('data:')) ? '(Fichier joint enregistré)' : (doc.fileUrl || '')}" onchange="if(!this.value.includes('(Fichier joint')) updateAdminDocumentField(${idx}, 'fileUrl', this.value)">
             <button type="button" class="btn-secondary" style="font-size:0.75rem; white-space:nowrap;" onclick="document.getElementById('adm-doc-upload-${idx}').click()">
               <i class="fa-solid fa-upload"></i> Joindre
             </button>
-            <input type="file" id="adm-doc-upload-${idx}" accept="image/*,.pdf" style="display:none;" onchange="handleAdminDocFileUpload(event, ${idx})">
+            <input type="file" id="adm-doc-upload-${idx}" accept="image/*,.pdf,application/pdf" style="display:none;" onchange="handleAdminDocFileUpload(event, ${idx})">
           </div>
+          ${doc.fileUrl ? `
+            <div style="font-size:0.75rem; color:#16a34a; margin-top:4px; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid ${doc.fileUrl.includes('pdf') ? 'fa-file-pdf' : 'fa-image'}"></i>
+              <span>Fichier bien joint (${doc.fileUrl.includes('pdf') ? 'Format PDF' : 'Image'})</span>
+              <button type="button" onclick="updateAdminDocumentField(${idx}, 'fileUrl', ''); renderAdminDocuments();" style="background:none; border:none; color:#dc2626; cursor:pointer; font-size:0.72rem; text-decoration:underline; padding:0 4px;">Retirer</button>
+            </div>
+          ` : ''}
         </div>
       </div>
 

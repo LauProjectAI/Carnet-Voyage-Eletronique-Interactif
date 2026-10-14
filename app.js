@@ -637,15 +637,58 @@ function closeQrModal() {
 // Transit / Metro Map Modal Dialog
 function downloadTransitMapFile(url, fileName) {
   if (!url) return;
+  
   // Déterminer l'extension
   let ext = 'png';
-  if (url.includes('.svg')) ext = 'svg';
-  else if (url.includes('.jpg') || url.includes('.jpeg')) ext = 'jpg';
-  else if (url.includes('.pdf')) ext = 'pdf';
+  if (url.startsWith('data:application/pdf') || url.toLowerCase().includes('.pdf')) {
+    ext = 'pdf';
+  } else if (url.startsWith('data:image/svg') || url.toLowerCase().includes('.svg')) {
+    ext = 'svg';
+  } else if (url.startsWith('data:image/jpeg') || url.toLowerCase().includes('.jpg') || url.toLowerCase().includes('.jpeg')) {
+    ext = 'jpg';
+  } else if (url.startsWith('data:image/webp') || url.toLowerCase().includes('.webp')) {
+    ext = 'webp';
+  }
 
-  const defaultName = fileName || `Plan-Transports-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Voyage'}.${ext}`;
+  let defaultName = fileName || `Document-Voyage-${(currentTrip && currentTrip.destination) ? currentTrip.destination.replace(/[^a-zA-Z0-9]/g, '_') : 'Girardot'}.${ext}`;
+  if (!defaultName.includes('.')) {
+    defaultName += `.${ext}`;
+  }
 
-  // Si c'est un chemin local ou de même origine
+  // 1. Si c'est une data-URL base64
+  if (url.startsWith('data:')) {
+    try {
+      const parts = url.split(',');
+      const mime = parts[0].match(/:(.*?);/)[1];
+      const bstr = atob(parts[1]);
+      let n = bstr.length;
+      const u8arr = new Uint8Array(n);
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n);
+      }
+      const blob = new Blob([u8arr], { type: mime });
+      const blobUrl = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = blobUrl;
+      a.download = defaultName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2000);
+      return;
+    } catch (e) {
+      console.warn("Erreur téléchargement data-URL via Blob, fallback classique :", e);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = defaultName;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      return;
+    }
+  }
+
+  // 2. Si c'est un chemin local ou même origine
   if (!url.startsWith('http://') && !url.startsWith('https://')) {
     const a = document.createElement('a');
     a.href = url;
@@ -656,7 +699,7 @@ function downloadTransitMapFile(url, fileName) {
     return;
   }
 
-  // Si c'est une URL distante, tenter le fetch blob pour forcer le téléchargement local sans blocage navigateur
+  // 3. Si c'est une URL distante, fetch blob pour forcer le téléchargement local sans blocage navigateur
   fetch(url)
     .then(res => {
       if (!res.ok) throw new Error("HTTP error " + res.status);
@@ -673,8 +716,7 @@ function downloadTransitMapFile(url, fileName) {
       setTimeout(() => window.URL.revokeObjectURL(blobUrl), 2000);
     })
     .catch(err => {
-      console.warn("Téléchargement direct via Blob impossible, ouverture de la ressource :", err);
-      // Fallback : ouverture directe de l'image
+      console.warn("Téléchargement direct via Blob impossible, ouverture directe :", err);
       window.open(url, '_blank');
     });
 }
@@ -2596,16 +2638,74 @@ function viewClientDocDetails(docId, focusQr = false) {
   }
 
   // Fichier / Image jointe
-  if (doc.fileUrl) {
+  const pdfBox = document.getElementById('doc-modal-pdf-box');
+  const pdfOpenBtn = document.getElementById('doc-modal-open-pdf-btn');
+  const pdfNameEl = document.getElementById('doc-modal-pdf-filename');
+
+  if (doc.fileUrl && doc.fileUrl.trim()) {
     fileBox.style.display = 'block';
-    fileImg.src = doc.fileUrl;
+    const urlLower = doc.fileUrl.toLowerCase();
+    const isPdf = doc.fileUrl.startsWith('data:application/pdf') || urlLower.includes('.pdf');
+
+    if (isPdf) {
+      if (fileImg) fileImg.style.display = 'none';
+      if (pdfBox) {
+        pdfBox.style.display = 'block';
+        if (pdfNameEl) pdfNameEl.innerText = `${doc.title} (Document PDF)`;
+        if (pdfOpenBtn) {
+          pdfOpenBtn.onclick = () => {
+            if (doc.fileUrl.startsWith('data:application/pdf')) {
+              // Ouvrir un blob PDF dans un nouvel onglet
+              try {
+                const parts = doc.fileUrl.split(',');
+                const bstr = atob(parts[1]);
+                let n = bstr.length;
+                const u8arr = new Uint8Array(n);
+                while (n--) {
+                  u8arr[n] = bstr.charCodeAt(n);
+                }
+                const blob = new Blob([u8arr], { type: 'application/pdf' });
+                const blobUrl = window.URL.createObjectURL(blob);
+                window.open(blobUrl, '_blank');
+                setTimeout(() => window.URL.revokeObjectURL(blobUrl), 30000);
+              } catch (err) {
+                window.open(doc.fileUrl, '_blank');
+              }
+            } else {
+              window.open(doc.fileUrl, '_blank');
+            }
+          };
+        }
+      }
+    } else {
+      if (pdfBox) pdfBox.style.display = 'none';
+      if (fileImg) {
+        fileImg.style.display = 'inline-block';
+        fileImg.src = doc.fileUrl;
+        fileImg.onerror = () => {
+          // Si l'image ne charge pas (ex: PDF sans mime image ou lien brisé)
+          fileImg.style.display = 'none';
+          if (pdfBox) {
+            pdfBox.style.display = 'block';
+            if (pdfNameEl) pdfNameEl.innerText = `${doc.title} (Fichier joint)`;
+            if (pdfOpenBtn) {
+              pdfOpenBtn.onclick = () => window.open(doc.fileUrl, '_blank');
+            }
+          }
+        };
+      }
+    }
+
     downloadBtn.style.display = 'inline-flex';
     downloadBtn.onclick = (e) => {
       e.preventDefault();
-      downloadTransitMapFile(doc.fileUrl, `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.png`);
+      const ext = isPdf ? 'pdf' : 'png';
+      downloadTransitMapFile(doc.fileUrl, `${doc.title.replace(/[^a-zA-Z0-9]/g, '_')}.${ext}`);
     };
   } else {
     fileBox.style.display = 'none';
+    if (fileImg) fileImg.style.display = 'none';
+    if (pdfBox) pdfBox.style.display = 'none';
     downloadBtn.style.display = 'none';
   }
 
