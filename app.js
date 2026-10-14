@@ -808,16 +808,44 @@ function renderSouvenirs() {
 
   // Also render compact suggestions in Souvenirs tab
   const freetimeBox = document.getElementById('freetime-compact-container');
-  if (freetimeBox && currentTrip.freeTimeSuggestions) {
+  if (freetimeBox) {
     freetimeBox.innerHTML = '';
-    currentTrip.freeTimeSuggestions.slice(0, 3).forEach(sug => {
+    const tripTitle = ((currentTrip.title || "") + " " + (currentTrip.destination || "") + " " + (currentTrip.subtitle || "")).toLowerCase();
+    const isSouthAfricaTrip = tripTitle.includes('afrique') || tripTitle.includes('kruger') || tripTitle.includes('cap');
+
+    let validSuggs = (currentTrip.freeTimeSuggestions || []).filter(sug => {
+      if (!isSouthAfricaTrip) {
+        const text = ((sug.name || "") + " " + (sug.location || "") + " " + (sug.description || "")).toLowerCase();
+        if (text.includes('table mountain') || text.includes('kirstenbosch') || text.includes('le cap') || text.includes('kruger') || text.includes('fynbos') || text.includes('pot luck club')) {
+          return false;
+        }
+        if (sug.lat && sug.lat < 0 && !isSouthAfricaTrip) return false;
+      }
+      return true;
+    });
+
+    if (validSuggs.length === 0 && currentTrip.conciergerie && currentTrip.conciergerie.themes) {
+      const visitesTheme = currentTrip.conciergerie.themes.find(t => t.id === 'visites' && t.enabled !== false);
+      if (visitesTheme && visitesTheme.places) {
+        validSuggs = visitesTheme.places.map(p => ({
+          name: p.name,
+          category: p.category || "Coup de cœur",
+          location: p.location,
+          description: p.description,
+          lat: p.lat,
+          lng: p.lng
+        }));
+      }
+    }
+
+    validSuggs.slice(0, 3).forEach(sug => {
       const el = document.createElement('div');
       el.style = "background:white; border-radius:14px; padding:12px; margin-bottom:10px; border:1px solid var(--border-light);";
       const gpsUrl = (sug.lat && sug.lng) ? getGpsUrl(sug.lat, sug.lng, sug.name) : '#';
       el.innerHTML = `
-        <span style="font-size:0.7rem; background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-weight:bold;">${sug.category}</span>
+        <span style="font-size:0.7rem; background:#fee2e2; color:#b91c1c; padding:2px 8px; border-radius:4px; font-weight:bold;">${sug.category || 'Coup de cœur'}</span>
         <h4 style="font-size:0.92rem; font-weight:700; margin:4px 0 2px;">${sug.name}</h4>
-        <p style="font-size:0.78rem; color:#64748b; margin-bottom:6px;">${sug.location}</p>
+        <p style="font-size:0.78rem; color:#64748b; margin-bottom:6px;">${sug.location || ''}</p>
         <a href="${gpsUrl}" target="_blank" class="btn-entry-gps"><i class="fa-solid fa-location-arrow"></i> S'y rendre en GPS</a>
       `;
       freetimeBox.appendChild(el);
@@ -1961,34 +1989,67 @@ function renderMapMarkers(filterCategory = 'all') {
     }
   }
 
-  // 4. Free time
+  // 4. Free time & Coups de cœur de la destination
   if (filterCategory === 'all' || filterCategory === 'freetime') {
-    if (currentTrip.freeTimeSuggestions) {
-      currentTrip.freeTimeSuggestions.forEach((sug) => {
-        const sLat = parseFloat(sug.lat);
-        const sLng = parseFloat(sug.lng);
-        if (!isNaN(sLat) && !isNaN(sLng) && (sLat !== 0 || sLng !== 0)) {
-          const gpsUrl = getGpsUrl(sLat, sLng, sug.name);
-          const icon = L.divIcon({
-            className: 'custom-map-pin-sug',
-            html: `<div style="background:#e11d48; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"><i class="fa-solid fa-heart"></i></div>`,
-            iconSize: [26, 26],
-            iconAnchor: [13, 13]
-          });
+    const tripTitle = ((currentTrip.title || "") + " " + (currentTrip.destination || "") + " " + (currentTrip.subtitle || "")).toLowerCase();
+    const isSouthAfricaTrip = tripTitle.includes('afrique') || tripTitle.includes('kruger') || tripTitle.includes('cap');
 
-          const marker = L.marker([sLat, sLng], { icon: icon }).addTo(leafletMap);
-          marker.bindPopup(`
-            <div style="font-family:'Archivo',sans-serif; max-width:220px;">
-              <strong style="color:#1e293b; font-size:13px;">${sug.name}</strong><br>
-              <span style="font-size:11px; color:#64748b;">${sug.location}</span><br>
-              <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:6px; background:#0284c7; color:white; padding:4px 10px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">GPS Visite</a>
-            </div>
-          `);
-          mapMarkers.push(marker);
-          bounds.push([sLat, sLng]);
+    // Récupérer les suggestions de temps libre propres au voyage en éliminant les reliquats d'Afrique du Sud si ce n'est pas le voyage AF Sud
+    let validSuggs = (currentTrip.freeTimeSuggestions || []).filter(sug => {
+      if (!isSouthAfricaTrip) {
+        const text = ((sug.name || "") + " " + (sug.location || "") + " " + (sug.description || "")).toLowerCase();
+        if (text.includes('table mountain') || text.includes('kirstenbosch') || text.includes('le cap') || text.includes('kruger') || text.includes('fynbos') || text.includes('pot luck club')) {
+          return false;
         }
-      });
+        // Éliminer les coordonnées GPS en Afrique du Sud (lat négative autour de -33°) si voyage aux USA / Europe
+        if (sug.lat && sug.lat < 0 && !isSouthAfricaTrip) return false;
+      }
+      return true;
+    });
+
+    // Si le voyage n'a pas de freeTimeSuggestions manuelles mais possède des visites libres dans la conciergerie, les inclure sur la carte
+    if (validSuggs.length === 0 && currentTrip.conciergerie && currentTrip.conciergerie.themes) {
+      const visitesTheme = currentTrip.conciergerie.themes.find(t => t.id === 'visites' && t.enabled !== false);
+      if (visitesTheme && visitesTheme.places) {
+        visitesTheme.places.forEach(p => {
+          if (p.lat && p.lng) {
+            validSuggs.push({
+              name: p.name,
+              category: p.category || "Coup de cœur",
+              location: p.location,
+              description: p.description,
+              lat: p.lat,
+              lng: p.lng
+            });
+          }
+        });
+      }
     }
+
+    validSuggs.forEach((sug) => {
+      const sLat = parseFloat(sug.lat);
+      const sLng = parseFloat(sug.lng);
+      if (!isNaN(sLat) && !isNaN(sLng) && (sLat !== 0 || sLng !== 0)) {
+        const gpsUrl = getGpsUrl(sLat, sLng, sug.name);
+        const icon = L.divIcon({
+          className: 'custom-map-pin-sug',
+          html: `<div style="background:#e11d48; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:11px; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);"><i class="fa-solid fa-heart"></i></div>`,
+          iconSize: [26, 26],
+          iconAnchor: [13, 13]
+        });
+
+        const marker = L.marker([sLat, sLng], { icon: icon }).addTo(leafletMap);
+        marker.bindPopup(`
+          <div style="font-family:'Archivo',sans-serif; max-width:220px;">
+            <strong style="color:#1e293b; font-size:13px;">${sug.name}</strong><br>
+            <span style="font-size:11px; color:#64748b;">${sug.location || ''}</span><br>
+            <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:6px; background:#0284c7; color:white; padding:4px 10px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">GPS Visite</a>
+          </div>
+        `);
+        mapMarkers.push(marker);
+        bounds.push([sLat, sLng]);
+      }
+    });
   }
 
   if (bounds.length > 0) {
