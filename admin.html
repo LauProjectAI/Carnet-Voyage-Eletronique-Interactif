@@ -175,11 +175,17 @@
         <span style="font-size:0.8rem; color:#64748b;">
           <i class="fa-solid fa-cloud-arrow-down"></i> Sauvegarde automatique dans le navigateur + export de fichiers <code>.json</code>
         </span>
-        <div style="display:flex; gap:8px;">
-          <button type="button" onclick="exportTripJsonFile()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px;">
-            <i class="fa-solid fa-download"></i> Télécharger le fichier (.json)
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button type="button" onclick="downloadTripTemplateJson()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" title="Télécharger un modèle vierge (.json) avec toutes les rubriques pré-remplies (étapes, déroulé, infos pratiques...)">
+            <i class="fa-solid fa-file-circle-plus"></i> Modèle type vierge (.json)
           </button>
-          <button type="button" onclick="document.getElementById('import-json-file').click()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px;">
+          <button type="button" onclick="downloadReferenceSouthAfricaJson()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#f0fdf4; color:#15803d; border-color:#86efac; font-weight:700;" title="Télécharger l'exemple complet du programme Afrique du Sud (.json)">
+            <i class="fa-solid fa-file-lines"></i> Modèle exemple Afrique du Sud (.json)
+          </button>
+          <button type="button" onclick="exportTripJsonFile()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px;" title="Exporter le voyage actuellement sélectionné">
+            <i class="fa-solid fa-download"></i> Exporter ce voyage (.json)
+          </button>
+          <button type="button" onclick="document.getElementById('import-json-file').click()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#f8fafc;" title="Importer un fichier .json complété">
             <i class="fa-solid fa-upload"></i> Importer un fichier (.json)
           </button>
           <input type="file" id="import-json-file" accept=".json" style="display:none;" onchange="importTripJsonFile(event)">

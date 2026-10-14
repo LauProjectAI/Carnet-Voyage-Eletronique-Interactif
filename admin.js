@@ -273,6 +273,204 @@ function saveTripToCatalogAndStorage(trip) {
   localStorage.setItem('girardot_trips_catalog', JSON.stringify(customList));
 }
 
+function downloadTripTemplateJson() {
+  const template = {
+    id: "nouveau-voyage-" + Date.now(),
+    title: "Titre de votre destination (ex: Canada - Les Grands Espaces)",
+    subtitle: "Sous-titre ou thème (ex: De Montréal aux Chutes du Niagara)",
+    dates: "Ex: Du lundi 10 mai au vendredi 21 mai 2027",
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(Date.now() + 10 * 86400000).toISOString().split('T')[0],
+    coverImage: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1200&q=80",
+    intro: "Texte d'introduction présentant les temps forts de votre circuit, la promesse du voyage et les paysages à découvrir.",
+    alert: {
+      title: "Formalités indispensables (Passeport / Visas)",
+      text: "Passeport biométrique valide 6 mois après la date de retour. Formulaire électronique obligatoire avant départ.",
+      link: ""
+    },
+    flightsList: [
+      {
+        type: "Aller",
+        airline: "Air France",
+        flightNumber: "AF084",
+        departureAirport: "Paris Charles de Gaulle (CDG)",
+        departureTime: "10:30",
+        arrivalAirport: "Montréal (YUL)",
+        arrivalTime: "12:45",
+        date: "Jour 1",
+        via: "",
+        notes: "Rendez-vous 3h avant au comptoir Terminal 2E."
+      },
+      {
+        type: "Retour",
+        airline: "Air France",
+        flightNumber: "AF085",
+        departureAirport: "Montréal (YUL)",
+        departureTime: "19:00",
+        arrivalAirport: "Paris Charles de Gaulle (CDG)",
+        arrivalTime: "08:15 (+1 jour)",
+        date: "Dernier jour",
+        via: "",
+        notes: "Enregistrement bagages soute 23 kg inclus."
+      }
+    ],
+    itinerary: [
+      {
+        day: 1,
+        title: "Jour 1 • Rendez-vous, envol et arrivée",
+        highlight: "Départ et premier contact avec la destination",
+        city: "Ville d'arrivée",
+        dateStr: "Jour 1",
+        description: "Accueil de vos voyageurs à l'aéroport par votre guide local francophone. Transfert vers votre hôtel et installation.",
+        lat: 45.5017,
+        lng: -73.5673,
+        timeline: [
+          {
+            time: "10:30",
+            title: "Envol pour votre destination",
+            subtitle: "Vol direct avec prestations à bord.",
+            address: "Aéroport de départ",
+            lat: 49.0097,
+            lng: 2.5479,
+            icon: "plane-departure"
+          },
+          {
+            time: "14:30",
+            title: "Accueil & Installation à l'hôtel",
+            subtitle: "Remise des clés et dîner de bienvenue.",
+            address: "Hôtel d'étape",
+            lat: 45.5017,
+            lng: -73.5673,
+            icon: "hotel"
+          }
+        ]
+      },
+      {
+        day: 2,
+        title: "Jour 2 • Découverte du centre historique",
+        highlight: "Visite guidée et panoramas",
+        city: "Centre historique",
+        dateStr: "Jour 2",
+        description: "Matinée consacrée à la découverte pédestre des monuments emblématiques et des quartiers historiques avec votre guide.",
+        lat: 45.5088,
+        lng: -73.5542,
+        timeline: [
+          {
+            time: "09:30",
+            title: "Visite guidée des monuments clés",
+            subtitle: "Architecture, anecdotes et histoire locale.",
+            address: "Place centrale",
+            lat: 45.5088,
+            lng: -73.5542,
+            icon: "monument"
+          },
+          {
+            time: "12:30",
+            title: "Déjeuner traditionnel inclus",
+            subtitle: "Spécialités culinaires régionales.",
+            address: "Restaurant partenaire",
+            lat: 45.5075,
+            lng: -73.5550,
+            icon: "utensils"
+          },
+          {
+            time: "15:00",
+            title: "Temps libre ou visite de musée",
+            subtitle: "Flânerie et découvertes personnelles.",
+            address: "Quartier piétonnier",
+            lat: 45.5090,
+            lng: -73.5560,
+            icon: "camera"
+          }
+        ]
+      }
+    ],
+    hotels: [
+      {
+        name: "Hôtel Partenaire Girardot",
+        city: "Ville étape",
+        rating: "4 étoiles",
+        checkIn: "Du Jour 1 au Jour 3 (2 nuits)",
+        phone: "+1 514-000-0000",
+        address: "100 Rue Principale, Ville",
+        lat: 45.5017,
+        lng: -73.5673,
+        description: "Établissement tout confort avec petit-déjeuner buffet inclus, Wi-Fi gratuit et réception 24h/24.",
+        tips: "Espace bien-être accessible gratuitement aux clients Girardot.",
+        photos: []
+      }
+    ],
+    documents: [
+      {
+        id: "doc-billet-1",
+        type: "flight",
+        title: "Billet électronique Paris ➔ Destination",
+        reference: "PNR: GIR982",
+        beneficiary: "Tous les passagers",
+        date: "Jour 1",
+        qrCode: "E-TICKET-GIRARDOT-01",
+        notes: "Présentation au comptoir avec pièce d'identité.",
+        fileUrl: ""
+      }
+    ],
+    freeTimeSuggestions: [
+      {
+        name: "Belvédère panoramique",
+        category: "Panorama & Photo",
+        city: "Ville d'étape",
+        tag: "Incontournable",
+        address: "Belvédère de la ville",
+        lat: 45.5048,
+        lng: -73.5872,
+        description: "Superbe point de vue sur la ville et la baie. Parfait au coucher du soleil."
+      }
+    ],
+    practicalInfo: {
+      money: "Monnaie locale : Cartes bancaires acceptées partout. Prévoir un petit montant d'espèces pour les pourboires.",
+      electricity: "Courant 110V/220V. Prévoir un adaptateur de prise universel.",
+      clothing: "Tenue confortable et chaussures de marche pour les visites. Prévoir une veste chaude pour les soirées.",
+      tips: "Pourboires indicatifs : 2 à 3 € / jour / personne pour le guide et 1 à 2 € pour le chauffeur.",
+      wifi: "Wi-Fi gratuit disponible dans tous les hôtels et les autocars."
+    },
+    contactsList: [
+      {
+        category: "Assistance Girardot 24h/7j",
+        name: "Permanence Urgences Girardot",
+        phone: "+33 3 85 00 00 00",
+        address: "Chalon-sur-Saône, France",
+        isEmergency: true
+      },
+      {
+        category: "Guide accompagnateur",
+        name: "Votre Guide Girardot",
+        phone: "+33 6 00 00 00 00",
+        address: "Sur place avec le groupe",
+        isEmergency: false
+      }
+    ]
+  };
+
+  const filename = "modele-programme-voyage-girardot.json";
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(template, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", filename);
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+}
+
+function downloadReferenceSouthAfricaJson() {
+  const filename = "programme-afrique-du-sud-reference.json";
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(window.defaultTravelData, null, 2));
+  const dlAnchor = document.createElement('a');
+  dlAnchor.setAttribute("href", dataStr);
+  dlAnchor.setAttribute("download", filename);
+  document.body.appendChild(dlAnchor);
+  dlAnchor.click();
+  dlAnchor.remove();
+}
+
 function exportTripJsonFile() {
   const filename = `${tripData.id || 'voyage'}.json`;
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tripData, null, 2));
