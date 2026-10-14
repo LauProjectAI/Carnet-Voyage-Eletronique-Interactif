@@ -213,6 +213,7 @@ function loadTripData() {
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(tripParam))));
       currentTrip = decoded;
+      normalizeTripTransitMaps();
       // Sauvegarder dans le stockage du navigateur sous son ID sans toucher aux documents du client
       if (decoded && decoded.id) {
         localStorage.setItem(`girardot_trip_data_${decoded.id}`, JSON.stringify(decoded));
@@ -230,6 +231,7 @@ function loadTripData() {
     if (stored) {
       try {
         currentTrip = JSON.parse(stored);
+        normalizeTripTransitMaps();
         return;
       } catch (e) {}
     }
@@ -242,6 +244,7 @@ function loadTripData() {
     if (storedTrip) {
       try {
         currentTrip = JSON.parse(storedTrip);
+        normalizeTripTransitMaps();
         return;
       } catch (e) {}
     }
@@ -251,6 +254,7 @@ function loadTripData() {
   if (legacyStored) {
     try {
       currentTrip = JSON.parse(legacyStored);
+      normalizeTripTransitMaps();
       return;
     } catch (e) {
       console.error(e);
@@ -258,6 +262,35 @@ function loadTripData() {
   }
 
   currentTrip = window.defaultTravelData;
+  normalizeTripTransitMaps();
+}
+
+function normalizeTripTransitMaps() {
+  if (!currentTrip || !currentTrip.conciergerie || !currentTrip.conciergerie.themes) return;
+  const transportTheme = currentTrip.conciergerie.themes.find(t => t.id === 'transports');
+  if (!transportTheme) return;
+
+  const tripText = ((currentTrip.title || '') + ' ' + (currentTrip.destination || '') + ' ' + (currentTrip.subtitle || '')).toLowerCase();
+  
+  // Correction automatique si le plan de transport pointe vers l'ancien lien SF 404 ou si c'est San Francisco sans image locale
+  if (tripText.includes('san francisco') || tripText.includes('francisco') || (transportTheme.transitMapImageUrl && transportTheme.transitMapImageUrl.includes('sfmta.com'))) {
+    if (!transportTheme.transitMapImageUrl || transportTheme.transitMapImageUrl.includes('sfmta.com/sites/default/files') || transportTheme.transitMapImageUrl.includes('Nov_2022.png')) {
+      transportTheme.transitMapImageUrl = "assets/sf-metro-map.jpg";
+    }
+    if (!transportTheme.transitMapUrl) {
+      transportTheme.transitMapUrl = "https://www.sfmta.com/maps";
+    }
+  }
+
+  // Idem pour Chicago
+  if (tripText.includes('chicago')) {
+    if (!transportTheme.transitMapImageUrl) {
+      transportTheme.transitMapImageUrl = "assets/chicago-metro-map.svg";
+    }
+    if (!transportTheme.transitMapUrl) {
+      transportTheme.transitMapUrl = "https://www.transitchicago.com/maps/";
+    }
+  }
 }
 
 // Rendu du sélecteur client
@@ -322,6 +355,7 @@ function onClientTripSwitch(tripId) {
 }
 
 function refreshAppAfterTripChange() {
+  normalizeTripTransitMaps();
   activeDayIndex = determineInitialDayIndex();
   renderClientTripSelector();
   renderDaySelectorPills();
@@ -929,8 +963,8 @@ function executeConciergeQuery(query) {
   let matchedPlaces = [];
   let answerIntro = "";
 
-  // 1. Détection de requêtes TRANSPORTS / ITINÉRAIRES
-  const isTransportQuery = q.includes('aller') || q.includes('rejoindre') || q.includes('transport') || q.includes('comment') || q.includes('taxi') || q.includes('bus') || q.includes('trajet');
+  // 1. Détection de requêtes TRANSPORTS / CARTE / ITINÉRAIRES
+  const isTransportQuery = q.includes('aller') || q.includes('rejoindre') || q.includes('transport') || q.includes('comment') || q.includes('taxi') || q.includes('bus') || q.includes('trajet') || q.includes('métro') || q.includes('metro') || q.includes('carte') || q.includes('plan');
 
   if (isTransportQuery) {
     const transportTheme = activeThemes.find(t => t.id === 'transports');
@@ -946,8 +980,17 @@ function executeConciergeQuery(query) {
       return;
     }
 
-    // Déterminer la destination mentionnée
-    let destName = "votre destination";
+    // Récupérer le nom de l'hôtel de destination s'il existe
+    const sfHotels = (currentTrip.hotels || []).filter(h => {
+      const txt = ((h.name || "") + " " + (h.city || "") + " " + (h.address || "")).toLowerCase();
+      const isFrance = txt.includes('france') || txt.includes('lyon') || txt.includes('paris') || txt.includes('roissy') || txt.includes('cdg') || txt.includes('saint-exupéry') || txt.includes('saint exupéry');
+      return !isFrance;
+    });
+    const currentHotel = sfHotels.length > 0 ? sfHotels[0] : (currentTrip.hotels && currentTrip.hotels[0]);
+    const hotelName = currentHotel ? currentHotel.name : "votre hôtel";
+
+    // Déterminer la destination mentionnée si spécifique
+    let destName = "";
     let destCoords = null;
     if (q.includes('table mountain') || q.includes('montagne')) {
       destName = "la Montagne de la Table (Table Mountain)";
@@ -959,18 +1002,21 @@ function executeConciergeQuery(query) {
       destName = "le Jardin Botanique de Kirstenbosch";
       destCoords = [-33.9877, 18.4326];
     } else if (q.includes('aeroport') || q.includes('aéroport')) {
-      destName = "l'Aéroport du Cap (CPT)";
-      destCoords = [-33.9715, 18.6021];
+      destName = "l'Aéroport";
     }
 
-    titleEl.innerHTML = `<i class="fa-solid fa-route" style="color:#0891b2; margin-right:8px;"></i> Meilleure solution pour rejoindre ${destName}`;
+    titleEl.innerHTML = destName 
+      ? `<i class="fa-solid fa-route" style="color:#0891b2; margin-right:8px;"></i> Se déplacer vers ${destName}`
+      : `<i class="fa-solid fa-train-subway" style="color:#0891b2; margin-right:8px;"></i> Transports en commun, Bus & Métro`;
+
     listEl.innerHTML = `
       <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:16px; padding:16px; margin-bottom:14px;">
         <h4 style="font-size:0.95rem; font-weight:800; color:#0369a1; margin-bottom:4px;">
-          <i class="fa-solid fa-sparkles"></i> Recommandation de votre Concierge Girardot :
+          <i class="fa-solid fa-sparkles"></i> Conseils de votre Concierge Girardot :
         </h4>
         <p style="font-size:0.86rem; color:#0f172a; line-height:1.5;">
-          Pour rejoindre <strong>${destName}</strong> depuis votre hôtel (ANEW Green Point), la solution la plus sûre et rapide est le <strong>VTC Uber</strong> (course directe d'env. 10 à 15 min, tarif indicatif : 70 à 120 ZAR / ~4 à 6 €).
+          ${destName ? `Pour vos déplacements vers <strong>${destName}</strong> depuis <strong>${hotelName}</strong>, ` : `Depuis <strong>${hotelName}</strong>, `}
+          vous pouvez utiliser le réseau de transports en commun officiel, les taxis ou commander un VTC (Uber / Lyft) directement sur votre smartphone.
         </p>
         ${destCoords ? `
           <div style="margin-top:10px;">

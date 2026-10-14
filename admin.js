@@ -1683,7 +1683,50 @@ async function triggerAiConciergeGeneration() {
 
   // 0. Pack Spécial SAN FRANCISCO (Calcul par rayons stricts : <1km immédiat, puis 1 à 4km, et visites <5km sans doublons)
   if (lowerCity.includes("san francisco") || lowerCity.includes("francisco")) {
-    tripData.conciergerie.welcomeMessage = "Bienvenue à San Francisco ! Je suis votre Concierge Voyage Girardot. Retrouvez vos adresses sélectionnées à proximité immédiate de votre hôtel et pour votre temps libre dans la City by the Bay.";
+    // Identifier l'hôtel sur la destination San Francisco (en excluant formellement l'hôtel de pré-acheminement en France)
+    const sfHotels = (tripData.hotels || []).filter(h => {
+      const text = ((h.name || '') + ' ' + (h.address || '') + ' ' + (h.notes || '')).toLowerCase();
+      // Exclure France, Lyon, Roissy, Paris, escale ou pré-acheminement
+      if (text.includes('france') || text.includes('lyon') || text.includes('paris') || text.includes('roissy') || text.includes('cdg') || text.includes('saint-exupéry') || text.includes('avant voyage') || text.includes('départ')) {
+        return false;
+      }
+      // Si des coordonnées GPS existent, vérifier qu'elles sont dans la zone américaine / californienne
+      if (h.lat && h.lng) {
+        if (h.lat > 40 && h.lng > 0) return false; // En Europe / France
+      }
+      return true;
+    });
+
+    // L'hôtel de référence à San Francisco
+    const targetHotel = sfHotels[0] || (tripData.hotels || [])[0] || null;
+    const hotelRefName = targetHotel ? targetHotel.name : "votre hôtel à San Francisco";
+    const hotelLat = (targetHotel && targetHotel.lat) ? Number(targetHotel.lat) : 37.7879; // Défaut Union Sq
+    const hotelLng = (targetHotel && targetHotel.lng) ? Number(targetHotel.lng) : -122.4075;
+
+    // Fonction de calcul de distance précise (Haversine)
+    const computeDistanceKm = (lat1, lon1, lat2, lon2) => {
+      if (!lat1 || !lon1 || !lat2 || !lon2) return null;
+      const R = 6371; // Rayon de la Terre en km
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                Math.sin(dLon / 2) * Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      return R * c;
+    };
+
+    const getDistanceLabel = (pLat, pLng) => {
+      const d = computeDistanceKm(hotelLat, hotelLng, pLat, pLng);
+      if (d === null) return "";
+      if (d < 1) {
+        const m = Math.round(d * 1000);
+        return `À ${m}m de ${targetHotel ? targetHotel.name.split(' ')[0] : 'l\'hôtel'}`;
+      }
+      return `À ${d.toFixed(1)} km de l'hôtel`;
+    };
+
+    tripData.conciergerie.welcomeMessage = `Bienvenue à San Francisco ! Je suis votre Concierge Voyage Girardot. Retrouvez vos adresses sélectionnées à proximité immédiate de ${hotelRefName} et pour votre temps libre dans la City by the Bay.`;
     
     // Extraction des titres de visites programmées pour exclure les doublons
     const plannedTitles = (tripData.itinerary || [])
@@ -1699,37 +1742,37 @@ async function triggerAiConciergeGeneration() {
       th.enabled = true;
 
       if (th.id === 'resto') {
-        th.places = [
-          // RAYON 1 : À PROXIMITÉ IMMÉDIATE DU COEUR HOTELIER (Union Square / Nob Hill / SOMA < 1 km)
+        const allRestaurants = [
+          // PROXIMITÉ IMMÉDIATE DU COEUR HÔTELIER (< 1 km)
           {
             name: "John's Grill (Steakhouse historique)",
-            category: "Steakhouse & Fruits de mer (Rayon 400m)",
-            location: "63 Ellis St, Union Square, San Francisco, CA 94102",
+            category: "Steakhouse & Fruits de mer",
+            location: "63 Ellis St, San Francisco, CA 94102",
             tag: "Légendaire depuis 1908",
             phone: "+1 415-986-0069",
             bookingUrl: "https://www.johnsgrill.com",
             description: "Table mythique de San Francisco fondée en 1908, immortalisée par Dashiell Hammett dans Le Faucon Maltais. Filets de bœuf grillés, côtes d'agneau et fruits de mer servis dans un somptueux décor boisé d'époque.",
-            tips: "À seulement 3 minutes à pied d'Union Square. Réservez pour dîner au premier étage près des photos historiques de stars.",
+            tips: "Idéal pour dîner le premier soir sans marcher longtemps. Réservez à l'avance pour le premier étage.",
             lat: 37.7858,
             lng: -122.4082
           },
           {
             name: "Sears Fine Food (Brasserie & Pancakes)",
-            category: "Brasserie américaine & Petit-déjeuner (Rayon 300m)",
-            location: "439 Powell St, Union Square, San Francisco, CA 94102",
+            category: "Brasserie américaine & Petit-déjeuner",
+            location: "439 Powell St, San Francisco, CA 94102",
             tag: "Institution depuis 1938",
             phone: "+1 415-986-0700",
             bookingUrl: "https://www.searsfinefood.com",
             description: "Célèbre institution face au passage des mythiques Cable Cars. Connue dans le monde entier pour ses 18 mini-pancakes suédois au beurre fondu, ses omelettes fermières et ses burgers traditionnels.",
-            tips: "Parfait pour un petit-déjeuner copieux ou un déjeuner rapide avant de prendre le Cable Car.",
+            tips: "Parfait pour un petit-déjeuner copieux ou un déjeuner rapide au saut du lit.",
             lat: 37.7891,
             lng: -122.4087
           },
           {
-            name: "Super Duper Burgers (Union Square)",
-            category: "Burger Gourmet Local (Rayon 200m)",
-            location: "721 Market St / Union Square, San Francisco, CA 94103",
-            tag: "Meilleurs Burgers 100% Bio",
+            name: "Super Duper Burgers",
+            category: "Burger Gourmet Local 100% Bio",
+            location: "721 Market St, San Francisco, CA 94103",
+            tag: "Meilleurs Burgers Bio de SF",
             phone: "+1 415-538-3437",
             bookingUrl: "https://www.superduperburgers.com",
             description: "La référence californienne du burger artisanal écoresponsable : viande de bœuf bio issue d'élevages locaux sans hormones, buns moelleux cuits le matin même, frites maison au sel de mer et pickles à volonté.",
@@ -1739,21 +1782,21 @@ async function triggerAiConciergeGeneration() {
           },
           {
             name: "Enjoy Vegetarian Restaurant",
-            category: "Végétarien & Vegan Asiatique (Rayon 800m)",
-            location: "839 Kearny St, Chinatown / Financial, San Francisco, CA 94108",
+            category: "Végétarien & Vegan Asiatique",
+            location: "839 Kearny St, San Francisco, CA 94108",
             tag: "100% Végétal & Sans OGM",
             phone: "+1 415-956-7868",
             bookingUrl: "https://enjoyveggie.com",
             description: "Table réputée et certifiée bouddhiste proposant une cuisine chinoise entièrement végétarienne et végane sans glutamate : raviolis aux légumes frais, woks de champignons sauvages et tofu braisé savoureux.",
-            tips: "Rapport qualité/prix exceptionnel à deux pas de la porte des Dragons de Chinatown.",
+            tips: "Rapport qualité/prix imbattable à quelques minutes de marche de votre hôtel.",
             lat: 37.7958,
             lng: -122.4051
           },
           {
             name: "Mister Jiu's (Étoilé Michelin)",
-            category: "Haute Gastronomie Asiatique (Rayon 900m)",
+            category: "Haute Gastronomie Asiatique",
             location: "28 Waverly Pl, Chinatown, San Francisco, CA 94108",
-            tag: "Étoile Michelin & Cadre somptueux",
+            tag: "Étoile Michelin",
             phone: "+1 415-857-9688",
             bookingUrl: "https://misterjius.com",
             description: "Le chef Brandon Jew réinvente la gastronomie cantonaise dans un ancien banquet historique de Waverly Place. Canard laqué rôti au feu de bois réputé dans tous les États-Unis et dim sums de haute voltige.",
@@ -1763,8 +1806,8 @@ async function triggerAiConciergeGeneration() {
           },
           {
             name: "Tadich Grill (Fruits de mer & Grillades)",
-            category: "Fruits de mer & Cuisine locale (Rayon 950m)",
-            location: "240 California St, Financial District, San Francisco, CA 94111",
+            category: "Fruits de mer & Cioppino traditionnel",
+            location: "240 California St, San Francisco, CA 94111",
             tag: "Plus vieux restaurant de Californie (1849)",
             phone: "+1 415-391-1849",
             bookingUrl: "https://tadichgrillsf.com",
@@ -1774,44 +1817,60 @@ async function triggerAiConciergeGeneration() {
             lng: -122.3996
           },
 
-          // RAYON 2 : ENTRE 1 ET 4 KM (Adresses emblématiques accessibles en 5 à 10 min de bus/cable car/taxi)
+          // RAYON 1 À 4 KM (Adresses emblématiques accessibles en court trajet)
           {
             name: "Original Joe's (North Beach)",
-            category: "Tradition Italo-Américaine (Rayon 1.6 km)",
+            category: "Tradition Italo-Américaine",
             location: "601 Union St, North Beach, San Francisco, CA 94133",
-            tag: "Coup de cœur convivial",
+            tag: "Institution chaleureuse",
             phone: "+1 415-775-4877",
             bookingUrl: "https://originaljoes.com",
             description: "Temple chaleureux de la cuisine italo-américaine depuis 1937 face au parc Washington Square. Célèbres raviolis maison, escalopes de veau parmigiana, steaks charbon et banquettes en cuir rouge.",
-            tips: "Atmosphère vibrante et généreuse au cœur du quartier italien. Très facile d'accès avec le bus 30 ou 8.",
+            tips: "Atmosphère vibrante au cœur du quartier italien. Très rapide d'accès en bus 30 ou 8.",
             lat: 37.8005,
             lng: -122.4103
           },
           {
             name: "Shizen Vegan Sushi Bar & Izakaya",
-            category: "Sushis Végans Gastronomiques (Rayon 2.5 km)",
+            category: "Sushis Végans Gastronomiques",
             location: "370 14th St, Mission District, San Francisco, CA 94103",
-            tag: "Référence mondiale Vegan",
+            tag: "Bib Gourmand Michelin",
             phone: "+1 415-678-5767",
             bookingUrl: "https://www.shizensf.com",
             description: "Izakaya japonais gastronomique 100% végétalien récompensé par le Guide Michelin (Bib Gourmand). Créations spectaculaires combinant igname de montagne, konjac et champignons pour reproduire des textures marines sans aucune pêche.",
-            tips: "Arrivez dès l'ouverture à 17h ou inscrivez-vous sur leur liste d'attente sur Yelp.",
+            tips: "Arrivez dès l'ouverture à 17h ou inscrivez-vous sur leur liste d'attente en ligne.",
             lat: 37.7683,
             lng: -122.4217
           },
           {
-            name: "Greens Restaurant (Fort Mason Waterfront)",
-            category: "Haute Gastronomie Végétarienne (Rayon 3.5 km)",
+            name: "Greens Restaurant (Waterfront)",
+            category: "Haute Gastronomie Végétarienne",
             location: "2 Marina Blvd, Fort Mason Center, San Francisco, CA 94123",
-            tag: "Vue baie & Golden Gate Bridge",
+            tag: "Vue panoramique Golden Gate",
             phone: "+1 415-771-6222",
             bookingUrl: "https://greensrestaurant.com",
             description: "Pionnier mondial de la gastronomie végétale fondé en 1979 par le Centre Zen de San Francisco. Situé dans un ancien hangar maritime rénové avec d'immenses baies vitrées offrant une vue féerique sur le Golden Gate Bridge.",
-            tips: "Idéal pour un déjeuner panoramique ou un coucher de soleil mémorable. Produits bio en direct de la ferme Green Gulch.",
+            tips: "Idéal pour un déjeuner panoramique ou un dîner au coucher du soleil face au pont.",
             lat: 37.8066,
             lng: -122.4318
           }
         ];
+
+        // Calcul dynamique et intégration de la distance réelle par rapport à l'hôtel de destination
+        th.places = allRestaurants.map(r => {
+          const dist = computeDistanceKm(hotelLat, hotelLng, r.lat, r.lng);
+          const distLabel = dist !== null 
+            ? (dist < 1 ? ` (${Math.round(dist * 1000)}m de l'hôtel)` : ` (${dist.toFixed(1)} km de l'hôtel)`)
+            : "";
+          return {
+            ...r,
+            category: r.category + distLabel
+          };
+        }).filter(r => {
+          const d = computeDistanceKm(hotelLat, hotelLng, r.lat, r.lng);
+          // Filtrer strictement les restaurants dans un rayon maximal de 4.5 km de l'hôtel
+          return d === null || d <= 4.5;
+        });
       } else if (th.id === 'visites') {
         const potentialVisits = [
           {
@@ -1973,7 +2032,7 @@ async function triggerAiConciergeGeneration() {
         ];
       } else if (th.id === 'transports') {
         th.transitMapUrl = "https://www.sfmta.com/maps";
-        th.transitMapImageUrl = "https://www.sfmta.com/sites/default/files/inline-images/Muni_Metro_Rail_Pocket_Map_Nov_2022.png";
+        th.transitMapImageUrl = "assets/sf-metro-map.jpg";
         th.guideHtml = `
           <strong>🚊 Guide pratique des transports à San Francisco (Réseau Muni, Cable Cars & BART) :</strong><br>
           • <strong>Le Réseau Muni (Métro léger & Bus) :</strong> Muni dessert l'intégralité de la ville. Les lignes de métro souterrain/aérien (lignes J, K, L, M, N, T) circulent le long de Market Street et relient tous les quartiers majeurs.<br>
