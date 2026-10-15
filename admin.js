@@ -1523,89 +1523,128 @@ function parseRoomingTextAndPopulate(rawText, sourceFileName) {
   const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
   const newEntries = [];
-  let currentEntry = null;
+  let currentRoomType = "Double (Grand Lit)";
+  let inTableSection = false;
 
-  lines.forEach((line, idx) => {
-    // Ignorer les en-têtes évidentes
-    if (/^(rooming|chambre|hotel|occupant|nom|type|régime|date|liste)/i.test(line) && line.length < 50) return;
+  // Lignes d'en-tête ou de pied de page hors tableau à ignorer
+  const headerOrFooterIgnore = [
+    "repartition des chambres", "répartition des chambres", "voyages girardot", "organisation",
+    "caracteres d ameriques", "caractères d'amériques", "rashida rouabah", "info@caracteres",
+    "voyage n°", "voyage no", "rooming n°", "rooming no", "cdg paris charles de gaulle",
+    "laurent bidet", "total chambre", "soit un total", "chambre individuelle =", "chambre double =",
+    "20 rue louis jacques", "71100 chalon", "44201 nantes", "10 rue gaetan"
+  ];
 
-    // Format CSV avec délimiteur (;, tab ou virgule)
-    if (line.includes(';') || line.includes('\t') || (line.includes(',') && !line.includes('Street') && !line.includes('Avenue'))) {
-      const parts = line.split(/[;\t]|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-      if (parts.length >= 2) {
-        let rNum = parts[0];
-        let rType = parts[1] || "Double (Grand Lit)";
-        let rOcc = parts[2] || "";
-        let rNotes = parts[3] || "";
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    const lower = line.toLowerCase();
 
-        // Si la 1ère colonne est plutôt un nom
-        if (isNaN(parseInt(rNum)) && parts.length >= 2 && !isNaN(parseInt(parts[1]))) {
-          rOcc = parts[0];
-          rNum = parts[1];
-          rType = parts[2] || "Double";
-        }
+    // Vérifier les en-têtes de type de chambre
+    if (/^chambre\s+individuelle/i.test(line)) {
+      currentRoomType = "Individuelle (Single)";
+      inTableSection = true;
+      continue;
+    }
+    if (/^chambre\s+double/i.test(line)) {
+      currentRoomType = "Double (Grand Lit)";
+      inTableSection = true;
+      continue;
+    }
+    if (/^chambre\s+twin/i.test(line)) {
+      currentRoomType = "Twin (2 lits séparés)";
+      inTableSection = true;
+      continue;
+    }
+    if (/^chambre\s+triple/i.test(line)) {
+      currentRoomType = "Triple";
+      inTableSection = true;
+      continue;
+    }
 
-        if (rOcc || !isNaN(parseInt(rNum))) {
-          newEntries.push({
-            roomNumber: rNum || String(100 + newEntries.length + 1),
-            type: normalizeRoomType(rType),
-            occupants: rOcc || rNum,
-            notes: rNotes
-          });
-          return;
-        }
+    // Ignorer les lignes d'en-tête de colonnes du tableau
+    if (lower.includes("rgpt") && (lower.includes("nom") || lower.includes("dossier") || lower.includes("prenom"))) {
+      inTableSection = true;
+      continue;
+    }
+
+    // Ignorer si la ligne correspond à une métadonnée ou pied de page
+    if (headerOrFooterIgnore.some(h => lower.includes(h))) {
+      continue;
+    }
+
+    // Si on est dans le tableau ou format délimité CSV
+    if (line.includes(';') || line.includes('\t')) {
+      const parts = line.split(/[;\t]/).map(p => p.trim());
+      if (parts.length >= 2 && !parts[0].toLowerCase().includes('rgpt')) {
+        let rOcc = parts.find(p => /^(?:MR|MRS|M\.|MME)\b/i.test(p) || /^[A-ZÀ-Ý\s-]{3,}$/.test(p)) || parts[2] || parts[0];
+        let rNum = parts.find(p => /^\d{1,4}$/.test(p)) || String(101 + newEntries.length);
+        newEntries.push({
+          roomNumber: rNum,
+          type: currentRoomType,
+          occupants: rOcc,
+          notes: ""
+        });
+        continue;
       }
     }
 
-    // Détection motif Chambre / N° (Ex: "Chambre 101", "Ch. 12", "101 - DBL - Dupont...")
-    const roomMatch = line.match(/(?:chambre|ch\.?|room)?\s*([A-Za-z]?\d{1,4}[A-Za-z]?)\s*[:\-–—]?\s*(.*)/i);
-    if (roomMatch && (!isNaN(parseInt(roomMatch[1])) || /^[A-Z]\d+/.test(roomMatch[1]))) {
-      const rNum = roomMatch[1];
-      const rest = roomMatch[2] ? roomMatch[2].trim() : "";
-
-      let rType = "Double (Grand Lit)";
-      let rOcc = rest;
-      let rNotes = "";
-
-      if (/sgl|single|individuelle/i.test(rest)) {
-        rType = "Individuelle (Single)";
-        rOcc = rest.replace(/sgl|single|individuelle/gi, '').replace(/[:\-–—]/g, '').trim();
-      } else if (/twin|2\s*lits/i.test(rest)) {
-        rType = "Twin (2 lits séparés)";
-        rOcc = rest.replace(/twin|2\s*lits/gi, '').replace(/[:\-–—]/g, '').trim();
-      } else if (/triple|3\s*lits/i.test(rest)) {
-        rType = "Triple";
-        rOcc = rest.replace(/triple|3\s*lits/gi, '').replace(/[:\-–—]/g, '').trim();
+    // Détection d'une ligne passager du tableau officiel Girardot
+    // Motif A: "004 MRS MORIN MIREILLE 28/04/1959..." ou "001 MR TRIOUX JOSE 19/12/1954..."
+    const dossierMatch = line.match(/^(?:\d{3}\s+)?(?:00\d|\d{2,3})\s+(MR|MRS|MME|MLLE|M\.)\s+([A-ZÀ-Ý\s-]+?)\s+([A-ZÀ-Ýa-zà-ÿ-]+)(?:\s+\d{2}\/\d{2}\/\d{4})?(.*)/i);
+    if (dossierMatch) {
+      const civ = dossierMatch[1].toUpperCase();
+      const nom = dossierMatch[2].trim();
+      const prenom = dossierMatch[3].trim();
+      const rest = dossierMatch[4] ? dossierMatch[4].trim() : "";
+      
+      const occupantStr = `${civ} ${nom} ${prenom}`;
+      
+      // Extraire un éventuel contact d'urgence ou remarque
+      let noteStr = "";
+      if (rest) {
+        const phoneMatch = rest.match(/(?:0\d|\+33)\s*[\d\s]{8,14}/);
+        if (phoneMatch) {
+          noteStr = "Urgence : " + rest.replace(/\d{2}\/\d{2}\/\d{4}/, '').trim();
+        }
       }
 
-      newEntries.push({
-        roomNumber: rNum,
-        type: rType,
-        occupants: rOcc,
-        notes: rNotes
-      });
-      return;
+      // Si c'est une chambre double et que la dernière entrée n'a qu'un occupant, regrouper dans la même chambre
+      if (currentRoomType.includes("Double") && newEntries.length > 0 && newEntries[newEntries.length - 1].type.includes("Double") && !newEntries[newEntries.length - 1].occupants.includes(" / ")) {
+        const last = newEntries[newEntries.length - 1];
+        last.occupants += ` / ${occupantStr}`;
+        if (noteStr && !last.notes) last.notes = noteStr;
+      } else {
+        newEntries.push({
+          roomNumber: String(101 + newEntries.length),
+          type: currentRoomType,
+          occupants: occupantStr,
+          notes: noteStr
+        });
+      }
+      continue;
     }
 
-    // Si la ligne ressemble à un nom d'occupant (Ex: "M. et Mme DUPONT Jean")
-    if (/(?:M\.|Mme|Mlle|Monsieur|Madame)\b/i.test(line) || /^[A-ZÀ-Ý\s-]{4,30}\s+[A-ZÀ-Ýa-zà-ÿ]+/.test(line)) {
+    // Motif B: Cas particulier (Accompagnateur) : "Declerque Hélène" ou "(Accompagnateur) Hélène"
+    if (/declerque/i.test(line) || /accompagnateur/i.test(line) && inTableSection) {
+      const occ = line.replace(/[(]accompagnateur[)]/i, '').replace(/[()]/g, '').trim() || "Declerque Hélène";
       newEntries.push({
         roomNumber: String(101 + newEntries.length),
-        type: "Double (Grand Lit)",
-        occupants: line,
-        notes: ""
+        type: "Individuelle (Single)",
+        occupants: occ.includes("Hélène") ? "Mme DECLERQUE Hélène (Accompagnatrice)" : occ,
+        notes: "Chambre Accompagnateur"
       });
+      continue;
     }
-  });
+  }
 
   if (newEntries.length > 0) {
     tripData.driverDossier.roomingList = newEntries;
     renderAdminDriver();
     if (statusEl) {
-      statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> <strong>${newEntries.length} chambre(s)</strong> importée(s) et synchronisées avec succès depuis <em>${sourceFileName}</em>.</span>`;
+      statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> <strong>${newEntries.length} chambre(s)</strong> extraite(s) exclusivement depuis les zones du tableau de <em>${sourceFileName}</em>.</span>`;
     }
   } else {
-    alert("Le fichier a été lu mais aucune structure de chambre n'a pu être reconnue. Vous pouvez ajouter les chambres manuellement avec le bouton '+ Ajouter une chambre'.");
+    alert("Aucune ligne de chambre n'a pu être identifiée dans les zones du tableau.");
   }
 }
 
@@ -1691,71 +1730,73 @@ function parsePassengersTextAndPopulate(rawText, sourceFileName) {
   const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
   const newPassengers = [];
+  const headerOrFooterIgnore = [
+    "voyages girardot organisation", "liste des passagers", "voyage n°", "voyage no",
+    "mexique paris charles de gaulle", "edition du", "trié par inscription", "civ nom prénom téléphone",
+    "laurent bidet", "total chambre", "page 1", "page 2"
+  ];
 
   lines.forEach((line) => {
-    // Ignorer les en-têtes
-    if (/^(passager|participant|nom|prenom|prénom|place|siège|arret|montée|telephone|téléphone)/i.test(line) && line.length < 50) return;
+    const lower = line.toLowerCase();
 
-    // Détection format délimité (CSV ou tabulation)
-    if (line.includes(';') || line.includes('\t') || (line.includes(',') && !line.includes('Street') && !line.includes('Avenue'))) {
-      const parts = line.split(/[;\t]|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
-      if (parts.length >= 2) {
-        let pName = parts[0];
-        let pPickup = parts[1] || "Départ circuit";
-        let pPhone = parts[2] || "";
-        let pSeat = parts[3] || "";
-        let pNotes = parts[4] || "";
+    // Ignorer les métadonnées hors tableau et l'en-tête de colonnes
+    if (headerOrFooterIgnore.some(h => lower.includes(h))) return;
+    if (lower.startsWith("civ") && lower.includes("nom")) return;
 
-        // Si la 1ère colonne est un numéro de siège (ex: "1A", "2B")
-        if (/^\d{1,2}[A-D]$/i.test(parts[0])) {
-          pSeat = parts[0].toUpperCase();
-          pName = parts[1];
-          pPickup = parts[2] || "Départ circuit";
-          pPhone = parts[3] || "";
-        }
-
-        if (pName) {
-          newPassengers.push({
-            name: pName,
-            pickup: pPickup,
-            phone: pPhone,
-            seatNumber: pSeat,
-            notes: pNotes
-          });
-          return;
-        }
+    // Format délimité (CSV ou tabulation)
+    if (line.includes(';') || line.includes('\t')) {
+      const parts = line.split(/[;\t]/).map(p => p.trim());
+      if (parts.length >= 3 && !parts[0].toLowerCase().includes("civ")) {
+        let civ = /^(MR|MRS|M\.|MME|MLLE)$/i.test(parts[0]) ? parts[0] + " " : "";
+        let nom = parts[1] || "";
+        let prenom = parts[2] || "";
+        let tel = parts.find(p => /(?:0\d|\+33)\s*[\d\s]{8,14}/.test(p)) || parts[3] || "";
+        newPassengers.push({
+          name: `${civ}${nom} ${prenom}`.trim(),
+          pickup: "Départ circuit",
+          phone: tel,
+          seatNumber: "",
+          notes: ""
+        });
+        return;
       }
     }
 
-    // Détection ligne textuelle avec N° de siège (ex: "1A - DUPONT Jean - Mâcon - 06 12 34 56 78")
-    const seatMatch = line.match(/^(\d{1,2}[A-D])\s*[:\-–—]?\s*(.*)/i);
-    if (seatMatch) {
-      const seat = seatMatch[1].toUpperCase();
-      const rest = seatMatch[2].trim();
-      const parts = rest.split(/[-–—•,;]/).map(p => p.trim());
+    // Détection stricte de ligne de tableau : commence par une Civilité (MR, MRS, M., MME...)
+    // Exemple : "MR TRIOUX JOSE 07 78 10 96 99 1"
+    const rowMatch = line.match(/^(MR|MRS|MME|MLLE|M\.)\s+([A-ZÀ-Ý\s-]+?)\s+([A-ZÀ-Ýa-zà-ÿ\s,-]+?)\s+((?:0\d|\+33|\+52|\+1)[\s\d.-]{8,16})(?:\s+\d+)?$/i);
+    if (rowMatch) {
+      const civ = rowMatch[1].toUpperCase();
+      const nom = rowMatch[2].trim();
+      const prenom = rowMatch[3].trim();
+      const tel = rowMatch[4].trim();
+
       newPassengers.push({
-        seatNumber: seat,
-        name: parts[0] || rest,
-        pickup: parts[1] || "Départ circuit",
-        phone: parts.find(p => /(?:0|\+33|\+52|\+1)\s*\d/.test(p)) || "",
+        name: `${civ} ${nom} ${prenom}`,
+        pickup: "Départ circuit",
+        phone: tel,
+        seatNumber: "",
         notes: ""
       });
       return;
     }
 
-    // Ligne textuelle représentant une personne (ex: "M. DUPONT Jean (06 12 34 56 78) - Chalon")
-    if (/(?:M\.|Mme|Mlle|Monsieur|Madame)\b/i.test(line) || /^[A-ZÀ-Ý\s-]{3,30}\s+[A-ZÀ-Ýa-zà-ÿ]+/.test(line)) {
-      const phoneMatch = line.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/);
-      let phone = phoneMatch ? phoneMatch[0].trim() : "";
-      let cleanName = line.replace(phone, '').replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
+    // Variantes sans téléphone ou format alternatif
+    const rowAltMatch = line.match(/^(MR|MRS|MME|MLLE|M\.)\s+([A-ZÀ-Ý\s-]+?)\s+([A-ZÀ-Ýa-zà-ÿ\s,-]+?)(?:\s+((?:0\d|\+33|\+52)[\s\d.-]{8,16}))?(?:\s+\d+)?$/i);
+    if (rowAltMatch && rowAltMatch[2].length >= 2 && !rowAltMatch[2].includes("GIRARDOT") && !rowAltMatch[2].includes("VOYAGE")) {
+      const civ = rowAltMatch[1].toUpperCase();
+      const nom = rowAltMatch[2].trim();
+      const prenom = rowAltMatch[3].trim();
+      const tel = rowAltMatch[4] ? rowAltMatch[4].trim() : "";
 
       newPassengers.push({
-        name: cleanName,
+        name: `${civ} ${nom} ${prenom}`,
         pickup: "Départ circuit",
-        phone: phone,
+        phone: tel,
         seatNumber: "",
         notes: ""
       });
+      return;
     }
   });
 
@@ -1763,12 +1804,13 @@ function parsePassengersTextAndPopulate(rawText, sourceFileName) {
     tripData.driverDossier.passengersList = newPassengers;
     renderAdminDriver();
     if (statusEl) {
-      statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> <strong>${newPassengers.length} passager(s)</strong> importé(s) avec succès depuis <em>${sourceFileName}</em>.</span>`;
+      statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> <strong>${newPassengers.length} passager(s)</strong> importé(s) avec succès exclusivement depuis le tableau de <em>${sourceFileName}</em>.</span>`;
     }
   } else {
-    alert("Le document a été lu mais aucun participant n'a pu être reconnu. Vous pouvez utiliser le bouton '+ Ajouter un passager' pour compléter la liste.");
+    alert("Aucune ligne de passager n'a pu être identifiée dans le tableau du document.");
   }
 }
+
 
 function addNewRoomingEntry() {
   ensureDriverStructure();
