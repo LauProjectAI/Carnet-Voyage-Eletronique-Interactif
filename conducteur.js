@@ -34,6 +34,19 @@ function loadDriverTripData() {
         return;
       } catch (e) {}
     }
+    // Vérifier si présent dans les voyages préenregistrés
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam);
+    if (foundPredefined && foundPredefined.file) {
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', foundPredefined.file, false);
+        xhr.send(null);
+        if (xhr.status === 200 || xhr.status === 0) {
+          driverTrip = JSON.parse(xhr.responseText);
+          return;
+        }
+      } catch (err) {}
+    }
   }
 
   // 3. Dernier voyage actif en cache

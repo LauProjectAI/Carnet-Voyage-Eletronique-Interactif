@@ -117,9 +117,10 @@ function loadTripById(tripId) {
     return;
   }
 
-  // 3. Si c'est le voyage Italie dans le sous-dossier voyages/
-  if (tripId === 'italie-dolomites-2026') {
-    fetch('voyages/italie-dolomites-2026.json')
+  // 3. Si c'est un voyage prédéfini dans le sous-dossier voyages/ (Italie, San Francisco...)
+  const predefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId);
+  if (predefined && predefined.file) {
+    fetch(predefined.file)
       .then(res => res.json())
       .then(data => {
         tripData = data;
@@ -130,7 +131,7 @@ function loadTripById(tripId) {
       .catch(() => {
         tripData = JSON.parse(JSON.stringify(window.defaultTravelData));
         tripData.id = tripId;
-        tripData.title = "Italie du Nord & Dolomites";
+        tripData.title = predefined.title || "Voyage";
         tripData.documents = [];
         normalizeAdminTripDocuments(tripData);
         populateForm();

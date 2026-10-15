@@ -225,7 +225,7 @@ function loadTripData() {
     }
   }
 
-  // 2. Paramètre ID dans l'URL (?id=italie-dolomites-2026)
+  // 2. Paramètre ID dans l'URL (?id=san-francisco ou ?id=italie-dolomites-2026)
   if (idParam) {
     const stored = localStorage.getItem(`girardot_trip_data_${idParam}`);
     if (stored) {
@@ -234,6 +234,25 @@ function loadTripData() {
         normalizeTripTransitMaps();
         return;
       } catch (e) {}
+    }
+    // Vérifier si le voyage est présent dans les voyages préenregistrés du dossier voyages/
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam);
+    if (foundPredefined && foundPredefined.file) {
+      // Chargement synchrone ou par fetch
+      try {
+        const xhr = new XMLHttpRequest();
+        xhr.open('GET', foundPredefined.file, false); // Synchrone pour initialisation immédiate
+        xhr.send(null);
+        if (xhr.status === 200 || xhr.status === 0) {
+          currentTrip = JSON.parse(xhr.responseText);
+          normalizeTripTransitMaps();
+          localStorage.setItem(`girardot_trip_data_${currentTrip.id}`, JSON.stringify(currentTrip));
+          localStorage.setItem('girardot_active_trip_id', currentTrip.id);
+          return;
+        }
+      } catch (err) {
+        console.warn('Chargement synchrone du fichier voyage impossible, essai différé:', err);
+      }
     }
   }
 
@@ -362,12 +381,14 @@ function onClientTripSwitch(tripId) {
     return;
   }
 
-  // Si c'est l'Italie
-  if (tripId === 'italie-dolomites-2026') {
-    fetch('voyages/italie-dolomites-2026.json')
+  // Si présent dans les voyages prédéfinis (Italie, San Francisco...)
+  const predefinedTrip = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId);
+  if (predefinedTrip && predefinedTrip.file) {
+    fetch(predefinedTrip.file)
       .then(res => res.json())
       .then(data => {
         currentTrip = data;
+        localStorage.setItem(`girardot_trip_data_${currentTrip.id}`, JSON.stringify(currentTrip));
         refreshAppAfterTripChange();
       })
       .catch(() => {

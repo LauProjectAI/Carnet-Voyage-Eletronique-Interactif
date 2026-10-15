@@ -12,5 +12,12 @@ window.AVAILABLE_TRIPS = [
     subtitle: "Des Grands Lacs aux Sommets Alpins",
     dates: "Du 6 au 13 juin 2026",
     file: "voyages/italie-dolomites-2026.json"
+  },
+  {
+    id: "san-francisco",
+    title: "Carnet San Francisco",
+    subtitle: "Voyage Famille",
+    dates: "13/02 au 21/02/2027",
+    file: "voyages/san-francisco.json"
   }
 ];
