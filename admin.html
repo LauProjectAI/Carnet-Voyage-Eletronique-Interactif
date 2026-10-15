@@ -393,14 +393,19 @@
         </div>
 
         <!-- 2. ROOMING LIST -->
+        <!-- 2. ROOMING LIST -->
         <div class="section-box" style="border-left:4px solid #10b981; margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
             <h4 style="font-size:1rem; font-weight:800; color:#1e293b; margin:0; display:flex; align-items:center; gap:8px;">
               <i class="fa-solid fa-bed" style="color:#10b981;"></i> 2. Rooming List des Hôtels
             </h4>
-            <div style="display:flex; gap:6px;">
-              <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px;" onclick="document.getElementById('adm-driver-rooming-upload').click()">
-                <i class="fa-solid fa-file-pdf"></i> Joindre PDF Rooming
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" onclick="document.getElementById('adm-driver-rooming-data-upload').click()" title="Importer les chambres depuis un fichier PDF, CSV, Excel ou texte">
+                <i class="fa-solid fa-file-import"></i> Importer Rooming (PDF / CSV / TXT)
+              </button>
+              <input type="file" id="adm-driver-rooming-data-upload" accept=".pdf,.csv,.txt,.xlsx,.xls" style="display:none;" onchange="handleImportRoomingData(event)">
+              <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px;" onclick="document.getElementById('adm-driver-rooming-upload').click()" title="Attacher le document PDF officiel pour consultation par le chauffeur">
+                <i class="fa-solid fa-paperclip"></i> Joindre PDF Rooming
               </button>
               <input type="file" id="adm-driver-rooming-upload" accept="image/*,.pdf" style="display:none;" onchange="handleDriverRoomingUpload(event)">
               <button type="button" onclick="addNewRoomingEntry()" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#ecfdf5; color:#047857; border-color:#a7f3d0; font-weight:700;">
@@ -433,10 +438,18 @@
             <h4 style="font-size:1rem; font-weight:800; color:#1e293b; margin:0; display:flex; align-items:center; gap:8px;">
               <i class="fa-solid fa-clipboard-user" style="color:#8b5cf6;"></i> 3. Liste des Passagers (Pointage & Arrêts)
             </h4>
-            <button type="button" onclick="addNewPassengerEntry()" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;">
-              <i class="fa-solid fa-user-plus"></i> Ajouter un passager
-            </button>
+            <div style="display:flex; gap:6px; flex-wrap:wrap;">
+              <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" onclick="document.getElementById('adm-driver-passengers-upload').click()" title="Importer la liste des participants depuis un fichier PDF, CSV, Excel ou texte">
+                <i class="fa-solid fa-file-import"></i> Importer Passagers (PDF / CSV / TXT)
+              </button>
+              <input type="file" id="adm-driver-passengers-upload" accept=".pdf,.csv,.txt,.xlsx,.xls" style="display:none;" onchange="handleImportPassengersData(event)">
+              <button type="button" onclick="addNewPassengerEntry()" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;">
+                <i class="fa-solid fa-user-plus"></i> Ajouter un passager
+              </button>
+            </div>
           </div>
+
+          <div id="adm-driver-passengers-file-status" style="font-size:0.75rem; color:#6d28d9; margin-bottom:10px; font-weight:bold;"></div>
 
           <div style="overflow-x:auto;">
             <table style="width:100%; border-collapse:collapse; font-size:0.8rem; background:white; border-radius:8px; overflow:hidden;">

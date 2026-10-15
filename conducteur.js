@@ -544,9 +544,35 @@ function renderDriverContacts() {
   const container = document.getElementById('driver-contacts-list');
   if (!container) return;
 
-  const contacts = driverTrip.contactsList || [
-    { category: "Permanence Urgences Girardot", name: "Assistance 24/7", phone: "+33 3 85 00 00 00", address: "Chalon-sur-Saône", isEmergency: true }
-  ];
+  let contacts = [];
+  if (Array.isArray(driverTrip.contactsList) && driverTrip.contactsList.length > 0) {
+    contacts = [...driverTrip.contactsList];
+  } else if (driverTrip.contacts) {
+    if (driverTrip.contacts.receptif) {
+      contacts.push({
+        category: "Correspondant Réceptif Local",
+        name: driverTrip.contacts.receptif.name || "",
+        phone: driverTrip.contacts.receptif.emergency || driverTrip.contacts.receptif.phone || "",
+        address: driverTrip.contacts.receptif.address || "",
+        isEmergency: true
+      });
+    }
+    if (driverTrip.contacts.agence) {
+      contacts.push({
+        category: "Voyages Girardot",
+        name: driverTrip.contacts.agence.name || "Siège Chalon",
+        phone: driverTrip.contacts.agence.phone || "03 85 42 82 50",
+        address: driverTrip.contacts.agence.address || "",
+        isEmergency: false
+      });
+    }
+  }
+
+  if (contacts.length === 0) {
+    contacts = [
+      { category: "Permanence Urgences Girardot", name: "Assistance Exploitation 24/7", phone: "+33 3 85 42 82 50", address: "Chalon-sur-Saône", isEmergency: true }
+    ];
+  }
 
   container.innerHTML = contacts.map(c => `
     <div style="background:#0b1120; border-radius:12px; padding:12px; margin-bottom:10px; border-left:4px solid ${c.isEmergency ? '#ef4444' : '#0284c7'}; display:flex; justify-content:space-between; align-items:center;">

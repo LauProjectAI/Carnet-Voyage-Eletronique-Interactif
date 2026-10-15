@@ -1445,6 +1445,331 @@ function handleDriverRoomingUpload(e) {
   reader.readAsDataURL(file);
 }
 
+// -----------------------------------------------------------------------------
+// IMPORTATION DES DONNÉES DE ROOMING LIST (PDF / CSV / TXT)
+// -----------------------------------------------------------------------------
+function handleImportRoomingData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+  const statusEl = document.getElementById('adm-driver-rooming-file-status');
+
+  if (isPdf) {
+    if (!window.pdfjsLib) {
+      alert("La bibliothèque PDF.js n'est pas encore prête. Veuillez réessayer.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      // Joindre également comme document de référence consultable
+      updateDriverField('roomingFileUrl', evt.target.result);
+
+      window.pdfjsLib.getDocument({ data: new Uint8Array(evt.target.result) }).promise.then(async function(pdf) {
+        let extractedText = "";
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const textContent = await page.getTextContent();
+          
+          const items = textContent.items;
+          if (!items || items.length === 0) continue;
+          items.sort((a, b) => {
+            const yA = a.transform[5];
+            const yB = b.transform[5];
+            if (Math.abs(yA - yB) > 5) return yB - yA;
+            return a.transform[4] - b.transform[4];
+          });
+
+          let pageLines = [];
+          let curY = null;
+          let curLine = "";
+          for (const item of items) {
+            const str = item.str;
+            if (!str) continue;
+            if (curY === null) {
+              curY = item.transform[5];
+              curLine = str;
+            } else if (Math.abs(item.transform[5] - curY) > 5) {
+              pageLines.push(curLine.trim());
+              curY = item.transform[5];
+              curLine = str;
+            } else {
+              curLine += (curLine.endsWith(" ") || str.startsWith(" ") ? "" : " ") + str;
+            }
+          }
+          if (curLine.trim()) pageLines.push(curLine.trim());
+          extractedText += pageLines.join("\n") + "\n\n";
+        }
+        parseRoomingTextAndPopulate(extractedText, file.name);
+      }).catch(err => {
+        console.error("Erreur lecture PDF rooming:", err);
+        alert("Erreur lors de la lecture du fichier PDF : " + err.message);
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    // Fichier texte, CSV ou tableur exporté
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      parseRoomingTextAndPopulate(evt.target.result, file.name);
+    };
+    reader.readAsText(file);
+  }
+}
+
+function parseRoomingTextAndPopulate(rawText, sourceFileName) {
+  ensureDriverStructure();
+  const statusEl = document.getElementById('adm-driver-rooming-file-status');
+  const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+  const newEntries = [];
+  let currentEntry = null;
+
+  lines.forEach((line, idx) => {
+    // Ignorer les en-têtes évidentes
+    if (/^(rooming|chambre|hotel|occupant|nom|type|régime|date|liste)/i.test(line) && line.length < 50) return;
+
+    // Format CSV avec délimiteur (;, tab ou virgule)
+    if (line.includes(';') || line.includes('\t') || (line.includes(',') && !line.includes('Street') && !line.includes('Avenue'))) {
+      const parts = line.split(/[;\t]|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
+      if (parts.length >= 2) {
+        let rNum = parts[0];
+        let rType = parts[1] || "Double (Grand Lit)";
+        let rOcc = parts[2] || "";
+        let rNotes = parts[3] || "";
+
+        // Si la 1ère colonne est plutôt un nom
+        if (isNaN(parseInt(rNum)) && parts.length >= 2 && !isNaN(parseInt(parts[1]))) {
+          rOcc = parts[0];
+          rNum = parts[1];
+          rType = parts[2] || "Double";
+        }
+
+        if (rOcc || !isNaN(parseInt(rNum))) {
+          newEntries.push({
+            roomNumber: rNum || String(100 + newEntries.length + 1),
+            type: normalizeRoomType(rType),
+            occupants: rOcc || rNum,
+            notes: rNotes
+          });
+          return;
+        }
+      }
+    }
+
+    // Détection motif Chambre / N° (Ex: "Chambre 101", "Ch. 12", "101 - DBL - Dupont...")
+    const roomMatch = line.match(/(?:chambre|ch\.?|room)?\s*([A-Za-z]?\d{1,4}[A-Za-z]?)\s*[:\-–—]?\s*(.*)/i);
+    if (roomMatch && (!isNaN(parseInt(roomMatch[1])) || /^[A-Z]\d+/.test(roomMatch[1]))) {
+      const rNum = roomMatch[1];
+      const rest = roomMatch[2] ? roomMatch[2].trim() : "";
+
+      let rType = "Double (Grand Lit)";
+      let rOcc = rest;
+      let rNotes = "";
+
+      if (/sgl|single|individuelle/i.test(rest)) {
+        rType = "Individuelle (Single)";
+        rOcc = rest.replace(/sgl|single|individuelle/gi, '').replace(/[:\-–—]/g, '').trim();
+      } else if (/twin|2\s*lits/i.test(rest)) {
+        rType = "Twin (2 lits séparés)";
+        rOcc = rest.replace(/twin|2\s*lits/gi, '').replace(/[:\-–—]/g, '').trim();
+      } else if (/triple|3\s*lits/i.test(rest)) {
+        rType = "Triple";
+        rOcc = rest.replace(/triple|3\s*lits/gi, '').replace(/[:\-–—]/g, '').trim();
+      }
+
+      newEntries.push({
+        roomNumber: rNum,
+        type: rType,
+        occupants: rOcc,
+        notes: rNotes
+      });
+      return;
+    }
+
+    // Si la ligne ressemble à un nom d'occupant (Ex: "M. et Mme DUPONT Jean")
+    if (/(?:M\.|Mme|Mlle|Monsieur|Madame)\b/i.test(line) || /^[A-ZÀ-Ý\s-]{4,30}\s+[A-ZÀ-Ýa-zà-ÿ]+/.test(line)) {
+      newEntries.push({
+        roomNumber: String(101 + newEntries.length),
+        type: "Double (Grand Lit)",
+        occupants: line,
+        notes: ""
+      });
+    }
+  });
+
+  if (newEntries.length > 0) {
+    tripData.driverDossier.roomingList = newEntries;
+    renderAdminDriver();
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> <strong>${newEntries.length} chambre(s)</strong> importée(s) et synchronisées avec succès depuis <em>${sourceFileName}</em>.</span>`;
+    }
+  } else {
+    alert("Le fichier a été lu mais aucune structure de chambre n'a pu être reconnue. Vous pouvez ajouter les chambres manuellement avec le bouton '+ Ajouter une chambre'.");
+  }
+}
+
+function normalizeRoomType(str = "") {
+  const s = str.toLowerCase();
+  if (s.includes('sgl') || s.includes('single') || s.includes('indiv')) return 'Individuelle (Single)';
+  if (s.includes('twin') || s.includes('jumeau') || s.includes('séparé') || s.includes('separe')) return 'Twin (2 lits séparés)';
+  if (s.includes('triple')) return 'Triple';
+  return 'Double (Grand Lit)';
+}
+
+// -----------------------------------------------------------------------------
+// IMPORTATION DE LA LISTE DES PASSAGERS (PDF / CSV / TXT)
+// -----------------------------------------------------------------------------
+function handleImportPassengersData(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const isPdf = file.name.toLowerCase().endsWith('.pdf') || file.type === 'application/pdf';
+  const statusEl = document.getElementById('adm-driver-passengers-file-status');
+
+  if (isPdf) {
+    if (!window.pdfjsLib) {
+      alert("La bibliothèque PDF.js n'est pas encore prête. Veuillez réessayer.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      window.pdfjsLib.getDocument({ data: new Uint8Array(evt.target.result) }).promise.then(async function(pdf) {
+        let extractedText = "";
+        for (let p = 1; p <= pdf.numPages; p++) {
+          const page = await pdf.getPage(p);
+          const textContent = await page.getTextContent();
+          
+          const items = textContent.items;
+          if (!items || items.length === 0) continue;
+          items.sort((a, b) => {
+            const yA = a.transform[5];
+            const yB = b.transform[5];
+            if (Math.abs(yA - yB) > 5) return yB - yA;
+            return a.transform[4] - b.transform[4];
+          });
+
+          let pageLines = [];
+          let curY = null;
+          let curLine = "";
+          for (const item of items) {
+            const str = item.str;
+            if (!str) continue;
+            if (curY === null) {
+              curY = item.transform[5];
+              curLine = str;
+            } else if (Math.abs(item.transform[5] - curY) > 5) {
+              pageLines.push(curLine.trim());
+              curY = item.transform[5];
+              curLine = str;
+            } else {
+              curLine += (curLine.endsWith(" ") || str.startsWith(" ") ? "" : " ") + str;
+            }
+          }
+          if (curLine.trim()) pageLines.push(curLine.trim());
+          extractedText += pageLines.join("\n") + "\n\n";
+        }
+        parsePassengersTextAndPopulate(extractedText, file.name);
+      }).catch(err => {
+        console.error("Erreur lecture PDF passagers:", err);
+        alert("Erreur lors de la lecture du PDF : " + err.message);
+      });
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      parsePassengersTextAndPopulate(evt.target.result, file.name);
+    };
+    reader.readAsText(file);
+  }
+}
+
+function parsePassengersTextAndPopulate(rawText, sourceFileName) {
+  ensureDriverStructure();
+  const statusEl = document.getElementById('adm-driver-passengers-file-status');
+  const lines = rawText.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+
+  const newPassengers = [];
+
+  lines.forEach((line) => {
+    // Ignorer les en-têtes
+    if (/^(passager|participant|nom|prenom|prénom|place|siège|arret|montée|telephone|téléphone)/i.test(line) && line.length < 50) return;
+
+    // Détection format délimité (CSV ou tabulation)
+    if (line.includes(';') || line.includes('\t') || (line.includes(',') && !line.includes('Street') && !line.includes('Avenue'))) {
+      const parts = line.split(/[;\t]|,(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)/).map(p => p.replace(/^"|"$/g, '').trim());
+      if (parts.length >= 2) {
+        let pName = parts[0];
+        let pPickup = parts[1] || "Départ circuit";
+        let pPhone = parts[2] || "";
+        let pSeat = parts[3] || "";
+        let pNotes = parts[4] || "";
+
+        // Si la 1ère colonne est un numéro de siège (ex: "1A", "2B")
+        if (/^\d{1,2}[A-D]$/i.test(parts[0])) {
+          pSeat = parts[0].toUpperCase();
+          pName = parts[1];
+          pPickup = parts[2] || "Départ circuit";
+          pPhone = parts[3] || "";
+        }
+
+        if (pName) {
+          newPassengers.push({
+            name: pName,
+            pickup: pPickup,
+            phone: pPhone,
+            seatNumber: pSeat,
+            notes: pNotes
+          });
+          return;
+        }
+      }
+    }
+
+    // Détection ligne textuelle avec N° de siège (ex: "1A - DUPONT Jean - Mâcon - 06 12 34 56 78")
+    const seatMatch = line.match(/^(\d{1,2}[A-D])\s*[:\-–—]?\s*(.*)/i);
+    if (seatMatch) {
+      const seat = seatMatch[1].toUpperCase();
+      const rest = seatMatch[2].trim();
+      const parts = rest.split(/[-–—•,;]/).map(p => p.trim());
+      newPassengers.push({
+        seatNumber: seat,
+        name: parts[0] || rest,
+        pickup: parts[1] || "Départ circuit",
+        phone: parts.find(p => /(?:0|\+33|\+52|\+1)\s*\d/.test(p)) || "",
+        notes: ""
+      });
+      return;
+    }
+
+    // Ligne textuelle représentant une personne (ex: "M. DUPONT Jean (06 12 34 56 78) - Chalon")
+    if (/(?:M\.|Mme|Mlle|Monsieur|Madame)\b/i.test(line) || /^[A-ZÀ-Ý\s-]{3,30}\s+[A-ZÀ-Ýa-zà-ÿ]+/.test(line)) {
+      const phoneMatch = line.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/);
+      let phone = phoneMatch ? phoneMatch[0].trim() : "";
+      let cleanName = line.replace(phone, '').replace(/[()\-–—]/g, ' ').replace(/\s+/g, ' ').trim();
+
+      newPassengers.push({
+        name: cleanName,
+        pickup: "Départ circuit",
+        phone: phone,
+        seatNumber: "",
+        notes: ""
+      });
+    }
+  });
+
+  if (newPassengers.length > 0) {
+    tripData.driverDossier.passengersList = newPassengers;
+    renderAdminDriver();
+    if (statusEl) {
+      statusEl.innerHTML = `<span style="color:#16a34a;"><i class="fa-solid fa-check"></i> <strong>${newPassengers.length} passager(s)</strong> importé(s) avec succès depuis <em>${sourceFileName}</em>.</span>`;
+    }
+  } else {
+    alert("Le document a été lu mais aucun participant n'a pu être reconnu. Vous pouvez utiliser le bouton '+ Ajouter un passager' pour compléter la liste.");
+  }
+}
+
 function addNewRoomingEntry() {
   ensureDriverStructure();
   const nextNum = 100 + (tripData.driverDossier.roomingList.length + 1);
@@ -3999,8 +4324,47 @@ function extractTextFromPdfArray(typedarray, originalFileName) {
     for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
       const page = await pdf.getPage(pageNum);
       const textContent = await page.getTextContent();
-      const pageItems = textContent.items.map(item => item.str);
-      fullText += pageItems.join(" ") + "\n\n";
+      
+      // Regrouper les éléments textuels par ligne en utilisant leur coordonnée Y
+      const items = textContent.items;
+      if (!items || items.length === 0) continue;
+
+      // Trier verticalement (du haut vers le bas, y décroissant) puis horizontalement (x croissant)
+      items.sort((a, b) => {
+        const yA = a.transform[5];
+        const yB = b.transform[5];
+        if (Math.abs(yA - yB) > 5) {
+          return yB - yA; // Ligne supérieure d'abord
+        }
+        return a.transform[4] - b.transform[4]; // De gauche à droite
+      });
+
+      let pageLines = [];
+      let currentLineY = null;
+      let currentLineText = "";
+
+      for (const item of items) {
+        const str = item.str;
+        if (!str) continue;
+        const itemY = item.transform[5];
+
+        if (currentLineY === null) {
+          currentLineY = itemY;
+          currentLineText = str;
+        } else if (Math.abs(itemY - currentLineY) > 5) {
+          pageLines.push(currentLineText.trim());
+          currentLineY = itemY;
+          currentLineText = str;
+        } else {
+          // Même ligne : ajouter un espace si besoin
+          currentLineText += (currentLineText.endsWith(" ") || str.startsWith(" ") ? "" : " ") + str;
+        }
+      }
+      if (currentLineText.trim()) {
+        pageLines.push(currentLineText.trim());
+      }
+
+      fullText += pageLines.join("\n") + "\n\n";
     }
 
     if (!fullText.trim()) {
@@ -4039,7 +4403,7 @@ function parsePastedTextToTrip() {
   processExtractedTextToTrip(text, "Programme importé");
 }
 
-// Moteur heuristique d'analyse et de structuration du programme
+// Moteur heuristique d'analyse et de structuration du programme Girardot
 function processExtractedTextToTrip(text, sourceName) {
   const statusEl = document.getElementById('pdf-import-status');
   const previewBox = document.getElementById('pdf-preview-container');
@@ -4047,48 +4411,96 @@ function processExtractedTextToTrip(text, sourceName) {
   const btnDownload = document.getElementById('btn-download-parsed-json');
   const btnApply = document.getElementById('btn-apply-parsed-trip');
 
-  const lines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
-  // 1. Détection du Titre et Destination
+  // 1. Détection du Titre et Dates globales
   let detectedTitle = "";
-  if (sourceName && !sourceName.toLowerCase().includes("programme importé")) {
+  let detectedSubtitle = "Circuit exclusif Voyages Girardot";
+  let detectedDates = "";
+  let detectedStartDate = "";
+  let detectedEndDate = "";
+
+  // Recherche de motif de carnet "Votre carnet de voyage X"
+  for (let i = 0; i < Math.min(rawLines.length, 15); i++) {
+    const l = rawLines[i];
+    const carnetMatch = l.match(/Votre carnet de voyage\s+(.*)/i);
+    if (carnetMatch) {
+      detectedTitle = carnetMatch[1].trim();
+    }
+    const datesMatch = l.match(/((?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4})\s*[-–—]\s*((?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4})/i);
+    if (datesMatch) {
+      detectedDates = `${datesMatch[1]} au ${datesMatch[2]}`;
+    }
+    const subMatch = l.match(/De\s+([A-Za-zÀ-Ý\s-]+)\s+au\s+([A-Za-zÀ-Ý\s-]+(?:\s+en passant par\s+[A-Za-zÀ-Ý\s-]+)?)/i);
+    if (subMatch) {
+      detectedSubtitle = subMatch[0].trim();
+    }
+  }
+
+  if (!detectedTitle && sourceName && !sourceName.toLowerCase().includes("programme importé")) {
     detectedTitle = sourceName.replace(/\.pdf$/i, "").replace(/[_-]/g, " ").trim();
   }
-  if (!detectedTitle && lines.length > 0) {
-    detectedTitle = lines[0].slice(0, 60);
+  if (!detectedTitle && rawLines.length > 0) {
+    detectedTitle = rawLines[0].slice(0, 60);
   }
 
-  // 2. Détection des étapes "Jour X" ou "J1 / J2"
+  // 2. Détection précise des étapes "Jour X"
   const itinerary = [];
-  const dayRegex = /(?:^|\b)(?:jour|j)\s*(\d{1,2})\b[:\s\-–—]*(.*)/i;
-  
   let currentDay = null;
+  const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—]\s*(.*))?$/i;
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const match = line.match(dayRegex);
+  // Repérer la fin du programme des étapes (ex: "Coordonnées de vos hôtels", "Le voyage n'étant pas une science exacte")
+  const stopKeywords = [
+    "coordonnées de vos hôtels", "coordonnees de vos hotels", "vos hôtels", "vos hotels",
+    "le voyage n’étant pas une science exacte", "le voyage n'etant pas une science exacte",
+    "votre accompagnatrice", "votre guide", "vos contacts", "convocation aérienne"
+  ];
 
-    if (match) {
-      const dayNum = parseInt(match[1], 10);
-      const rawTitle = match[2] ? match[2].trim() : `Étape Jour ${dayNum}`;
+  let inItinerarySection = false;
 
+  for (let i = 0; i < rawLines.length; i++) {
+    const line = rawLines[i];
+    const lowerLine = line.toLowerCase();
+
+    // Arrêt si on atteint la fin du programme
+    if (itinerary.length > 0 && stopKeywords.some(sk => lowerLine.startsWith(sk) || lowerLine.includes(sk))) {
       if (currentDay) {
         itinerary.push(currentDay);
+        currentDay = null;
+      }
+      break;
+    }
+
+    const match = line.match(dayHeaderRegex);
+    if (match) {
+      inItinerarySection = true;
+      if (currentDay) {
+        itinerary.push(currentDay);
+      }
+      const dayNum = parseInt(match[1], 10);
+      let dayTitle = (match[2] || "").trim();
+      
+      // Si le titre était sur la même ligne ou vide
+      if (!dayTitle) {
+        dayTitle = `Étape Jour ${dayNum}`;
       }
 
       currentDay = {
         day: dayNum,
-        title: rawTitle ? `Jour ${dayNum} • ${rawTitle}` : `Jour ${dayNum}`,
-        highlight: rawTitle || `Temps fort du Jour ${dayNum}`,
-        city: extractProbableCity(rawTitle),
+        title: `Jour ${dayNum} • ${dayTitle.replace(/^(?:Jour\s*\d+\s*[•:\-–—]\s*)/i, '')}`,
+        highlight: dayTitle.replace(/^(?:Jour\s*\d+\s*[•:\-–—]\s*)/i, ''),
+        city: extractProbableCity(dayTitle),
         dateStr: `Jour ${dayNum}`,
         description: "",
         lat: 0,
         lng: 0,
         timeline: []
       };
-    } else if (currentDay) {
-      // Si la ligne contient un horaire (ex: 09h30 ou 14:00)
+      continue;
+    }
+
+    if (inItinerarySection && currentDay) {
+      // Détecter si la ligne contient une heure (ex: 09h30, 14:00)
       const timeMatch = line.match(/(?:^|\b)(\d{1,2}[h:]\d{2})\b[:\s\-–—]*(.*)/i);
       if (timeMatch) {
         const timeStr = timeMatch[1].replace('h', ':');
@@ -4100,10 +4512,8 @@ function processExtractedTextToTrip(text, sourceName) {
           icon: detectIconForText(descStr)
         });
       } else {
-        // Ajouter à la description générale de la journée
-        if (currentDay.description.length < 500) {
-          currentDay.description += (currentDay.description ? " " : "") + line;
-        }
+        // Ajouter au texte descriptif de la journée
+        currentDay.description += (currentDay.description ? " " : "") + line;
       }
     }
   }
@@ -4112,88 +4522,244 @@ function processExtractedTextToTrip(text, sourceName) {
     itinerary.push(currentDay);
   }
 
-  // Si aucune découpe "Jour X" n'a été trouvée, créer au moins une découpe propre
-  if (itinerary.length === 0) {
-    itinerary.push({
-      day: 1,
-      title: "Jour 1 • Rendez-vous et début du circuit",
-      highlight: "Découverte et temps forts",
-      city: "Destination",
-      dateStr: "Jour 1",
-      description: text.slice(0, 400) + "...",
-      timeline: [
-        { time: "09:30", title: "Rendez-vous et accueil", subtitle: "Début des visites du programme.", icon: "location-dot" }
-      ]
-    });
-  }
-
-  // S'assurer que chaque jour a au moins une visite dans sa timeline
+  // Découper les descriptions longues en timeline chronologique de visites
   itinerary.forEach(d => {
     if (!d.timeline || d.timeline.length === 0) {
-      d.timeline = [
-        {
-          time: "10:00",
-          title: d.highlight || d.title,
-          subtitle: d.description ? d.description.slice(0, 100) : "Programme et déroulé de l'étape.",
-          icon: "route"
-        }
-      ];
+      const sentences = (d.description || "").split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
+      if (sentences.length > 0) {
+        d.timeline = sentences.slice(0, 4).map((sentence, idx) => {
+          const hour = 8 + (idx * 3);
+          const timeStr = `${hour < 10 ? '0' : ''}${hour}:00`;
+          let shortTitle = sentence.slice(0, 55).replace(/[.!?]$/, '').trim();
+          return {
+            time: timeStr,
+            title: shortTitle,
+            subtitle: sentence,
+            icon: detectIconForText(sentence)
+          };
+        });
+      } else {
+        d.timeline = [
+          {
+            time: "10:00",
+            title: d.highlight || d.title,
+            subtitle: d.description || "Déroulé de la journée.",
+            icon: "route"
+          }
+        ];
+      }
     }
   });
 
-  // 3. Détection des Hôtels
+  // 3. Détection des Hôtels avec Dates et Adresses complètes
   const hotels = [];
-  const hotelRegex = /(?:hôtel|hotel|lodge|camp|auberge)\s+([A-ZÀ-Ý][\w\s'-]{3,35})/gi;
-  let hMatch;
-  const foundHotelNames = new Set();
-  while ((hMatch = hotelRegex.exec(text)) !== null) {
-    const fullHotelName = hMatch[0].trim();
-    if (!foundHotelNames.has(fullHotelName) && fullHotelName.length < 40) {
-      foundHotelNames.add(fullHotelName);
+  const hotelSectionRegex = /(?:coordonn[ée]es de vos h[ôo]tels|vos h[ôo]tels)([\s\S]*?)(?:votre accompagnatrice|votre guide|vos contacts|formalités|bon à savoir|$)/i;
+  const hotelSectionMatch = text.match(hotelSectionRegex);
+  const hotelTextToAnalyze = hotelSectionMatch ? hotelSectionMatch[1] : text;
+
+  // Motif typique Girardot :
+  // "du 11 au 13 novembre" suivi de "HOTEL NOM", adresse, code postal, téléphone
+  const hotelBlockRegex = /du\s+(\d{1,2}(?:\s+[a-zà-ÿ]+)?\s+au\s+\d{1,2}\s+[a-zà-ÿ]+)([\s\S]*?)(?=(?:du\s+\d{1,2}\s+au|$))/gi;
+  let hbMatch;
+
+  while ((hbMatch = hotelBlockRegex.exec(hotelTextToAnalyze)) !== null) {
+    const datesStay = "Du " + hbMatch[1].trim();
+    const blockContent = hbMatch[2].trim();
+    const bLines = blockContent.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0 && !/^sous réserve/i.test(l));
+
+    if (bLines.length > 0) {
+      const hotelName = bLines[0];
+      let addressParts = [];
+      let phone = "";
+
+      for (let j = 1; j < bLines.length; j++) {
+        const l = bLines[j];
+        if (/^t[ée]l\.?\s*:/i.test(l)) {
+          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+        } else {
+          addressParts.push(l);
+        }
+      }
+
       hotels.push({
-        name: fullHotelName,
-        city: "Étape du circuit",
-        rating: "Hôtel sélectionné",
-        checkIn: "Pendant le circuit",
-        phone: "",
-        address: fullHotelName,
-        description: "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-        photos: []
+        name: hotelName,
+        dates: datesStay,
+        city: addressParts[addressParts.length - 1] || "Étape du circuit",
+        address: addressParts.join(", ") || hotelName,
+        phone: phone,
+        lat: 0,
+        lng: 0,
+        notes: "Hôtel sélectionné par Voyages Girardot"
       });
     }
   }
 
-  // 4. Détection des Vols
-  const flightsList = [];
-  if (text.match(/vol|avion|aéroport|terminal|air\s*france|emirates|lufthansa/i)) {
-    flightsList.push({
-      type: "Aller",
-      airline: "Compagnie aérienne régulière",
-      flightNumber: "",
-      departureAirport: "Aéroport de départ",
-      departureTime: "",
-      arrivalAirport: "Aéroport d'arrivée",
-      arrivalTime: "",
-      date: "Jour 1",
-      via: "",
-      notes: "Présentation au comptoir avec passeport en cours de validité."
+  // Si le motif "du X au Y" n'a pas matché, recherche heuristique par mot-clé HOTEL
+  if (hotels.length === 0) {
+    const fallbackHotelRegex = /(?:hôtel|hotel|lodge|camp)\s+([A-ZÀ-Ý][\w\s'-]{3,35})/gi;
+    let fhMatch;
+    const foundNames = new Set();
+    while ((fhMatch = fallbackHotelRegex.exec(text)) !== null) {
+      const name = fhMatch[0].trim();
+      if (!foundNames.has(name) && name.length < 40) {
+        foundNames.add(name);
+        hotels.push({
+          name: name,
+          dates: "Pendant le circuit",
+          city: "Étape du circuit",
+          address: name,
+          phone: "",
+          lat: 0,
+          lng: 0,
+          notes: ""
+        });
+      }
+    }
+  }
+
+  // 4. Détection des Contacts (Guide local, Accompagnatrice, Urgences / Réceptif)
+  const contactsList = [];
+
+  // A. Accompagnatrice Girardot
+  const accompMatch = text.match(/Votre accompagnatrice\s*(?:Girardot)?\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)/i);
+  if (accompMatch) {
+    const accompName = accompMatch[1].trim();
+    contactsList.push({
+      category: "Accompagnatrice Girardot",
+      name: accompName,
+      phone: "",
+      address: "Avec le groupe sur le circuit",
+      isEmergency: false
     });
   }
 
-  // 5. Construction de l'objet Voyage final conforme
+  // B. Guide local
+  const guideMatch = text.match(/Votre guide local\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
+  if (guideMatch) {
+    contactsList.push({
+      category: "Guide Local",
+      name: guideMatch[1].trim(),
+      phone: guideMatch[2] ? guideMatch[2].trim() : "",
+      address: "Guide local francophone",
+      isEmergency: false
+    });
+  }
+
+  // C. Réceptif et Urgences
+  const receptifMatch = text.match(/(?:Au Mexique|Réceptif local|En France|Vos contacts)\s*[–-]?\s*([A-ZÀ-Ý\s&’']+)?\s*:\s*([\s\S]*?)(?=(?:Formalités|Bon à savoir|Assurance|$))/i);
+  if (receptifMatch) {
+    const rawContactBlock = receptifMatch[2].slice(0, 450);
+    const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
+    const mainPhone = phones[0] || "";
+    const contactNameMatch = rawContactBlock.match(/(?:Mme|M\.)\s+([A-Za-zÀ-Ý\s-]+)/);
+    const contactName = contactNameMatch ? contactNameMatch[0] : (receptifMatch[1] || "Correspondant Réceptif Local");
+
+    contactsList.push({
+      category: "Correspondant Réceptif & Urgence",
+      name: contactName.trim(),
+      phone: mainPhone,
+      address: "Assistance locale 24h/24",
+      isEmergency: true
+    });
+  }
+
+  // D. Assistance Girardot standard
+  contactsList.push({
+    category: "Assistance Girardot 24h/7j",
+    name: "Permanence Urgences Girardot",
+    phone: "03 85 42 82 50",
+    address: "Chalon-sur-Saône, France",
+    isEmergency: true
+  });
+
+  // 5. Détection des Vols (Aller / Retour avec numéros de vol, dates, aéroports, horaires)
+  const flightsList = [];
+  
+  // Bloc Aller
+  const outboundMatch = text.match(/Aller\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})([\s\S]*?)(?=Retour|$)/i);
+  if (outboundMatch) {
+    const outDate = outboundMatch[1];
+    const outBlock = outboundMatch[2];
+
+    const depAero = (outBlock.match(/D[ée]collage de l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
+    const arrAero = (outBlock.match(/A l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
+    const flightNum = (outBlock.match(/N°\s*de vol\s*:\s*(.*)/i) || [])[1] || "";
+    const depTime = (outBlock.match(/D[ée]collage pr[ée]vu [àa]\s*:\s*(.*)/i) || [])[1] || "";
+    const arrTime = (outBlock.match(/Arriv[ée]e pr[ée]vue [àa]\s*:\s*(.*)/i) || [])[1] || "";
+    const comp = (outBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
+    const meeting = (outBlock.match(/Heure de pr[ée]sentation\s*:\s*(.*)/i) || [])[1] || "";
+
+    flightsList.push({
+      type: "Aller",
+      airline: comp.trim(),
+      flightNumber: flightNum.trim(),
+      departureAirport: depAero.trim(),
+      departureTime: depTime.trim(),
+      arrivalAirport: arrAero.trim(),
+      arrivalTime: arrTime.trim(),
+      date: outDate.trim(),
+      via: "",
+      notes: meeting ? `Convocation à ${meeting.trim()}` : ""
+    });
+  }
+
+  // Bloc Retour
+  const inboundMatch = text.match(/Retour\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})([\s\S]*?)(?=Nous attirons|Bagages|Jour 1|$)/i);
+  if (inboundMatch) {
+    const inDate = inboundMatch[1];
+    const inBlock = inboundMatch[2];
+
+    const depAero = (inBlock.match(/D[ée]collage de l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
+    const arrAero = (inBlock.match(/A l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
+    const flightNum = (inBlock.match(/N°\s*de vol\s*:\s*(.*)/i) || [])[1] || "";
+    const depTime = (inBlock.match(/D[ée]collage pr[ée]vu [àa]\s*:\s*(.*)/i) || [])[1] || "";
+    const arrTime = (inBlock.match(/Arriv[ée]e pr[ée]vue [àa]\s*:\s*(.*)/i) || [])[1] || "";
+    const comp = (inBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
+
+    flightsList.push({
+      type: "Retour",
+      airline: comp.trim(),
+      flightNumber: flightNum.trim(),
+      departureAirport: depAero.trim(),
+      departureTime: depTime.trim(),
+      arrivalAirport: arrAero.trim(),
+      arrivalTime: arrTime.trim(),
+      date: inDate.trim(),
+      via: "",
+      notes: ""
+    });
+  }
+
+  // Si pas de bloc formaté détecté, créer au moins un vol générique si le mot vol apparaît
+  if (flightsList.length === 0 && text.match(/vol|avion|aéroport|terminal/i)) {
+    flightsList.push({
+      type: "Aller",
+      airline: "Compagnie régulière",
+      flightNumber: "",
+      departureAirport: "Paris",
+      departureTime: "",
+      arrivalAirport: detectedTitle,
+      arrivalTime: "",
+      date: "Jour 1",
+      via: "",
+      notes: ""
+    });
+  }
+
+  // 6. Objet Voyage Final
   const newTripId = 'voyage-' + Date.now();
   currentParsedTrip = {
     id: newTripId,
-    title: detectedTitle || "Nouveau Circuit Girardot",
-    subtitle: "Circuit exclusif Voyages Girardot",
-    dates: "Selon calendrier des départs",
+    title: detectedTitle || "Cocktail Mexicain",
+    subtitle: detectedSubtitle || "Circuit exclusif Voyages Girardot",
+    dates: detectedDates || "Du 11 au 23 novembre 2026",
     startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + (itinerary.length || 7) * 86400000).toISOString().split('T')[0],
-    coverImage: "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80",
+    endDate: new Date(Date.now() + (itinerary.length || 14) * 86400000).toISOString().split('T')[0],
+    coverImage: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?auto=format&fit=crop&w=1200&q=80",
     intro: text.slice(0, 320) + "...",
     alert: {
       title: "Formalités indispensables",
-      text: "Vérifier la validité de votre passeport biométrique et formalités sanitaires éventuelles avant départ.",
+      text: "Passeport biométrique valide 6 mois après la date de retour. Formulaire FMM à conserver précieusement.",
       link: ""
     },
     flightsList: flightsList,
@@ -4201,23 +4767,71 @@ function processExtractedTextToTrip(text, sourceName) {
     hotels: hotels,
     documents: [],
     freeTimeSuggestions: [],
+    contactsList: contactsList,
     practicalInfo: {
-      money: "Monnaie locale : Cartes de crédit acceptées. Prévoir des espèces pour les petits commerces.",
-      electricity: "Courant électrique standard. Prévoir un adaptateur universel.",
-      clothing: "Tenue confortable et chaussures de marche recommandées pour les visites de journée.",
-      tips: "Pourboires indicatifs : 2 à 3 €/jour/personne pour le guide et 1 € pour le chauffeur.",
-      wifi: "Wi-Fi disponible gratuitement dans la majorité des hôtels du circuit."
+      money: "Monnaie : Peso mexicain. Cartes de crédit acceptées. Prévoir des espèces pour les petits commerces.",
+      electricity: "110 volts. Prises à fiches plates américaines (prévoir un adaptateur).",
+      clothing: "Tenue d'été pour la côte, lainages pour les régions en altitude et la climatisation du car.",
+      tips: "Pourboires indicatifs : 3 € / jour / personne pour le guide et 2 € pour le chauffeur.",
+      wifi: "Wi-Fi disponible gratuitement dans les hôtels."
     },
-    contactsList: [
-      {
-        category: "Assistance Girardot 24h/7j",
-        name: "Permanence Urgences Girardot",
-        phone: "+33 3 85 00 00 00",
-        address: "Chalon-sur-Saône, France",
-        isEmergency: true
-      }
-    ]
+    driverDossier: {
+      busModel: "Autocar Grand Tourisme",
+      busCapacity: 50,
+      busPlanUrl: "",
+      busNotes: "Placement libre ou selon consignes de l'accompagnatrice.",
+      roomingList: [],
+      roomingFileUrl: "",
+      passengersList: []
+    }
   };
+
+  // Synchronisation rétrocompatible des objets flights et contacts
+  if (flightsList.length > 0) {
+    const outF = flightsList.find(f => f.type === 'Aller') || flightsList[0];
+    const inF = flightsList.find(f => f.type === 'Retour') || flightsList[flightsList.length - 1];
+    currentParsedTrip.flights = {
+      outbound: {
+        airline: outF.airline,
+        flightNumber: outF.flightNumber,
+        departureAirport: outF.departureAirport,
+        departureTime: outF.departureTime,
+        arrivalAirport: outF.arrivalAirport,
+        arrivalTime: outF.arrivalTime,
+        date: outF.date,
+        layover: outF.via,
+        meetingTime: outF.notes
+      },
+      inbound: {
+        airline: inF.airline,
+        flightNumber: inF.flightNumber,
+        departureAirport: inF.departureAirport,
+        departureTime: inF.departureTime,
+        arrivalAirport: inF.arrivalAirport,
+        arrivalTime: inF.arrivalTime,
+        date: inF.date,
+        layover: inF.via
+      },
+      domesticFlights: []
+    };
+  }
+
+  if (contactsList.length > 0) {
+    const mainRec = contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('urgence')) || contactsList[0];
+    currentParsedTrip.contacts = {
+      receptif: {
+        name: mainRec.name,
+        emergency: mainRec.phone,
+        phone: mainRec.phone,
+        address: mainRec.address
+      },
+      agence: {
+        name: "Voyages Girardot",
+        phone: "03 85 42 82 50",
+        email: "contact@voyages-girardot.com"
+      }
+    };
+  }
 
   // Affichage du résultat dans le modal
   if (statusEl) {
@@ -4225,16 +4839,18 @@ function processExtractedTextToTrip(text, sourceName) {
     statusEl.style.borderColor = '#86efac';
     statusEl.style.background = '#f0fdf4';
     statusEl.style.color = '#15803d';
-    statusEl.innerHTML = `<i class="fa-solid fa-check"></i> Conversion réussie ! <strong>${itinerary.length} étape(s)</strong> et <strong>${hotels.length} hébergement(s)</strong> détectés.`;
+    statusEl.innerHTML = `<i class="fa-solid fa-check"></i> <strong>Conversion réussie !</strong> ${itinerary.length} étape(s), ${hotels.length} hôtel(s), ${flightsList.length} vol(s) et ${contactsList.length} contact(s) reconnus.`;
   }
 
   if (previewBox && previewSummary) {
     previewBox.style.display = 'block';
     previewSummary.innerHTML = `
-      <div style="margin-bottom:6px;"><strong>Titre :</strong> ${currentParsedTrip.title}</div>
-      <div style="margin-bottom:6px;"><strong>Nombre de jours :</strong> ${itinerary.length} jours au programme</div>
-      <div style="margin-bottom:6px;"><strong>Étapes détectées :</strong> ${itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.city || d.title.slice(0, 20)}</span>`).join('')}</div>
-      ${hotels.length > 0 ? `<div><strong>Hôtels identifiés :</strong> ${hotels.map(h => h.name).join(', ')}</div>` : ''}
+      <div style="margin-bottom:6px;"><strong>Destination :</strong> ${currentParsedTrip.title} (${currentParsedTrip.subtitle})</div>
+      <div style="margin-bottom:6px;"><strong>Dates :</strong> ${currentParsedTrip.dates} • <strong>${itinerary.length} jours au programme</strong></div>
+      <div style="margin-bottom:6px;"><strong>Vols reconnus :</strong> ${flightsList.map(f => `${f.type}: ${f.airline} ${f.flightNumber} (${f.departureAirport} ➔ ${f.arrivalAirport})`).join(' | ')}</div>
+      <div style="margin-bottom:6px;"><strong>Hôtels avec adresses :</strong> ${hotels.map(h => `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${h.name} (${h.dates})</span>`).join('')}</div>
+      <div style="margin-bottom:6px;"><strong>Contacts identifiés :</strong> ${contactsList.map(c => `${c.category}: ${c.name} ${c.phone ? `(${c.phone})` : ''}`).join(' | ')}</div>
+      <div><strong>Étapes :</strong> ${itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.highlight || d.title.slice(0, 20)}</span>`).join('')}</div>
     `;
   }
 
