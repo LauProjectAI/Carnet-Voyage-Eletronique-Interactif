@@ -236,12 +236,12 @@ function loadTripData() {
       } catch (e) {}
     }
     // Vérifier si le voyage est présent dans les voyages préenregistrés du dossier voyages/
-    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam);
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam || t.alias === idParam || (t.aliases && t.aliases.includes(idParam)));
     if (foundPredefined && foundPredefined.file) {
       // Chargement synchrone ou par fetch
       try {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', foundPredefined.file, false); // Synchrone pour initialisation immédiate
+        xhr.open('GET', encodeURI(foundPredefined.file), false); // Synchrone pour initialisation immédiate
         xhr.send(null);
         if (xhr.status === 200 || xhr.status === 0) {
           currentTrip = JSON.parse(xhr.responseText);
@@ -381,10 +381,10 @@ function onClientTripSwitch(tripId) {
     return;
   }
 
-  // Si présent dans les voyages prédéfinis (Italie, San Francisco...)
-  const predefinedTrip = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId);
+  // Si présent dans les voyages prédéfinis (Italie, San Francisco, Chicago, Mexique...)
+  const predefinedTrip = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId || t.alias === tripId || (t.aliases && t.aliases.includes(tripId)));
   if (predefinedTrip && predefinedTrip.file) {
-    fetch(predefinedTrip.file)
+    fetch(encodeURI(predefinedTrip.file))
       .then(res => res.json())
       .then(data => {
         currentTrip = data;

@@ -117,10 +117,10 @@ function loadTripById(tripId) {
     return;
   }
 
-  // 3. Si c'est un voyage prédéfini dans le sous-dossier voyages/ (Italie, San Francisco...)
-  const predefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId);
+  // 3. Si c'est un voyage prédéfini dans le sous-dossier voyages/ (Italie, San Francisco, Chicago, Mexique...)
+  const predefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId || t.alias === tripId || (t.aliases && t.aliases.includes(tripId)));
   if (predefined && predefined.file) {
-    fetch(predefined.file)
+    fetch(encodeURI(predefined.file))
       .then(res => res.json())
       .then(data => {
         tripData = data;

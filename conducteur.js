@@ -35,11 +35,11 @@ function loadDriverTripData() {
       } catch (e) {}
     }
     // Vérifier si présent dans les voyages préenregistrés
-    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam);
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam || t.alias === idParam || (t.aliases && t.aliases.includes(idParam)));
     if (foundPredefined && foundPredefined.file) {
       try {
         const xhr = new XMLHttpRequest();
-        xhr.open('GET', foundPredefined.file, false);
+        xhr.open('GET', encodeURI(foundPredefined.file), false);
         xhr.send(null);
         if (xhr.status === 200 || xhr.status === 0) {
           driverTrip = JSON.parse(xhr.responseText);

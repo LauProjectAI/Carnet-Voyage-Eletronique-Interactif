@@ -1,6 +1,6 @@
 {
-  "id": "san-francisco",
-  "title": "Carnet San Francisco",
+  "id": "voyage-1791900707100",
+  "title": "San Francisco - Perso",
   "subtitle": "Voyage Famille",
   "dates": "13/02 au 21/02/2027",
   "startDate": "2026-10-13",
@@ -37,10 +37,10 @@
   },
   "contacts": {
     "receptif": {
-      "name": "GO TOURISM",
-      "emergency": "+27 (0)83 254 5813",
-      "phone": "+27 (0)83 254 5813",
-      "address": "P.O BOX 32076 Camps Bay, Cape Town 8040 - South Africa"
+      "name": "L'esprit San Francisco",
+      "emergency": "+1 415 283 6727",
+      "phone": "+1 415 283 6727",
+      "address": "San Francisco, CA 94117 USA"
     },
     "agence": {
       "name": "Voyages Girardot",
@@ -310,68 +310,7 @@
       ]
     }
   ],
-  "freeTimeSuggestions": [
-    {
-      "id": "s1",
-      "category": "Visite & Panorama",
-      "name": "Ascension de la Table Mountain (Montagne de la Table)",
-      "location": "Le Cap",
-      "description": "Prenez le téléphérique rotatif ou partez en balade pour admirer un panorama à 360° sur toute la baie du Cap et l'océan Atlantique. Incontournable lors d'une fin d'après-midi ensoleillée !",
-      "lat": -33.9573,
-      "lng": 18.4031,
-      "tips": "Vérifiez la météo avant de monter car la nappe de nuages (« la nappe ») peut recouvrir le sommet."
-    },
-    {
-      "id": "s2",
-      "category": "Visite & Nature",
-      "name": "Jardin Botanique National de Kirstenbosch",
-      "location": "Newlands, Le Cap",
-      "description": "L'un des plus beaux jardins botaniques au monde au pied du flanc oriental de la Montagne de la Table. Ne manquez pas la passerelle aérienne 'Centenary Tree Canopy Walkway' (Boomslang).",
-      "lat": -33.9877,
-      "lng": 18.4326,
-      "tips": "Idéal pour une promenade relaxante au milieu de la flore unique du Fynbos sud-africain."
-    },
-    {
-      "id": "s3",
-      "category": "Restaurant",
-      "name": "The Pot Luck Club",
-      "location": "The Old Biscuit Mill, Woodstock, Le Cap",
-      "description": "Restaurant gastronomique avec vue panoramique sur les toits. Cuisine créative sous forme de petites assiettes à partager, orchestrée par le chef Luke Dale-Roberts.",
-      "lat": -33.9275,
-      "lng": 18.4571,
-      "tips": "Réservation vivement recommandée plusieurs jours à l'avance."
-    },
-    {
-      "id": "s4",
-      "category": "Restaurant & Ambiance",
-      "name": "Gold Restaurant",
-      "location": "Green Point, Le Cap",
-      "description": "Expérience culinaire africaine immersive en 14 plats avec dégustations de spécialités de tout le continent, spectacles de percussion djembe et chants traditionnels.",
-      "lat": -33.9161,
-      "lng": 18.4182,
-      "tips": "Situé à seulement quelques minutes à pied de votre hôtel à Green Point !"
-    },
-    {
-      "id": "s5",
-      "category": "Balade & Shopping",
-      "name": "Victoria & Alfred Waterfront - The Watershed",
-      "location": "V&A Waterfront, Le Cap",
-      "description": "Un immense marché couvert dédié aux créateurs sud-africains : céramiques, bijoux artisanaux, cuir, textiles et œuvres d'art contemporain de grande qualité.",
-      "lat": -33.9056,
-      "lng": 18.4208,
-      "tips": "Parfait pour trouver des souvenirs authentiques tout en soutenant l'artisanat local."
-    },
-    {
-      "id": "s6",
-      "category": "Café & Détente",
-      "name": "Truth Coffee Roasting",
-      "location": "Buitenkant St, Le Cap",
-      "description": "Élu meilleur café au monde à plusieurs reprises par The Telegraph. Décoration rétrofuturiste 'steampunk' spectaculaire et cafés d'exception torréfiés sur place.",
-      "lat": -33.9282,
-      "lng": 18.4237,
-      "tips": "Commandez leur blend signature et un croissant chaud le matin."
-    }
-  ],
+  "freeTimeSuggestions": [],
   "conciergerie": {
     "welcomeMessage": "Bienvenue à San Francisco ! Je suis votre Concierge Voyage Girardot. Retrouvez vos adresses sélectionnées à proximité immédiate de Travelodge Fisherman's Wharf et pour votre temps libre dans la City by the Bay.",
     "themes": [
@@ -799,9 +738,9 @@
   "contactsList": [
     {
       "category": "Correspondant Local / Réceptif",
-      "name": "GO TOURISM",
-      "phone": "+27 (0)83 254 5813",
-      "address": "P.O BOX 32076 Camps Bay, Cape Town 8040 - South Africa",
+      "name": "L'esprit San Francisco",
+      "phone": "+1 415 283 6727",
+      "address": "San Francisco, CA 94117 USA",
       "isEmergency": true
     },
     {
@@ -813,15 +752,15 @@
     },
     {
       "category": "Consulat / Ambassade de France",
-      "name": "Ambassade de France en Afrique du Sud",
-      "phone": "+27 12 425 1600",
-      "address": "250 Melk Street, Nieuw Muckleneuk, Pretoria",
+      "name": "Consulat Général à San Francisco",
+      "phone": "+1 415-347-8557",
+      "address": "44 Montgomery St #3400, San Francisco, CA 94104",
       "isEmergency": false
     },
     {
       "category": "Assistance & Rapatriement",
       "name": "Assurance Multirisque & Rapatriement",
-      "phone": "",
+      "phone": "+33 1 55 98 88 17",
       "address": "",
       "isEmergency": true
     }
@@ -830,27 +769,91 @@
     {
       "title": "Monnaie & Devises",
       "icon": "coins",
-      "content": "Monnaie : Rand sud-africain (ZAR). Environ 1 ZAR = 0,05 €. Les cartes de crédit (Visa, Mastercard) sont acceptées presque partout."
+      "content": "Monnaie : Dollar US. Carte bancaire acceptée quasiment partout mais attention quelques boutiques ou commerces font de la résistance. Prévoir du liquide."
     },
     {
       "title": "Électricité & Prises",
       "icon": "plug",
-      "content": "Courant 220V. Prises de type M (trois grosses broches rondes). Prévoir un adaptateur adéquat ou disponible en réception."
+      "content": "Courant 110V. Prises de type 2 fiches plates. Prévoir un adaptateur adéquat ou disponible en réception."
     },
     {
       "title": "Vêtements conseillés",
       "icon": "shirt",
-      "content": "Tenue décontractée en journée, vêtements chauds/coupe-vent pour les safaris matinaux et les soirées. Couleurs neutres (kaki, beige) recommandées pour les safaris."
+      "content": "Tenue décontractée en journée, vêtements chauds/coupe-vent, la température et le climat peuvent changer rapidement. Risque de brouillard.  "
     },
     {
       "title": "Pourboires",
       "icon": "hand-holding-dollar",
-      "content": "Pourboires indicatifs : 2 €/jour/personne pour le guide, 1 €/jour/personne pour le chauffeur, 2 €/jour/personne pour les rangers lors des safaris."
+      "content": "Pourboires indicatifs : 10 à 20 % de l'addition."
     },
     {
       "title": "Connexion Wi-Fi",
       "icon": "wifi",
-      "content": "Disponible gratuitement dans tous les hôtels à la réception et généralement dans les chambres."
+      "content": "Disponible gratuitement dans tous les hôtels et dans les chambres."
     }
-  ]
+  ],
+  "driverDossier": {
+    "busModel": "Mercedes Tourismo 16 RHD • 53 Places",
+    "busCapacity": 53,
+    "busPlanUrl": "",
+    "busNotes": "1er rang réservé aux personnes sensibles au mal des transports.",
+    "roomingList": [
+      {
+        "roomNumber": "101",
+        "type": "Double (Grand Lit)",
+        "occupants": "M. & Mme Passager",
+        "notes": "Chambre calme côté jardin"
+      },
+      {
+        "roomNumber": "102",
+        "type": "Twin (2 lits séparés)",
+        "occupants": "M. Dupont / M. Martin",
+        "notes": "Régime sans gluten"
+      },
+      {
+        "roomNumber": "103",
+        "type": "Individuelle (Single)",
+        "occupants": "Mme Leroy",
+        "notes": ""
+      }
+    ],
+    "roomingFileUrl": "",
+    "passengersList": [
+      {
+        "name": "Passager Jean",
+        "pickup": "Chalon-sur-Saône (Gare)",
+        "phone": "+33 6 12 34 56 78",
+        "seatNumber": "3A",
+        "notes": ""
+      },
+      {
+        "name": "Passager Marie",
+        "pickup": "Chalon-sur-Saône (Gare)",
+        "phone": "+33 6 12 34 56 79",
+        "seatNumber": "3B",
+        "notes": ""
+      },
+      {
+        "name": "Dupont Alain",
+        "pickup": "Beaune (Péage)",
+        "phone": "+33 6 22 33 44 55",
+        "seatNumber": "5C",
+        "notes": "Végétarien"
+      },
+      {
+        "name": "Martin Bernard",
+        "pickup": "Beaune (Péage)",
+        "phone": "+33 6 33 44 55 66",
+        "seatNumber": "5D",
+        "notes": "Sans gluten"
+      },
+      {
+        "name": "Leroy Sophie",
+        "pickup": "Dijon (Palais des Congrès)",
+        "phone": "+33 6 98 76 54 32",
+        "seatNumber": "7A",
+        "notes": ""
+      }
+    ]
+  }
 }
