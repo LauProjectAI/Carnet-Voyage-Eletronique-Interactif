@@ -1,0 +1,743 @@
+{
+  "id": "voyage-1791552514414",
+  "title": "Chicago",
+  "subtitle": "Elan Chalon",
+  "dates": "23/02/2027 au 28/02/2027",
+  "startDate": "2026-10-09",
+  "endDate": "2026-10-16",
+  "coverImage": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Chicago_Skyline_Sunrise_March_15_2026_-_02.jpg/960px-Chicago_Skyline_Sunrise_March_15_2026_-_02.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+  "intro": "Chicago est la troisième plus grande ville des États-Unis et la plus grande ville de la région du Middle West. Bordée par la rive sud-ouest du lac Michigan, un des cinq Grands Lacs d'Amérique du Nord, Chicago est très régulièrement en haut des classements des plus belles et agréables villes au monde. Chicago est une ville à la fois cosmopolite, moderne, culturelle et résidentielle. Avec ses 77 quartiers, ses immenses gratte-ciels, ses 42 kilomètres de bord de lac, ses 26 plages ou encore ses 580 parcs et espaces verts, Chicago ne laisse personne indifférent.",
+  "alert": {
+    "title": "Formalité indispensable : Formulaire ESTA",
+    "text": "Formulaire ESTA obligatoire et disponible sur internet  Coût : 40$/personne à ce jour.",
+    "link": " https://esta.cbp.dhs.gov "
+  },
+  "flights": {
+    "outbound": {
+      "airline": "Air France",
+      "flightNumber": "AF066",
+      "departureAirport": "Paris CDG Terminal E2",
+      "departureTime": "14:00",
+      "arrivalAirport": "Chicago O Hare International 5",
+      "arrivalTime": "16:15",
+      "date": "23/02/2027",
+      "layover": ""
+    },
+    "inbound": {
+      "airline": "KLM",
+      "flightNumber": "KL612",
+      "departureAirport": "Chicago O Hare 5",
+      "departureTime": "16:25",
+      "arrivalAirport": "Paris CDG Terminal 2F",
+      "arrivalTime": "10:45",
+      "date": "27/02/2027",
+      "layover": "Escale à Amsterdam à 07h15. Redécollage à 09:20 sur vol AF1241"
+    },
+    "domesticFlights": []
+  },
+  "contacts": {
+    "receptif": {
+      "name": "CONTACT TOUR",
+      "emergency": "",
+      "phone": "",
+      "address": ""
+    },
+    "agence": {
+      "name": "Voyages Girardot",
+      "address": "Bourgogne-Franche-Comté, France",
+      "phone": "+33 (0)3 85 42 82 50",
+      "email": "contact@voyages-girardot.com"
+    },
+    "ambassade": {
+      "name": "Ambassade de France en Afrique du Sud",
+      "address": "250 Melk Street, Nieuw Muckleneuk, Pretoria",
+      "phone": "+27 12 425 1600"
+    },
+    "assistance": {
+      "name": "Assurance Multirisque & Rapatriement",
+      "details": "Reportez-vous à votre carte d'assistance remise avec votre carnet. En cas d'urgence médicale vitale, contacter immédiatement l'assureur avant engagement de frais majeurs."
+    }
+  },
+  "hotels": [
+    {
+      "id": "h1",
+      "name": "Hôtel Aloft by Marriott Chicago Downtown River North",
+      "dates": "Du 23 au 27 Février 2027",
+      "address": "515 North Clark Street, River North, Chicago, IL 60654, États-Unis",
+      "phone": "",
+      "lat": 41.8914658,
+      "lng": -87.6308226,
+      "notes": "Connexion Wi-Fi  - Restaurant sur place - Bouteilles d'eau gratuites"
+    }
+  ],
+  "itinerary": [
+    {
+      "day": 1,
+      "city": "Chicago",
+      "title": "Jour 1 • Votre région - Paris - Chicago",
+      "highlight": "Départ du circuit",
+      "dateStr": "Jour 1",
+      "weather": "Ensoleillé",
+      "description": "Rendez-vous à l'aéroport de Paris CDG. Assistance aux formalités et envol vers Chicago sur vol Air France ou similaire. Arrivée aux Etats Unis en fin de journée, transfert vers votre hôtel. Installation, dîner et logement.",
+      "timeline": [
+        {
+          "time": "10:00",
+          "title": "Accueil & Formalités",
+          "subtitle": "Rendez-vous avec votre guide accompagnateur.",
+          "icon": "plane-departure",
+          "address": ""
+        },
+        {
+          "time": "17:00",
+          "title": "Installation à votre hôtel",
+          "subtitle": "Détails et déroulé",
+          "address": "",
+          "lat": null,
+          "lng": null,
+          "icon": "location-dot"
+        },
+        {
+          "time": "20:00",
+          "title": "Dîner au Giordano's",
+          "subtitle": "Découvrez la spécialité locale : la deep dish pizza.",
+          "address": "",
+          "lat": null,
+          "lng": null,
+          "icon": "location-dot"
+        }
+      ],
+      "lat": 41.8755616,
+      "lng": -87.6244212,
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/6/61/Chicago_Skyline_Sunrise_March_15_2026_-_01.jpg/960px-Chicago_Skyline_Sunrise_March_15_2026_-_01.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    },
+    {
+      "day": 2,
+      "title": "Chicago",
+      "highlight": "Découverte",
+      "city": "Chicago The Loop",
+      "description": "Petit-déjeuner.\nLe matin visite guidée du Loop, cœur historique et architectural de la ville. Entre buildings emblématiques, histoire urbaine et trésors cachés, c'est la meilleure introduction à Chicago. Entrée au 360 Chicago Observation Deck.\nDéjeuner libre ainsi que le reste de la journée. Dîner libre.",
+      "lat": 41.8816094,
+      "lng": -87.6294574,
+      "timeline": [
+        {
+          "time": "09:00",
+          "title": "Visite guidée du Loop",
+          "subtitle": "Détails et déroulé",
+          "address": "",
+          "lat": null,
+          "lng": null,
+          "icon": "location-dot"
+        },
+        {
+          "time": "12:00",
+          "title": "Montée à la 360 Chicago Observation Desk",
+          "subtitle": "Détails et déroulé",
+          "address": "",
+          "lat": null,
+          "lng": null,
+          "icon": "location-dot"
+        }
+      ],
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/8/83/360_Chicago_View_007.jpg/960px-360_Chicago_View_007.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    },
+    {
+      "day": 3,
+      "title": "Chicago ",
+      "highlight": "Match NBA des Chicago Bulls",
+      "city": "Chicago United Center",
+      "description": "Petit-déjeuner. La matinée sera consacrée à une croisière sur la Chicago River. 1h30 de bateau, sur les canaux du centre-ville de Chicago, à admirer les buildings et à en apprendre davantage sur leurs architectures. En effet, de nombreux bâtiments emblématiques de la ville se trouvent en bordure de la Chicago River. Ce sont le cas notamment de le Reid, Aon Center, Wrigley Building, Merchandise Mart, du St. Regis Chicago ou encore du Civic Opera House. Ce tour permet de découvrir les 3 branches principales de la Chicago River. Avec notamment des passages sous le Northwestern Railway Bridge et le St. Charles Air Line Bridge.\nDéjeuner et reste de la journée libre. \nMatch NBA au United Center avec Fan Experience : assister à l'échauffement avant l'ouverture de la salle au public.\nDîner libre logement.",
+      "lat": 41.8806831,
+      "lng": -87.6741851,
+      "timeline": [
+        {
+          "time": "10:00",
+          "title": "Croisière Architecture",
+          "subtitle": "Détails et déroulé",
+          "address": "",
+          "lat": null,
+          "lng": null,
+          "icon": "location-dot"
+        },
+        {
+          "time": "17:00",
+          "title": "Match NBA Bulls Atlanta",
+          "subtitle": "Fan Experience : Assister au pré-shooting avant l'ouverture au public",
+          "address": "",
+          "lat": null,
+          "lng": null,
+          "icon": "location-dot"
+        }
+      ],
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/United_Center_pano.jpg/960px-United_Center_pano.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    },
+    {
+      "day": 4,
+      "title": "Chicago",
+      "highlight": "Découverte libre",
+      "city": "Chicago",
+      "description": "Petit-déjeuner.  Journée et repas libres. Logement.",
+      "lat": 41.8755616,
+      "lng": -87.6244212,
+      "timeline": [],
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Millennium_Park_Chicago_%283844497396%29.jpg/960px-Millennium_Park_Chicago_%283844497396%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    },
+    {
+      "day": 5,
+      "title": "Chicago",
+      "highlight": "Temps libre et vol retour",
+      "city": "Chicago",
+      "description": "Petit-déjeuner.  Petit-déjeuner. Matinée libre. Transfert en fin de matinée, début d'après-midi, assistance aux formalités. Envol à destination de Paris via Amsterdam. Dîner et nuit à bord.",
+      "lat": 41.8755616,
+      "lng": -87.6244212,
+      "timeline": [],
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/31/Navy_Pier_Drone_shot.jpg/960px-Navy_Pier_Drone_shot.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail"
+    },
+    {
+      "day": 6,
+      "title": "Amsterdam - Paris",
+      "highlight": "Retour région",
+      "city": "Amsterdam",
+      "description": "Arrivée à Amsterdam à 07h20. Redécollage à 09h20 et arrivée à Paris à .\nFin de nos prestations.",
+      "lat": null,
+      "lng": null,
+      "timeline": []
+    }
+  ],
+  "freeTimeSuggestions": [
+    {
+      "id": "s1",
+      "category": "Visite",
+      "name": "Three Dots & Dash",
+      "location": "435 N Clark St, Chicago",
+      "description": "Caché dans le sous-sol d’un immeuble ou dans une ancienne chambre d’hôtel, les speakeasies font partie des lieux les plus populaires de la ville de Chicago. Ces bars clandestins de l’ère de la prohibition, sont devenus des lieux de divertissement incontournables aux États-Unis. Chaque speakeasy a sa propre ambiance et ses propres codes. \nCelui-ci, à proximité immédiate de votre hôtel, vous propose un voyage exotique au travers de ses rhums et cocktails artisanaux. Profitez de son cadre tropical pour vous offrir une expérience extraordinaire.",
+      "lat": 41.8897924,
+      "lng": -87.6307013,
+      "tips": "",
+      "tag": "Speakeasy",
+      "address": "435 N Clark St, Chicago"
+    }
+  ],
+  "conciergerie": {
+    "welcomeMessage": "Bienvenue à Chicago ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre dans la Windy City ?",
+    "themes": [
+      {
+        "id": "resto",
+        "label": "Où bien manger ?",
+        "icon": "utensils",
+        "color": "#ea580c",
+        "description": "Tables gourmandes, spécialités africaines et rooftops d'exception sélectionnés par nos guides.",
+        "places": [
+          {
+            "name": "Lou Malnati's Pizzeria (River North)",
+            "category": "Deep Dish Pizza Authentique",
+            "location": "439 N Wells St, Chicago",
+            "tag": "Spécialité culte",
+            "phone": "+1 312-828-9800",
+            "bookingUrl": "https://www.loumalnatis.com",
+            "description": "La véritable Deep Dish Pizza de Chicago avec sa pâte au beurre croustillante, sa sauce tomate maison et sa mozzarella fondante.",
+            "tips": "Comptez 30 à 40 min de cuisson pour une vraie Deep Dish. Commandez-la dès votre arrivée à table.",
+            "lat": 41.8903,
+            "lng": -87.6343
+          },
+          {
+            "name": "Au Cheval",
+            "category": "Burger Gourmet & Brasserie",
+            "location": "800 W Randolph St, Chicago",
+            "tag": "Meilleur burger des USA",
+            "phone": "+1 312-929-4580",
+            "bookingUrl": "http://auchevaldiner.com",
+            "description": "Classé régulièrement meilleur cheeseburger d'Amérique (double patty croustillant, cheddar fondu, œuf au plat et bacon épais). Ambiance diner rétro branchée.",
+            "tips": "Ne prend pas de réservations. Venez dès l'ouverture à 11h ou en milieu d'après-midi pour limiter l'attente.",
+            "lat": 41.8841,
+            "lng": -87.6479
+          },
+          {
+            "name": "The Purple Pig",
+            "category": "Petites assiettes & Méditerranéen",
+            "location": "444 N Michigan Ave, Chicago",
+            "tag": "Sur la Magnificent Mile",
+            "phone": "+1 312-464-1744",
+            "bookingUrl": "https://thepurplepigchicago.com",
+            "description": "Institution primée au Michelin Bib Gourmand, célèbre pour ses spécialités méditerranéennes à partager, charcuteries artisanales et terrasse animée.",
+            "tips": "Idéal pour un déjeuner raffiné pendant votre shopping sur Michigan Avenue.",
+            "lat": 41.8906,
+            "lng": -87.6243
+          },
+          {
+            "name": "Gibsons Bar & Steakhouse",
+            "category": "Steakhouse Américain d'exception",
+            "location": "1028 N Rush St, Chicago",
+            "tag": "Classique légendaire",
+            "phone": "+1 312-266-8999",
+            "bookingUrl": "https://www.gibsonssteakhouse.com",
+            "description": "Le steakhouse le plus emblématique de Chicago : bœuf certifié Gibsons Prime Angus, portions généreuses, cocktails martini et ambiance vintage.",
+            "tips": "Pensez à réserver plusieurs jours à l'avance pour le service du soir.",
+            "lat": 41.9016,
+            "lng": -87.6277
+          },
+          {
+            "name": "Alinea",
+            "category": "Haute Gastronomie (3 Étoiles Michelin)",
+            "location": "1723 N Halsted St, Chicago",
+            "tag": "3 étoiles Michelin mondial",
+            "phone": "+1 312-867-0110",
+            "bookingUrl": "https://www.alinearestaurant.com",
+            "description": "Temple de la cuisine moderniste et moléculaire du Chef Grant Achatz. Une expérience multisensorielle inoubliable élue parmi les meilleures tables du monde.",
+            "tips": "Réservation indispensable plusieurs mois à l'avance via leur billetterie en ligne.",
+            "lat": 41.9134,
+            "lng": -87.6481
+          },
+          {
+            "name": "The Chicago Diner (Meat Free Since '83)",
+            "category": "Végétarien & Végane Gourmand",
+            "location": "3411 N Halsted St, Chicago",
+            "tag": "100% Végétarien & Végane",
+            "phone": "+1 773-935-6696",
+            "bookingUrl": "https://www.veggiediner.com",
+            "description": "Pionnier de la cuisine végétale à Chicago : version végane bluffante du sandwich Reuben, poutines végétales, burgers bios et milkshakes sans lactose récompensés.",
+            "tips": "Ne manquez pas leur célèbre milkshake au beurre de cacahuète végétal !",
+            "lat": 41.9442,
+            "lng": -87.6491
+          },
+          {
+            "name": "Duck Duck Goat (Chef Stephanie Izard)",
+            "category": "Cuisine Asiatique & Dim Sum créatifs",
+            "location": "857 W Fulton Market, Chicago",
+            "tag": "Saveurs asiatiques & Wok",
+            "phone": "+1 312-902-3825",
+            "bookingUrl": "https://www.duckduckgoatchicago.com",
+            "description": "Table asiatique vibrante au cœur du quartier branché de Fulton Market : nouilles fraîches tirées à la main, dumplings vapeur et canard laqué pékinois d'exception.",
+            "tips": "Commandez plusieurs dim sum à partager au centre de la table.",
+            "lat": 41.8867,
+            "lng": -87.6496
+          },
+          {
+            "name": "Shaw's Crab House",
+            "category": "Poissons, Huîtres & Fruits de mer frais",
+            "location": "21 E Hubbard St, Chicago",
+            "tag": "Fruits de mer & Oyster Bar",
+            "phone": "+1 312-527-2722",
+            "bookingUrl": "https://www.shawscrabhouse.com",
+            "description": "Bar à huîtres et restaurant de poissons haut de gamme style rétro : crabes royaux de l'Alaska, homards du Maine, sushis de maître et arrivages de l'Atlantique.",
+            "tips": "L'Oyster Bar côté taverne propose d'excellentes formules happy hour en fin d'après-midi.",
+            "lat": 41.8899,
+            "lng": -87.6271
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "visites",
+        "label": "Que visiter en temps libre ?",
+        "icon": "compass",
+        "color": "#059669",
+        "description": "Monuments, panoramas incontournables et trésors naturels hors des sentiers battus.",
+        "places": [
+          {
+            "name": "Art Institute of Chicago & Millenium Park",
+            "category": "Musée Mondial d'Art",
+            "location": "111 S Michigan Ave, Chicago",
+            "tag": "Chef-d'œuvre mondial",
+            "phone": "+1 312-443-3600",
+            "bookingUrl": "https://www.artic.edu",
+            "description": "L'un des plus grands musées du monde : célèbre collection impressionniste, peintures d'Edward Hopper, Grant Wood et statues modernes.",
+            "tips": "Passez voir la sculpture 'The Bean' (Cloud Gate) dans le parc attenant juste après.",
+            "lat": 41.8796,
+            "lng": -87.6237
+          },
+          {
+            "name": "Skydeck Chicago (Willis Tower - The Ledge)",
+            "category": "Panorama 360° & Boîtes de verre",
+            "location": "233 S Wacker Dr, Chicago",
+            "tag": "Vue à couper le souffle",
+            "phone": "+1 312-875-9696",
+            "bookingUrl": "https://theskydeck.com",
+            "description": "Montez au 103ème étage et marchez au-dessus du vide sur 'The Ledge', les balcons en verre surplombant la ville à 412 mètres.",
+            "tips": "Montez 1h avant le coucher du soleil pour profiter de la lumière dorée puis des lumières nocturnes.",
+            "lat": 41.8789,
+            "lng": -87.6359
+          },
+          {
+            "name": "Wrigley Field",
+            "category": "Recommandation locale",
+            "location": "1060 w. addison st, Chicago",
+            "tag": "Conseil Girardot",
+            "description": "Le stade des CUBS, club de baseball de la ville.",
+            "tips": "À ne pas manquer !",
+            "phone": "",
+            "bookingUrl": "mlb.com/cubs/",
+            "lat": 41.9481846,
+            "lng": -87.655559
+          },
+          {
+            "name": "Musée Field Histoire Naturelle",
+            "category": "Recommandation locale",
+            "location": "1400 S lake shore Chicago",
+            "tag": "Conseil Girardot",
+            "description": "un musée de renom car on y retrouve des pièces comme le plus grand fossile de tyrannosaure au monde ! Vous y découvrirez une grande variété de choses : plantes, animaux, cultures… ",
+            "tips": "À ne pas manquer !",
+            "phone": "",
+            "bookingUrl": "",
+            "lat": 41.8625774,
+            "lng": -87.618461
+          },
+          {
+            "name": "Navy Pier",
+            "category": "Recommandation locale",
+            "location": "Navy pier",
+            "tag": "Conseil Girardot",
+            "description": "Le Navy Pier est la jetée que l’on retrouve sur les rives du lac Michigan. Et comme souvent aux États-Unis, dès qu’il y a une jetée, il y a un parc d’attraction ! C’est un endroit très sympa pour se balader et admirer la vue sur la skyline et pourquoi pas se laisser aller à faire quelques attractions.\n\nOn y retrouve aussi des attractions culturelles et quelques musées tels que le Chicago Children’s Museum mais aussi de nombreux restaurants et bars.",
+            "tips": "À ne pas manquer !",
+            "phone": "",
+            "bookingUrl": "",
+            "lat": 32.7141678,
+            "lng": -117.173889
+          },
+          {
+            "name": "Millennium Park",
+            "category": "Recommandation locale",
+            "location": "Millennium Park",
+            "tag": "Conseil Girardot",
+            "description": "Si l’on ne devait retenir qu’un seul symbole de Chicago, on choisirait le « bean ». Cette sculpture artistique, de son vrai nom le Cloud Gate, est surnommée le bean en raison de sa forme semblable à un haricot.\n\nC’est à Millennium Park que l’on peut l’admirer, le plus grand parc de la ville, situé dans le quartier du Loop. Ce parc spectaculaire vous donne non seulement une super vue depuis la skyline mais on y retrouve également de nombreux jardins, fontaines, ponts, galeries d’art et même une piscine, une patinoire et un théâtre. De nombreux événements, festivals et concerts en font un agréable parc dans lequel se balader.",
+            "tips": "À ne pas manquer !",
+            "phone": "",
+            "bookingUrl": "",
+            "lat": 41.8825754,
+            "lng": -87.6225361
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "shopping",
+        "label": "Boutiques & Souvenirs locaux",
+        "icon": "bag-shopping",
+        "color": "#c29958",
+        "description": "Artisanat d'art, marchés authentiques, épiceries fines et créateurs sud-africains.",
+        "places": [
+          {
+            "name": "The Magnificent Mile (Michigan Avenue)",
+            "category": "Avenue commerçante mythique",
+            "location": "North Michigan Ave, Chicago",
+            "tag": "Grands magasins & Boutiques",
+            "phone": "",
+            "bookingUrl": "https://www.themagnificentmile.com",
+            "description": "Plus de 450 boutiques, grands magasins prestigieux (Nordstrom, Macy's) et galeries marchandes au cœur de la ville.",
+            "tips": "Flânez du pont de la rivière Chicago jusqu'à la Water Tower historique.",
+            "lat": 41.8968,
+            "lng": -87.6243
+          },
+          {
+            "name": "Water Tower Place",
+            "category": "Centre commercial historique sur 8 étages",
+            "location": "835 N Michigan Ave, Chicago",
+            "tag": "Mode & Souvenirs",
+            "phone": "+1 312-440-3166",
+            "bookingUrl": "https://www.shopwatertower.com",
+            "description": "Complexe commercial iconique abritant des marques américaines exclusives, boutiques de souvenirs et espaces gourmands.",
+            "tips": "Parfait en cas de météo fraîche ou pluvieuse pour faire du shopping à l'abri.",
+            "lat": 41.8979,
+            "lng": -87.6234
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "pratique",
+        "label": "Bureaux de change, Banques & Santé",
+        "icon": "landmark",
+        "color": "#2563eb",
+        "description": "Distributeurs fiables, bureaux de change certifiés, pharmacies et supermarchés de proximité.",
+        "places": [
+          {
+            "name": "Chase Bank & ATM Loop Michigan",
+            "category": "Distributeur automatique de billets (DAB)",
+            "location": "10 S Dearborn St / Michigan Ave, Chicago",
+            "tag": "Sécurisé 24/7",
+            "phone": "+1 312-732-4000",
+            "bookingUrl": "",
+            "description": "Agence bancaire principale avec DAB acceptant toutes cartes internationales (Visa, Mastercard).",
+            "tips": "Privilégiez les DAB situés dans les sas intérieurs sécurisés des agences bancaires.",
+            "lat": 41.8818,
+            "lng": -87.6298
+          },
+          {
+            "name": "Walgreens Pharmacy & Convenience Store",
+            "category": "Pharmacie & Dépannage quotidien",
+            "location": "151 N State St, Chicago",
+            "tag": "Ouvert tard",
+            "phone": "+1 312-863-4249",
+            "bookingUrl": "",
+            "description": "Grande enseigne américaine regroupant pharmacie de soins, produits de parapharmacie, adaptateurs électriques et snacks frais.",
+            "tips": "Idéal pour trouver de l'eau minérale, des pansements ou des souvenirs de Chicago à petits prix.",
+            "lat": 41.8845,
+            "lng": -87.6278
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "detente",
+        "label": "Bars branchés, Cafés & Rooftops",
+        "icon": "martini-glass",
+        "color": "#9333ea",
+        "description": "Prendre un verre face au coucher de soleil sur l'Atlantique ou savourer un café d'exception.",
+        "places": [
+          {
+            "name": "Cindy's Rooftop (Chicago Athletic Association)",
+            "category": "Rooftop panoramique face au lac",
+            "location": "12 S Michigan Ave, Chicago",
+            "tag": "Vue époustouflante sur Millennium Park",
+            "phone": "+1 312-792-3502",
+            "bookingUrl": "https://www.cindysrooftop.com",
+            "description": "Terrasse sous verrière spectaculaire offrant une vue plongeante sur 'The Bean', le Millennium Park et le lac Michigan. Cocktails signature d'exception.",
+            "tips": "Arrivez tôt en fin d'après-midi pour profiter de la lumière du coucher de soleil sur le parc.",
+            "lat": 41.8817,
+            "lng": -87.6247
+          },
+          {
+            "name": "Green Mill Cocktail Lounge",
+            "category": "Club de Jazz Historique (Al Capone)",
+            "location": "4802 N Broadway, Chicago",
+            "tag": "Histoire & Jazz live",
+            "phone": "+1 773-878-5552",
+            "bookingUrl": "https://greenmilljazz.com",
+            "description": "Le bar de jazz le plus légendaire des États-Unis, ancien repaire d'Al Capone conservé dans son décor des années 1930 avec concerts live chaque soir.",
+            "tips": "Paiement en espèces (Cash only). Venez tôt pour avoir une place assise.",
+            "lat": 41.9692,
+            "lng": -87.6598
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "transports",
+        "enabled": true,
+        "label": "Transports & Déplacements urbains",
+        "icon": "taxi",
+        "color": "#0891b2",
+        "description": "Taxis officiels, VTC sécurisés, bus MyCiTi et conseils de mobilité urbaine dans la ville.",
+        "places": [
+          {
+            "name": "Carte officielle & Horaires en direct CTA",
+            "category": "Réseau Métro & Bus de Chicago",
+            "location": "Ensemble de la métropole de Chicago",
+            "tag": "Plan officiel & Tarifs",
+            "phone": "+1 888-968-7282",
+            "bookingUrl": "https://www.transitchicago.com/maps/",
+            "description": "Accédez au plan officiel complet interactif du métro aérien 'L' et des lignes de bus de Chicago avec calcul d'itinéraire en temps réel.",
+            "tips": "Téléchargez l'application Ventra pour suivre l'arrivée des rames à la minute près.",
+            "lat": 41.8818,
+            "lng": -87.6298
+          },
+          {
+            "name": "VTC Uber & Lyft (Chicago)",
+            "category": "VTC avec chauffeur 24/7",
+            "location": "Disponible partout immédiatement",
+            "tag": "Rapide & Prix fixé",
+            "phone": "",
+            "bookingUrl": "https://www.uber.com/global/fr/cities/chicago/",
+            "description": "Les deux géants du VTC américain sont omniprésents à Chicago. Temps d'attente moyen inférieur à 3 minutes dans tout le centre.",
+            "tips": "Application indispensable pour rentrer le soir. Le tarif est débité automatiquement sans pourboire obligatoire en cash.",
+            "lat": 41.8845,
+            "lng": -87.6278
+          },
+          {
+            "name": "CURB Chicago Taxis (Taxis officiels Jaunes & Verts)",
+            "category": "Compagnie de Taxis Officiels Agréés",
+            "location": "Gares, hôtels, aéroports et maraude en rue",
+            "tag": "Taxis officiels de la ville",
+            "phone": "+1 312-829-4222",
+            "bookingUrl": "https://www.gocurb.com/cities/chicago",
+            "description": "Plus de 3 000 taxis agréés par la ville de Chicago. Hélables d'un geste de la main dans la rue (voyant lumineux allumé sur le toit) ou réservables via l'application CURB.",
+            "tips": "Tous les taxis acceptent obligatoirement la carte bancaire. Compteur officiel affiché sur l'écran du tableau de bord.",
+            "lat": 41.8837,
+            "lng": -87.6324
+          },
+          {
+            "name": "Water Taxi Chicago (Bateaux-Bus sur la rivière)",
+            "category": "Navette fluviale panoramique",
+            "location": "Quais de Michigan Ave, Willis Tower et Chinatown",
+            "tag": "Trajet ludique & panoramique",
+            "phone": "+1 312-337-1446",
+            "bookingUrl": "https://www.chicagowatertaxi.com",
+            "description": "Navettes fluviales jaunes reliant les grands pôles de la ville sur la rivière Chicago. Moyen magique et sans embouteillage pour rejoindre Chinatown ou la Willis Tower.",
+            "tips": "Billet simple à 6 $ ou pass journée à 10 $. Très agréable entre avril et novembre.",
+            "lat": 41.889,
+            "lng": -87.6235
+          },
+          {
+            "name": "Divvy Bikes (Vélos en libre-service & Électriques)",
+            "category": "Vélos en libre-service (Bikeshare)",
+            "location": "Plus de 600 stations dans toute la ville",
+            "tag": "Pistes cyclables du lac",
+            "phone": "+1 855-553-4889",
+            "bookingUrl": "https://divvybikes.com",
+            "description": "Le système de vélos partagés de la ville. Idéal pour parcourir les 30 kilomètres de pistes cyclables aménagées du 'Lakefront Trail' au bord du lac Michigan.",
+            "tips": "Déverrouillage directement depuis l'application Lyft ou Divvy.",
+            "lat": 41.8817,
+            "lng": -87.6247
+          }
+        ],
+        "transitMapUrl": "https://www.transitchicago.com/maps/",
+        "transitMapImageUrl": "assets/chicago-metro-map.svg",
+        "guideHtml": "\n          <strong>🚇 Comment utiliser les transports à Chicago (Réseau CTA - Métro 'L' & Bus) :</strong><br>\n          • <strong>Le Métro 'L' (Elevated Train) :</strong> 8 lignes identifiées par des couleurs (Red, Blue, Brown, Green...). Toutes convergent vers le centre historique (The Loop). Les lignes Blue et Orange relient directement les aéroports O'Hare et Midway au centre-ville.<br>\n          • <strong>Acheter son titre & Payer sans contact :</strong> Vous pouvez payer <em>directement</em> aux portillons du métro et à bord des bus en posant votre <strong>carte bancaire sans contact</strong> (ou Apple Pay / Google Pay sur smartphone). Tarif : 2,50 $ par trajet en métro, 2,25 $ en bus.<br>\n          • <strong>Pass Illimités Ventra (Très économiques) :</strong><br>\n          &nbsp;&nbsp;- <strong>1-Day CTA Pass :</strong> 5,00 $ (trajets illimités bus + métro pendant 24h)<br>\n          &nbsp;&nbsp;- <strong>3-Day CTA Pass :</strong> 15,00 $ (idéal pour un séjour week-end/court circuit)<br>\n          &nbsp;&nbsp;- <strong>7-Day CTA Pass :</strong> 20,00 $ (le meilleur rapport qualité/prix de la ville)<br>\n          Ces pass s'achètent en 1 minute sur les bornes automatiques tactiles <em>Ventra</em> présentes dans chaque station de métro (CB acceptée) ou directement sur l'application mobile gratuite <em>Ventra App</em>.<br>\n          • <strong>En bus :</strong> Montez obligatoirement par la porte avant et validez votre pass ou carte sans contact sur le lecteur du chauffeur.\n        "
+      }
+    ]
+  },
+  "practicalInfo": {
+    "money": "Monnaie : Dollar US. Les cartes de crédit (Visa, Mastercard) sont acceptées partout.",
+    "electricity": "Courant 220V. Prises de type M (trois grosses broches rondes). Prévoir un adaptateur adéquat ou disponible en réception.",
+    "clothing": "Tenue décontractée en journée, vêtements chauds/coupe-vent.",
+    "tips": "Pourboires inclus dans votre tarif hors prestations annexes. Au restaurant une base de 10% de la note est la norme.",
+    "wifi": "Disponible gratuitement dans tous les hôtels à la réception et généralement dans les chambres."
+  },
+  "flightsList": [
+    {
+      "type": "Aller",
+      "airline": "Air France",
+      "flightNumber": "AF066",
+      "departureAirport": "Paris CDG Terminal E2",
+      "departureTime": "14:00",
+      "arrivalAirport": "Chicago O Hare International 5",
+      "arrivalTime": "16:15",
+      "date": "23/02/2027",
+      "via": "",
+      "notes": "Rendez-vous au comptoir d'enregistrement Air France à 11:00"
+    },
+    {
+      "type": "Retour",
+      "airline": "KLM",
+      "flightNumber": "KL612",
+      "departureAirport": "Chicago O Hare 5",
+      "departureTime": "16:25",
+      "arrivalAirport": "Paris CDG Terminal 2F",
+      "arrivalTime": "10:45",
+      "date": "27/02/2027",
+      "via": "Escale à Amsterdam à 07h15. Redécollage à 09:20 sur vol AF1241",
+      "notes": ""
+    }
+  ],
+  "driverDossier": {
+    "busModel": "Mercedes Tourismo 16 RHD • 53 Places",
+    "busCapacity": 53,
+    "busPlanUrl": "",
+    "busNotes": "1er rang réservé aux personnes sensibles au mal des transports.",
+    "roomingList": [
+      {
+        "roomNumber": "101",
+        "type": "Double (Grand Lit)",
+        "occupants": "M. & Mme Passager",
+        "notes": "Chambre calme côté jardin"
+      },
+      {
+        "roomNumber": "102",
+        "type": "Twin (2 lits séparés)",
+        "occupants": "M. Dupont / M. Martin",
+        "notes": "Régime sans gluten"
+      },
+      {
+        "roomNumber": "103",
+        "type": "Individuelle (Single)",
+        "occupants": "Mme Leroy",
+        "notes": ""
+      }
+    ],
+    "roomingFileUrl": "",
+    "passengersList": [
+      {
+        "name": "Passager Jean",
+        "pickup": "Chalon-sur-Saône (Gare)",
+        "phone": "+33 6 12 34 56 78",
+        "seatNumber": "3A",
+        "notes": ""
+      },
+      {
+        "name": "Passager Marie",
+        "pickup": "Chalon-sur-Saône (Gare)",
+        "phone": "+33 6 12 34 56 79",
+        "seatNumber": "3B",
+        "notes": ""
+      },
+      {
+        "name": "Dupont Alain",
+        "pickup": "Beaune (Péage)",
+        "phone": "+33 6 22 33 44 55",
+        "seatNumber": "5C",
+        "notes": "Végétarien"
+      },
+      {
+        "name": "Martin Bernard",
+        "pickup": "Beaune (Péage)",
+        "phone": "+33 6 33 44 55 66",
+        "seatNumber": "5D",
+        "notes": "Sans gluten"
+      },
+      {
+        "name": "Leroy Sophie",
+        "pickup": "Dijon (Palais des Congrès)",
+        "phone": "+33 6 98 76 54 32",
+        "seatNumber": "7A",
+        "notes": ""
+      }
+    ]
+  },
+  "documents": [],
+  "contactsList": [
+    {
+      "category": "Correspondant Local / Réceptif",
+      "name": "CONTACT TOUR",
+      "phone": "",
+      "address": "",
+      "isEmergency": true
+    },
+    {
+      "category": "Agence Voyages Girardot",
+      "name": "Voyages Girardot",
+      "phone": "+33 (0)3 85 42 82 50",
+      "address": "Bourgogne-Franche-Comté, France",
+      "isEmergency": false
+    },
+    {
+      "category": "Consulat / Ambassade de France",
+      "name": "Consulat de France à Chicago",
+      "phone": "+1 312-635-6631",
+      "address": "205 N Michigan Ave #3700, Chicago, IL 60601",
+      "isEmergency": false
+    },
+    {
+      "category": "Assistance & Rapatriement",
+      "name": "Assurance Multirisque & Rapatriement",
+      "phone": "",
+      "address": "",
+      "isEmergency": true
+    }
+  ],
+  "practicalTipsList": [
+    {
+      "title": "Monnaie & Devises",
+      "icon": "coins",
+      "content": "Monnaie : Dollar US. Les cartes de crédit (Visa, Mastercard) sont acceptées partout."
+    },
+    {
+      "title": "Électricité & Prises",
+      "icon": "plug",
+      "content": "Courant 110V. Prises de type 2 fiches plates. Prévoir un adaptateur adéquat."
+    },
+    {
+      "title": "Vêtements conseillés",
+      "icon": "shirt",
+      "content": "Vêtements chauds/coupe-vent, la ville est réputée pour son vent. "
+    },
+    {
+      "title": "Pourboires",
+      "icon": "hand-holding-dollar",
+      "content": "Pourboires inclus dans votre tarif hors prestations annexes. Au restaurant une base entre 10% et 15% de la note est la norme."
+    },
+    {
+      "title": "Connexion Wi-Fi",
+      "icon": "wifi",
+      "content": "Disponible gratuitement dans l'hôtel à la réception et dans les chambres."
+    }
+  ]
+}
