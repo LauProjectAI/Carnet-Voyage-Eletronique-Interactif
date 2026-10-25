@@ -166,7 +166,10 @@
         </h1>
         <p style="font-size:0.85rem; color:#64748b;">Espace d'administration Voyages Girardot — Créez et personnalisez vos carnets clients sans coder.</p>
       </div>
-      <div>
+      <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" onclick="openGitHubConfigModal()" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
+          <i class="fa-brands fa-github"></i> <span id="github-status-indicator">Synchro GitHub</span>
+        </button>
         <a href="index.html" target="_blank" class="btn-secondary" style="text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
           <i class="fa-solid fa-eye"></i> Voir le carnet client
         </a>
@@ -606,6 +609,9 @@
         <button type="button" onclick="saveAllCarnet()" class="btn-save-main" style="padding:10px 20px; font-size:0.9rem;">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer
         </button>
+        <button type="button" onclick="saveTripDirectToGitHub()" class="btn-save-main" style="background:#0f172a; color:#38bdf8; padding:10px 18px; font-size:0.9rem; border:1px solid #334155;" title="Enregistrer et publier directement ce voyage dans voyages/ sur GitHub">
+          <i class="fa-brands fa-github"></i> Publier sur GitHub
+        </button>
       </div>
 
     </form>
@@ -719,5 +725,62 @@
   <script src="voyages/index_voyages.js"></script>
   <script src="data.js"></script>
   <script src="admin.js"></script>
+
+  <!-- MODALE CONFIGURATION & SYNCHRO GITHUB API -->
+  <div id="github-config-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); z-index:99999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:white; border-radius:18px; width:100%; max-width:540px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+      <div style="padding:16px 20px; background:#0f172a; color:white; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <i class="fa-brands fa-github" style="font-size:1.4rem; color:#38bdf8;"></i>
+          <div>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:white;">Connexion API GitHub</h3>
+            <p style="margin:0; font-size:0.75rem; color:#94a3b8;">Publication directe des voyages dans voyages/ sans passer par un terminal</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeGitHubConfigModal()" style="background:none; border:none; color:#94a3b8; font-size:1.3rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <div style="padding:20px;">
+        <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:12px 14px; font-size:0.82rem; color:#0369a1; margin-bottom:16px;">
+          <i class="fa-solid fa-circle-info"></i> Votre jeton GitHub (Personal Access Token) permet d'enregistrer et de mettre a jour les voyages directement sur votre dépôt GitHub. Il est mémorisé uniquement dans ce navigateur.
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-size:0.82rem; font-weight:700;">Dépôt GitHub :</label>
+          <input type="text" id="gh-repo" class="form-control" value="LauProjectAI/Carnet-Voyage-Eletronique-Interactif" placeholder="proprietaire/nom-depot">
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-size:0.82rem; font-weight:700;">Branche :</label>
+          <input type="text" id="gh-branch" class="form-control" value="main">
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-size:0.82rem; font-weight:700;">GitHub Personal Access Token (PAT) :</label>
+          <input type="password" id="gh-token" class="form-control" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+          <small style="font-size:0.75rem; color:#64748b; display:block; margin-top:4px;">
+            Générable dans <em>GitHub &gt; Settings &gt; Developer Settings &gt; Personal access tokens</em> avec la permission <code>repo</code>.
+          </small>
+        </div>
+
+        <div id="gh-test-feedback" style="font-size:0.82rem; font-weight:bold; margin-top:10px;"></div>
+      </div>
+
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" onclick="disconnectGitHub()" class="btn-secondary" style="color:#dc2626; border-color:#fca5a5; font-size:0.8rem;">
+          Effacer la clé
+        </button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="testGitHubConnection()" class="btn-secondary" style="font-size:0.82rem;">
+            Tester
+          </button>
+          <button type="button" onclick="saveGitHubConfig()" class="btn-save-main" style="font-size:0.85rem; padding:8px 18px;">
+            Sauvegarder
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>

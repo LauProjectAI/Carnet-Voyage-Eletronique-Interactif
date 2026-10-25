@@ -84,6 +84,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initMultiTripSystem();
   populateForm();
   updateShareLink();
+  updateGitHubStatusIndicator();
 });
 
 // Récupération de l'index des voyages enregistrés
@@ -3973,134 +3974,7 @@ function updatePracticalField(idx, field, value) {
 // ENREGISTREMENT COMPLET ET PARTAGE
 // -----------------------------------------------------------------------------
 function saveAllCarnet() {
-  // Update general fields
-  let rawTitle = document.getElementById('adm-title').value.trim();
-  if (!rawTitle) {
-    const asked = prompt("Veuillez donner un nom à votre carnet de voyage (il servira aussi à nommer le fichier .json) :");
-    if (!asked || !asked.trim()) return;
-    rawTitle = asked.trim();
-    document.getElementById('adm-title').value = rawTitle;
-  }
-
-  tripData.title = rawTitle;
-  tripData.id = slugifyTitle(rawTitle);
-  tripData.subtitle = document.getElementById('adm-subtitle').value;
-  tripData.dates = document.getElementById('adm-dates').value;
-  tripData.coverImage = document.getElementById('adm-cover').value;
-  tripData.intro = document.getElementById('adm-intro').value;
-
-  // Alert
-  tripData.alert = {
-    title: document.getElementById('adm-alert-title').value,
-    text: document.getElementById('adm-alert-text').value,
-    link: document.getElementById('adm-alert-link').value
-  };
-
-  // Synchronisation directe et garantie de l'itinéraire depuis les champs du formulaire
-  if (tripData.itinerary && Array.isArray(tripData.itinerary)) {
-    tripData.itinerary.forEach((day, dayIndex) => {
-      const latInput = document.getElementById(`day-lat-${dayIndex}`);
-      const lngInput = document.getElementById(`day-lng-${dayIndex}`);
-      if (latInput && latInput.value !== '') {
-        const parsedLat = parseFloat(latInput.value);
-        if (!isNaN(parsedLat)) day.lat = parsedLat;
-      }
-      if (lngInput && lngInput.value !== '') {
-        const parsedLng = parseFloat(lngInput.value);
-        if (!isNaN(parsedLng)) day.lng = parsedLng;
-      }
-
-      // Synchroniser également les visites
-      if (day.timeline && Array.isArray(day.timeline)) {
-        day.timeline.forEach((v, vIdx) => {
-          const vLatInp = document.getElementById(`visit-lat-${dayIndex}-${vIdx}`);
-          const vLngInp = document.getElementById(`visit-lng-${dayIndex}-${vIdx}`);
-          const vAddrInp = document.getElementById(`visit-addr-${dayIndex}-${vIdx}`);
-          if (vLatInp && vLatInp.value !== '') {
-            const p = parseFloat(vLatInp.value);
-            if (!isNaN(p)) v.lat = p;
-          }
-          if (vLngInp && vLngInp.value !== '') {
-            const p = parseFloat(vLngInp.value);
-            if (!isNaN(p)) v.lng = p;
-          }
-          if (vAddrInp) v.address = vAddrInp.value;
-        });
-      }
-    });
-  }
-
-  // Synchronisation directe des coordonnées et adresses de la conciergerie
-  if (tripData.conciergerie && tripData.conciergerie.themes) {
-    tripData.conciergerie.themes.forEach((th, thIdx) => {
-      if (th.places && Array.isArray(th.places)) {
-        th.places.forEach((p, pIdx) => {
-          const pAddrInp = document.getElementById(`place-addr-${thIdx}-${pIdx}`);
-          const pLatInp = document.getElementById(`place-lat-${thIdx}-${pIdx}`);
-          const pLngInp = document.getElementById(`place-lng-${thIdx}-${pIdx}`);
-          if (pAddrInp && pAddrInp.value !== '') p.location = pAddrInp.value;
-          if (pLatInp && pLatInp.value !== '') {
-            const pLat = parseFloat(pLatInp.value);
-            if (!isNaN(pLat)) p.lat = pLat;
-          }
-          if (pLngInp && pLngInp.value !== '') {
-            const pLng = parseFloat(pLngInp.value);
-            if (!isNaN(pLng)) p.lng = pLng;
-          }
-        });
-      }
-    });
-  }
-
-  // Synchronisation rétrocompatible de l'objet flights
-  if (tripData.flightsList && tripData.flightsList.length > 0) {
-    const outboundFlight = tripData.flightsList.find(f => f.type === 'Aller') || tripData.flightsList[0];
-    const inboundFlight = tripData.flightsList.find(f => f.type === 'Retour') || tripData.flightsList[tripData.flightsList.length - 1];
-    
-    tripData.flights = {
-      outbound: {
-        airline: outboundFlight.airline,
-        flightNumber: outboundFlight.flightNumber,
-        departureAirport: outboundFlight.departureAirport,
-        departureTime: outboundFlight.departureTime,
-        arrivalAirport: outboundFlight.arrivalAirport,
-        arrivalTime: outboundFlight.arrivalTime,
-        date: outboundFlight.date,
-        layover: outboundFlight.via
-      },
-      inbound: {
-        airline: inboundFlight.airline,
-        flightNumber: inboundFlight.flightNumber,
-        departureAirport: inboundFlight.departureAirport,
-        departureTime: inboundFlight.departureTime,
-        arrivalAirport: inboundFlight.arrivalAirport,
-        arrivalTime: inboundFlight.arrivalTime,
-        date: inboundFlight.date,
-        layover: inboundFlight.via
-      },
-      domesticFlights: tripData.flightsList.filter(f => f.type === 'Intérieur').map((df, i) => ({
-        id: `dom-${i+1}`,
-        label: `${df.airline} ${df.flightNumber}`,
-        airline: df.airline,
-        flightNumber: df.flightNumber,
-        departureAirport: df.departureAirport,
-        arrivalAirport: df.arrivalAirport,
-        notes: df.notes || df.via || ''
-      }))
-    };
-  }
-
-  // Synchronisation rétrocompatible des contacts
-  if (tripData.contactsList && tripData.contactsList.length > 0) {
-    const mainRec = tripData.contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('local')) || tripData.contactsList[0];
-    if (!tripData.contacts) tripData.contacts = {};
-    tripData.contacts.receptif = {
-      name: mainRec.name,
-      emergency: mainRec.phone,
-      phone: mainRec.phone,
-      address: mainRec.address
-    };
-  }
+  if (!syncFormDataIntoTrip()) return;
 
   // Save to LocalStorage & Catalog
   saveTripToCatalogAndStorage(tripData);
@@ -4111,7 +3985,7 @@ function saveAllCarnet() {
   // Update direct share link
   updateShareLink();
 
-  alert(`✓ Le carnet de voyage "${tripData.title}" a été enregistré avec succès ! Vos clients et l'espace administrateur le retrouveront à tout moment.`);
+  alert(`✓ Le carnet de voyage "${tripData.title}" a été enregistré localement avec succès ! Pour le rendre accessible en ligne à vos voyageurs sans passer par un terminal, cliquez sur "Publier sur GitHub".`);
 }
 
 // Reset data
@@ -5031,5 +4905,452 @@ function applyParsedTripToAdmin() {
   closePdfImportModal();
 
   alert(`✓ Le voyage "${currentParsedTrip.title}" (${currentParsedTrip.id}.json) extrait du PDF a été chargé dans l'administration avec succès !`);
+}
+
+
+// ==========================================
+// SYNCHRONISATION DU FORMULAIRE DANS TRIPDATA
+// ==========================================
+function syncFormDataIntoTrip() {
+  let rawTitle = document.getElementById('adm-title') ? document.getElementById('adm-title').value.trim() : '';
+  if (!rawTitle) {
+    const asked = prompt("Veuillez donner un nom à votre carnet de voyage (il servira aussi à nommer le fichier .json) :");
+    if (!asked || !asked.trim()) return false;
+    rawTitle = asked.trim();
+    if (document.getElementById('adm-title')) document.getElementById('adm-title').value = rawTitle;
+  }
+
+  if (!tripData) tripData = createBlankTripTemplate(rawTitle);
+
+  tripData.title = rawTitle;
+  tripData.id = slugifyTitle(rawTitle);
+  tripData.subtitle = document.getElementById('adm-subtitle') ? document.getElementById('adm-subtitle').value : '';
+  tripData.dates = document.getElementById('adm-dates') ? document.getElementById('adm-dates').value : '';
+  tripData.coverImage = document.getElementById('adm-cover') ? document.getElementById('adm-cover').value : '';
+  tripData.intro = document.getElementById('adm-intro') ? document.getElementById('adm-intro').value : '';
+
+  // Alert
+  tripData.alert = {
+    title: document.getElementById('adm-alert-title') ? document.getElementById('adm-alert-title').value : '',
+    text: document.getElementById('adm-alert-text') ? document.getElementById('adm-alert-text').value : '',
+    link: document.getElementById('adm-alert-link') ? document.getElementById('adm-alert-link').value : ''
+  };
+
+  // Synchronisation directe de l'itinéraire
+  if (tripData.itinerary && Array.isArray(tripData.itinerary)) {
+    tripData.itinerary.forEach((day, dayIndex) => {
+      const latInput = document.getElementById(`day-lat-${dayIndex}`);
+      const lngInput = document.getElementById(`day-lng-${dayIndex}`);
+      if (latInput && latInput.value !== '') {
+        const parsedLat = parseFloat(latInput.value);
+        if (!isNaN(parsedLat)) day.lat = parsedLat;
+      }
+      if (lngInput && lngInput.value !== '') {
+        const parsedLng = parseFloat(lngInput.value);
+        if (!isNaN(parsedLng)) day.lng = parsedLng;
+      }
+
+      if (day.timeline && Array.isArray(day.timeline)) {
+        day.timeline.forEach((v, vIdx) => {
+          const vLatInp = document.getElementById(`visit-lat-${dayIndex}-${vIdx}`);
+          const vLngInp = document.getElementById(`visit-lng-${dayIndex}-${vIdx}`);
+          const vAddrInp = document.getElementById(`visit-addr-${dayIndex}-${vIdx}`);
+          if (vLatInp && vLatInp.value !== '') {
+            const p = parseFloat(vLatInp.value);
+            if (!isNaN(p)) v.lat = p;
+          }
+          if (vLngInp && vLngInp.value !== '') {
+            const p = parseFloat(vLngInp.value);
+            if (!isNaN(p)) v.lng = p;
+          }
+          if (vAddrInp) v.address = vAddrInp.value;
+        });
+      }
+    });
+  }
+
+  // Synchronisation conciergerie
+  if (tripData.conciergerie && tripData.conciergerie.themes) {
+    tripData.conciergerie.themes.forEach((th, thIdx) => {
+      if (th.places && Array.isArray(th.places)) {
+        th.places.forEach((p, pIdx) => {
+          const pAddrInp = document.getElementById(`place-addr-${thIdx}-${pIdx}`);
+          const pLatInp = document.getElementById(`place-lat-${thIdx}-${pIdx}`);
+          const pLngInp = document.getElementById(`place-lng-${thIdx}-${pIdx}`);
+          if (pAddrInp && pAddrInp.value !== '') p.location = pAddrInp.value;
+          if (pLatInp && pLatInp.value !== '') {
+            const pLat = parseFloat(pLatInp.value);
+            if (!isNaN(pLat)) p.lat = pLat;
+          }
+          if (pLngInp && pLngInp.value !== '') {
+            const pLng = parseFloat(pLngInp.value);
+            if (!isNaN(pLng)) p.lng = pLng;
+          }
+        });
+      }
+    });
+  }
+
+  // Synchronisation rétrocompatible des vols
+  if (tripData.flightsList && tripData.flightsList.length > 0) {
+    const outboundFlight = tripData.flightsList.find(f => f.type === 'Aller') || tripData.flightsList[0];
+    const inboundFlight = tripData.flightsList.find(f => f.type === 'Retour') || tripData.flightsList[tripData.flightsList.length - 1];
+    
+    tripData.flights = {
+      outbound: {
+        airline: outboundFlight.airline,
+        flightNumber: outboundFlight.flightNumber,
+        departureAirport: outboundFlight.departureAirport,
+        departureTime: outboundFlight.departureTime,
+        arrivalAirport: outboundFlight.arrivalAirport,
+        arrivalTime: outboundFlight.arrivalTime,
+        date: outboundFlight.date,
+        layover: outboundFlight.via
+      },
+      inbound: {
+        airline: inboundFlight.airline,
+        flightNumber: inboundFlight.flightNumber,
+        departureAirport: inboundFlight.departureAirport,
+        departureTime: inboundFlight.departureTime,
+        arrivalAirport: inboundFlight.arrivalAirport,
+        arrivalTime: inboundFlight.arrivalTime,
+        date: inboundFlight.date,
+        layover: inboundFlight.via
+      },
+      domesticFlights: tripData.flightsList.filter(f => f.type === 'Intérieur').map((df, i) => ({
+        id: `dom-${i+1}`,
+        label: `${df.airline} ${df.flightNumber}`,
+        airline: df.airline,
+        flightNumber: df.flightNumber,
+        departureAirport: df.departureAirport,
+        arrivalAirport: df.arrivalAirport,
+        notes: df.notes || df.via || ''
+      }))
+    };
+  }
+
+  // Synchronisation rétrocompatible des contacts
+  if (tripData.contactsList && tripData.contactsList.length > 0) {
+    const mainRec = tripData.contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('local')) || tripData.contactsList[0];
+    if (!tripData.contacts) tripData.contacts = {};
+    tripData.contacts.receptif = {
+      name: mainRec.name,
+      emergency: mainRec.phone,
+      phone: mainRec.phone,
+      address: mainRec.address
+    };
+  }
+
+  return true;
+}
+
+// ==========================================
+// GESTION DE LA SYNCHRONISATION GITHUB (API)
+// ==========================================
+
+const GITHUB_CONFIG_KEY = 'girardot_github_config';
+const DEFAULT_GH_REPO = 'LauProjectAI/Carnet-Voyage-Eletronique-Interactif';
+const DEFAULT_GH_BRANCH = 'main';
+
+function getGitHubConfig() {
+  try {
+    const raw = localStorage.getItem(GITHUB_CONFIG_KEY);
+    if (raw) {
+      const cfg = JSON.parse(raw);
+      return {
+        repo: (cfg.repo || DEFAULT_GH_REPO).trim(),
+        branch: (cfg.branch || DEFAULT_GH_BRANCH).trim(),
+        token: (cfg.token || '').trim()
+      };
+    }
+  } catch (e) {
+    console.warn("Erreur lecture config GitHub:", e);
+  }
+  return {
+    repo: DEFAULT_GH_REPO,
+    branch: DEFAULT_GH_BRANCH,
+    token: ''
+  };
+}
+
+function updateGitHubStatusIndicator() {
+  const indicator = document.getElementById('github-status-indicator');
+  if (!indicator) return;
+  const cfg = getGitHubConfig();
+  if (cfg.token) {
+    const shortRepo = cfg.repo.split('/')[1] || cfg.repo;
+    indicator.innerHTML = `<span style="color:#22c55e;">●</span> GitHub connecté (${shortRepo})`;
+    if (indicator.parentElement) {
+      indicator.parentElement.style.borderColor = '#86efac';
+      indicator.parentElement.style.background = '#f0fdf4';
+      indicator.parentElement.style.color = '#15803d';
+    }
+  } else {
+    indicator.innerHTML = `Synchro GitHub`;
+    if (indicator.parentElement) {
+      indicator.parentElement.style.borderColor = '';
+      indicator.parentElement.style.background = '';
+      indicator.parentElement.style.color = '';
+    }
+  }
+}
+
+function openGitHubConfigModal() {
+  const cfg = getGitHubConfig();
+  const repoInp = document.getElementById('gh-repo');
+  const branchInp = document.getElementById('gh-branch');
+  const tokenInp = document.getElementById('gh-token');
+  const feedback = document.getElementById('gh-test-feedback');
+
+  if (repoInp) repoInp.value = cfg.repo;
+  if (branchInp) branchInp.value = cfg.branch;
+  if (tokenInp) tokenInp.value = cfg.token;
+  if (feedback) feedback.innerHTML = '';
+
+  const modal = document.getElementById('github-config-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closeGitHubConfigModal() {
+  const modal = document.getElementById('github-config-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function saveGitHubConfig() {
+  const repoInp = document.getElementById('gh-repo');
+  const branchInp = document.getElementById('gh-branch');
+  const tokenInp = document.getElementById('gh-token');
+
+  const repo = repoInp ? repoInp.value.trim() : DEFAULT_GH_REPO;
+  const branch = branchInp ? branchInp.value.trim() : DEFAULT_GH_BRANCH;
+  const token = tokenInp ? tokenInp.value.trim() : '';
+
+  const cfg = { repo: repo || DEFAULT_GH_REPO, branch: branch || DEFAULT_GH_BRANCH, token: token };
+  localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(cfg));
+  updateGitHubStatusIndicator();
+
+  alert("✓ Paramètres GitHub enregistrés avec succès !");
+  closeGitHubConfigModal();
+}
+
+function disconnectGitHub() {
+  if (confirm("Voulez-vous vraiment effacer le jeton GitHub enregistré sur ce navigateur ?")) {
+    const cfg = getGitHubConfig();
+    cfg.token = '';
+    localStorage.setItem(GITHUB_CONFIG_KEY, JSON.stringify(cfg));
+    const tokenInp = document.getElementById('gh-token');
+    if (tokenInp) tokenInp.value = '';
+    const feedback = document.getElementById('gh-test-feedback');
+    if (feedback) feedback.innerHTML = '<span style="color:#64748b;">Clé supprimée.</span>';
+    updateGitHubStatusIndicator();
+  }
+}
+
+async function testGitHubConnection() {
+  const repoInp = document.getElementById('gh-repo');
+  const tokenInp = document.getElementById('gh-token');
+  const feedback = document.getElementById('gh-test-feedback');
+
+  const repo = repoInp ? repoInp.value.trim() : DEFAULT_GH_REPO;
+  const token = tokenInp ? tokenInp.value.trim() : '';
+
+  if (!token) {
+    if (feedback) feedback.innerHTML = '<span style="color:#ef4444;">⚠️ Veuillez entrer un jeton GitHub (PAT) pour tester la connexion.</span>';
+    return;
+  }
+
+  if (feedback) feedback.innerHTML = '<span style="color:#0284c7;"><i class="fa-solid fa-spinner fa-spin"></i> Test de connexion en cours...</span>';
+
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      const canPush = data.permissions ? data.permissions.push : true;
+      if (feedback) {
+        feedback.innerHTML = `<span style="color:#16a34a;">✓ Connexion réussie à <strong>${data.full_name}</strong> ! ${canPush ? '(Droit d\'écriture validé)' : '(Attention: droit d\'écriture non confirmé)'}</span>`;
+      }
+    } else {
+      const errData = await res.json().catch(() => ({ message: res.statusText }));
+      if (feedback) {
+        feedback.innerHTML = `<span style="color:#ef4444;">❌ Erreur (${res.status}) : ${errData.message || 'Dépôt inaccessible ou jeton invalide'}.</span>`;
+      }
+    }
+  } catch (err) {
+    if (feedback) feedback.innerHTML = `<span style="color:#ef4444;">❌ Erreur réseau : ${err.message}</span>`;
+  }
+}
+
+function encodeUtf8Base64(str) {
+  return window.btoa(unescape(encodeURIComponent(str)));
+}
+
+function decodeUtf8Base64(b64) {
+  return decodeURIComponent(escape(window.atob(b64.replace(/\s/g, ''))));
+}
+
+async function saveTripDirectToGitHub() {
+  if (!syncFormDataIntoTrip()) return;
+
+  const cfg = getGitHubConfig();
+  if (!cfg.token) {
+    alert("⚠️ Aucun jeton GitHub (Personal Access Token) n'a été renseigné.\n\nVeuillez renseigner votre clé GitHub pour enregistrer directement vos voyages sur le dépôt en ligne.");
+    openGitHubConfigModal();
+    return;
+  }
+
+  const slug = tripData.id;
+  const fileName = `${slug}.json`;
+  const filePath = `voyages/${fileName}`;
+  const repo = cfg.repo;
+  const branch = cfg.branch;
+
+  const confirmSave = confirm(
+    `Voulez-vous publier le voyage "${tripData.title}" directement sur GitHub ?\n\n` +
+    `• Fichier : ${filePath}\n` +
+    `• Dépôt : ${repo} (${branch})\n\n` +
+    `Le voyage sera immédiatement accessible publiquement sur GitHub Pages pour vos voyageurs.`
+  );
+  if (!confirmSave) return;
+
+  const originalSaveBtn = document.querySelector('button[onclick="saveTripDirectToGitHub()"]');
+  const originalBtnHtml = originalSaveBtn ? originalSaveBtn.innerHTML : null;
+  if (originalSaveBtn) {
+    originalSaveBtn.disabled = true;
+    originalSaveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Publication GitHub...';
+  }
+
+  try {
+    saveTripToCatalogAndStorage(tripData);
+    renderTripSelectorOptions();
+    updateShareLink();
+
+    let existingSha = null;
+    try {
+      const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(filePath)}?ref=${branch}`, {
+        headers: {
+          'Authorization': `Bearer ${cfg.token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+      if (getFileRes.ok) {
+        const fileData = await getFileRes.json();
+        existingSha = fileData.sha;
+      }
+    } catch (e) {
+      console.warn("Vérification existence fichier:", e);
+    }
+
+    const tripJsonString = JSON.stringify(tripData, null, 2);
+    const putBody = {
+      message: existingSha ? `feat(voyages): mise à jour du carnet ${tripData.title}` : `feat(voyages): ajout du carnet ${tripData.title}`,
+      content: encodeUtf8Base64(tripJsonString),
+      branch: branch
+    };
+    if (existingSha) putBody.sha = existingSha;
+
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(filePath)}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${cfg.token}`,
+        'Content-Type': 'application/json',
+        'Accept': 'application/vnd.github.v3+json'
+      },
+      body: JSON.stringify(putBody)
+    });
+
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({ message: putRes.statusText }));
+      throw new Error(`Erreur lors de la publication du JSON (${putRes.status}) : ${err.message}`);
+    }
+
+    // Mise à jour de index_voyages.js
+    try {
+      const indexPath = 'voyages/index_voyages.js';
+      const getIndexRes = await fetch(`https://api.github.com/repos/${repo}/contents/${indexPath}?ref=${branch}`, {
+        headers: {
+          'Authorization': `Bearer ${cfg.token}`,
+          'Accept': 'application/vnd.github.v3+json'
+        }
+      });
+
+      if (getIndexRes.ok) {
+        const indexData = await getIndexRes.json();
+        const indexContent = decodeUtf8Base64(indexData.content);
+
+        const alreadyIndexed = indexContent.includes(`id: "${slug}"`) || indexContent.includes(`id: '${slug}'`);
+        if (!alreadyIndexed) {
+          const newEntry = `  {\n    id: "${slug}",\n    alias: "${slug}",\n    aliases: ["${slug}"],\n    title: ${JSON.stringify(tripData.title)},\n    subtitle: ${JSON.stringify(tripData.subtitle || '')},\n    dates: ${JSON.stringify(tripData.dates || '')},\n    file: "${filePath}"\n  },\n`;
+          
+          let updatedIndexContent;
+          if (indexContent.includes('window.AVAILABLE_TRIPS = [')) {
+            updatedIndexContent = indexContent.replace('window.AVAILABLE_TRIPS = [', `window.AVAILABLE_TRIPS = [\n${newEntry}`);
+          } else if (indexContent.lastIndexOf('];') !== -1) {
+            const lastBracket = indexContent.lastIndexOf('];');
+            updatedIndexContent = indexContent.slice(0, lastBracket) + newEntry + indexContent.slice(lastBracket);
+          } else {
+            updatedIndexContent = indexContent + `\nwindow.AVAILABLE_TRIPS.push(${JSON.stringify({ id: slug, title: tripData.title, file: filePath })});\n`;
+          }
+
+          await fetch(`https://api.github.com/repos/${repo}/contents/${indexPath}`, {
+            method: 'PUT',
+            headers: {
+              'Authorization': `Bearer ${cfg.token}`,
+              'Content-Type': 'application/json',
+              'Accept': 'application/vnd.github.v3+json'
+            },
+            body: JSON.stringify({
+              message: `feat(index): référencer le carnet ${tripData.title} dans index_voyages.js`,
+              content: encodeUtf8Base64(updatedIndexContent),
+              branch: branch,
+              sha: indexData.sha
+            })
+          });
+        }
+      }
+    } catch (indexErr) {
+      console.warn("Index voyages non mis à jour automatiquement (non bloquant):", indexErr);
+    }
+
+    const [owner, repoName] = repo.split('/');
+    const cleanRepoName = repoName || 'Carnet-Voyage-Eletronique-Interactif';
+    const clientPublicUrl = `https://${(owner || 'lauprojectai').toLowerCase()}.github.io/${cleanRepoName}/index.html?id=${slug}`;
+    const driverPublicUrl = `https://${(owner || 'lauprojectai').toLowerCase()}.github.io/${cleanRepoName}/conducteur.html?id=${slug}`;
+
+    try {
+      navigator.clipboard.writeText(clientPublicUrl);
+    } catch (e) {}
+
+    alert(
+      `🎉 SUCCÈS ! Le carnet a été publié directement sur GitHub !\n\n` +
+      `📁 Fichier : ${filePath}\n\n` +
+      `🔗 Lien Voyageur (copié dans votre presse-papier) :\n${clientPublicUrl}\n\n` +
+      `🔗 Lien Dossier Conducteur :\n${driverPublicUrl}\n\n` +
+      `(Note : GitHub Pages prend 30 à 60 secondes pour propager les nouveaux fichiers en ligne).`
+    );
+
+    const clientShareInput = document.getElementById('client-share-link');
+    if (clientShareInput) clientShareInput.value = clientPublicUrl;
+    const previewClientLink = document.getElementById('preview-client-link');
+    if (previewClientLink) previewClientLink.href = clientPublicUrl;
+    const driverShareInput = document.getElementById('driver-share-link');
+    if (driverShareInput) driverShareInput.value = driverPublicUrl;
+    const previewDriverLink = document.getElementById('preview-driver-link');
+    if (previewDriverLink) previewDriverLink.href = driverPublicUrl;
+
+  } catch (err) {
+    console.error("Erreur enregistrement GitHub API:", err);
+    alert(`❌ Erreur lors de la publication sur GitHub :\n\n${err.message}\n\nVérifiez votre connexion internet et la validité de votre token GitHub dans les réglages.`);
+  } finally {
+    if (originalSaveBtn && originalBtnHtml) {
+      originalSaveBtn.disabled = false;
+      originalSaveBtn.innerHTML = originalBtnHtml;
+    }
+  }
 }
 
