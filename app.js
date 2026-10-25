@@ -237,22 +237,20 @@ function loadTripData() {
     }
     // Vérifier si le voyage est présent dans les voyages préenregistrés du dossier voyages/
     const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam || t.alias === idParam || (t.aliases && t.aliases.includes(idParam)));
-    if (foundPredefined && foundPredefined.file) {
-      // Chargement synchrone ou par fetch
-      try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', encodeURI(foundPredefined.file), false); // Synchrone pour initialisation immédiate
-        xhr.send(null);
-        if (xhr.status === 200 || xhr.status === 0) {
-          currentTrip = JSON.parse(xhr.responseText);
-          normalizeTripTransitMaps();
-          localStorage.setItem(`girardot_trip_data_${currentTrip.id}`, JSON.stringify(currentTrip));
-          localStorage.setItem('girardot_active_trip_id', currentTrip.id);
-          return;
-        }
-      } catch (err) {
-        console.warn('Chargement synchrone du fichier voyage impossible, essai différé:', err);
+    const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${idParam}.json`;
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', encodeURI(targetFile), false); // Synchrone pour initialisation immédiate
+      xhr.send(null);
+      if (xhr.status === 200 || xhr.status === 0) {
+        currentTrip = JSON.parse(xhr.responseText);
+        normalizeTripTransitMaps();
+        localStorage.setItem(`girardot_trip_data_${currentTrip.id}`, JSON.stringify(currentTrip));
+        localStorage.setItem('girardot_active_trip_id', currentTrip.id);
+        return;
       }
+    } catch (err) {
+      console.warn('Chargement synchrone du fichier voyage impossible, essai différé:', err);
     }
   }
 
@@ -344,28 +342,10 @@ function normalizeTripTransitMaps() {
   }
 }
 
-// Rendu du sélecteur client
+// Rendu du sélecteur client (désactivé pour n'afficher que le carnet prévu)
 function renderClientTripSelector() {
   const select = document.getElementById('client-trip-quick-selector');
-  if (!select) return;
-
-  const catalog = getClientAvailableTrips();
-  if (catalog.length <= 1) {
-    select.style.display = 'none';
-    return;
-  }
-  select.style.display = 'inline-block';
-  select.innerHTML = '';
-
-  catalog.forEach(t => {
-    const opt = document.createElement('option');
-    opt.value = t.id;
-    opt.textContent = t.title;
-    if (currentTrip && currentTrip.id === t.id) {
-      opt.selected = true;
-    }
-    select.appendChild(opt);
-  });
+  if (select) select.style.display = 'none';
 }
 
 function onClientTripSwitch(tripId) {
@@ -818,54 +798,85 @@ function renderFullCircuit() {
   });
 }
 
-// 4. SOUVENIRS / PHOTO CAPTURE
+// 4. SOUVENIRS / PHOTO CAPTURE (avec compression automatique pour préserver le quota localStorage)
+function compressImageFile(file, maxWidth = 1024, quality = 0.72) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const img = new Image();
+      img.onload = () => {
+        let width = img.width;
+        let height = img.height;
+        if (width > maxWidth) {
+          height = Math.round((height * maxWidth) / width);
+          width = maxWidth;
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = reject;
+      img.src = evt.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
 function initCaptureFeature() {
   const quickCaptureBtn = document.getElementById('btn-quick-capture');
   const addSouvenirBtn = document.getElementById('add-souvenir-btn');
   const fileInput = document.getElementById('camera-file-input');
 
   const triggerCamera = () => {
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (file) {
+        try {
+          const compressedBase64 = await compressImageFile(file);
+          saveSouvenir({
+            id: 'souv_' + Date.now(),
+            title: `Souvenir Jour ${activeDayIndex + 1}`,
+            date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
+            image: compressedBase64
+          });
+          switchMainTab('tab-souvenirs');
+        } catch (err) {
+          console.error('Erreur compression image:', err);
+        } finally {
+          fileInput.value = '';
+        }
+      }
+    };
     fileInput.click();
   };
 
   quickCaptureBtn.addEventListener('click', triggerCamera);
   addSouvenirBtn.addEventListener('click', triggerCamera);
-
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(evt) {
-        const base64 = evt.target.result;
-        saveSouvenir({
-          id: 'souv_' + Date.now(),
-          title: `Souvenir Jour ${activeDayIndex + 1}`,
-          date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
-          image: base64
-        });
-        switchMainTab('tab-souvenirs');
-      };
-      reader.readAsDataURL(file);
-    }
-  });
 }
 
 function quickAddPhotoForEntry(entryTitle) {
   const fileInput = document.getElementById('camera-file-input');
-  fileInput.onchange = function(e) {
+  fileInput.onchange = async function(e) {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = function(evt) {
+      try {
+        const compressedBase64 = await compressImageFile(file);
         saveSouvenir({
           id: 'souv_' + Date.now(),
           title: entryTitle,
           date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }),
-          image: evt.target.result
+          image: compressedBase64
         });
         switchMainTab('tab-souvenirs');
-      };
-      reader.readAsDataURL(file);
+      } catch (err) {
+        console.error('Erreur compression image:', err);
+      } finally {
+        fileInput.value = '';
+      }
     }
   };
   fileInput.click();
@@ -875,6 +886,18 @@ function saveSouvenir(item) {
   const key = `girardot_souvenirs_${currentTrip.id}`;
   const list = JSON.parse(localStorage.getItem(key) || '[]');
   list.unshift(item);
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (e) {
+    alert("L'espace de stockage local de votre navigateur est plein. Supprimez d'anciennes photos pour en ajouter de nouvelles.");
+  }
+  renderSouvenirs();
+}
+
+function deleteSouvenir(souvId) {
+  const key = `girardot_souvenirs_${currentTrip.id}`;
+  let list = JSON.parse(localStorage.getItem(key) || '[]');
+  list = list.filter(s => s.id !== souvId);
   localStorage.setItem(key, JSON.stringify(list));
   renderSouvenirs();
 }
@@ -884,27 +907,42 @@ function renderSouvenirs() {
   const key = `girardot_souvenirs_${currentTrip.id}`;
   let list = JSON.parse(localStorage.getItem(key) || '[]');
 
-  // Default sample souvenirs from trip images if empty
-  if (list.length === 0) {
+  // Uniquement pour l'Afrique du Sud si aucun souvenir n'a été pris
+  if (list.length === 0 && currentTrip.id === 'afrique-du-sud-2026') {
     list = [
-      { id: 'def1', title: 'Safari Big Five • Kruger', date: 'Jour 5', image: 'Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png' },
-      { id: 'def2', title: 'Colonie des manchots', date: 'Jour 10', image: 'Business Profile Girardot/resource_81SHDV3ufg44rvmTPYt_h0.png' }
+      { id: 'def1', title: 'Safari Big Five • Kruger', date: 'Jour 5', image: 'Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png', isDemo: true },
+      { id: 'def2', title: 'Colonie des manchots', date: 'Jour 10', image: 'Business Profile Girardot/resource_81SHDV3ufg44rvmTPYt_h0.png', isDemo: true }
     ];
   }
 
   grid.innerHTML = '';
-  list.forEach(s => {
-    const card = document.createElement('div');
-    card.className = 'souvenir-card';
-    card.innerHTML = `
-      <img src="${s.image}" alt="${s.title}">
-      <div class="souvenir-body">
-        <div class="souvenir-title">${s.title}</div>
-        <div class="souvenir-date">${s.date}</div>
+  if (list.length === 0) {
+    grid.innerHTML = `
+      <div style="grid-column: 1 / -1; background:white; border:1px dashed #cbd5e1; border-radius:16px; padding:24px; text-align:center; color:#64748b; font-size:0.85rem;">
+        <i class="fa-solid fa-camera-retro" style="font-size:1.6rem; color:var(--accent-gold); margin-bottom:8px; display:block;"></i>
+        Aucun souvenir enregistré pour le moment.<br>Appuyez sur <strong>« Ajouter une photo »</strong> ou sur le bouton <strong>CAPTURE</strong> pour immortaliser votre voyage !
       </div>
     `;
-    grid.appendChild(card);
-  });
+  } else {
+    list.forEach(s => {
+      const card = document.createElement('div');
+      card.className = 'souvenir-card';
+      card.style.position = 'relative';
+      card.innerHTML = `
+        <img src="${s.image}" alt="${s.title}">
+        ${!s.isDemo ? `
+          <button onclick="deleteSouvenir('${s.id}')" title="Supprimer cette photo" style="position:absolute; top:8px; right:8px; background:rgba(15,23,42,0.65); color:white; border:none; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.75rem;">
+            <i class="fa-solid fa-trash"></i>
+          </button>
+        ` : ''}
+        <div class="souvenir-body">
+          <div class="souvenir-title">${s.title}</div>
+          <div class="souvenir-date">${s.date}</div>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+  }
 
   // Also render compact suggestions in Souvenirs tab
   const freetimeBox = document.getElementById('freetime-compact-container');

@@ -34,19 +34,18 @@ function loadDriverTripData() {
         return;
       } catch (e) {}
     }
-    // Vérifier si présent dans les voyages préenregistrés
+    // Vérifier si présent dans les voyages préenregistrés ou dans voyages/<id>.json
     const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam || t.alias === idParam || (t.aliases && t.aliases.includes(idParam)));
-    if (foundPredefined && foundPredefined.file) {
-      try {
-        const xhr = new XMLHttpRequest();
-        xhr.open('GET', encodeURI(foundPredefined.file), false);
-        xhr.send(null);
-        if (xhr.status === 200 || xhr.status === 0) {
-          driverTrip = JSON.parse(xhr.responseText);
-          return;
-        }
-      } catch (err) {}
-    }
+    const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${idParam}.json`;
+    try {
+      const xhr = new XMLHttpRequest();
+      xhr.open('GET', encodeURI(targetFile), false);
+      xhr.send(null);
+      if (xhr.status === 200 || xhr.status === 0) {
+        driverTrip = JSON.parse(xhr.responseText);
+        return;
+      }
+    } catch (err) {}
   }
 
   // 3. Dernier voyage actif en cache

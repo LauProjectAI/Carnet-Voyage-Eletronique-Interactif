@@ -3,6 +3,83 @@ let tripData = null;
 let currentTripId = null;
 let savedTripsIndex = [];
 
+// Helper: génère un slug propre à partir du nom du carnet (ex: "Norvège - Fjords 2026" -> "norvege-fjords-2026")
+function slugifyTitle(text) {
+  if (!text || !text.trim()) return 'nouveau-carnet';
+  return text
+    .toString()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'nouveau-carnet';
+}
+
+// Squelette vierge pour démarrer un nouveau carnet sans pollution d'un autre circuit
+function createBlankTripTemplate(title = '') {
+  const cleanTitle = title.trim();
+  const id = cleanTitle ? slugifyTitle(cleanTitle) : '';
+  const baseConciergerie = (window.defaultTravelData && window.defaultTravelData.conciergerie)
+    ? JSON.parse(JSON.stringify(window.defaultTravelData.conciergerie))
+    : { welcomeMessage: "Posez votre question ou explorez nos sélections :", themes: [] };
+
+  if (baseConciergerie.themes) {
+    baseConciergerie.themes.forEach(t => { t.places = []; t.enabled = true; });
+  }
+
+  return {
+    id: id,
+    title: cleanTitle,
+    subtitle: "",
+    dates: "",
+    startDate: new Date().toISOString().split('T')[0],
+    endDate: new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0],
+    coverImage: "",
+    intro: "",
+    alert: { title: "", text: "", link: "" },
+    flights: { outbound: null, inbound: null, domesticFlights: [] },
+    flightsList: [],
+    itinerary: [
+      {
+        day: 1,
+        city: "",
+        title: "Jour 1",
+        highlight: "",
+        dateStr: "Jour 1",
+        weather: "",
+        description: "",
+        lat: null,
+        lng: null,
+        timeline: []
+      }
+    ],
+    hotels: [],
+    documents: [],
+    freeTimeSuggestions: [],
+    conciergerie: baseConciergerie,
+    driverDossier: {
+      busModel: "",
+      busCapacity: 50,
+      busPlanUrl: "",
+      busNotes: "",
+      roomingList: [],
+      roomingFileUrl: "",
+      passengersList: []
+    },
+    contactsList: [
+      {
+        category: "Agence Voyages Girardot",
+        name: "Siège Chalon-sur-Saône",
+        phone: "03 85 42 82 82",
+        address: "",
+        isEmergency: false
+      }
+    ],
+    practicalTipsList: []
+  };
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   initMultiTripSystem();
   populateForm();
@@ -31,14 +108,9 @@ function getSavedTripsCatalog() {
 }
 
 function initMultiTripSystem() {
-  const catalog = getSavedTripsCatalog();
-  
-  // Dernier voyage actif ou premier disponible
-  const activeId = localStorage.getItem('girardot_active_trip_id') || (catalog[0] ? catalog[0].id : 'afrique-du-sud-2026');
-  currentTripId = activeId;
-
-  // Charger les données du voyage
-  loadTripById(currentTripId);
+  // Par défaut à l'ouverture : page vierge prête pour un nouveau carnet
+  currentTripId = '__blank__';
+  tripData = createBlankTripTemplate('');
   renderTripSelectorOptions();
 }
 
@@ -47,11 +119,17 @@ function renderTripSelectorOptions() {
   if (!select) return;
   select.innerHTML = '';
 
+  const blankOpt = document.createElement('option');
+  blankOpt.value = '__blank__';
+  blankOpt.textContent = '✨ Nouveau carnet vierge (Non enregistré)';
+  if (currentTripId === '__blank__' || !currentTripId) blankOpt.selected = true;
+  select.appendChild(blankOpt);
+
   const catalog = getSavedTripsCatalog();
   catalog.forEach(item => {
     const opt = document.createElement('option');
     opt.value = item.id;
-    opt.textContent = `${item.title} — ${item.subtitle || ''}`;
+    opt.textContent = `${item.title}${item.subtitle ? ' — ' + item.subtitle : ''}`;
     if (item.id === currentTripId) opt.selected = true;
     select.appendChild(opt);
   });
@@ -89,6 +167,12 @@ function normalizeAdminTripDocuments(trip) {
 }
 
 function loadTripById(tripId) {
+  if (!tripId || tripId === '__blank__') {
+    currentTripId = '__blank__';
+    tripData = createBlankTripTemplate('');
+    return;
+  }
+
   currentTripId = tripId;
   localStorage.setItem('girardot_active_trip_id', tripId);
 
@@ -129,22 +213,17 @@ function loadTripById(tripId) {
         updateShareLink();
       })
       .catch(() => {
-        tripData = JSON.parse(JSON.stringify(window.defaultTravelData));
+        tripData = createBlankTripTemplate(predefined.title || tripId);
         tripData.id = tripId;
-        tripData.title = predefined.title || "Voyage";
-        tripData.documents = [];
-        normalizeAdminTripDocuments(tripData);
         populateForm();
         updateShareLink();
       });
     return;
   }
 
-  // Par défaut : nouveau squelette
-  tripData = JSON.parse(JSON.stringify(window.defaultTravelData));
+  // Par défaut : nouveau squelette vierge
+  tripData = createBlankTripTemplate(tripId);
   tripData.id = tripId;
-  tripData.documents = [];
-  normalizeAdminTripDocuments(tripData);
 }
 
 function onSelectTripChange(newTripId) {
@@ -154,65 +233,32 @@ function onSelectTripChange(newTripId) {
 }
 
 function createNewTripPrompt() {
-  const title = prompt("Titre de la nouvelle destination (ex: Norvège - Fjords & Aurores Boréales) :");
-  if (!title || !title.trim()) return;
+  const title = prompt("Nom du nouveau carnet (ex: Norvège - Fjords & Aurores Boréales) :");
+  if (title === null) return;
 
-  const id = 'voyage-' + Date.now();
-  const newTrip = JSON.parse(JSON.stringify(window.defaultTravelData));
-  newTrip.id = id;
-  newTrip.title = title.trim();
-  newTrip.subtitle = "Nouveau circuit Girardot";
-  newTrip.dates = "À définir";
-  newTrip.startDate = new Date().toISOString().split('T')[0];
-  newTrip.endDate = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0];
-  newTrip.itinerary = [
-    {
-      day: 1,
-      city: "Départ",
-      title: "Jour 1 • Rendez-vous et envol",
-      highlight: "Départ du circuit",
-      dateStr: "Jour 1",
-      weather: "Ensoleillé",
-      description: "Accueil de vos voyageurs et installation à l'hôtel.",
-      timeline: [
-        {
-          time: "10:00",
-          title: "Accueil & Formalités",
-          subtitle: "Rendez-vous avec votre guide accompagnateur.",
-          icon: "plane-departure"
-        }
-      ]
-    }
-  ];
-  newTrip.flights = {
-    outbound: null,
-    inbound: null,
-    domesticFlights: []
-  };
-  newTrip.flightsList = [];
-  newTrip.hotels = [];
-  newTrip.freeTimeSuggestions = [];
-  newTrip.documents = [];
-
-  // Enregistrer
-  saveTripToCatalogAndStorage(newTrip);
-  currentTripId = id;
+  const newTrip = createBlankTripTemplate(title.trim());
+  if (title.trim()) {
+    currentTripId = newTrip.id;
+    saveTripToCatalogAndStorage(newTrip);
+  } else {
+    currentTripId = '__blank__';
+  }
   tripData = newTrip;
   renderTripSelectorOptions();
   populateForm();
   updateShareLink();
-  alert(`✓ Le voyage "${title}" a été créé ! Vous pouvez maintenant le personnaliser.`);
+  document.getElementById('adm-title').focus();
 }
 
 function duplicateCurrentTrip() {
   const currentTitle = tripData.title || "Voyage";
-  const newTitle = prompt(`Titre de la copie :`, `${currentTitle} (Copie)`);
-  if (!newTitle) return;
+  const newTitle = prompt(`Nom du carnet dupliqué :`, `${currentTitle} - Copie`);
+  if (!newTitle || !newTitle.trim()) return;
 
-  const id = 'voyage-' + Date.now();
+  const id = slugifyTitle(newTitle.trim());
   const copyTrip = JSON.parse(JSON.stringify(tripData));
   copyTrip.id = id;
-  copyTrip.title = newTitle;
+  copyTrip.title = newTitle.trim();
 
   saveTripToCatalogAndStorage(copyTrip);
   currentTripId = id;
@@ -220,34 +266,45 @@ function duplicateCurrentTrip() {
   renderTripSelectorOptions();
   populateForm();
   updateShareLink();
-  alert(`✓ Le voyage a été dupliqué sous le nom "${newTitle}".`);
+  alert(`✓ Le carnet a été dupliqué sous le nom "${newTitle}" (fichier : ${id}.json).`);
 }
 
 function deleteCurrentTripPrompt() {
-  const catalog = getSavedTripsCatalog();
-  if (catalog.length <= 1) {
-    alert("Vous ne pouvez pas supprimer le seul voyage restant.");
+  if (currentTripId === '__blank__') {
+    tripData = createBlankTripTemplate('');
+    populateForm();
+    updateShareLink();
     return;
   }
 
-  if (confirm(`Êtes-vous sûr de vouloir supprimer définitivement le carnet "${tripData.title}" ?`)) {
-    // Supprimer du catalogue local
+  if (confirm(`Êtes-vous sûr de vouloir supprimer le carnet "${tripData.title || currentTripId}" de ce navigateur ?`)) {
     let customList = JSON.parse(localStorage.getItem('girardot_trips_catalog') || '[]');
     customList = customList.filter(c => c.id !== currentTripId);
     localStorage.setItem('girardot_trips_catalog', JSON.stringify(customList));
     localStorage.removeItem(`girardot_trip_data_${currentTripId}`);
 
-    const remaining = getSavedTripsCatalog();
-    const nextId = remaining[0] ? remaining[0].id : 'afrique-du-sud-2026';
-    loadTripById(nextId);
+    currentTripId = '__blank__';
+    tripData = createBlankTripTemplate('');
     renderTripSelectorOptions();
     populateForm();
     updateShareLink();
-    alert("✓ Voyage supprimé.");
+    alert("✓ Carnet supprimé. Vous êtes sur une page vierge.");
   }
 }
 
 function saveTripToCatalogAndStorage(trip) {
+  const cleanSlug = slugifyTitle(trip.title);
+  const oldId = trip.id;
+  trip.id = cleanSlug;
+  currentTripId = cleanSlug;
+
+  if (oldId && oldId !== cleanSlug && oldId !== '__blank__') {
+    localStorage.removeItem(`girardot_trip_data_${oldId}`);
+    let list = JSON.parse(localStorage.getItem('girardot_trips_catalog') || '[]');
+    list = list.filter(c => c.id !== oldId);
+    localStorage.setItem('girardot_trips_catalog', JSON.stringify(list));
+  }
+
   // Stocker les données complètes
   localStorage.setItem(`girardot_trip_data_${trip.id}`, JSON.stringify(trip));
   
@@ -263,6 +320,7 @@ function saveTripToCatalogAndStorage(trip) {
     title: trip.title,
     subtitle: trip.subtitle || '',
     dates: trip.dates || '',
+    file: `voyages/${trip.id}.json`,
     lastModified: new Date().toISOString()
   };
 
@@ -473,7 +531,21 @@ function downloadReferenceSouthAfricaJson() {
 }
 
 function exportTripJsonFile() {
-  const filename = `${tripData.id || 'voyage'}.json`;
+  const titleInput = document.getElementById('adm-title');
+  if (titleInput && titleInput.value.trim()) {
+    tripData.title = titleInput.value.trim();
+  }
+  if (!tripData.title || !tripData.title.trim()) {
+    const asked = prompt("Veuillez indiquer le nom du carnet avant d'exporter le fichier JSON :");
+    if (!asked || !asked.trim()) return;
+    tripData.title = asked.trim();
+    if (titleInput) titleInput.value = tripData.title;
+  }
+
+  const fileSlug = slugifyTitle(tripData.title);
+  tripData.id = fileSlug;
+  const filename = `${fileSlug}.json`;
+
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(tripData, null, 2));
   const dlAnchor = document.createElement('a');
   dlAnchor.setAttribute("href", dataStr);
@@ -491,8 +563,8 @@ function importTripJsonFile(event) {
   reader.onload = (e) => {
     try {
       const parsed = JSON.parse(e.target.result);
-      if (!parsed.id) parsed.id = 'voyage-' + Date.now();
-      if (!parsed.title) parsed.title = file.name.replace('.json', '');
+      if (!parsed.title) parsed.title = file.name.replace(/\.json$/i, '');
+      parsed.id = slugifyTitle(parsed.title);
 
       saveTripToCatalogAndStorage(parsed);
       currentTripId = parsed.id;
@@ -500,7 +572,7 @@ function importTripJsonFile(event) {
       renderTripSelectorOptions();
       populateForm();
       updateShareLink();
-      alert(`✓ Le voyage "${parsed.title}" a été importé avec succès !`);
+      alert(`✓ Le carnet "${parsed.title}" (${parsed.id}.json) a été importé avec succès !`);
     } catch (err) {
       alert("Erreur lors de la lecture du fichier JSON. Assurez-vous que le format est valide.");
       console.error(err);
@@ -3902,7 +3974,16 @@ function updatePracticalField(idx, field, value) {
 // -----------------------------------------------------------------------------
 function saveAllCarnet() {
   // Update general fields
-  tripData.title = document.getElementById('adm-title').value;
+  let rawTitle = document.getElementById('adm-title').value.trim();
+  if (!rawTitle) {
+    const asked = prompt("Veuillez donner un nom à votre carnet de voyage (il servira aussi à nommer le fichier .json) :");
+    if (!asked || !asked.trim()) return;
+    rawTitle = asked.trim();
+    document.getElementById('adm-title').value = rawTitle;
+  }
+
+  tripData.title = rawTitle;
+  tripData.id = slugifyTitle(rawTitle);
   tripData.subtitle = document.getElementById('adm-subtitle').value;
   tripData.dates = document.getElementById('adm-dates').value;
   tripData.coverImage = document.getElementById('adm-cover').value;
@@ -4924,7 +5005,9 @@ function detectIconForText(str) {
 
 function downloadParsedTripJson() {
   if (!currentParsedTrip) return;
-  const filename = `${currentParsedTrip.title.replace(/[^a-zA-Z0-9]/g, '_').toLowerCase()}.json`;
+  const slug = slugifyTitle(currentParsedTrip.title);
+  currentParsedTrip.id = slug;
+  const filename = `${slug}.json`;
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(currentParsedTrip, null, 2));
   const dlAnchor = document.createElement('a');
   dlAnchor.setAttribute("href", dataStr);
@@ -4936,6 +5019,7 @@ function downloadParsedTripJson() {
 
 function applyParsedTripToAdmin() {
   if (!currentParsedTrip) return;
+  currentParsedTrip.id = slugifyTitle(currentParsedTrip.title);
 
   saveTripToCatalogAndStorage(currentParsedTrip);
   currentTripId = currentParsedTrip.id;
@@ -4946,6 +5030,6 @@ function applyParsedTripToAdmin() {
   updateShareLink();
   closePdfImportModal();
 
-  alert(`✓ Le voyage "${currentParsedTrip.title}" extrait du PDF a été chargé dans l'administration avec succès !`);
+  alert(`✓ Le voyage "${currentParsedTrip.title}" (${currentParsedTrip.id}.json) extrait du PDF a été chargé dans l'administration avec succès !`);
 }
 

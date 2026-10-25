@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Carnet de Voyage — Voyages Girardot</title>
   <link rel="manifest" href="manifest.json">
+  <link rel="icon" type="image/svg+xml" href="icon-girardot.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
   <meta name="theme-color" content="#144534">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -31,14 +34,8 @@
         </div>
       </a>
       <div class="top-right-actions">
-        <!-- Sélecteur rapide de carnet (si plusieurs voyages créés/disponibles) -->
-        <select id="client-trip-quick-selector" class="form-control" style="font-size:0.75rem; padding:4px 8px; border-radius:20px; font-weight:700; max-width:140px; background:#f8fafc; border:1px solid #cbd5e1;" onchange="onClientTripSwitch(this.value)">
-        </select>
         <a href="#sos" class="sos-badge" onclick="switchMainTab('tab-pratique'); return false;" title="Assistance et urgence 24/7">
           <i class="fa-solid fa-phone"></i> SOS
-        </a>
-        <a href="admin.html" class="admin-icon-btn" title="Espace d'administration">
-          <i class="fa-solid fa-gear"></i>
         </a>
       </div>
     </header>

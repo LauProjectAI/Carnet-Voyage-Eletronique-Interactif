@@ -4,6 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Administration Carnet de Voyage — Voyages Girardot</title>
+  <link rel="icon" type="image/svg+xml" href="icon-girardot.svg">
+  <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+  <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -125,6 +128,29 @@
       border-radius: var(--radius-md);
       padding: 16px;
       margin-bottom: 24px;
+    }
+    .floating-save-bar {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9998;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(8px);
+      padding: 10px 14px;
+      border-radius: 50px;
+      box-shadow: 0 10px 28px rgba(15, 23, 42, 0.22);
+      border: 1px solid #cbd5e1;
+    }
+    @media (max-width: 640px) {
+      .floating-save-bar {
+        left: 12px;
+        right: 12px;
+        bottom: 14px;
+        justify-content: space-between;
+      }
     }
   </style>
 </head>
@@ -260,8 +286,8 @@
         
         <div class="form-row">
           <div class="form-group">
-            <label>Titre de la destination :</label>
-            <input type="text" id="adm-title" class="form-control" placeholder="Ex: Afrique du Sud">
+            <label><i class="fa-solid fa-tag" style="color:var(--accent-gold);"></i> Nom du carnet / Destination <span style="color:#dc2626;">*</span> <small style="font-weight:normal; color:#64748b;">(définit le nom du fichier .json)</small> :</label>
+            <input type="text" id="adm-title" class="form-control" placeholder="Ex: Norvège - Fjords 2026" style="border:2px solid var(--primary-color); font-weight:700;">
           </div>
           <div class="form-group">
             <label>Sous-titre / Thématique :</label>
@@ -565,10 +591,20 @@
       <!-- Action buttons -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; border-top:1px solid #e2e8f0; padding-top:20px;">
         <button type="button" onclick="resetToDefaultData()" class="btn-secondary" style="color:#dc2626; border-color:#fca5a5;">
-          <i class="fa-solid fa-rotate-left"></i> Rétablir l'exemple complet
+          <i class="fa-solid fa-rotate-left"></i> Charger l'exemple Afrique du Sud
         </button>
         <button type="button" onclick="saveAllCarnet()" class="btn-save-main">
           <i class="fa-solid fa-floppy-disk"></i> Enregistrer les modifications
+        </button>
+      </div>
+
+      <!-- Barre d'enregistrement flottante toujours accessible -->
+      <div class="floating-save-bar">
+        <button type="button" onclick="exportTripJsonFile()" class="btn-secondary" style="font-size:0.82rem; padding:8px 14px;" title="Exporter le fichier JSON portant le nom du carnet">
+          <i class="fa-solid fa-download"></i> Exporter .json
+        </button>
+        <button type="button" onclick="saveAllCarnet()" class="btn-save-main" style="padding:10px 20px; font-size:0.9rem;">
+          <i class="fa-solid fa-floppy-disk"></i> Enregistrer
         </button>
       </div>
 

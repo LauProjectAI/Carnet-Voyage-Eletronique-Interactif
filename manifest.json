@@ -1,16 +1,29 @@
 {
   "short_name": "Carnet Girardot",
-  "name": "Carnet de Voyage - Voyages Girardot",
+  "name": "Carnet de Voyage — Voyages Girardot",
   "icons": [
     {
-      "src": "Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png",
+      "src": "icon-girardot.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any"
+    },
+    {
+      "src": "icon-192.png",
       "type": "image/png",
-      "sizes": "192x192 512x512"
+      "sizes": "192x192",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "any maskable"
     }
   ],
   "start_url": "./index.html",
-  "background_color": "#16382b",
-  "theme_color": "#1c4937",
+  "background_color": "#144534",
+  "theme_color": "#144534",
   "display": "standalone",
   "orientation": "portrait"
 }

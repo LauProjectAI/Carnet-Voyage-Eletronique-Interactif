@@ -12,7 +12,7 @@ while ($true) {
     if ($line) {
         $parts = $line.Split(' ')
         $url = $parts[1].TrimStart('/')
-        if ([string]::IsNullOrEmpty($url) -or $url -eq '/') { $url = 'index.html' }
+        if ([string]::IsNullOrEmpty($url) -or $url -eq '/') { $url = 'admin.html' }
         if ($url.Contains('?')) { $url = $url.Substring(0, $url.IndexOf('?')) }
         $url = [System.Uri]::UnescapeDataString($url)
         $filePath = Join-Path $PSScriptRoot $url
@@ -28,6 +28,7 @@ while ($true) {
                 ".png"  { "image/png" }
                 ".jpg"  { "image/jpeg" }
                 ".svg"  { "image/svg+xml" }
+                ".ico"  { "image/x-icon" }
                 default { "application/octet-stream" }
             }
             $header = "HTTP/1.1 200 OK`r`nContent-Type: $mime`r`nContent-Length: $($bytes.Length)`r`nAccess-Control-Allow-Origin: *`r`nConnection: close`r`n`r`n"

@@ -2,3 +2,5 @@
 *.log
 .DS_Store
 Thumbs.db
+generate_docx.py
+generate_icons.py

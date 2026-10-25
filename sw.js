@@ -1,14 +1,19 @@
-const CACHE_NAME = 'carnet-girardot-v2';
+const CACHE_NAME = 'carnet-girardot-v5';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
   './admin.html',
+  './conducteur.html',
   './style.css',
   './app.js',
   './admin.js',
+  './conducteur.js',
   './data.js',
   './voyages/index_voyages.js',
   './manifest.json',
+  './icon-girardot.svg',
+  './icon-192.png',
+  './icon-512.png',
   'https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.css',
   'https://unpkg.com/leaflet@1.9.4/dist/leaflet.js',
