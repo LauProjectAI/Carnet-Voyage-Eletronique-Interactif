@@ -4733,6 +4733,9 @@ const COSTA_DIADEMA_DECKS = [
 ];
 
 function getCruiseShipDecks(shipName) {
+  if (typeof window.CRUISE_FLEET !== 'undefined' && typeof window.CRUISE_FLEET.getCruiseShipDecks === 'function') {
+    return window.CRUISE_FLEET.getCruiseShipDecks(shipName);
+  }
   const s = (shipName || "").toLowerCase();
   if (s.includes('diadema')) {
     return COSTA_DIADEMA_DECKS;
@@ -4744,6 +4747,9 @@ function getCruiseShipDecks(shipName) {
 // CONCIERGERIE SPÉCIALE CROISIÈRE : RESTAURANTS, BARS, BOUTIQUES, INFIRMERIE & PONTS
 // -----------------------------------------------------------------------------
 function buildCruiseConciergerie(shipName, itinerary, rawText) {
+  if (typeof window.CRUISE_FLEET !== 'undefined' && typeof window.CRUISE_FLEET.buildCruiseConciergerie === 'function') {
+    return window.CRUISE_FLEET.buildCruiseConciergerie(shipName, itinerary, rawText);
+  }
   const ship = shipName || "Navire de Croisière";
   const isDiadema = (ship.toLowerCase().includes('diadema') || (rawText && rawText.toLowerCase().includes('diadema')));
 
@@ -5342,12 +5348,12 @@ function processExtractedTextToTrip(text, sourceName) {
   }
 
   // Détection automatique : Croisière maritime/fluviale vs Circuit Terrestre
-  const isCruise = /croisi[eè]re|bateau|navire|\bpaquebot\b|\bà bord du\b|\ba bord du\b|\bcosta\b|\bmsc\b|\bcroisieurope\b|\bponant\b|\bhurtigruten\b/i.test(text);
+  const isCruise = /croisi[eè]re|bateau|navire|\bpaquebot\b|\bà bord du\b|\ba bord du\b|\bcosta\b|\bmsc\b|\bcroisieurope\b|\bponant\b|\bhurtigruten\b|\bgrands espaces\b|\bpolarfront\b|\bvoyages d'exception\b|\bfluviale?\b|\bms\s+[a-zà-ÿ]+/i.test(text);
   let detectedShip = "";
   if (isCruise) {
     const shipMatch = text.match(/(?:à bord du|a bord du|navire amiral de|navire|bateau)\s+([A-ZÀ-Ý][\w\s'-]{2,25})(?=[!\r\n,•|]|$)/i)
                    || text.match(/(?:Votre bateau[\s\r\n]+(?:sous réserve de modification[\s\r\n]+)?(?:Données non contractuelles[\s\r\n]+)?)([A-ZÀ-Ý][\w\s'-]{2,25})/i)
-                   || text.match(/\b(Costa\s+[A-ZÀ-Ý][a-zà-ÿ]+|MSC\s+[A-ZÀ-Ý][a-zà-ÿ]+|CroisiEurope\s+[A-ZÀ-Ý][a-zà-ÿ]+)\b/i);
+                   || text.match(/\b(Costa\s+[A-ZÀ-Ý][a-zà-ÿ]+|MSC\s+[A-ZÀ-Ý][a-zà-ÿ]+|CroisiEurope\s+[A-ZÀ-Ý][a-zà-ÿ]+|MS\s+[A-ZÀ-Ý][a-zà-ÿ]+|Le\s+Boréal|L'Austral|Le\s+Soléal|Le\s+Lyrial|Le\s+Commandant\s+Charcot|Le\s+Polarfront|Polarfront|Le\s+Nanook|Ocean\s+Nova)\b/i);
     if (shipMatch) {
       detectedShip = shipMatch[1].split(/\r?\n|!|[•|]/)[0].trim();
     }
@@ -5817,54 +5823,55 @@ function processExtractedTextToTrip(text, sourceName) {
 
   if (isCruise) {
     currentParsedTrip.isCruise = true;
-    currentParsedTrip.shipName = detectedShip || "Costa Diadema";
-    currentParsedTrip.decks = getCruiseShipDecks(detectedShip);
-    currentParsedTrip.conciergerie = buildCruiseConciergerie(detectedShip, itinerary, text);
-    currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
-    currentParsedTrip.practicalInfo = {
-      money: "Aucune circulation d'argent liquide à bord. Votre carte cabine sert de moyen de paiement unique. Enregistrez votre carte bancaire dès les premiers jours aux bornes automatiques.",
-      electricity: "Voltage en cabine : 220V et 110V (prises européennes et américaines disponibles).",
-      clothing: "Tenue décontractée en journée, vêtements confortables pour les escales. Prévoir une tenue de gala / cocktail pour la soirée du Commandant.",
-      tips: "Pourboires au personnel de bord (frais de service) inclus ou prépayés selon contrat. Pourboires libres pour les guides locaux et chauffeurs lors des excursions.",
-      wifi: "Wi-Fi gratuit du bord pour utiliser l'application MyCosta (programme 'Oggi a bordo', menus, réservations). Forfait Internet satellite payant disponible pour naviguer sur le web en mer."
-    };
-    currentParsedTrip.practicalTipsList = [
-      {
-        title: "Paiement & Monnaie à bord",
-        icon: "credit-card",
-        content: "Aucune circulation d'argent liquide à bord. Votre carte de cabine Costa sert de moyen de paiement unique pour tous vos achats (boutiques, bars, spa, excursions). Enregistrez votre carte bancaire dès les premiers jours aux bornes libre-service du navire (ou dépôt d'espèces de 150 € min/personne)."
-      },
-      {
-        title: "Électricité & Voltage en cabine",
-        icon: "plug",
-        content: "Voltage en cabine : 220V et 110V (60 Hz). Prises européennes standard et américaines disponibles. Pensez à emporter vos chargeurs de smartphones, appareils photos et tablettes."
-      },
-      {
-        title: "Vêtements conseillés & Soirées",
-        icon: "shirt",
-        content: "Tenue décontractée et confortable en journée, chaussures de marche pour les escales. Prévoyez un maillot de bain pour les piscines/jacuzzis et une tenue élégante / de gala pour la soirée du Commandant (ainsi qu'une touche de blanc pour la soirée blanche)."
-      },
-      {
-        title: "Pourboires & Frais de séjour",
-        icon: "hand-holding-dollar",
-        content: "Pour votre confort, les pourboires au personnel de bord Costa (frais de séjour) sont prépayés et inclus dans votre forfait Voyages Girardot. Les pourboires pour les guides et chauffeurs d'excursions restent à votre discrétion."
-      },
-      {
-        title: "Wi-Fi & Application MyCosta",
-        icon: "wifi",
-        content: "L'application MyCosta est indispensable à bord (programme Oggi a bordo, menus, réservation d'excursions, solde). Elle fonctionne gratuitement sur le Wi-Fi du navire. Pensez à mettre votre smartphone en mode avion en mer pour éviter les frais satellites d'itinérance."
-      },
-      {
-        title: "Santé, Médicaments & Mal de mer",
-        icon: "shield-heart",
-        content: "Un service médical avec médecins et infirmières est disponible 24h/24 à bord (soins payants, couverts par assurance multirisque). Conservez vos médicaments et ordonnances en bagage à main. Des comprimés contre le mal de mer sont disponibles à la Réception."
-      }
-    ];
-    currentParsedTrip.alert = {
-      title: "Procédures pré-départ indispensables (Web Check-In)",
-      text: "Effectuez votre enregistrement en ligne (Web Check-In) sur MyCosta dès réception de votre numéro de réservation afin de télécharger vos billets de croisière et étiquettes bagages.",
-      link: "https://www.mycosta.com"
-    };
+    const cruiseInfo = (typeof detectCruiseLineAndShip === 'function')
+      ? detectCruiseLineAndShip(detectedShip || detectedTitle, text)
+      : { line: 'costa', companyName: 'Croisière', shipName: detectedShip || "Costa Diadema", isRiver: false, isPolar: false };
+
+    currentParsedTrip.shipName = detectedShip || cruiseInfo.shipName || "Costa Diadema";
+    currentParsedTrip.cruiseCompany = cruiseInfo.companyName;
+    currentParsedTrip.cruiseCategory = cruiseInfo.category;
+    currentParsedTrip.decks = getCruiseShipDecks(currentParsedTrip.shipName, text);
+    currentParsedTrip.conciergerie = buildCruiseConciergerie(currentParsedTrip.shipName, itinerary, text);
+
+    if (cruiseInfo.isPolar) {
+      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=1200&q=80";
+      currentParsedTrip.alert = {
+        title: "Équipements Polaires & Formalités",
+        text: "Passeport individuel valide 6 mois après retour. Parkas et bottes thermiques Muck Boots fournies à bord pour les sorties en Zodiacs.",
+        link: ""
+      };
+    } else if (cruiseInfo.isRiver) {
+      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80";
+      currentParsedTrip.alert = {
+        title: "Formalités & Embarquement Fluvial",
+        text: "Carte nationale d'identité ou passeport en cours de validité. Présentation des bons de voyage Girardot lors de l'embarquement à quai.",
+        link: ""
+      };
+    } else if (cruiseInfo.line === 'ponant') {
+      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80";
+      currentParsedTrip.alert = {
+        title: "Fiche Médicale & Formalités Ponant",
+        text: "Passeport valide et questionnaire médical d'embarquement obligatoire à compléter avant le départ.",
+        link: "https://www.ponant.com"
+      };
+    } else {
+      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
+      currentParsedTrip.alert = {
+        title: "Procédures pré-départ indispensables (Web Check-In)",
+        text: "Effectuez votre enregistrement en ligne (Web Check-In) dès réception de votre numéro de réservation afin de télécharger vos billets de croisière et étiquettes bagages.",
+        link: cruiseInfo.line === 'msc' ? "https://www.msccroisieres.fr" : "https://www.mycosta.com"
+      };
+    }
+
+    if (typeof getCruisePracticalInfo === 'function') {
+      currentParsedTrip.practicalInfo = getCruisePracticalInfo(currentParsedTrip.shipName, text);
+    }
+    if (typeof getCruisePracticalTips === 'function') {
+      currentParsedTrip.practicalTipsList = getCruisePracticalTips(currentParsedTrip.shipName, text);
+    }
+    if (typeof getCruiseContacts === 'function') {
+      currentParsedTrip.contactsList = getCruiseContacts(currentParsedTrip.shipName, accompName || "Mireille");
+    }
   } else {
     currentParsedTrip.practicalTipsList = [
       {

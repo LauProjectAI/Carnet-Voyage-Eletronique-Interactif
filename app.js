@@ -2094,6 +2094,9 @@ const COSTA_DIADEMA_DECKS = [
 ];
 
 function getCruiseShipDecks(shipName) {
+  if (typeof window.CRUISE_FLEET !== 'undefined' && typeof window.CRUISE_FLEET.getCruiseShipDecks === 'function') {
+    return window.CRUISE_FLEET.getCruiseShipDecks(shipName);
+  }
   const s = (shipName || "").toLowerCase();
   if (s.includes('diadema')) {
     return COSTA_DIADEMA_DECKS;
@@ -2165,6 +2168,9 @@ const COSTA_DIADEMA_KEY_LOCATIONS = [
 
 function getActiveCruiseKeyLocations() {
   const ship = (typeof currentTrip !== 'undefined' && currentTrip && (currentTrip.shipName || currentTrip.title || "")).toLowerCase();
+  if (typeof window.CRUISE_FLEET !== 'undefined' && typeof window.CRUISE_FLEET.getCruiseKeyLocations === 'function') {
+    return window.CRUISE_FLEET.getCruiseKeyLocations(ship);
+  }
   if (ship.includes('diadema')) {
     return COSTA_DIADEMA_KEY_LOCATIONS;
   }
@@ -2192,6 +2198,10 @@ let cruiseCompassOrientationHandler = null;
 // Décodeur mathématique de cabine Costa
 function decodeCruiseCabin(rawInput) {
   if (!rawInput) return null;
+  const activeShip = (typeof currentTrip !== 'undefined' && currentTrip && (currentTrip.shipName || currentTrip.title || "")) || "";
+  if (typeof window.CRUISE_FLEET !== 'undefined' && typeof window.CRUISE_FLEET.decodeCruiseCabin === 'function') {
+    return window.CRUISE_FLEET.decodeCruiseCabin(rawInput, activeShip);
+  }
   const cleaned = rawInput.toString().trim().replace(/\D/g, '');
   if (!cleaned || cleaned.length < 3) return null;
 
@@ -2496,8 +2506,16 @@ function renderCruiseDeckOrientationModule(containerEl, trip) {
   if (initialCabinDecoded) {
     currentActiveCruiseDeck = initialCabinDecoded.deck;
   } else {
-    const isDiadema = (shipName || "").toLowerCase().includes("diadema");
-    currentActiveCruiseDeck = isDiadema ? 5 : 8;
+    const s = (shipName || "").toLowerCase();
+    const isRiver = s.includes("croisieurope") || /fluvial|péniche|ms\s+/i.test(s);
+    const isYacht = /ponant|boréal|austral|lyrial|soléal|charcot/i.test(s);
+    const isPolar = /polarfront|nanook|grands espaces/i.test(s);
+    const isDiadema = s.includes("diadema");
+    if (isRiver) currentActiveCruiseDeck = 2; // Pont Supérieur
+    else if (isYacht) currentActiveCruiseDeck = 4; // Grand Salon
+    else if (isPolar) currentActiveCruiseDeck = 4; // Salon d'observation
+    else if (isDiadema) currentActiveCruiseDeck = 5;
+    else currentActiveCruiseDeck = 8;
   }
 
   const wrapper = document.createElement('div');

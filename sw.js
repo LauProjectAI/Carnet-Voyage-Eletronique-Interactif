@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnet-girardot-v5';
+const CACHE_NAME = 'carnet-girardot-v6';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS_TO_CACHE = [
   './admin.js',
   './conducteur.js',
   './data.js',
+  './cruise_fleet.js',
   './voyages/index_voyages.js',
   './manifest.json',
   './icon-girardot.svg',
