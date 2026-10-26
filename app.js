@@ -313,8 +313,31 @@ function normalizeTripDocuments() {
   }
 }
 
+
+function normalizeTripItinerary() {
+  if (!currentTrip || !Array.isArray(currentTrip.itinerary)) return;
+  currentTrip.itinerary.forEach((item, idx) => {
+    if (!item.day && item.dayNumber) item.day = item.dayNumber;
+    if (!item.day) item.day = idx + 1;
+    if (!item.dayNumber) item.dayNumber = item.day;
+    if (!item.dateStr && item.date) item.dateStr = item.date;
+    if (!item.timeline && Array.isArray(item.steps)) {
+      item.timeline = item.steps.map(s => ({
+        time: s.time || '',
+        title: s.title || '',
+        subtitle: s.desc || s.subtitle || '',
+        description: s.desc || s.description || '',
+        icon: (s.time === '08:00' || s.time === '08:30' || s.time === '09:00') ? 'anchor' : 'location-dot',
+        lat: s.lat || item.lat,
+        lng: s.lng || item.lng
+      }));
+    }
+  });
+}
+
 function normalizeTripTransitMaps() {
   normalizeTripDocuments();
+  normalizeTripItinerary();
   if (!currentTrip || !currentTrip.conciergerie || !currentTrip.conciergerie.themes) return;
   const transportTheme = currentTrip.conciergerie.themes.find(t => t.id === 'transports');
   if (!transportTheme) return;
@@ -432,20 +455,25 @@ function determineInitialDayIndex() {
 
 // Initialize Application
 document.addEventListener('DOMContentLoaded', () => {
+  // 1. Initialiser la navigation par onglets EN PREMIER pour garantir l'interactivité quoi qu'il arrive
+  initNavigation();
+
+  // 2. Charger les données du voyage et normaliser
   loadTripData();
+  normalizeTripItinerary();
   renderClientTripSelector();
   activeDayIndex = determineInitialDayIndex();
   
-  renderDaySelectorPills();
-  renderTodayFocus();
-  renderFullCircuit();
-  renderSouvenirs();
-  renderConciergerie();
-  renderHotelsAndFlights();
-  renderContactsAndAlert();
-  renderClientDocuments();
-  initNavigation();
-  initCaptureFeature();
+  // 3. Rendu sécurisé de chaque sous-composant
+  try { renderDaySelectorPills(); } catch(e) { console.error('Pills error:', e); }
+  try { renderTodayFocus(); } catch(e) { console.error('TodayFocus error:', e); }
+  try { renderFullCircuit(); } catch(e) { console.error('FullCircuit error:', e); }
+  try { renderSouvenirs(); } catch(e) { console.error('Souvenirs error:', e); }
+  try { renderConciergerie(); } catch(e) { console.error('Conciergerie error:', e); }
+  try { renderHotelsAndFlights(); } catch(e) { console.error('HotelsFlights error:', e); }
+  try { renderContactsAndAlert(); } catch(e) { console.error('Contacts error:', e); }
+  try { renderClientDocuments(); } catch(e) { console.error('ClientDocs error:', e); }
+  try { initCaptureFeature(); } catch(e) { console.error('Capture error:', e); }
 });
 
 // Helper: Open GPS route (Google Maps / Apple Maps / Waze)
@@ -2845,7 +2873,7 @@ function renderHotelsAndFlights() {
       `;
       flightsContainer.appendChild(card);
     });
-  } else if (currentTrip.flights) {
+  } else if (currentTrip.flights && currentTrip.flights.outbound) {
     // Rétrocompatibilité avec l'ancien format d'origine
     const f = currentTrip.flights;
     const outboundLogo = getAirlineLogoUrl(f.outbound.airline, f.outbound.flightNumber);
@@ -2949,7 +2977,7 @@ function renderHotelsAndFlights() {
       el.style = "background:white; border-radius:16px; border:1px solid var(--border-light); padding:14px; margin-bottom:10px;";
       const gpsUrl = (h.lat && h.lng) ? getGpsUrl(h.lat, h.lng, h.name) : '#';
       el.innerHTML = `
-        <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800;">${h.dates}</div>
+        <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800;">${h.dates || h.date || h.day || ""}</div>
         <div style="font-size:0.95rem; font-weight:800; color:var(--text-main);">${h.name}</div>
         <div style="font-size:0.8rem; color:#64748b; margin:2px 0 6px;">${h.address}</div>
         <a href="${gpsUrl}" target="_blank" class="btn-entry-gps"><i class="fa-solid fa-location-arrow"></i> GPS Hébergement</a>
@@ -3008,20 +3036,60 @@ function renderContactsAndAlert() {
       <h3 style="font-size:1.1rem; font-weight:800; color:var(--primary-dark); margin-bottom:12px;">
         <i class="fa-solid fa-phone-volume" style="color:var(--accent-gold); margin-right:6px;"></i> Contacts Clés & Urgences
       </h3>
-
-      <div style="background:#fef2f2; border:1px solid #fee2e2; border-left:4px solid #dc2626; border-radius:16px; padding:16px; margin-bottom:14px;">
-        <h4 style="font-size:0.98rem; font-weight:800; color:#dc2626; margin-bottom:4px;">
-          <i class="fa-solid fa-triangle-exclamation"></i> Correspondant Local & Urgences 24/7
-        </h4>
-        <div style="font-weight:700; font-size:0.92rem; color:var(--text-main);">${c.receptif.name}</div>
-        <div style="font-size:0.82rem; color:#475569; margin:4px 0 8px;">${c.receptif.address}</div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <a href="tel:${c.receptif.emergency ? c.receptif.emergency.replace(/[^0-9+]/g, '') : ''}" class="btn-entry-gps" style="background:#dc2626; color:white; padding:8px 14px; font-size:0.82rem;">
-            <i class="fa-solid fa-phone-volume"></i> Urgence : ${c.receptif.emergency}
-          </a>
-        </div>
-      </div>
     `;
+
+    if (c.receptif && c.receptif.name) {
+      contactsBox.innerHTML += `
+        <div style="background:#fef2f2; border:1px solid #fee2e2; border-left:4px solid #dc2626; border-radius:16px; padding:16px; margin-bottom:14px;">
+          <h4 style="font-size:0.98rem; font-weight:800; color:#dc2626; margin-bottom:4px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> Correspondant Local & Urgences 24/7
+          </h4>
+          <div style="font-weight:700; font-size:0.92rem; color:var(--text-main);">${c.receptif.name}</div>
+          <div style="font-size:0.82rem; color:#475569; margin:4px 0 8px;">${c.receptif.address || ''}</div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <a href="tel:${c.receptif.emergency ? c.receptif.emergency.replace(/[^0-9+]/g, '') : ''}" class="btn-entry-gps" style="background:#dc2626; color:white; padding:8px 14px; font-size:0.82rem;">
+              <i class="fa-solid fa-phone-volume"></i> Urgence : ${c.receptif.emergency}
+            </a>
+          </div>
+        </div>
+      `;
+    }
+
+    if (c.guide && c.guide.name) {
+      contactsBox.innerHTML += `
+        <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-left:4px solid #16a34a; border-radius:16px; padding:16px; margin-bottom:14px;">
+          <h4 style="font-size:0.98rem; font-weight:800; color:#166534; margin-bottom:4px;">
+            <i class="fa-solid fa-user-tie"></i> ${c.guide.role || 'Accompagnateur Girardot'}
+          </h4>
+          <div style="font-weight:700; font-size:0.92rem; color:var(--text-main);">${c.guide.name}</div>
+          ${c.guide.phone ? `
+            <div style="margin-top:6px;">
+              <a href="tel:${c.guide.phone.replace(/[^0-9+]/g, '')}" class="btn-entry-gps" style="background:#16a34a; color:white; padding:8px 14px; font-size:0.82rem;">
+                <i class="fa-solid fa-phone"></i> ${c.guide.phone}
+              </a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    if (c.emergency && c.emergency.name) {
+      contactsBox.innerHTML += `
+        <div style="background:#fef2f2; border:1px solid #fee2e2; border-left:4px solid #dc2626; border-radius:16px; padding:16px; margin-bottom:14px;">
+          <h4 style="font-size:0.98rem; font-weight:800; color:#dc2626; margin-bottom:4px;">
+            <i class="fa-solid fa-triangle-exclamation"></i> ${c.emergency.name}
+          </h4>
+          <div style="font-size:0.82rem; color:#475569; margin:4px 0 8px;">${c.emergency.agency || 'Assistance 24/7'}</div>
+          ${c.emergency.phone ? `
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <a href="tel:${c.emergency.phone.replace(/[^0-9+]/g, '')}" class="btn-entry-gps" style="background:#dc2626; color:white; padding:8px 14px; font-size:0.82rem;">
+                <i class="fa-solid fa-phone-volume"></i> ${c.emergency.phone}
+              </a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    }
   }
 
   const practicalBox = document.getElementById('practical-container');
@@ -3071,7 +3139,7 @@ function renderContactsAndAlert() {
 // 6. LEAFLET MAP LOGIC
 function initMap() {
   const mapElement = document.getElementById('travel-map');
-  if (!mapElement) return;
+  if (!mapElement || typeof L === 'undefined') return;
 
   if (leafletMap) {
     updateMapFilterButtonsVisibility();
@@ -3151,7 +3219,7 @@ function initMap() {
 }
 
 function renderMapMarkers(filterCategory = 'all') {
-  if (!leafletMap) return;
+  if (!leafletMap || typeof L === 'undefined') return;
 
   mapMarkers.forEach(m => leafletMap.removeLayer(m));
   mapMarkers = [];

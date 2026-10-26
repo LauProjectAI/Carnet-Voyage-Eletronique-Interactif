@@ -37,6 +37,11 @@
       "name": "Réception Centrale Costa Smeralda",
       "phone": "Poste Réception 24h/24",
       "agency": "Voyages Girardot : +33 3 85 42 82 82"
+    },
+    "receptif": {
+      "name": "Réception Centrale Costa Smeralda (Poste 24h/24)",
+      "address": "Pont 7 Positano — Navire en mer",
+      "emergency": "Service Rception 24h/24 ou Girardot : +33 3 85 42 82 82"
     }
   },
   "hotels": [
@@ -59,7 +64,10 @@
         "Théâtre Sanremo",
         "Infirmerie 24h/24",
         "Boutiques Duty Free"
-      ]
+      ],
+      "lat": 43.3444,
+      "lng": 5.3488,
+      "dates": "01/11 au 08/11/2026"
     }
   ],
   "itinerary": [
@@ -103,7 +111,49 @@
         "breakfast": false,
         "lunch": "Buffet libre-service à bord inclus",
         "dinner": "Dîner au restaurant principal inclus"
-      }
+      },
+      "day": 1,
+      "dateStr": "Dimanche 01/11/2026",
+      "lat": 43.3444,
+      "lng": 5.3488,
+      "timeline": [
+        {
+          "time": "13:00",
+          "title": "Accueil au Terminal Croisières de Marseille",
+          "subtitle": "Dépose de vos bagages étiquetés, formalités de contrôle d'embarquement et remise de votre carte de cabine Costa.",
+          "description": "Dépose de vos bagages étiquetés, formalités de contrôle d'embarquement et remise de votre carte de cabine Costa.",
+          "icon": "location-dot",
+          "lat": 43.3444,
+          "lng": 5.3488
+        },
+        {
+          "time": "14:30",
+          "title": "Installation en cabine & Déjeuner libre au buffet",
+          "subtitle": "Prenez possession de votre cabine, découvrez les installations et profitez du buffet La Sagra dei Sapori (Pont 8).",
+          "description": "Prenez possession de votre cabine, découvrez les installations et profitez du buffet La Sagra dei Sapori (Pont 8).",
+          "icon": "location-dot",
+          "lat": 43.3444,
+          "lng": 5.3488
+        },
+        {
+          "time": "17:00",
+          "title": "Exercice obligatoire de sécurité maritime",
+          "subtitle": "Visionnez la vidéo de sécurité puis validez votre présence à votre Muster Station avant le départ.",
+          "description": "Visionnez la vidéo de sécurité puis validez votre présence à votre Muster Station avant le départ.",
+          "icon": "location-dot",
+          "lat": 43.3444,
+          "lng": 5.3488
+        },
+        {
+          "time": "18:00",
+          "title": "Appareillage vers Barcelone",
+          "subtitle": "Grand départ en mer face aux côtes phocéennes. Soirée festive et premier dîner inclus au restaurant principal.",
+          "description": "Grand départ en mer face aux côtes phocéennes. Soirée festive et premier dîner inclus au restaurant principal.",
+          "icon": "location-dot",
+          "lat": 43.3444,
+          "lng": 5.3488
+        }
+      ]
     },
     {
       "dayNumber": 2,
@@ -140,7 +190,40 @@
         "breakfast": "Petit-déjeuner buffet inclus",
         "lunch": "Libre à terre ou buffet inclus à bord",
         "dinner": "Dîner de gala servi à table"
-      }
+      },
+      "day": 2,
+      "dateStr": "Lundi 02/11/2026",
+      "lat": 41.3851,
+      "lng": 2.1734,
+      "timeline": [
+        {
+          "time": "09:00",
+          "title": "Accostage au port de Barcelone",
+          "subtitle": "Débarquement pour votre excursion guidée ou journée de visite libre de la capitale de la Catalogne.",
+          "description": "Débarquement pour votre excursion guidée ou journée de visite libre de la capitale de la Catalogne.",
+          "icon": "anchor",
+          "lat": 41.3851,
+          "lng": 2.1734
+        },
+        {
+          "time": "10:00",
+          "title": "Chefs-d'œuvre de Gaudi & Sagrada Familia",
+          "subtitle": "Découverte de l'incroyable basilique de la Sagrada Familia, du quartier gothique et promenade sur les célèbres Ramblas.",
+          "description": "Découverte de l'incroyable basilique de la Sagrada Familia, du quartier gothique et promenade sur les célèbres Ramblas.",
+          "icon": "location-dot",
+          "lat": 41.3851,
+          "lng": 2.1734
+        },
+        {
+          "time": "17:30",
+          "title": "Retour à bord du navire",
+          "subtitle": "Horaire limite de retour à bord avant l'appareillage pour la nuit en mer.",
+          "description": "Horaire limite de retour à bord avant l'appareillage pour la nuit en mer.",
+          "icon": "location-dot",
+          "lat": 41.3851,
+          "lng": 2.1734
+        }
+      ]
     },
     {
       "dayNumber": 3,
@@ -177,7 +260,40 @@
         "breakfast": "Inclus",
         "lunch": "Inclus",
         "dinner": "Dîner de gala du Commandant inclus"
-      }
+      },
+      "day": 3,
+      "dateStr": "Mardi 03/11/2026",
+      "lat": 40.5,
+      "lng": 5.5,
+      "timeline": [
+        {
+          "time": "10:00",
+          "title": "Détente au Spa Solemio & Piscines",
+          "subtitle": "Sauna avec vue sur la mer, bains à remous et piscine intérieure tempérée La Spiaggia (Pont 16 et 17).",
+          "description": "Sauna avec vue sur la mer, bains à remous et piscine intérieure tempérée La Spiaggia (Pont 16 et 17).",
+          "icon": "location-dot",
+          "lat": 40.5,
+          "lng": 5.5
+        },
+        {
+          "time": "14:30",
+          "title": "Promenade panoramique Volare à 65m de haut",
+          "subtitle": "Balade sensationnelle sur la passerelle de verre suspendue tout en haut du navire (Pont 19 Cortina).",
+          "description": "Balade sensationnelle sur la passerelle de verre suspendue tout en haut du navire (Pont 19 Cortina).",
+          "icon": "location-dot",
+          "lat": 40.5,
+          "lng": 5.5
+        },
+        {
+          "time": "17:00",
+          "title": "Shopping hors-taxes & Atrium Colosseo",
+          "subtitle": "Profitez des boutiques duty-free et des spectacles acrobatiques au cœur du Colosseo.",
+          "description": "Profitez des boutiques duty-free et des spectacles acrobatiques au cœur du Colosseo.",
+          "icon": "location-dot",
+          "lat": 40.5,
+          "lng": 5.5
+        }
+      ]
     },
     {
       "dayNumber": 4,
@@ -209,7 +325,31 @@
         "breakfast": "Inclus",
         "lunch": "Inclus à bord ou libre",
         "dinner": "Inclus à bord"
-      }
+      },
+      "day": 4,
+      "dateStr": "Mercredi 04/11/2026",
+      "lat": 39.2238,
+      "lng": 9.1217,
+      "timeline": [
+        {
+          "time": "08:00",
+          "title": "Arrivée en Sardaigne",
+          "subtitle": "Débarquement au port de Cagliari, cité chargée d'histoire perchée sur son promontoire rocheux.",
+          "description": "Débarquement au port de Cagliari, cité chargée d'histoire perchée sur son promontoire rocheux.",
+          "icon": "anchor",
+          "lat": 39.2238,
+          "lng": 9.1217
+        },
+        {
+          "time": "09:30",
+          "title": "Bastion Saint-Rémy & Quartier du Castello",
+          "subtitle": "Vue panoramique exceptionnelle sur le golfe des Anges depuis les terrasses du Bastion Saint-Rémy.",
+          "description": "Vue panoramique exceptionnelle sur le golfe des Anges depuis les terrasses du Bastion Saint-Rémy.",
+          "icon": "location-dot",
+          "lat": 39.2238,
+          "lng": 9.1217
+        }
+      ]
     },
     {
       "dayNumber": 5,
@@ -241,7 +381,31 @@
         "breakfast": "Inclus",
         "lunch": "Inclus à bord ou libre",
         "dinner": "Inclus à bord"
-      }
+      },
+      "day": 5,
+      "dateStr": "Jeudi 05/11/2026",
+      "lat": 38.1157,
+      "lng": 13.3615,
+      "timeline": [
+        {
+          "time": "08:00",
+          "title": "Accostage au cœur de Palerme",
+          "subtitle": "Arrivée dans l'une des cités les plus fascinantes d'Italie, mélange unique d'art byzantin, normand et baroque.",
+          "description": "Arrivée dans l'une des cités les plus fascinantes d'Italie, mélange unique d'art byzantin, normand et baroque.",
+          "icon": "anchor",
+          "lat": 38.1157,
+          "lng": 13.3615
+        },
+        {
+          "time": "10:00",
+          "title": "Cathédrale de Monreale & Palais des Normands",
+          "subtitle": "Visite des mosaïques dorées de Monreale et dégustation des célèbres cannoli siciliens.",
+          "description": "Visite des mosaïques dorées de Monreale et dégustation des célèbres cannoli siciliens.",
+          "icon": "location-dot",
+          "lat": 38.1157,
+          "lng": 13.3615
+        }
+      ]
     },
     {
       "dayNumber": 6,
@@ -278,7 +442,40 @@
         "breakfast": "Inclus",
         "lunch": "Libre lors de l'excursion à Rome",
         "dinner": "Inclus à bord"
-      }
+      },
+      "day": 6,
+      "dateStr": "Vendredi 06/11/2026",
+      "lat": 42.0924,
+      "lng": 11.7955,
+      "timeline": [
+        {
+          "time": "08:30",
+          "title": "Arrivée à Civitavecchia",
+          "subtitle": "Départ matinal en autocar grand tourisme ou train express vers le centre historique de Rome.",
+          "description": "Départ matinal en autocar grand tourisme ou train express vers le centre historique de Rome.",
+          "icon": "anchor",
+          "lat": 42.0924,
+          "lng": 11.7955
+        },
+        {
+          "time": "10:30",
+          "title": "Colisée, Fontaine de Trevi & Vatican",
+          "subtitle": "Journée d'exception à la découverte des monuments mythiques de l'Empire Romain et de la place Saint-Pierre.",
+          "description": "Journée d'exception à la découverte des monuments mythiques de l'Empire Romain et de la place Saint-Pierre.",
+          "icon": "location-dot",
+          "lat": 42.0924,
+          "lng": 11.7955
+        },
+        {
+          "time": "18:30",
+          "title": "Retour à bord pour le départ",
+          "subtitle": "Appareillage pour la riviera ligure.",
+          "description": "Appareillage pour la riviera ligure.",
+          "icon": "location-dot",
+          "lat": 42.0924,
+          "lng": 11.7955
+        }
+      ]
     },
     {
       "dayNumber": 7,
@@ -315,7 +512,40 @@
         "breakfast": "Inclus",
         "lunch": "Inclus",
         "dinner": "Dîner de clôture festif inclus"
-      }
+      },
+      "day": 7,
+      "dateStr": "Samedi 07/11/2026",
+      "lat": 44.3079,
+      "lng": 8.4811,
+      "timeline": [
+        {
+          "time": "08:30",
+          "title": "Arrivée au port de Savone",
+          "subtitle": "Escale au port historique Costa de Savone, dominé par l'imposante forteresse du Priamar.",
+          "description": "Escale au port historique Costa de Savone, dominé par l'imposante forteresse du Priamar.",
+          "icon": "anchor",
+          "lat": 44.3079,
+          "lng": 8.4811
+        },
+        {
+          "time": "10:00",
+          "title": "Visite de Savone ou excursion vers Portofino",
+          "subtitle": "Balade dans le centre médiéval de Savone ou escapade vers les perles de la Riviera ligurienne.",
+          "description": "Balade dans le centre médiéval de Savone ou escapade vers les perles de la Riviera ligurienne.",
+          "icon": "location-dot",
+          "lat": 44.3079,
+          "lng": 8.4811
+        },
+        {
+          "time": "20:00",
+          "title": "Dernière grande soirée festive à bord",
+          "subtitle": "Soirée d'au revoir organisée par l'équipe d'animation et remise des pourboires.",
+          "description": "Soirée d'au revoir organisée par l'équipe d'animation et remise des pourboires.",
+          "icon": "location-dot",
+          "lat": 44.3079,
+          "lng": 8.4811
+        }
+      ]
     },
     {
       "dayNumber": 8,
@@ -352,7 +582,40 @@
         "breakfast": "Inclus à bord",
         "lunch": false,
         "dinner": false
-      }
+      },
+      "day": 8,
+      "dateStr": "Dimanche 08/11/2026",
+      "lat": 43.3444,
+      "lng": 5.3488,
+      "timeline": [
+        {
+          "time": "07:30",
+          "title": "Dernier petit-déjeuner avec vue mer",
+          "subtitle": "Prenez votre petit-déjeuner avant de libérer votre cabine vers 8h00.",
+          "description": "Prenez votre petit-déjeuner avant de libérer votre cabine vers 8h00.",
+          "icon": "location-dot",
+          "lat": 43.3444,
+          "lng": 5.3488
+        },
+        {
+          "time": "09:00",
+          "title": "Accostage à Marseille & Débarquement",
+          "subtitle": "Débarquement selon la couleur de vos étiquettes de bagages et récupération des valises sous le hangar terminal.",
+          "description": "Débarquement selon la couleur de vos étiquettes de bagages et récupération des valises sous le hangar terminal.",
+          "icon": "anchor",
+          "lat": 43.3444,
+          "lng": 5.3488
+        },
+        {
+          "time": "10:30",
+          "title": "Retour vers votre région avec Girardot",
+          "subtitle": "Prise en charge par votre autocar Girardot pour le trajet de retour.",
+          "description": "Prise en charge par votre autocar Girardot pour le trajet de retour.",
+          "icon": "location-dot",
+          "lat": 43.3444,
+          "lng": 5.3488
+        }
+      ]
     }
   ],
   "conciergerie": {
@@ -733,5 +996,19 @@
         ]
       }
     ]
-  }
+  },
+  "contactsList": [
+    {
+      "category": "Accompagnateur",
+      "name": "Accompagnateur Girardot de bord",
+      "phone": "+33 6 00 00 00 00",
+      "address": "Votre interlocuteur dédié pendant toute la croisière"
+    },
+    {
+      "category": "Urgence Navire",
+      "name": "Réception Centrale Costa Smeralda",
+      "phone": "Poste Réception 24h/24",
+      "address": "Permanence Voyages Girardot : +33 3 85 42 82 82"
+    }
+  ]
 }
