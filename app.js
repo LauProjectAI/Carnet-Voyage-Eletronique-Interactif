@@ -208,26 +208,26 @@ function loadTripData() {
   const tripParam = urlParams.get('trip');
   const idParam = urlParams.get('id');
 
-  // 1. Paramètre Base64 complet dans l'URL
-  if (tripParam) {
+  // 1. Paramètre Base64 complet dans l'URL (?trip=<base64>)
+  if (tripParam && tripParam.length > 50) {
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(tripParam))));
       currentTrip = decoded;
       normalizeTripTransitMaps();
-      // Sauvegarder dans le stockage du navigateur sous son ID sans toucher aux documents du client
       if (decoded && decoded.id) {
         localStorage.setItem(`girardot_trip_data_${decoded.id}`, JSON.stringify(decoded));
         localStorage.setItem('girardot_active_trip_id', decoded.id);
       }
       return;
     } catch (e) {
-      console.warn('Impossible de charger le voyage depuis l URL:', e);
+      console.warn('Impossible de charger le voyage Base64 depuis l URL, tentative en tant qu\'ID ou alias:', e);
     }
   }
 
-  // 2. Paramètre ID dans l'URL (?id=san-francisco ou ?id=italie-dolomites-2026)
-  if (idParam) {
-    const stored = localStorage.getItem(`girardot_trip_data_${idParam}`);
+  // 2. Paramètre ID ou Alias dans l'URL (?id=reves-orient ou ?trip=reves-orient ou ?trip=croisiere)
+  const candidateId = idParam || tripParam;
+  if (candidateId) {
+    const stored = localStorage.getItem(`girardot_trip_data_${candidateId}`);
     if (stored) {
       try {
         currentTrip = JSON.parse(stored);
@@ -236,8 +236,13 @@ function loadTripData() {
       } catch (e) {}
     }
     // Vérifier si le voyage est présent dans les voyages préenregistrés du dossier voyages/
-    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam || t.alias === idParam || (t.aliases && t.aliases.includes(idParam)));
-    const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${idParam}.json`;
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => 
+      t.id === candidateId || 
+      t.alias === candidateId || 
+      (t.aliases && t.aliases.includes(candidateId)) ||
+      (t.id && t.id.toLowerCase().includes(candidateId.toLowerCase()))
+    );
+    const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${candidateId}.json`;
     try {
       const xhr = new XMLHttpRequest();
       xhr.open('GET', encodeURI(targetFile), false); // Synchrone pour initialisation immédiate
@@ -254,7 +259,7 @@ function loadTripData() {
     }
   }
 
-  // 3. Voyage actif mémorisé
+  // 3. Voyage actif mémorisé dans le navigateur
   const activeId = localStorage.getItem('girardot_active_trip_id');
   if (activeId) {
     const storedTrip = localStorage.getItem(`girardot_trip_data_${activeId}`);
@@ -1285,6 +1290,10 @@ function executeConciergeQuery(query) {
   }
 
   const isTransportQuery = q.includes('aller') || q.includes('rejoindre') || q.includes('transport') || q.includes('comment') || q.includes('taxi') || q.includes('bus') || q.includes('trajet') || q.includes('métro') || q.includes('metro') || q.includes('carte') || q.includes('plan');
+  if (isTransportQuery && isCruiseTrip) {
+    selectConciergeTheme('transports');
+    return;
+  }
 
   if (isTransportQuery) {
     const transportTheme = activeThemes.find(t => t.id === 'transports');
@@ -1777,7 +1786,7 @@ function resetConciergeView() {
 // NAVIGATION & GÉOLOCALISATION INTÉRIEURE CROISIÈRE (100% HORS-LIGNE)
 // =============================================================================
 
-const CRUISE_SHIP_DECKS = [
+const COSTA_SMERALDA_DECKS = [
   {
     deck: 4,
     name: "Palermo",
@@ -1819,8 +1828,7 @@ const CRUISE_SHIP_DECKS = [
       { name: "Réception & Bureau d'Information 24h/24", zone: "Centre", side: "Centre", icon: "bell-concierge", color: "#059669", desc: "Accueil permanent en français, questions pratiques et gestion de compte." },
       { name: "Bornes Enregistrement Carte Cabine", zone: "Centre", side: "Tribord", icon: "credit-card", color: "#2563eb", desc: "Association obligatoire de votre carte bancaire dès le premier jour." },
       { name: "Campari Bar (Atrium Colosseo)", zone: "Centre", side: "Bâbord", icon: "martini-glass-citrus", color: "#dc2626", desc: "Apéritif italien rouge vif surplombant les shows de l'Atrium." },
-      { name: "Piazza di Spagna & Grand Escalier", zone: "Poupe (Arrière)", side: "Poupe", icon: "sun", color: "#ea580c", desc: "Gradins extérieurs monumentaux ouverts sur l'horizon marin." },
-      { name: "Restaurant Tutti a Tavola", zone: "Poupe (Arrière)", side: "Tribord", icon: "people-roof", color: "#0891b2", desc: "Restaurant familial convivial avec animations." }
+      { name: "Piazza di Spagna & Grand Escalier", zone: "Poupe (Arrière)", side: "Poupe", icon: "sun", color: "#ea580c", desc: "Gradins extérieurs monumentaux ouverts sur l'horizon marin." }
     ]
   },
   {
@@ -1832,15 +1840,14 @@ const CRUISE_SHIP_DECKS = [
       { name: "Buffet La Sagra dei Sapori", zone: "Poupe (Arrière)", side: "Centre", icon: "bowl-food", color: "#e11d48", desc: "Buffet libre-service géant : entrées, pâtes fraîches, viandes, desserts." },
       { name: "Galleria Sanremo & Boutiques Tax-Free", zone: "Centre", side: "Bâbord & Tribord", icon: "bag-shopping", color: "#d97706", desc: "Parfums, cosmétiques, bijoux, maroquinerie italienne et tabacs détaxés." },
       { name: "Pizzeria Pummid'Oro", zone: "Centre", side: "Bâbord", icon: "pizza-slice", color: "#ea580c", desc: "Pizzas artisanales à fermentation lente et mozzarella 100% faite à bord." },
-      { name: "Restaurant Japonais Teppanyaki", zone: "Poupe (Arrière)", side: "Tribord", icon: "fire-burner", color: "#b91c1c", desc: "Show cooking japonais spectaculaire sous vos yeux." },
-      { name: "Ferrari Spazio Bollicine", zone: "Centre", side: "Tribord", icon: "champagne-glasses", color: "#c29958", desc: "Bar à vins pétillants italiens de la prestigieuse maison Ferrari Trento." }
+      { name: "Restaurant Japonais Teppanyaki", zone: "Poupe (Arrière)", side: "Tribord", icon: "fire-burner", color: "#b91c1c", desc: "Show cooking japonais spectaculaire sous vos yeux." }
     ]
   },
   {
     deck: 9,
     name: "Napoli",
     category: "Pont Cabines",
-    description: "Cabines passagers intérieures, extérieures avec vue mer et avec balcon privé. Coursives Bâbord (numéros pairs) et Tribord (numéros impairs).",
+    description: "Cabines passagers intérieures, extérieures avec vue mer et avec balcon privé.",
     highlights: [
       { name: "Cabines Pont 9 (9001 à 9390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès immédiat par les ascenseurs Avant, Centraux ou Arrière." }
     ]
@@ -1851,7 +1858,7 @@ const CRUISE_SHIP_DECKS = [
     category: "Pont Cabines",
     description: "Cabines passagers avec balcon et suites élégantes.",
     highlights: [
-      { name: "Cabines Pont 10 (10001 à 10390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès par les ascenseurs Avant (Théâtre), Centraux (Colosseo) ou Arrière (Piazza)." }
+      { name: "Cabines Pont 10 (10001 à 10390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès par les ascenseurs Avant, Centraux ou Arrière." }
     ]
   },
   {
@@ -1876,7 +1883,7 @@ const CRUISE_SHIP_DECKS = [
     deck: 14,
     name: "Venezia",
     category: "Pont Cabines",
-    description: "Cabines et Suites vénitiennes (note maritime : pas de pont 13).",
+    description: "Cabines et Suites vénitiennes (pas de pont 13).",
     highlights: [
       { name: "Cabines Pont 14 (14001 à 14390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Ascenseurs Avant, Centraux et Arrière." }
     ]
@@ -1885,7 +1892,7 @@ const CRUISE_SHIP_DECKS = [
     deck: 15,
     name: "Milano",
     category: "Pont Cabines",
-    description: "Cabines avec balcon supérieur et suites. Accès immédiat aux ponts de loisirs 16 et 17.",
+    description: "Cabines avec balcon supérieur et suites.",
     highlights: [
       { name: "Cabines Pont 15 (15001 à 15390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "À un seul escalier du Spa et des piscines supérieures." }
     ]
@@ -1893,73 +1900,288 @@ const CRUISE_SHIP_DECKS = [
   {
     deck: 16,
     name: "Como",
-    category: "Bien-être, Spa & Piscines",
-    description: "Spa Solemio, Espace Beauté, Sauna, Hammam, Salle de Fitness & Gym panoramique, Piscine intérieure tempérée La Spiaggia.",
+    category: "Bien-être, Spa & Fitness",
+    description: "Spa Solemio, Espace Beauté, Sauna, Hammam, Salle de Fitness panoramique.",
     highlights: [
-      { name: "Spa Solemio & Massages", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Parcours thermal thermal luxueux, cabine de neige, sauna vue mer." },
-      { name: "Salle de Gym & Fitness Panoramique", zone: "Proue (Avant)", side: "Tribord", icon: "dumbbell", color: "#0284c7", desc: "Équipements Technogym avec vue plongeante sur l'étrave du navire." },
-      { name: "Piscine Intérieure Tempérée La Spiaggia", zone: "Centre", side: "Centre", icon: "water-ladder", color: "#0891b2", desc: "Grand bassin couvert avec verrière rétractable et jacuzzis." }
+      { name: "Spa Solemio & Massages", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Parcours thermal luxueux, cabine de neige, sauna vue mer." },
+      { name: "Salle de Gym & Fitness", zone: "Proue (Avant)", side: "Tribord", icon: "dumbbell", color: "#0284c7", desc: "Équipements Technogym avec vue panoramique mer." }
     ]
   },
   {
     deck: 17,
     name: "Bellagio",
-    category: "Piscines, Aqua Park & Cocktails",
-    description: "Piscines extérieures La Spiaggia, Bar Aperol Spritz, Nutella Café, Gelateria Amarillo, Aqua Park avec toboggans aquatiques.",
+    category: "Piscines & Ponts Extérieurs",
+    description: "Piscine centrale La Spiaggia avec verrière amovible, Solarium, Aperol Spritz Bar.",
     highlights: [
-      { name: "Aqua Park & Toboggans", zone: "Centre / Poupe", side: "Centre", icon: "water", color: "#0284c7", desc: "Toboggans aquatiques vertigineux surplombant l'océan." },
-      { name: "Aperol Spritz Bar & Solarium", zone: "Centre", side: "Bâbord", icon: "wine-glass", color: "#f97316", desc: "Cocktails face au coucher de soleil sur le bleu méditerranéen." },
-      { name: "Gelateria Amarillo & Nutella Café", zone: "Centre", side: "Tribord", icon: "ice-cream", color: "#d97706", desc: "Glaces italiennes bio artisanales et crêpes gourmandes." }
+      { name: "Piscine La Spiaggia", zone: "Centre", side: "Centre", icon: "water-ladder", color: "#0284c7", desc: "Bassin principal tempéré sous verrière avec transats." },
+      { name: "Aperol Spritz Bar", zone: "Centre", side: "Bâbord", icon: "wine-glass", color: "#f97316", desc: "Cocktails face à la mer au coucher du soleil." }
     ]
   },
   {
     deck: 18,
     name: "Torino",
-    category: "Sports & Solarium",
-    description: "Terrain multisports plein air, Piste de jogging panoramique, Solarium avec transats.",
+    category: "Sports & Club Enfants",
+    description: "Terrain multisports, parcours de marche, Club Squok enfants.",
     highlights: [
-      { name: "Terrain Multisports Plein Air", zone: "Poupe (Arrière)", side: "Centre", icon: "basketball", color: "#ea580c", desc: "Football, basketball et tennis au grand air de la mer." },
-      { name: "Piste de Jogging Panoramique", zone: "Pourtour du pont", side: "Bâbord & Tribord", icon: "person-running", color: "#059669", desc: "Circuit de marche et course avec panorama à 360° sur les flots." }
+      { name: "Terrain Multisports", zone: "Poupe (Arrière)", side: "Centre", icon: "basketball", color: "#ea580c", desc: "Terrains de basket, football et tennis en plein air." }
     ]
   },
   {
     deck: 19,
     name: "Cortina",
     category: "Passerelle Panoramique Volare",
-    description: "Promenade panoramique suspendue 'Volare' avec plancher de verre surplombant la mer à 65 mètres au-dessus des flots.",
+    description: "Passerelle panoramique Volare suspendue à 65 mètres avec sol en verre.",
     highlights: [
-      { name: "Passerelle de Verre 'Volare'", zone: "Poupe (Arrière)", side: "Centre", icon: "eye", color: "#0891b2", desc: "Vue aérienne à couper le souffle, point le plus haut accessible." }
-    ]
-  },
-  {
-    deck: 20,
-    name: "Trieste",
-    category: "Solarium Sommet",
-    description: "Solarium supérieur tout en haut du paquebot, calme absolu sous le ciel méditerranéen.",
-    highlights: [
-      { name: "Solarium Sommet 360°", zone: "Centre", side: "Centre", icon: "sun", color: "#eab308", desc: "Transats exclusifs sous le soleil marin avec horizon infini." }
+      { name: "Passerelle Volare", zone: "Poupe (Arrière)", side: "Centre", icon: "eye", color: "#0891b2", desc: "Promenade spectaculaire au-dessus du vide face à l'immensité de la mer." }
     ]
   }
 ];
 
-const CRUISE_KEY_LOCATIONS = [
-  { id: 'infirmerie', name: 'Centre Médical & Infirmerie', deck: 4, deckName: 'Palermo', side: 'Bâbord', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'shield-heart', color: '#2563eb' },
-  { id: 'reception', name: 'Réception & Information 24h', deck: 7, deckName: 'Positano', side: 'Centre', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'bell-concierge', color: '#059669' },
-  { id: 'bornes_carte', name: 'Bornes Enregistrement Carte Cabine', deck: 7, deckName: 'Positano', side: 'Tribord', zone: 'Centre (Près Réception)', elevator: 'Centraux (Colosseo)', icon: 'credit-card', color: '#2563eb' },
-  { id: 'resto_colombina', name: 'Restaurant Principal La Colombina', deck: 5, deckName: 'Taormina', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'utensils', color: '#e11d48' },
-  { id: 'resto_meneghino', name: 'Restaurants Il Meneghino & Arlecchino', deck: 6, deckName: 'Matera', side: 'Bâbord/Tribord', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'utensils', color: '#e11d48' },
-  { id: 'buffet_sagra', name: 'Buffet La Sagra dei Sapori', deck: 8, deckName: 'Capri', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'bowl-food', color: '#e11d48' },
-  { id: 'pizzeria', name: 'Pizzeria Pummid\'Oro', deck: 8, deckName: 'Capri', side: 'Bâbord', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'pizza-slice', color: '#ea580c' },
-  { id: 'teppanyaki', name: 'Restaurant Show Cooking Teppanyaki', deck: 8, deckName: 'Capri', side: 'Tribord', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'fire-burner', color: '#b91c1c' },
-  { id: 'theatre', name: 'Grand Théâtre Sanremo', deck: 6, deckName: 'Matera', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'masks-theater', color: '#7c3aed' },
-  { id: 'bar_campari', name: 'Bar Campari (Atrium Colosseo)', deck: 7, deckName: 'Positano', side: 'Bâbord', zone: 'Centre (Colosseo)', elevator: 'Centraux (Colosseo)', icon: 'martini-glass-citrus', color: '#dc2626' },
-  { id: 'bar_aperol', name: 'Aperol Spritz Bar & Vue Mer', deck: 17, deckName: 'Bellagio', side: 'Bâbord', zone: 'Ponts Extérieurs (Piscine)', elevator: 'Centraux (Colosseo)', icon: 'wine-glass', color: '#f97316' },
-  { id: 'bar_mastroianni', name: 'Grand Bar Mastroianni (Musique Live)', deck: 6, deckName: 'Matera', side: 'Centre', zone: 'Centre', elevator: 'Centraux (Colosseo)', icon: 'music', color: '#9333ea' },
-  { id: 'duty_free', name: 'Galleria Sanremo & Boutiques Tax-Free', deck: 8, deckName: 'Capri', side: 'Bâbord/Tribord', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'bag-shopping', color: '#d97706' },
-  { id: 'piscine', name: 'Piscines La Spiaggia & Aqua Park', deck: 17, deckName: 'Bellagio', side: 'Centre', zone: 'Centre / Extérieur', elevator: 'Centraux (Colosseo)', icon: 'water-ladder', color: '#0284c7' },
-  { id: 'spa', name: 'Spa Solemio & Gym Panoramique', deck: 16, deckName: 'Como', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'spa', color: '#0d9488' },
-  { id: 'volare', name: 'Passerelle Panoramique Volare (Sol verre 65m)', deck: 19, deckName: 'Cortina', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'eye', color: '#0891b2' }
+const COSTA_DIADEMA_DECKS = [
+  {
+    deck: 1,
+    name: "Timone",
+    category: "Services Médicaux & Cabines",
+    description: "Centre Médical & Infirmerie (Avant), Cabines passagers intérieures et vue mer.",
+    highlights: [
+      { name: "Centre Médical & Infirmerie", zone: "Proue (Avant)", side: "Centre", icon: "shield-heart", color: "#2563eb", desc: "Consultations, soins d'urgence, mal de mer et délivrance de médicaments 24h/24." },
+      { name: "Cabines Pont 1", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Cabines passagers calmes proches des ascenseurs." }
+    ]
+  },
+  {
+    deck: 2,
+    name: "Sara",
+    category: "Pont Cabines & Passerelle",
+    description: "Cabines passagers et passerelle d'accès pour les débarquements en escale.",
+    highlights: [
+      { name: "Passerelle de débarquement", zone: "Centre / Poupe", side: "Bâbord & Tribord", icon: "door-open", color: "#0891b2", desc: "Accès piéton pour les sorties d'escale et excursions." },
+      { name: "Cabines Pont 2", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Cabines avec hublot vue mer et cabines intérieures." }
+    ]
+  },
+  {
+    deck: 3,
+    name: "Centenario",
+    category: "Accueil, Dîner & Théâtre",
+    description: "Théâtre Emerald (Avant), Réception & Guest Service 24h, Atrium Eliodoro, Restaurant Fiorentino (Arrière), Restaurant Adularia (Centre).",
+    highlights: [
+      { name: "Réception & Guest Service (24h/24)", zone: "Centre", side: "Centre", icon: "bell-concierge", color: "#059669", desc: "Accueil francophone permanent, gestion de compte et cartes cabine." },
+      { name: "Restaurant Adularia (1er Service)", zone: "Centre", side: "Centre", icon: "utensils", color: "#e11d48", desc: "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et régionale servie à table." },
+      { name: "Restaurant Fiorentino (Niveau 1)", zone: "Poupe (Arrière)", side: "Centre", icon: "utensils", color: "#be123c", desc: "Grand restaurant élégant avec vue splendide sur le sillage du navire." },
+      { name: "Théâtre Emerald (Niveau 1)", zone: "Proue (Avant)", side: "Centre", icon: "masks-theater", color: "#7c3aed", desc: "Grandes comédies musicales, danseurs et artistes internationaux." },
+      { name: "Atrium Eliodoro (Niveau 1)", zone: "Centre", side: "Centre", icon: "landmark", color: "#c29958", desc: "Atrium central spectaculaire avec ascenseurs panoramiques en verre." }
+    ]
+  },
+  {
+    deck: 4,
+    name: "Perla di Venere",
+    category: "Grands Salons & Fêtes",
+    description: "Théâtre Emerald (Niveau 2), Grand Bar Orlov (Centre), Bar Bollicine, Atrium Eliodoro (Niveau 2), Restaurant Fiorentino (Niveau supérieur).",
+    highlights: [
+      { name: "Grand Bar Orlov", zone: "Centre", side: "Centre", icon: "music", color: "#9333ea", desc: "Le grand salon de danse du navire avec orchestre live tous les soirs." },
+      { name: "Bar Bollicine", zone: "Centre", side: "Tribord", icon: "champagne-glasses", color: "#c29958", desc: "Bar à bulles et cocktails de prestige avant le dîner." },
+      { name: "Théâtre Emerald (Niveau 2)", zone: "Proue (Avant)", side: "Centre", icon: "masks-theater", color: "#7c3aed", desc: "Balcon mezzanine du théâtre avec vue plongeante sur la scène." },
+      { name: "Restaurant Fiorentino (Niveau 2)", zone: "Poupe (Arrière)", side: "Centre", icon: "utensils", color: "#be123c", desc: "Niveau supérieur du restaurant panoramique." }
+    ]
+  },
+  {
+    deck: 5,
+    name: "Eldorador",
+    category: "Promenade, Restaurants & Boutiques",
+    description: "Promenade La Passeggiata (500m), Pizzeria La Tavernetta, Teppanyaki, Birreria Dresden Green, Vinoteca Gran Duca di Toscana, Country Rock Club, Casino Golden Mirage, Boutiques Tax-Free.",
+    highlights: [
+      { name: "Promenade extérieure 'La Passeggiata'", zone: "Tout le tour", side: "Bâbord & Tribord", icon: "person-walking", color: "#0284c7", desc: "500 mètres de promenade en plein air faisant tout le tour du navire, avec bains à remous suspendus." },
+      { name: "Pizzeria La Tavernetta", zone: "Centre", side: "Bâbord", icon: "pizza-slice", color: "#ea580c", desc: "Véritable pizza italienne artisanale avec pâte levée et mozzarella fraîche du bord." },
+      { name: "Restaurant Japonais Teppanyaki", zone: "Centre", side: "Tribord", icon: "fire-burner", color: "#b91c1c", desc: "Spectacle culinaire japonais sur plaques chauffantes par des maîtres teppanyaki." },
+      { name: "Birreria Dresden Green", zone: "Centre", side: "Bâbord", icon: "beer-mug-empty", color: "#b45309", desc: "Brasserie artisanale avec bières à la pression et ambiance chaleureuse." },
+      { name: "Vinoteca Gran Duca di Toscana", zone: "Centre", side: "Tribord", icon: "wine-glass", color: "#9333ea", desc: "Bar à vins italiens de renom, dégustations avec sommeliers." },
+      { name: "Country Rock Club", zone: "Centre", side: "Bâbord", icon: "guitar", color: "#dc2626", desc: "Concerts rock live, guitares et musique américaine." },
+      { name: "Galerie Marchande & Duty Free", zone: "Centre", side: "Centre", icon: "bag-shopping", color: "#d97706", desc: "Boutiques détaxées : parfums, mode italienne, montres, souvenirs Costa." },
+      { name: "Casino Golden Mirage", zone: "Centre", side: "Tribord", icon: "clover", color: "#059669", desc: "Roulettes, tables de blackjack, poker et machines à sous." },
+      { name: "Bar Teodora (Salon Arrière)", zone: "Poupe (Arrière)", side: "Centre", icon: "martini-glass-citrus", color: "#0891b2", desc: "Grand salon de détente arrière avec vue panoramique sur l'océan." }
+    ]
+  },
+  {
+    deck: 6,
+    name: "Brindisi",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon privé, vue mer et intérieures.",
+    highlights: [
+      { name: "Cabines Pont 6 (6001 à 6390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès immédiat par les 3 cages d'ascenseurs (Avant, Centraux, Arrière)." }
+    ]
+  },
+  {
+    deck: 7,
+    name: "Agata",
+    category: "Pont Cabines",
+    description: "Cabines avec balcon et suites confortables.",
+    highlights: [
+      { name: "Cabines Pont 7 (7001 à 7390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès ascenseurs Théâtre Emerald, Atrium Eliodoro ou Arrière." }
+    ]
+  },
+  {
+    deck: 8,
+    name: "Topazio",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon privé et mini-suites.",
+    highlights: [
+      { name: "Cabines Pont 8 (8001 à 8390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Coursives bâbord (pairs) et tribord (impairs)." }
+    ]
+  },
+  {
+    deck: 9,
+    name: "Acquamarina",
+    category: "Pont Cabines",
+    description: "Cabines supérieures avec balcon et vue panoramique dégagée.",
+    highlights: [
+      { name: "Cabines Pont 9 (9001 à 9390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "À un seul pont du buffet et des piscines du Pont 10." }
+    ]
+  },
+  {
+    deck: 10,
+    name: "Hortensia",
+    category: "Buffet, Piscines & Glaces",
+    description: "Buffet Corona Blu (Arrière), Lido Diana (Piscine couverte avec verrière rétractable et écran géant), Lido Stella del Sud (Piscine extérieure), Glacier Amarillo.",
+    highlights: [
+      { name: "Restaurant Buffet Corona Blu", zone: "Poupe (Arrière)", side: "Centre", icon: "bowl-food", color: "#e11d48", desc: "Buffet libre-service très complet pour petit-déjeuner, déjeuner et dîner décontracté." },
+      { name: "Lido Diana (Piscine couverte & Écran géant)", zone: "Centre", side: "Centre", icon: "water-ladder", color: "#0284c7", desc: "Grande piscine centrale tempérée sous verrière amovible et écran géant de cinéma." },
+      { name: "Lido Stella del Sud (Piscine Extérieure)", zone: "Poupe (Arrière)", side: "Poupe", icon: "sun", color: "#ea580c", desc: "Piscine plein air et solarium face au sillage du navire." },
+      { name: "Glacier Italien Amarillo", zone: "Centre", side: "Bâbord", icon: "ice-cream", color: "#d97706", desc: "Glaces italiennes artisanales bio fabriquées chaque jour à bord." }
+    ]
+  },
+  {
+    deck: 11,
+    name: "Samsara",
+    category: "Samsara Spa, Fitness & Bien-être",
+    description: "Samsara Spa (6 200 m² sur 4 étages), Salle de Fitness Technogym vue mer, Balnéothérapie, Hammam, Sauna, Restaurant Samsara.",
+    highlights: [
+      { name: "Samsara Spa & Wellness (6 200 m²)", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Parcours thermal de luxe, piscine balnéo, sauna finlandais et cabines de soins." },
+      { name: "Salle de Sport & Gym Panoramique", zone: "Proue (Avant)", side: "Tribord", icon: "dumbbell", color: "#0284c7", desc: "Appareils Technogym dernier cri avec baie vitrée plongeant sur l'avant du paquebot." },
+      { name: "Restaurant Samsara", zone: "Proue (Avant)", side: "Bâbord", icon: "utensils", color: "#059669", desc: "Cuisine saine, légère et raffinée dans un décor zen et apaisant." },
+      { name: "Lido Balbi & Bains à remous", zone: "Centre", side: "Centre", icon: "hot-tub-person", color: "#0891b2", desc: "Bains à remous bouillonnants et transats de relaxation." }
+    ]
+  },
+  {
+    deck: 12,
+    name: "Diamante",
+    category: "Spa Supérieur & Cabines Samsara",
+    description: "Niveau supérieur du Samsara Spa, solarium UVA et cabines bien-être.",
+    highlights: [
+      { name: "Samsara Spa (Niveau supérieur)", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Salons de relaxation intimes, lits chauffants en céramique et thérapie." },
+      { name: "Cabines & Suites Samsara", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#059669", desc: "Cabines privilégiées avec accès direct illimité à l'espace thermal." }
+    ]
+  },
+  {
+    deck: 14,
+    name: "Rubino",
+    category: "Sports, Footing & Enfants",
+    description: "Piste de jogging / footing en plein air, Terrain multisports, Club enfants Squok Club, Piscine enfants Peppa Pig, Cinéma 4D.",
+    highlights: [
+      { name: "Piste de Jogging / Footing en mer", zone: "Tout le tour", side: "Bâbord & Tribord", icon: "person-running", color: "#0284c7", desc: "Circuit de course à pied en plein air avec vue panoramique sur l'océan." },
+      { name: "Terrain Multisports Polyvalent", zone: "Centre", side: "Centre", icon: "basketball", color: "#ea580c", desc: "Tournois amicaux de basket-ball, football et volley-ball." },
+      { name: "Squok Club & Piscine Peppa Pig", zone: "Centre", side: "Tribord", icon: "children", color: "#ec4899", desc: "Espace d'animation réservé aux enfants avec pataugeoire thématique." },
+      { name: "Cinéma 4D & Simulateur de tir Star Lazer", zone: "Centre", side: "Bâbord", icon: "film", color: "#7c3aed", desc: "Sensations fortes avec effets sensoriels et jeux vidéo arcade." }
+    ]
+  },
+  {
+    deck: 15,
+    name: "Smeraldo",
+    category: "Grand Solarium Panoramique",
+    description: "Le sommet du paquebot : transats de bronzage, vue panoramique à 360° et observation du grand large.",
+    highlights: [
+      { name: "Grand Solarium Supérieur 360°", zone: "Tout le pont", side: "Proue & Centre", icon: "sun", color: "#f59e0b", desc: "Point culminant du navire pour admirer les arrivées au port et les couchers de soleil." }
+    ]
+  }
 ];
+
+function getCruiseShipDecks(shipName) {
+  const s = (shipName || "").toLowerCase();
+  if (s.includes('diadema')) {
+    return COSTA_DIADEMA_DECKS;
+  }
+  return COSTA_SMERALDA_DECKS;
+}
+
+function getActiveCruiseShipDecks() {
+  if (typeof currentTrip !== 'undefined' && currentTrip && currentTrip.decks && Array.isArray(currentTrip.decks) && currentTrip.decks.length > 0) {
+    return currentTrip.decks;
+  }
+  const ship = (typeof currentTrip !== 'undefined' && currentTrip && (currentTrip.shipName || currentTrip.title)) || "";
+  return getCruiseShipDecks(ship);
+}
+
+// Rétrocompatibilité universelle
+const CRUISE_SHIP_DECKS = new Proxy([], {
+  get(target, prop) {
+    const active = getActiveCruiseShipDecks();
+    if (prop === 'length') return active.length;
+    if (typeof active[prop] === 'function') {
+      return active[prop].bind(active);
+    }
+    return active[prop];
+  }
+});
+
+const COSTA_SMERALDA_KEY_LOCATIONS = [
+  { id: 'infirmerie', name: 'Centre Médical & Infirmerie', deck: 4, deckName: 'Palermo', side: 'Bâbord', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'shield-heart', iconEmoji: '🏥', color: '#2563eb' },
+  { id: 'reception', name: 'Réception & Information 24h', deck: 7, deckName: 'Positano', side: 'Centre', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'bell-concierge', iconEmoji: '🛎️', color: '#059669' },
+  { id: 'bornes_carte', name: 'Bornes Enregistrement Carte Cabine', deck: 7, deckName: 'Positano', side: 'Tribord', zone: 'Centre (Près Réception)', elevator: 'Centraux (Colosseo)', icon: 'credit-card', iconEmoji: '💳', color: '#2563eb' },
+  { id: 'resto_colombina', name: 'Restaurant Principal La Colombina', deck: 5, deckName: 'Taormina', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'utensils', iconEmoji: '🍽️', color: '#e11d48' },
+  { id: 'resto_meneghino', name: 'Restaurants Il Meneghino & Arlecchino', deck: 6, deckName: 'Matera', side: 'Bâbord/Tribord', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'utensils', iconEmoji: '🍽️', color: '#e11d48' },
+  { id: 'buffet_sagra', name: 'Buffet La Sagra dei Sapori', deck: 8, deckName: 'Capri', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'bowl-food', iconEmoji: '🥗', color: '#e11d48' },
+  { id: 'pizzeria', name: 'Pizzeria Pummid\'Oro', deck: 8, deckName: 'Capri', side: 'Bâbord', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'pizza-slice', iconEmoji: '🍕', color: '#ea580c' },
+  { id: 'teppanyaki', name: 'Restaurant Show Cooking Teppanyaki', deck: 8, deckName: 'Capri', side: 'Tribord', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'fire-burner', iconEmoji: '🔥', color: '#b91c1c' },
+  { id: 'theatre', name: 'Grand Théâtre Sanremo', deck: 6, deckName: 'Matera', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'masks-theater', iconEmoji: '🎭', color: '#7c3aed' },
+  { id: 'bar_campari', name: 'Bar Campari (Atrium Colosseo)', deck: 7, deckName: 'Positano', side: 'Bâbord', zone: 'Centre (Colosseo)', elevator: 'Centraux (Colosseo)', icon: 'martini-glass-citrus', iconEmoji: '🍹', color: '#dc2626' },
+  { id: 'bar_aperol', name: 'Aperol Spritz Bar & Vue Mer', deck: 17, deckName: 'Bellagio', side: 'Bâbord', zone: 'Ponts Extérieurs (Piscine)', elevator: 'Centraux (Colosseo)', icon: 'wine-glass', iconEmoji: '🍸', color: '#f97316' },
+  { id: 'bar_mastroianni', name: 'Grand Bar Mastroianni (Musique Live)', deck: 6, deckName: 'Matera', side: 'Centre', zone: 'Centre', elevator: 'Centraux (Colosseo)', icon: 'music', iconEmoji: '🎷', color: '#9333ea' },
+  { id: 'duty_free', name: 'Galleria Sanremo & Boutiques Tax-Free', deck: 8, deckName: 'Capri', side: 'Bâbord/Tribord', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'bag-shopping', iconEmoji: '🛍️', color: '#d97706' },
+  { id: 'piscine', name: 'Piscines La Spiaggia & Aqua Park', deck: 17, deckName: 'Bellagio', side: 'Centre', zone: 'Centre / Extérieur', elevator: 'Centraux (Colosseo)', icon: 'water-ladder', iconEmoji: '🏊', color: '#0284c7' },
+  { id: 'spa', name: 'Spa Solemio & Gym Panoramique', deck: 16, deckName: 'Como', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'spa', iconEmoji: '🧘', color: '#0d9488' },
+  { id: 'volare', name: 'Passerelle Panoramique Volare (Sol verre 65m)', deck: 19, deckName: 'Cortina', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'eye', iconEmoji: '🌅', color: '#0891b2' }
+];
+
+const COSTA_DIADEMA_KEY_LOCATIONS = [
+  { id: 'infirmerie', name: 'Centre Médical & Infirmerie', deck: 1, deckName: 'Timone', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre Emerald)', icon: 'shield-heart', iconEmoji: '🏥', color: '#2563eb' },
+  { id: 'reception', name: 'Réception & Guest Service 24h', deck: 3, deckName: 'Centenario', side: 'Centre', zone: 'Centre (Atrium Eliodoro)', elevator: 'Centraux (Atrium Eliodoro)', icon: 'bell-concierge', iconEmoji: '🛎️', color: '#059669' },
+  { id: 'bornes_carte', name: 'Bornes Enregistrement Carte Cabine', deck: 3, deckName: 'Centenario', side: 'Tribord', zone: 'Centre (Près Réception)', elevator: 'Centraux (Atrium Eliodoro)', icon: 'credit-card', iconEmoji: '💳', color: '#2563eb' },
+  { id: 'resto_adularia', name: 'Restaurant Principal Adularia (1er Service)', deck: 3, deckName: 'Centenario', side: 'Centre', zone: 'Centre', elevator: 'Centraux (Atrium Eliodoro)', icon: 'utensils', iconEmoji: '🍽️', color: '#e11d48' },
+  { id: 'resto_fiorentino', name: 'Restaurant Fiorentino (Vue Sillage)', deck: 3, deckName: 'Centenario', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière', icon: 'utensils', iconEmoji: '🍷', color: '#be123c' },
+  { id: 'theatre', name: 'Grand Théâtre Emerald (3 étages)', deck: 3, deckName: 'Centenario', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'masks-theater', iconEmoji: '🎭', color: '#7c3aed' },
+  { id: 'bar_orlov', name: 'Grand Bar Orlov (Danse & Musique Live)', deck: 4, deckName: 'Perla di Venere', side: 'Centre', zone: 'Centre', elevator: 'Centraux', icon: 'music', iconEmoji: '🎷', color: '#9333ea' },
+  { id: 'passeggiata', name: 'Promenade Extérieure La Passeggiata (500m)', deck: 5, deckName: 'Eldorador', side: 'Bâbord/Tribord', zone: 'Tout le tour', elevator: 'Centraux', icon: 'person-walking', iconEmoji: '🚶', color: '#0284c7' },
+  { id: 'pizzeria', name: 'Pizzeria La Tavernetta', deck: 5, deckName: 'Eldorador', side: 'Bâbord', zone: 'Centre', elevator: 'Centraux', icon: 'pizza-slice', iconEmoji: '🍕', color: '#ea580c' },
+  { id: 'teppanyaki', name: 'Restaurant Japonais Tavola Teppanyaki', deck: 5, deckName: 'Eldorador', side: 'Tribord', zone: 'Centre', elevator: 'Centraux', icon: 'fire-burner', iconEmoji: '🔥', color: '#b91c1c' },
+  { id: 'brasserie', name: 'Brasserie Artisanale Dresden Green', deck: 5, deckName: 'Eldorador', side: 'Bâbord', zone: 'Centre', elevator: 'Centraux', icon: 'beer-mug-empty', iconEmoji: '🍺', color: '#b45309' },
+  { id: 'vinoteca', name: 'Vinoteca Gran Duca di Toscana', deck: 5, deckName: 'Eldorador', side: 'Tribord', zone: 'Centre', elevator: 'Centraux', icon: 'wine-glass', iconEmoji: '🍾', color: '#9333ea' },
+  { id: 'country_rock', name: 'Country Rock Club (Live)', deck: 5, deckName: 'Eldorador', side: 'Bâbord', zone: 'Centre', elevator: 'Centraux', icon: 'guitar', iconEmoji: '🎸', color: '#dc2626' },
+  { id: 'duty_free', name: 'Galerie Marchande & Duty Free', deck: 5, deckName: 'Eldorador', side: 'Centre', zone: 'Centre', elevator: 'Centraux', icon: 'bag-shopping', iconEmoji: '🛍️', color: '#d97706' },
+  { id: 'buffet_coronablu', name: 'Restaurant Buffet Corona Blu', deck: 10, deckName: 'Hortensia', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière', icon: 'bowl-food', iconEmoji: '🥗', color: '#e11d48' },
+  { id: 'piscine_diana', name: 'Lido Diana (Piscine couverte & Écran géant)', deck: 10, deckName: 'Hortensia', side: 'Centre', zone: 'Centre', elevator: 'Centraux', icon: 'water-ladder', iconEmoji: '🏊', color: '#0284c7' },
+  { id: 'piscine_stella', name: 'Lido Stella del Sud (Piscine plein air)', deck: 10, deckName: 'Hortensia', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière', icon: 'sun', iconEmoji: '☀️', color: '#ea580c' },
+  { id: 'spa', name: 'Samsara Spa (6 200 m²) & Fitness', deck: 11, deckName: 'Samsara', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'spa', iconEmoji: '🧘', color: '#0d9488' },
+  { id: 'jogging', name: 'Piste de Jogging & Sports en plein air', deck: 14, deckName: 'Rubino', side: 'Bâbord/Tribord', zone: 'Tout le tour', elevator: 'Centraux', icon: 'person-running', iconEmoji: '🏃', color: '#0284c7' },
+  { id: 'solarium_sommet', name: 'Grand Solarium Supérieur 360°', deck: 15, deckName: 'Smeraldo', side: 'Centre', zone: 'Centre / Proue', elevator: 'Centraux', icon: 'sun', iconEmoji: '🌅', color: '#f59e0b' }
+];
+
+function getActiveCruiseKeyLocations() {
+  const ship = (typeof currentTrip !== 'undefined' && currentTrip && (currentTrip.shipName || currentTrip.title || "")).toLowerCase();
+  if (ship.includes('diadema')) {
+    return COSTA_DIADEMA_KEY_LOCATIONS;
+  }
+  return COSTA_SMERALDA_KEY_LOCATIONS;
+}
+
+const CRUISE_KEY_LOCATIONS = new Proxy([], {
+  get(target, prop) {
+    const active = getActiveCruiseKeyLocations();
+    if (prop === 'length') return active.length;
+    if (typeof active[prop] === 'function') {
+      return active[prop].bind(active);
+    }
+    return active[prop];
+  }
+});
+
 
 // État local du module croisière
 let currentActiveCruiseDeck = 8; // Par défaut Pont 8 (Cœur de vie Capri)
@@ -2007,17 +2229,17 @@ function decodeCruiseCabin(rawInput) {
 
   if (roomNumber < 130) {
     zoneName = "Proue (Avant du navire)";
-    elevatorName = "Ascenseurs Avant (Théâtre Sanremo)";
+    elevatorName = (typeof currentTrip !== "undefined" && (currentTrip.shipName || "").toLowerCase().includes("diadema")) ? "Ascenseurs Avant (Théâtre Emerald)" : "Ascenseurs Avant (Théâtre Sanremo)";
     elevatorCode = "avant";
     xRatio = 0.22;
   } else if (roomNumber <= 270) {
     zoneName = "Milieu / Centre (Atrium)";
-    elevatorName = "Ascenseurs Centraux (Atrium Colosseo)";
+    elevatorName = (typeof currentTrip !== "undefined" && (currentTrip.shipName || "").toLowerCase().includes("diadema")) ? "Ascenseurs Centraux (Atrium Eliodoro)" : "Ascenseurs Centraux (Atrium Colosseo)";
     elevatorCode = "centre";
     xRatio = 0.50;
   } else {
     zoneName = "Poupe (Arrière du navire)";
-    elevatorName = "Ascenseurs Arrière (Piazza di Spagna)";
+    elevatorName = (typeof currentTrip !== "undefined" && (currentTrip.shipName || "").toLowerCase().includes("diadema")) ? "Ascenseurs Arrière (Corona Blu & Lido)" : "Ascenseurs Arrière (Piazza di Spagna)";
     elevatorCode = "arriere";
     xRatio = 0.78;
   }
@@ -2273,6 +2495,9 @@ function renderCruiseDeckOrientationModule(containerEl, trip) {
   const initialCabinDecoded = storedCabin ? decodeCruiseCabin(storedCabin) : null;
   if (initialCabinDecoded) {
     currentActiveCruiseDeck = initialCabinDecoded.deck;
+  } else {
+    const isDiadema = (shipName || "").toLowerCase().includes("diadema");
+    currentActiveCruiseDeck = isDiadema ? 5 : 8;
   }
 
   const wrapper = document.createElement('div');
@@ -2366,20 +2591,9 @@ function renderCruiseDeckOrientationModule(containerEl, trip) {
         <div style="margin-bottom:12px;">
           <label style="font-size:0.78rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Où souhaitez-vous vous rendre ?</label>
           <select id="wayfinder-to-select" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem; font-weight:600; background:white;">
-            <option value="infirmerie">🏥 Centre Médical & Infirmerie (Pont 4)</option>
-            <option value="resto_colombina">🍽️ Restaurant Principal La Colombina (Pont 5)</option>
-            <option value="theatre">🎭 Grand Théâtre Sanremo (Pont 6 & 7)</option>
-            <option value="reception">🛎️ Réception Centrale 24h & Bureau Information (Pont 7)</option>
-            <option value="bornes_carte">💳 Bornes Enregistrement Carte Cabine (Pont 7)</option>
-            <option value="bar_campari">🍹 Bar Campari & Atrium Colosseo (Pont 7)</option>
-            <option value="buffet_sagra">🥗 Buffet La Sagra dei Sapori (Pont 8)</option>
-            <option value="pizzeria">🍕 Pizzeria Pummid'Oro (Pont 8)</option>
-            <option value="teppanyaki">🔥 Restaurant Teppanyaki (Pont 8)</option>
-            <option value="duty_free">🛍️ Galleria Duty Free & Boutiques (Pont 8)</option>
-            <option value="spa">🧘 Spa Solemio & Salle de Gym (Pont 16)</option>
-            <option value="piscine">🏊 Piscines La Spiaggia & Aqua Park (Pont 17)</option>
-            <option value="bar_aperol">🍸 Aperol Spritz Bar & Solarium (Pont 17)</option>
-            <option value="volare">🌅 Passerelle Panoramique Volare (Sol verre 65m - Pont 19)</option>
+            ${getActiveCruiseKeyLocations().map(loc => `
+              <option value="${loc.id}">${loc.iconEmoji || '📍'} ${loc.name} (Pont ${loc.deck} ${loc.deckName})</option>
+            `).join('')}
           </select>
         </div>
 
@@ -2873,7 +3087,7 @@ function renderHotelsAndFlights() {
       `;
       flightsContainer.appendChild(card);
     });
-  } else if (currentTrip.flights && currentTrip.flights.outbound) {
+  } else if (!currentTrip.isCruise && !currentTrip.flightsList && currentTrip.flights && currentTrip.flights.outbound && (currentTrip.flights.outbound.airline || currentTrip.flights.outbound.flightNumber)) {
     // Rétrocompatibilité avec l'ancien format d'origine
     const f = currentTrip.flights;
     const outboundLogo = getAirlineLogoUrl(f.outbound.airline, f.outbound.flightNumber);

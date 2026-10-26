@@ -4423,10 +4423,819 @@ function parsePastedTextToTrip() {
 
 
 // -----------------------------------------------------------------------------
+// PROFILS DE PONTS DES NAVIRES DE CROISIÈRE
+// -----------------------------------------------------------------------------
+const COSTA_SMERALDA_DECKS = [
+  {
+    deck: 4,
+    name: "Palermo",
+    category: "Services & Cabines",
+    description: "Centre Médical & Infirmerie (Avant), Cabines passagers, Passerelle d'embarquement / débarquement en escale.",
+    highlights: [
+      { name: "Centre Médical & Infirmerie", zone: "Proue (Avant)", side: "Bâbord", icon: "shield-heart", color: "#2563eb", desc: "Soins médicaux, urgences, consultations et médicaments 24h/24." },
+      { name: "Passerelle de débarquement", zone: "Centre / Poupe", side: "Bâbord & Tribord", icon: "door-open", color: "#0891b2", desc: "Accès piéton pour les sorties d'escale et excursions." }
+    ]
+  },
+  {
+    deck: 5,
+    name: "Taormina",
+    category: "Restauration & Cabines",
+    description: "Restaurant Principal La Colombina (Arrière), Cabines passagers.",
+    highlights: [
+      { name: "Restaurant Principal La Colombina", zone: "Poupe (Arrière)", side: "Centre", icon: "utensils", color: "#e11d48", desc: "Dîner inclus servi à table avec carte régionale italienne renouvelée chaque soir." }
+    ]
+  },
+  {
+    deck: 6,
+    name: "Matera",
+    category: "Spectacles & Grands Salons",
+    description: "Grand Théâtre Sanremo (Avant), Grand Bar Mastroianni (Centre), Atrium Colosseo (Centre), Illy Bar & Café, Restaurants Il Meneghino & Arlecchino (Arrière).",
+    highlights: [
+      { name: "Grand Théâtre Sanremo (Niveau 1)", zone: "Proue (Avant)", side: "Centre", icon: "masks-theater", color: "#7c3aed", desc: "Spectacles musicaux, acrobates, danseurs et artistes internationaux." },
+      { name: "Grand Bar Mastroianni", zone: "Centre", side: "Centre", icon: "music", color: "#9333ea", desc: "Grand salon central avec piste de danse et orchestre live." },
+      { name: "Atrium Colosseo (Niveau 1)", zone: "Centre", side: "Centre", icon: "landmark", color: "#c29958", desc: "Cœur battant du navire avec parois vitrées et écrans géants LED." },
+      { name: "Illy Bar & Café Italien", zone: "Centre", side: "Bâbord", icon: "mug-saucer", color: "#b45309", desc: "Véritable expresso italien, cappuccino et pâtisseries." },
+      { name: "Restaurants Il Meneghino & Arlecchino", zone: "Poupe (Arrière)", side: "Bâbord / Tribord", icon: "utensils", color: "#e11d48", desc: "Grands espaces de restauration panoramiques avec vue sur la mer." }
+    ]
+  },
+  {
+    deck: 7,
+    name: "Positano",
+    category: "Accueil & Vie Centrale",
+    description: "Théâtre Sanremo (Avant), Réception & Bureau d'Information 24h, Bornes Carte Cabine, Campari Bar, Piazza di Spagna (Arrière), Tutti a Tavola.",
+    highlights: [
+      { name: "Réception & Bureau d'Information 24h/24", zone: "Centre", side: "Centre", icon: "bell-concierge", color: "#059669", desc: "Accueil permanent en français, questions pratiques et gestion de compte." },
+      { name: "Bornes Enregistrement Carte Cabine", zone: "Centre", side: "Tribord", icon: "credit-card", color: "#2563eb", desc: "Association obligatoire de votre carte bancaire dès le premier jour." },
+      { name: "Campari Bar (Atrium Colosseo)", zone: "Centre", side: "Bâbord", icon: "martini-glass-citrus", color: "#dc2626", desc: "Apéritif italien rouge vif surplombant les shows de l'Atrium." },
+      { name: "Piazza di Spagna & Grand Escalier", zone: "Poupe (Arrière)", side: "Poupe", icon: "sun", color: "#ea580c", desc: "Gradins extérieurs monumentaux ouverts sur l'horizon marin." }
+    ]
+  },
+  {
+    deck: 8,
+    name: "Capri",
+    category: "Gastronomie & Boutiques Tax-Free",
+    description: "Galleria Sanremo (Duty Free), Pizzeria Pummid'Oro, Buffet La Sagra dei Sapori, Teppanyaki, Spazio Bollicine Ferrari.",
+    highlights: [
+      { name: "Buffet La Sagra dei Sapori", zone: "Poupe (Arrière)", side: "Centre", icon: "bowl-food", color: "#e11d48", desc: "Buffet libre-service géant : entrées, pâtes fraîches, viandes, desserts." },
+      { name: "Galleria Sanremo & Boutiques Tax-Free", zone: "Centre", side: "Bâbord & Tribord", icon: "bag-shopping", color: "#d97706", desc: "Parfums, cosmétiques, bijoux, maroquinerie italienne et tabacs détaxés." },
+      { name: "Pizzeria Pummid'Oro", zone: "Centre", side: "Bâbord", icon: "pizza-slice", color: "#ea580c", desc: "Pizzas artisanales à fermentation lente et mozzarella 100% faite à bord." },
+      { name: "Restaurant Japonais Teppanyaki", zone: "Poupe (Arrière)", side: "Tribord", icon: "fire-burner", color: "#b91c1c", desc: "Show cooking japonais spectaculaire sous vos yeux." }
+    ]
+  },
+  {
+    deck: 9,
+    name: "Napoli",
+    category: "Pont Cabines",
+    description: "Cabines passagers intérieures, extérieures avec vue mer et avec balcon privé.",
+    highlights: [
+      { name: "Cabines Pont 9 (9001 à 9390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès immédiat par les ascenseurs Avant, Centraux ou Arrière." }
+    ]
+  },
+  {
+    deck: 10,
+    name: "Roma",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon et suites élégantes.",
+    highlights: [
+      { name: "Cabines Pont 10 (10001 à 10390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès par les ascenseurs Avant, Centraux ou Arrière." }
+    ]
+  },
+  {
+    deck: 11,
+    name: "Firenze",
+    category: "Pont Cabines",
+    description: "Cabines passagers et suites avec vue panoramique.",
+    highlights: [
+      { name: "Cabines Pont 11 (11001 à 11390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès direct par les 3 cages d'ascenseurs principales." }
+    ]
+  },
+  {
+    deck: 12,
+    name: "Genova",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon.",
+    highlights: [
+      { name: "Cabines Pont 12 (12001 à 12390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès rapide aux ascenseurs Avant, Centraux et Arrière." }
+    ]
+  },
+  {
+    deck: 14,
+    name: "Venezia",
+    category: "Pont Cabines",
+    description: "Cabines et Suites vénitiennes (pas de pont 13).",
+    highlights: [
+      { name: "Cabines Pont 14 (14001 à 14390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Ascenseurs Avant, Centraux et Arrière." }
+    ]
+  },
+  {
+    deck: 15,
+    name: "Milano",
+    category: "Pont Cabines",
+    description: "Cabines avec balcon supérieur et suites.",
+    highlights: [
+      { name: "Cabines Pont 15 (15001 à 15390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "À un seul escalier du Spa et des piscines supérieures." }
+    ]
+  },
+  {
+    deck: 16,
+    name: "Como",
+    category: "Bien-être, Spa & Fitness",
+    description: "Spa Solemio, Espace Beauté, Sauna, Hammam, Salle de Fitness panoramique.",
+    highlights: [
+      { name: "Spa Solemio & Massages", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Parcours thermal luxueux, cabine de neige, sauna vue mer." },
+      { name: "Salle de Gym & Fitness", zone: "Proue (Avant)", side: "Tribord", icon: "dumbbell", color: "#0284c7", desc: "Équipements Technogym avec vue panoramique mer." }
+    ]
+  },
+  {
+    deck: 17,
+    name: "Bellagio",
+    category: "Piscines & Ponts Extérieurs",
+    description: "Piscine centrale La Spiaggia avec verrière amovible, Solarium, Aperol Spritz Bar.",
+    highlights: [
+      { name: "Piscine La Spiaggia", zone: "Centre", side: "Centre", icon: "water-ladder", color: "#0284c7", desc: "Bassin principal tempéré sous verrière avec transats." },
+      { name: "Aperol Spritz Bar", zone: "Centre", side: "Bâbord", icon: "wine-glass", color: "#f97316", desc: "Cocktails face à la mer au coucher du soleil." }
+    ]
+  },
+  {
+    deck: 18,
+    name: "Torino",
+    category: "Sports & Club Enfants",
+    description: "Terrain multisports, parcours de marche, Club Squok enfants.",
+    highlights: [
+      { name: "Terrain Multisports", zone: "Poupe (Arrière)", side: "Centre", icon: "basketball", color: "#ea580c", desc: "Terrains de basket, football et tennis en plein air." }
+    ]
+  },
+  {
+    deck: 19,
+    name: "Cortina",
+    category: "Passerelle Panoramique Volare",
+    description: "Passerelle panoramique Volare suspendue à 65 mètres avec sol en verre.",
+    highlights: [
+      { name: "Passerelle Volare", zone: "Poupe (Arrière)", side: "Centre", icon: "eye", color: "#0891b2", desc: "Promenade spectaculaire au-dessus du vide face à l'immensité de la mer." }
+    ]
+  }
+];
+
+const COSTA_DIADEMA_DECKS = [
+  {
+    deck: 1,
+    name: "Timone",
+    category: "Services Médicaux & Cabines",
+    description: "Centre Médical & Infirmerie (Avant), Cabines passagers intérieures et vue mer.",
+    highlights: [
+      { name: "Centre Médical & Infirmerie", zone: "Proue (Avant)", side: "Centre", icon: "shield-heart", color: "#2563eb", desc: "Consultations, soins d'urgence, mal de mer et délivrance de médicaments 24h/24." },
+      { name: "Cabines Pont 1", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Cabines passagers calmes proches des ascenseurs." }
+    ]
+  },
+  {
+    deck: 2,
+    name: "Sara",
+    category: "Pont Cabines & Passerelle",
+    description: "Cabines passagers et passerelle d'accès pour les débarquements en escale.",
+    highlights: [
+      { name: "Passerelle de débarquement", zone: "Centre / Poupe", side: "Bâbord & Tribord", icon: "door-open", color: "#0891b2", desc: "Accès piéton pour les sorties d'escale et excursions." },
+      { name: "Cabines Pont 2", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Cabines avec hublot vue mer et cabines intérieures." }
+    ]
+  },
+  {
+    deck: 3,
+    name: "Centenario",
+    category: "Accueil, Dîner & Théâtre",
+    description: "Théâtre Emerald (Avant), Réception & Guest Service 24h, Atrium Eliodoro, Restaurant Fiorentino (Arrière), Restaurant Adularia (Centre).",
+    highlights: [
+      { name: "Réception & Guest Service (24h/24)", zone: "Centre", side: "Centre", icon: "bell-concierge", color: "#059669", desc: "Accueil francophone permanent, gestion de compte et cartes cabine." },
+      { name: "Restaurant Adularia (1er Service)", zone: "Centre", side: "Centre", icon: "utensils", color: "#e11d48", desc: "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et régionale servie à table." },
+      { name: "Restaurant Fiorentino (Niveau 1)", zone: "Poupe (Arrière)", side: "Centre", icon: "utensils", color: "#be123c", desc: "Grand restaurant élégant avec vue splendide sur le sillage du navire." },
+      { name: "Théâtre Emerald (Niveau 1)", zone: "Proue (Avant)", side: "Centre", icon: "masks-theater", color: "#7c3aed", desc: "Grandes comédies musicales, danseurs et artistes internationaux." },
+      { name: "Atrium Eliodoro (Niveau 1)", zone: "Centre", side: "Centre", icon: "landmark", color: "#c29958", desc: "Atrium central spectaculaire avec ascenseurs panoramiques en verre." }
+    ]
+  },
+  {
+    deck: 4,
+    name: "Perla di Venere",
+    category: "Grands Salons & Fêtes",
+    description: "Théâtre Emerald (Niveau 2), Grand Bar Orlov (Centre), Bar Bollicine, Atrium Eliodoro (Niveau 2), Restaurant Fiorentino (Niveau supérieur).",
+    highlights: [
+      { name: "Grand Bar Orlov", zone: "Centre", side: "Centre", icon: "music", color: "#9333ea", desc: "Le grand salon de danse du navire avec orchestre live tous les soirs." },
+      { name: "Bar Bollicine", zone: "Centre", side: "Tribord", icon: "champagne-glasses", color: "#c29958", desc: "Bar à bulles et cocktails de prestige avant le dîner." },
+      { name: "Théâtre Emerald (Niveau 2)", zone: "Proue (Avant)", side: "Centre", icon: "masks-theater", color: "#7c3aed", desc: "Balcon mezzanine du théâtre avec vue plongeante sur la scène." },
+      { name: "Restaurant Fiorentino (Niveau 2)", zone: "Poupe (Arrière)", side: "Centre", icon: "utensils", color: "#be123c", desc: "Niveau supérieur du restaurant panoramique." }
+    ]
+  },
+  {
+    deck: 5,
+    name: "Eldorador",
+    category: "Promenade, Restaurants & Boutiques",
+    description: "Promenade La Passeggiata (500m), Pizzeria La Tavernetta, Teppanyaki, Birreria Dresden Green, Vinoteca Gran Duca di Toscana, Country Rock Club, Casino Golden Mirage, Boutiques Tax-Free.",
+    highlights: [
+      { name: "Promenade extérieure 'La Passeggiata'", zone: "Tout le tour", side: "Bâbord & Tribord", icon: "person-walking", color: "#0284c7", desc: "500 mètres de promenade en plein air faisant tout le tour du navire, avec bains à remous suspendus." },
+      { name: "Pizzeria La Tavernetta", zone: "Centre", side: "Bâbord", icon: "pizza-slice", color: "#ea580c", desc: "Véritable pizza italienne artisanale avec pâte levée et mozzarella fraîche du bord." },
+      { name: "Restaurant Japonais Teppanyaki", zone: "Centre", side: "Tribord", icon: "fire-burner", color: "#b91c1c", desc: "Spectacle culinaire japonais sur plaques chauffantes par des maîtres teppanyaki." },
+      { name: "Birreria Dresden Green", zone: "Centre", side: "Bâbord", icon: "beer-mug-empty", color: "#b45309", desc: "Brasserie artisanale avec bières à la pression et ambiance chaleureuse." },
+      { name: "Vinoteca Gran Duca di Toscana", zone: "Centre", side: "Tribord", icon: "wine-glass", color: "#9333ea", desc: "Bar à vins italiens de renom, dégustations avec sommeliers." },
+      { name: "Country Rock Club", zone: "Centre", side: "Bâbord", icon: "guitar", color: "#dc2626", desc: "Concerts rock live, guitares et musique américaine." },
+      { name: "Galerie Marchande & Duty Free", zone: "Centre", side: "Centre", icon: "bag-shopping", color: "#d97706", desc: "Boutiques détaxées : parfums, mode italienne, montres, souvenirs Costa." },
+      { name: "Casino Golden Mirage", zone: "Centre", side: "Tribord", icon: "clover", color: "#059669", desc: "Roulettes, tables de blackjack, poker et machines à sous." },
+      { name: "Bar Teodora (Salon Arrière)", zone: "Poupe (Arrière)", side: "Centre", icon: "martini-glass-citrus", color: "#0891b2", desc: "Grand salon de détente arrière avec vue panoramique sur l'océan." }
+    ]
+  },
+  {
+    deck: 6,
+    name: "Brindisi",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon privé, vue mer et intérieures.",
+    highlights: [
+      { name: "Cabines Pont 6 (6001 à 6390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès immédiat par les 3 cages d'ascenseurs (Avant, Centraux, Arrière)." }
+    ]
+  },
+  {
+    deck: 7,
+    name: "Agata",
+    category: "Pont Cabines",
+    description: "Cabines avec balcon et suites confortables.",
+    highlights: [
+      { name: "Cabines Pont 7 (7001 à 7390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès ascenseurs Théâtre Emerald, Atrium Eliodoro ou Arrière." }
+    ]
+  },
+  {
+    deck: 8,
+    name: "Topazio",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon privé et mini-suites.",
+    highlights: [
+      { name: "Cabines Pont 8 (8001 à 8390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Coursives bâbord (pairs) et tribord (impairs)." }
+    ]
+  },
+  {
+    deck: 9,
+    name: "Acquamarina",
+    category: "Pont Cabines",
+    description: "Cabines supérieures avec balcon et vue panoramique dégagée.",
+    highlights: [
+      { name: "Cabines Pont 9 (9001 à 9390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "À un seul pont du buffet et des piscines du Pont 10." }
+    ]
+  },
+  {
+    deck: 10,
+    name: "Hortensia",
+    category: "Buffet, Piscines & Glaces",
+    description: "Buffet Corona Blu (Arrière), Lido Diana (Piscine couverte avec verrière rétractable et écran géant), Lido Stella del Sud (Piscine extérieure), Glacier Amarillo.",
+    highlights: [
+      { name: "Restaurant Buffet Corona Blu", zone: "Poupe (Arrière)", side: "Centre", icon: "bowl-food", color: "#e11d48", desc: "Buffet libre-service très complet pour petit-déjeuner, déjeuner et dîner décontracté." },
+      { name: "Lido Diana (Piscine couverte & Écran géant)", zone: "Centre", side: "Centre", icon: "water-ladder", color: "#0284c7", desc: "Grande piscine centrale tempérée sous verrière amovible et écran géant de cinéma." },
+      { name: "Lido Stella del Sud (Piscine Extérieure)", zone: "Poupe (Arrière)", side: "Poupe", icon: "sun", color: "#ea580c", desc: "Piscine plein air et solarium face au sillage du navire." },
+      { name: "Glacier Italien Amarillo", zone: "Centre", side: "Bâbord", icon: "ice-cream", color: "#d97706", desc: "Glaces italiennes artisanales bio fabriquées chaque jour à bord." }
+    ]
+  },
+  {
+    deck: 11,
+    name: "Samsara",
+    category: "Samsara Spa, Fitness & Bien-être",
+    description: "Samsara Spa (6 200 m² sur 4 étages), Salle de Fitness Technogym vue mer, Balnéothérapie, Hammam, Sauna, Restaurant Samsara.",
+    highlights: [
+      { name: "Samsara Spa & Wellness (6 200 m²)", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Parcours thermal de luxe, piscine balnéo, sauna finlandais et cabines de soins." },
+      { name: "Salle de Sport & Gym Panoramique", zone: "Proue (Avant)", side: "Tribord", icon: "dumbbell", color: "#0284c7", desc: "Appareils Technogym dernier cri avec baie vitrée plongeant sur l'avant du paquebot." },
+      { name: "Restaurant Samsara", zone: "Proue (Avant)", side: "Bâbord", icon: "utensils", color: "#059669", desc: "Cuisine saine, légère et raffinée dans un décor zen et apaisant." },
+      { name: "Lido Balbi & Bains à remous", zone: "Centre", side: "Centre", icon: "hot-tub-person", color: "#0891b2", desc: "Bains à remous bouillonnants et transats de relaxation." }
+    ]
+  },
+  {
+    deck: 12,
+    name: "Diamante",
+    category: "Spa Supérieur & Cabines Samsara",
+    description: "Niveau supérieur du Samsara Spa, solarium UVA et cabines bien-être.",
+    highlights: [
+      { name: "Samsara Spa (Niveau supérieur)", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Salons de relaxation intimes, lits chauffants en céramique et thérapie." },
+      { name: "Cabines & Suites Samsara", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#059669", desc: "Cabines privilégiées avec accès direct illimité à l'espace thermal." }
+    ]
+  },
+  {
+    deck: 14,
+    name: "Rubino",
+    category: "Sports, Footing & Enfants",
+    description: "Piste de jogging / footing en plein air, Terrain multisports, Club enfants Squok Club, Piscine enfants Peppa Pig, Cinéma 4D.",
+    highlights: [
+      { name: "Piste de Jogging / Footing en mer", zone: "Tout le tour", side: "Bâbord & Tribord", icon: "person-running", color: "#0284c7", desc: "Circuit de course à pied en plein air avec vue panoramique sur l'océan." },
+      { name: "Terrain Multisports Polyvalent", zone: "Centre", side: "Centre", icon: "basketball", color: "#ea580c", desc: "Tournois amicaux de basket-ball, football et volley-ball." },
+      { name: "Squok Club & Piscine Peppa Pig", zone: "Centre", side: "Tribord", icon: "children", color: "#ec4899", desc: "Espace d'animation réservé aux enfants avec pataugeoire thématique." },
+      { name: "Cinéma 4D & Simulateur de tir Star Lazer", zone: "Centre", side: "Bâbord", icon: "film", color: "#7c3aed", desc: "Sensations fortes avec effets sensoriels et jeux vidéo arcade." }
+    ]
+  },
+  {
+    deck: 15,
+    name: "Smeraldo",
+    category: "Grand Solarium Panoramique",
+    description: "Le sommet du paquebot : transats de bronzage, vue panoramique à 360° et observation du grand large.",
+    highlights: [
+      { name: "Grand Solarium Supérieur 360°", zone: "Tout le pont", side: "Proue & Centre", icon: "sun", color: "#f59e0b", desc: "Point culminant du navire pour admirer les arrivées au port et les couchers de soleil." }
+    ]
+  }
+];
+
+function getCruiseShipDecks(shipName) {
+  const s = (shipName || "").toLowerCase();
+  if (s.includes('diadema')) {
+    return COSTA_DIADEMA_DECKS;
+  }
+  return COSTA_SMERALDA_DECKS;
+}
+
+// -----------------------------------------------------------------------------
 // CONCIERGERIE SPÉCIALE CROISIÈRE : RESTAURANTS, BARS, BOUTIQUES, INFIRMERIE & PONTS
 // -----------------------------------------------------------------------------
 function buildCruiseConciergerie(shipName, itinerary, rawText) {
   const ship = shipName || "Navire de Croisière";
+  const isDiadema = (ship.toLowerCase().includes('diadema') || (rawText && rawText.toLowerCase().includes('diadema')));
+
+  // Génération dynamique des escales à partir de l'itinéraire du PDF
+  const excursionsPlaces = [];
+  if (itinerary && Array.isArray(itinerary) && itinerary.length > 0) {
+    itinerary.forEach(d => {
+      const city = d.city || "";
+      const isSeaDay = city.toLowerCase().includes('plaisirs en mer') || d.title.toLowerCase().includes('en mer');
+
+      let cat = "Escale Portuaire";
+      let tag = city || "Escale";
+      let tips = "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.";
+
+      if (isSeaDay) {
+        cat = "Journée en Navigation";
+        tag = "Détente & Loisirs à bord";
+        tips = "Profitez des piscines, du spa, des boutiques détaxées et du programme d'animations Oggi a bordo.";
+      } else if (d.day === 1) {
+        cat = "Embarquement";
+        tag = "Marseille Terminal Croisière";
+        tips = "Présentez votre billet de croisière imprimé et votre pièce d'identité à la gare maritime.";
+      } else if (d.day === itinerary.length) {
+        cat = "Débarquement";
+        tag = "Fin de croisière";
+        tips = "Récupération des valises sous le hangar portuaire et retour dans votre région.";
+      }
+
+      let desc = d.description ? d.description.slice(0, 260) : (d.highlight || "Découverte de l'escale.");
+      if (d.timeline && d.timeline.length > 0) {
+        const excList = d.timeline.filter(t => t.time === "Excursion" || t.title.toLowerCase().includes('visite') || t.title.toLowerCase().includes('découverte')).map(t => t.title);
+        if (excList.length > 0) {
+          desc += " Excursions disponibles : " + excList.join(', ') + ".";
+        }
+      }
+
+      excursionsPlaces.push({
+        name: `${d.title}`,
+        category: cat,
+        location: `${city || 'En mer'} • ${d.dateStr || `Jour ${d.day}`}`,
+        tag: tag,
+        description: desc,
+        tips: tips,
+        lat: d.lat || 43.2965,
+        lng: d.lng || 5.3698
+      });
+    });
+  }
+
+  // Fallback si pas d'étapes dans l'itinéraire
+  if (excursionsPlaces.length === 0) {
+    if (isDiadema) {
+      excursionsPlaces.push(
+        { name: "Escale Savone (Italie)", category: "Escale historique", location: "Port de Savone", tag: "Forteresse & Portofino", description: "Vieille ville, forteresse du Priamar et excursions vers Gênes ou Portofino.", tips: "Centre-ville accessible à pied.", lat: 44.3079, lng: 8.4811 },
+        { name: "Escale Barcelone (Espagne)", category: "Escale culturelle", location: "Port de Barcelone", tag: "Gaudi & Ramblas", description: "Sagrada Familia, Parc Güell, balade sur les Ramblas et tapas.", tips: "Navette portuaire vers le centre.", lat: 41.3851, lng: 2.1734 },
+        { name: "Escale Tanger (Maroc)", category: "Escale d'Orient", location: "Port de Tanger", tag: "Médina & Grand Souk", description: "Médina blanchie à la chaux, kasbah sur le détroit de Gibraltar.", tips: "Marchandage de rigueur dans les souks.", lat: 35.7878, lng: -5.8118 },
+        { name: "Escale Casablanca (Maroc)", category: "Escale d'Orient", location: "Port de Casablanca", tag: "Mosquée Hassan II", description: "L'impressionnante mosquée Hassan II sur l'eau et quartier des Habous.", tips: "Respect des coutumes vestimentaires pour la mosquée.", lat: 33.6062, lng: -7.6186 },
+        { name: "Escale Cadix (Espagne)", category: "Escale andalouse", location: "Port de Cadix", tag: "Cathédrale & Séville", description: "Ruelles pavées, cathédrale à coupole dorée ou excursion vers Séville.", tips: "Escale très facile à pied.", lat: 36.5271, lng: -6.2886 },
+        { name: "Escale Gibraltar (Royaume-Uni)", category: "Escale insolite", location: "Port de Gibraltar", tag: "Le Rocher & Macaques", description: "Le célèbre rocher de Gibraltar, réserve naturelle et macaques en liberté.", tips: "Paiement en Livres ou Euros.", lat: 36.1408, lng: -5.3536 },
+        { name: "Escale Malaga (Espagne)", category: "Costa del Sol", location: "Port de Malaga", tag: "Picasso & Alcazaba", description: "Ville natale de Picasso, forteresse de l'Alcazaba et plages andalouses.", tips: "Musée Picasso au cœur historique.", lat: 36.7213, lng: -4.4214 }
+      );
+    } else {
+      excursionsPlaces.push(
+        { name: "Escale Barcelone (Espagne)", category: "Escale culturelle", location: "Port de Barcelone", tag: "Gaudi & Ramblas", description: "Sagrada Familia, Parc Güell et tapas.", tips: "Navette disponible.", lat: 41.3851, lng: 2.1734 },
+        { name: "Escale Palerme (Sicile)", category: "Trésors arabo-normands", location: "Port de Palerme", tag: "Cathédrale & Monreale", description: "Explorez la capitale sicilienne.", tips: "Dégustez les cannoli.", lat: 38.1157, lng: 13.3615 },
+        { name: "Escale Civitavecchia / Rome", category: "Cité Éternelle", location: "Port de Civitavecchia", tag: "Colisée & Vatican", description: "Excursion exceptionnelle vers Rome.", tips: "Trajet 1h15.", lat: 42.0924, lng: 11.7955 },
+        { name: "Escale Savone (Italie)", category: "Riviera Ligure", location: "Port de Savone", tag: "Forteresse du Priamar", description: "Forteresse du Priamar face à la mer.", tips: "Accessible à pied.", lat: 44.3079, lng: 8.4811 }
+      );
+    }
+  }
+
+  // Thème Restaurants
+  const restoPlaces = isDiadema ? [
+    {
+      name: "Restaurant Adularia (Pont 3)",
+      category: "Restaurant Principal Inclus",
+      location: "Pont 3 Centenario (Centre)",
+      tag: "1er Service réservé",
+      description: "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et méditerranéenne soignée servie à table avec rotation quotidienne des menus régionaux.",
+      tips: "Tenue soignée exigée en soirée. Boissons du forfait My Drinks incluses servies au verre.",
+      phone: "Service de bord",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Restaurant Fiorentino (Ponts 3 & 4)",
+      category: "Grand Restaurant Panoramique",
+      location: "Ponts 3 et 4 (Poupe / Arrière)",
+      tag: "Vue sur le sillage",
+      description: "Spectaculaire restaurant sur deux étages offrant une vue grandiose sur l'océan et le sillage du navire.",
+      tips: "Retrouvez chaque soir la carte et le menu du jour sur l'application MyCosta.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Buffet Corona Blu (Pont 10)",
+      category: "Buffet Libre-service & Saveurs",
+      location: "Pont 10 Hortensia (Arrière)",
+      tag: "Petit-déj, Déjeuner & Dîner",
+      description: "Buffet géant avec stations de pâtes fraîches, salades composées, poissons, viandes grillées et desserts gourmands. Idéal dès l'embarquement à Marseille !",
+      tips: "Parfait pour un déjeuner rapide et sans contrainte d'horaire au retour d'une escale.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Pizzeria La Tavernetta (Pont 5)",
+      category: "Véritable Pizzeria Italienne",
+      location: "Pont 5 Eldorador (Bâbord)",
+      tag: "Spécialité italienne",
+      description: "Pizzas artisanales préparées avec une pâte à fermentation lente et 100% de mozzarella fraîche produite directement à bord.",
+      tips: "Ambiance trattoria italienne chaleureuse. Restaurant de spécialité avec supplément.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Restaurant Japonais Teppanyaki (Pont 5)",
+      category: "Show Cooking & Cuisine Japonaise",
+      location: "Pont 5 Eldorador (Tribord)",
+      tag: "Spectacle culinaire",
+      description: "Les chefs cuisinent viandes, poissons et légumes avec virtuosité sur des plaques chauffantes sous vos yeux avec spectacle et acrobaties.",
+      tips: "Réservation indispensable à l'avance sur l'application MyCosta.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Restaurant Samsara (Pont 11)",
+      category: "Gastronomie Légère & Bien-être",
+      location: "Pont 11 Samsara (Avant)",
+      tag: "Ambiance feutrée & Zen",
+      description: "Restaurant exclusif dédié à une cuisine équilibrée, innovante et raffinée dans un cadre intime.",
+      tips: "Sur réservation via l'application MyCosta ou le maître d'hôtel.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ] : [
+    {
+      name: "Restaurant La Colombina (Pont 5)",
+      category: "Restaurant Principal Inclus",
+      location: "Pont 5 Taormina",
+      tag: "1er Service réservé",
+      description: "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et méditerranéenne soignée servie à table.",
+      tips: "Tenue soignée exigée en soirée. Eau minérale et forfait boissons My Drinks inclus selon formule.",
+      phone: "Service de bord",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Il Meneghino & Arlecchino (Pont 6)",
+      category: "Grands Restaurants Inclus",
+      location: "Pont 6 Matera",
+      tag: "Service à table",
+      description: "Deux superbes espaces de restauration proposant des menus inspirés de chaque région visitée par le navire avec vue sur la mer.",
+      tips: "Retrouvez chaque soir la carte et le menu du jour sur l'application MyCosta.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Buffet La Sagra dei Sapori (Pont 8)",
+      category: "Buffet & Saveurs du monde",
+      location: "Pont 8 Capri",
+      tag: "Petit-déj, Déjeuner & Dîner",
+      description: "Buffet libre-service très complet avec stations de pâtes fraîches, salades composées, grillades et desserts gourmands.",
+      tips: "Parfait pour un déjeuner rapide et sans contrainte d'horaire au retour d'une escale.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Pizzeria Pummid'Oro (Pont 8)",
+      category: "Véritable Pizzeria Italienne",
+      location: "Pont 8 Capri",
+      tag: "Spécialité italienne",
+      description: "Pizzas artisanales préparées avec une pâte à fermentation lente et 100% de mozzarella fraîche produite directement à bord.",
+      tips: "Ambiance trattoria italienne chaleureuse. Restaurant de spécialité avec supplément à la carte.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Restaurant Japonais Teppanyaki (Pont 8)",
+      category: "Show Cooking & Cuisine Japonaise",
+      location: "Pont 8 Capri",
+      tag: "Show culinaire",
+      description: "Les chefs cuisinent viandes, poissons et légumes avec virtuosité sur des plaques chauffantes sous vos yeux.",
+      tips: "Réservation indispensable à l'avance sur MyCosta.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ];
+
+  // Thème Shopping
+  const shoppingPlaces = isDiadema ? [
+    {
+      name: "Galerie Marchande & Duty Free (Pont 5)",
+      category: "Boutiques Tax Free en mer",
+      location: "Pont 5 Eldorador (Centre)",
+      tag: "Prix détaxés en navigation",
+      description: "Boutiques détaxées ouvertes en navigation : parfums de grandes marques, cosmétiques, maroquinerie, spiritueux et tabacs.",
+      tips: "Paiement direct avec votre carte de cabine Costa. Exonération de taxes en mer.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Boutique Officielle Costa Diadema (Pont 5)",
+      category: "Souvenirs de Croisière",
+      location: "Pont 5 Eldorador",
+      tag: "Objets collector",
+      description: "Maquettes officielles du Costa Diadema, polos, casquettes, serviettes de plage griffées et magnets souvenirs.",
+      tips: "Idéal pour rapporter des souvenirs du navire à vos proches.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Espace Photo & Photographes Costa (Pont 5)",
+      category: "Photos & Albums souvenirs",
+      location: "Pont 5 Eldorador",
+      tag: "Tirages personnalisés",
+      description: "Retrouvez et commandez toutes vos photos prises lors de l'embarquement, des soirées de gala et des escales.",
+      tips: "Visualisez également vos clichés directement sur l'application MyCosta.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Boutique Bijouterie & Mode Italienne (Pont 5)",
+      category: "Haute Horlogerie & Créateurs",
+      location: "Pont 5 Eldorador",
+      tag: "Grandes marques",
+      description: "Sélection de montres suisses, bijoux en or et argent, lunettes de créateurs et prêt-à-porter italien pour vos soirées de gala.",
+      tips: "Ventes promotionnelles flash annoncées quotidiennement dans Oggi a bordo.",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ] : [
+    {
+      name: "Galleria Sanremo & Duty Free (Pont 7 & 8)",
+      category: "Galerie Marchande & Tax Free",
+      location: "Ponts 7 et 8 (Atrium Colosseo)",
+      tag: "Prix détaxés en mer",
+      description: "Boutiques détaxées ouvertes en navigation : parfums de grandes marques, maquillage, alcools, confiseries et tabacs.",
+      tips: "Paiement direct avec votre carte de cabine.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Boutique Officielle Costa & Souvenirs",
+      category: "Souvenirs de Croisière",
+      location: "Pont 7 Positano",
+      tag: "Objets collector",
+      description: "Maquettes officielles, casquettes, polos, serviettes de plage griffées et magnets souvenirs.",
+      tips: "Idéal pour rapporter des cadeaux de vacances.",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ];
+
+  // Thème Pratique & Santé
+  const pratiquePlaces = [
+    {
+      name: isDiadema ? "Centre Médical & Infirmerie (Pont 1)" : "Centre Médical & Infirmerie (Pont 4)",
+      category: "Service Sanitaire & Soins d'Urgence",
+      location: isDiadema ? "Pont 1 Timone (Accès direct ascenseurs)" : "Pont 4 Palermo",
+      tag: "Médecin et infirmières 24h/24",
+      description: "Équipe médicale complète pour soins d'urgence, consultations, mal de mer et délivrance de médicaments d'urgence.",
+      tips: "En cas d'urgence vitale, composez le numéro d'urgence directement depuis le combiné de votre cabine ou contactez la Réception. Les consultations sont à la charge du passager (couvertes par votre assurance multirisque).",
+      phone: "Urgence Cabine ou Réception",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: isDiadema ? "Réception & Guest Service (Pont 3)" : "Réception & Bureau d'Information (Pont 7)",
+      category: "Accueil & Assistance Voyageurs 24h",
+      location: isDiadema ? "Pont 3 Centenario (Atrium Eliodoro)" : "Pont 7 Positano",
+      tag: "Ouvert 24h/24 & Francophone",
+      description: "Personnel francophone disponible jour et nuit pour répondre à toutes vos questions, gérer vos clés de cabine et vous assister.",
+      tips: "Réunion d'information francophone le jour de l'embarquement et réunion de débarquement l'avant-dernier jour.",
+      phone: "Poste Réception à bord",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: isDiadema ? "Bornes Carte Cabine (Ponts 3 & 5)" : "Bornes d'Enregistrement Carte Cabine (Pont 7)",
+      category: "Paiement & Monétique de bord",
+      location: isDiadema ? "Pont 3 (Réception) et Pont 5 (Casino)" : "Pont 7 à côté de la Réception",
+      tag: "Aucun argent liquide à bord",
+      description: "Votre carte cabine sert de moyen de paiement unique à bord. Enregistrez votre carte bancaire dès les premiers jours aux bornes automatiques.",
+      tips: "Dépôt d'espèces possible (150 € minimum par personne) aux bornes. Les chèques ne sont pas acceptés à bord.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Consignes de Sécurité & Muster Station",
+      category: "Sécurité Maritime Obligatoire",
+      location: "Point de rassemblement indiqué au dos de votre carte Costa",
+      tag: "Exercice obligatoire Jour 1",
+      description: "Visionnez le récapitulatif des consignes de sécurité sur l'application MyCosta puis présentez-vous à votre Muster Station pour valider votre présence.",
+      tips: "Obligatoire dès le premier jour avant l'appareillage du navire.",
+      phone: "",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Permanence Accompagnatrice Voyages Girardot",
+      category: "Accompagnement Privatif Girardot",
+      location: isDiadema ? "Restaurant Adularia (Pont 3) & Salons de bord" : "Salons de bord",
+      tag: "Permanence quotidienne",
+      description: "Votre accompagnatrice Voyages Girardot est présente chaque jour pour vous informer, coordonner les rendez-vous et faciliter votre séjour.",
+      tips: "Rendez-vous fixé chaque soir au dîner du 1er service.",
+      phone: "03 85 42 82 50",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ];
+
+  // Thème Détente & Bars
+  const detentePlaces = isDiadema ? [
+    {
+      name: "Grand Bar Orlov (Pont 4)",
+      category: "Grand Salon & Musique Live",
+      location: "Pont 4 Perla di Venere (Centre)",
+      tag: "Orchestre & Danse tous les soirs",
+      description: "Le cœur musical du paquebot : vaste salon avec piste de danse, musiciens live et ambiance festive. Inclus dans votre forfait boissons My Drinks !",
+      tips: "Idéal pour prendre l'apéritif et danser après le spectacle du soir.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Country Rock Club (Pont 5)",
+      category: "Bar Concert & Ambiance Rock",
+      location: "Pont 5 Eldorador (Bâbord)",
+      tag: "Concerts guitare & Rock",
+      description: "Le repaire des amateurs de bonne musique live, guitares électriques et cocktails dans une ambiance chaleureuse.",
+      tips: "Concerts acoustiques et reprises de classiques du rock en soirée.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Brasserie Dresden Green (Pont 5)",
+      category: "Bières Artisanales du Bord",
+      location: "Pont 5 Eldorador (Bâbord)",
+      tag: "Atmosphère bavaroise",
+      description: "Véritable brasserie à bord proposant bières artisanales à la pression, bretzels et snacks salés.",
+      tips: "Parfait pour se retrouver entre amis après une longue escale.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Vinoteca Gran Duca di Toscana (Pont 5)",
+      category: "Bar à Vins & Dégustations",
+      location: "Pont 5 Eldorador (Tribord)",
+      tag: "Grands Crus d'Italie",
+      description: "Bar à vins réputé servant au verre les meilleurs cépages de Toscane, du Piémont et de Vénétie, accompagnés de tapas italiennes.",
+      tips: "Dégustations guidées organisées par le sommelier du bord.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Bar Lido Diana (Pont 10)",
+      category: "Bar Piscine & Verrière",
+      location: "Pont 10 Hortensia (Centre)",
+      tag: "Piscine couverte",
+      description: "Boissons rafraîchissantes, cocktails et glaces au bord de la piscine couverte sous la verrière amovible.",
+      tips: "Ouvert toute la journée pour se désaltérer au retour des baignades.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Glacier Artisanal Amarillo (Pont 10)",
+      category: "Glaces & Desserts italiens",
+      location: "Pont 10 Hortensia",
+      tag: "Glaces faites à bord",
+      description: "Délicieuses glaces italiennes produites chaque jour à bord avec des ingrédients bio de qualité, gaufres et crêpes gourmandes.",
+      tips: "Le plaisir incontournable de l'après-midi pour petits et grands !",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ] : [
+    {
+      name: "Campari Bar (Pont 7)",
+      category: "Bar Cocktail Design",
+      location: "Pont 7 Positano (Colosseo)",
+      tag: "Aperitivo à l'italienne",
+      description: "Bar emblématique au design rouge passion offrant une vue plongeante sur les spectacles de l'atrium Colosseo.",
+      tips: "Idéal pour déguster un Negroni ou un Campari Spritz.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Aperol Spritz Bar (Pont 17)",
+      category: "Bar Piscine & Vue Mer",
+      location: "Pont 17 Bellagio",
+      tag: "Coucher de soleil",
+      description: "Bar en plein air les yeux dans le bleu méditerranéen. Dégustez votre Spritz face au sillage du navire.",
+      tips: "Inclus dans votre forfait My Drinks !",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Grand Bar Mastroianni (Pont 6)",
+      category: "Musique Live & Soirées dansantes",
+      location: "Pont 6 Matera",
+      tag: "Orchestre & Danse",
+      description: "Immense salon central avec grande scène, orchestre live tous les soirs, piste de danse et ambiance très chaleureuse.",
+      tips: "Rendez-vous incontournable pour prendre un verre.",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ];
+
+  // Thème Transports & Ponts
+  const transportPlaces = isDiadema ? [
+    {
+      name: "Organisation des 20 Ponts (15 ponts passagers)",
+      category: "Plan d'ensemble du Navire",
+      location: "Du Pont 1 Timone au Pont 15 Smeraldo",
+      tag: "Architecture Joseph Farcus",
+      description: "Pont 1 (Timone/Médical), Pont 2 (Sara), Pont 3 (Centenario/Adularia/Réception), Pont 4 (Perla di Venere/Grand Bar), Pont 5 (Eldorador/Promenade 500m/Boutiques), Ponts 6-9 (Cabines), Pont 10 (Hortensia/Corona Blu/Lido Diana), Pont 11 (Samsara Spa), Pont 14 (Rubino/Sports), Pont 15 (Smeraldo/Solarium).",
+      tips: "Utilisez le plan interactif et le calculateur d'itinéraires intégrés dans votre carnet pour vous déplacer aisément hors-connexion.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Promenade Extérieure 'La Passeggiata' (Pont 5)",
+      category: "Promenade Panoramique Maritime",
+      location: "Pont 5 Eldorador",
+      tag: "500m faisant le tour complet",
+      description: "Véritable terrasse de promenade faisant tout le tour du Costa Diadema, bordée de bains à remous suspendus au-dessus des flots.",
+      tips: "Magique à l'heure du coucher du soleil ou lors des manœuvres portuaires.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Samsara Spa & Balnéothérapie (Pont 11)",
+      category: "Espace Thermal de 6 200 m²",
+      location: "Ponts 11 et 12 Samsara",
+      tag: "4 niveaux de bien-être",
+      description: "Piscine thermale de balnéothérapie, hammam, sauna panoramique finlandais, cabines de soins et salle de fitness Technogym.",
+      tips: "Accès inclus pour les cabines et suites Samsara, forfaits journée disponibles pour tous les passagers.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Application Mobile 'MyCosta' (Wi-Fi gratuit du bord)",
+      category: "Guide de Poche & Déplacements",
+      location: "Sur votre smartphone (AppStore / Google Play)",
+      tag: "Indispensable & Gratuit à bord",
+      description: "Permet de consulter le journal 'Oggi a bordo', le plan interactif des ponts, réserver vos excursions et suivre vos dépenses.",
+      tips: "Connectez-vous au réseau Wi-Fi gratuit du navire dès votre arrivée sans consommer votre forfait data terrestre.",
+      phone: "Gratuit en Wi-Fi bord",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ] : [
+    {
+      name: "Organisation des 20 Ponts (16 ponts passagers)",
+      category: "Plan d'ensemble du Navire",
+      location: "Du Pont 4 au Pont 20",
+      tag: "Nommés d'après les villes italiennes",
+      description: "Pont 4 (Palermo), Pont 5 (Taormina), Pont 6 (Matera), Pont 7 (Positano), Pont 8 (Capri), Ponts 9-15 (Cabines), Pont 16 (Como/Spa), Pont 17 (Bellagio), Pont 18 (Torino), Pont 19 (Cortina/Volare).",
+      tips: "Des plans interactifs tactiles sont disposés devant chaque cage d'ascenseur.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Passerelle Panoramique 'Volare' (Pont 19)",
+      category: "Promenade Panoramique",
+      location: "Pont 19 Cortina",
+      tag: "Point culminant à 65m",
+      description: "Promenade extérieure suspendue offrant une vue spectaculaire à 360 degrés sur la mer et le ciel, avec sol de verre au-dessus du vide.",
+      tips: "Inoubliable au coucher de soleil.",
+      lat: 43.3444,
+      lng: 5.3488
+    },
+    {
+      name: "Application Mobile 'MyCosta' (Wi-Fi gratuit du bord)",
+      category: "Guide de Poche & Déplacements",
+      location: "Sur votre smartphone",
+      tag: "Gratuit à bord",
+      description: "Journal Oggi a bordo, menus, réservations et solde.",
+      tips: "Wi-Fi gratuit du bord.",
+      lat: 43.3444,
+      lng: 5.3488
+    }
+  ];
+
   return {
     welcomeMessage: `Bienvenue à bord du ${ship} ! Je suis votre Concierge de bord Voyages Girardot. Retrouvez ici les restaurants, bars, boutiques, infirmerie et le plan des ponts pour profiter pleinement de votre croisière.`,
     themes: [
@@ -4437,74 +5246,7 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
         color: "#e11d48",
         enabled: true,
         description: `Espaces de restauration à bord du ${ship} : tables incluses, buffets et restaurants de spécialités.`,
-        places: [
-          {
-            name: "Restaurant La Colombina (Pont 5)",
-            category: "Restaurant Principal Inclus",
-            location: "Pont 5 Taormina",
-            tag: "1er Service réservé",
-            description: "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et méditerranéenne soignée servie à table avec rotation quotidienne des menus régionaux.",
-            tips: "Tenue soignée exigée en soirée. Eau minérale et forfait boissons My Drinks inclus selon formule.",
-            phone: "Service de bord",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Il Meneghino & Arlecchino (Pont 6)",
-            category: "Grands Restaurants Inclus",
-            location: "Pont 6 Matera",
-            tag: "Service à table",
-            description: "Deux superbes espaces de restauration proposant des menus inspirés de chaque région visitée par le navire avec vue sur la mer.",
-            tips: "Retrouvez chaque soir la carte et le menu du jour sur votre smartphone via l'application MyCosta.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Buffet La Sagra dei Sapori (Pont 8)",
-            category: "Buffet & Saveurs du monde",
-            location: "Pont 8 Capri",
-            tag: "Petit-déj, Déjeuner & Dîner",
-            description: "Buffet libre-service très complet avec stations de pâtes fraîches, salades composées, grillades et desserts gourmands.",
-            tips: "Parfait pour un déjeuner rapide et sans contrainte d'horaire au retour d'une escale.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Pizzeria Pummid’Oro (Pont 8)",
-            category: "Véritable Pizzeria Italienne",
-            location: "Pont 8 Capri",
-            tag: "Spécialité italienne",
-            description: "Pizzas artisanales préparées avec une pâte à fermentation lente et 100% de mozzarella fraîche produite directement à bord.",
-            tips: "Ambiance trattoria italienne chaleureuse. Restaurant de spécialité avec supplément à la carte.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Restaurant Japonais Teppanyaki (Pont 8)",
-            category: "Show Cooking & Cuisine Japonaise",
-            location: "Pont 8 Capri",
-            tag: "Formule parrainage Girardot",
-            description: "Les chefs cuisinent viandes, poissons et légumes avec virtuosité sur des plaques chauffantes sous vos yeux avec spectacle culinaire.",
-            tips: "Réservation indispensable à l'avance sur l'espace en ligne MyCosta.com. Repas offert en formule parrainage Girardot !",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Restaurant Familial Tutti a Tavola (Pont 7)",
-            category: "Restaurant Famille & Convivialité",
-            location: "Pont 7 Positano",
-            tag: "Menus enfants & jeux",
-            description: "Restaurant dédié aux familles avec menus adaptés aux enfants et animations ludiques à proximité.",
-            tips: "Idéal pour dîner en toute décontraction avec des enfants ou petits-enfants.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          }
-        ]
+        places: restoPlaces
       },
       {
         id: "visites",
@@ -4513,58 +5255,7 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
         color: "#059669",
         enabled: true,
         description: "Temps forts et excursions proposées à chaque escale portuaire de votre itinéraire.",
-        places: [
-          {
-            name: "Escale Barcelone (Espagne)",
-            category: "Escale culturelle & shopping",
-            location: "Port de Barcelone • Escale 9h - 18h",
-            tag: "Sagrada Familia & Ramblas",
-            description: "Découverte des chefs-d'œuvre de Gaudi (Sagrada Familia, Parc Güell), balade shopping sur les Ramblas et dégustation de tapas catalanes.",
-            tips: "Excursion vendue à bord ou temps libre au centre-ville accessible rapidement en navette portuaire.",
-            lat: 41.3851,
-            lng: 2.1734
-          },
-          {
-            name: "Escale Cagliari (Sardaigne)",
-            category: "Histoire & Panorama sarde",
-            location: "Port de Cagliari • Escale 8h - 16h",
-            tag: "Bastion Saint-Rémy",
-            description: "La plus italienne des villes de Sardaigne : ruines romaines antiques, magnifique Bastion Saint-Rémy et splendide jardin botanique.",
-            tips: "Chaussures de marche recommandées pour arpenter les ruelles médiévales du quartier fortifié du Castello.",
-            lat: 39.2238,
-            lng: 9.1217
-          },
-          {
-            name: "Escale Palerme (Sicile)",
-            category: "Trésors arabo-normands",
-            location: "Port de Palerme • Escale 8h - 16h",
-            tag: "Cathédrale & Monreale",
-            description: "Explorez la capitale sicilienne : le Castello della Zisa, la somptueuse cathédrale de Monreale et les marchés traditionnels hauts en couleurs.",
-            tips: "Ne manquez pas de goûter aux fameux cannoli siciliens lors de votre balade en ville.",
-            lat: 38.1157,
-            lng: 13.3615
-          },
-          {
-            name: "Escale Civitavecchia / Rome (Italie)",
-            category: "Cité Éternelle",
-            location: "Port de Civitavecchia • Escale 8h30 - 19h",
-            tag: "Colisée & Vatican",
-            description: "Journée d'excursion exceptionnelle vers Rome : Colisée, forum impérial, fontaine de Trevi et place Saint-Pierre au Vatican.",
-            tips: "Transfert en car ou train express vers Rome (environ 1h15 de trajet). Respectez scrupuleusement l'horaire limite de retour au navire.",
-            lat: 42.0924,
-            lng: 11.7955
-          },
-          {
-            name: "Escale Savone (Italie)",
-            category: "Riviera Ligure & Portofino",
-            location: "Port de Savone • Escale 8h30 - 17h30",
-            tag: "Forteresse du Priamar",
-            description: "Imposante forteresse du Priamar face à la mer de Ligurie. Excursions possibles vers Gênes (aquarium, palais) ou le village marin de Portofino.",
-            tips: "Centre historique de Savone accessible directement à pied dès la passerelle de débarquement.",
-            lat: 44.3079,
-            lng: 8.4811
-          }
-        ]
+        places: excursionsPlaces
       },
       {
         id: "shopping",
@@ -4573,52 +5264,7 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
         color: "#d97706",
         enabled: true,
         description: `Galeries marchandes détaxées et souvenirs officiels à bord du ${ship}.`,
-        places: [
-          {
-            name: "Galleria Sanremo & Duty Free (Pont 7 & 8)",
-            category: "Galerie Marchande & Tax Free",
-            location: "Ponts 7 et 8 (Atrium Colosseo)",
-            tag: "Prix détaxés en mer",
-            description: "Boutiques détaxées ouvertes en navigation : parfums de grandes marques, maquillage, alcools, confiseries et tabacs.",
-            tips: "Paiement direct avec votre carte de cabine. Les achats sont exonérés de taxes pendant les navigations internationales.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Boutique Mode & Prêt-à-porter Italien",
-            category: "Vêtements & Maroquinerie",
-            location: "Place Trastevere (Pont 7)",
-            tag: "Grandes marques italiennes",
-            description: "Sélection de prêt-à-porter, sacs à main en cuir italien, lunettes solaires de créateurs et tenues de soirée pour les galas.",
-            tips: "Des ventes promotionnelles flash sont annoncées chaque jour dans le journal 'Oggi a bordo'.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Boutique Officielle Costa & Souvenirs",
-            category: "Souvenirs de Croisière",
-            location: "Pont 7 Positano",
-            tag: "Objets collector",
-            description: "Maquettes officielles du Costa Smeralda, casquettes, polos, serviettes de plage griffées et magnets souvenirs.",
-            tips: "Idéal pour rapporter des cadeaux de vacances à vos proches.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Espace Photographes MyCosta",
-            category: "Photos & Tirages",
-            location: "Pont 8 Capri",
-            tag: "Souvenirs personnalisés",
-            description: "Retrouvez et commandez toutes vos photos prises lors de l'embarquement, des soirées de gala et de la rencontre avec le Commandant.",
-            tips: "Offre famille Girardot : une photo de famille offerte pour les réservations de groupes familiaux !",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          }
-        ]
+        places: shoppingPlaces
       },
       {
         id: "pratique",
@@ -4627,52 +5273,7 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
         color: "#2563eb",
         enabled: true,
         description: "Centre médical, infirmerie du bord, formalités sanitaires et paiement par carte cabine.",
-        places: [
-          {
-            name: "Centre Médical & Infirmerie (Pont 4)",
-            category: "Service Sanitaire & Soins d'Urgence",
-            location: "Pont 4 Palermo (Accès ascenseurs cabines)",
-            tag: "Médecin et infirmières 24h/24",
-            description: "Équipe médicale complète pour soins d'urgence, consultations, mal de mer et délivrance de médicaments d'urgence.",
-            tips: "En cas d'urgence vitale, composez le numéro d'urgence directement depuis le combiné de votre cabine ou contactez la Réception. Les consultations sont à la charge du passager (couvertes par votre assurance multirisque).",
-            phone: "Urgence Cabine ou Réception",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Réception & Bureau d'Information (Pont 7)",
-            category: "Accueil & Assistance Voyageurs",
-            location: "Pont 7 Positano (Place centrale)",
-            tag: "Ouvert 24h/24",
-            description: "Personnel francophone disponible jour et nuit pour répondre à toutes vos questions, gérer vos clés de cabine et vous assister.",
-            tips: "Réunion d'information francophone le jour de l'embarquement et réunion de débarquement l'avant-dernier jour.",
-            phone: "Poste Réception",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Bornes d'Enregistrement Carte Cabine (Pont 7)",
-            category: "Paiement & Monétique de bord",
-            location: "Pont 7 à côté de la Réception",
-            tag: "Aucun argent liquide à bord",
-            description: "Votre carte cabine sert de moyen de paiement unique à bord. Enregistrez votre carte bancaire dès les premiers jours aux bornes automatiques.",
-            tips: "Dépôt d'espèces possible (150 € minimum par personne) aux bornes. Les chèques ne sont pas acceptés à bord.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Consignes de Sécurité & Muster Station",
-            category: "Sécurité Maritime Obligatoire",
-            location: "Point de rassemblement indiqué au dos de votre carte Costa",
-            tag: "Exercice obligatoire",
-            description: "Visionnez le récapitulatif des consignes de sécurité sur l'application MyCosta puis présentez-vous à votre Muster Station pour valider votre présence.",
-            tips: "Obligatoire dès le premier jour avant l'appareillage du navire.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          }
-        ]
+        places: pratiquePlaces
       },
       {
         id: "detente",
@@ -4680,75 +5281,8 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
         icon: "martini-glass",
         color: "#9333ea",
         enabled: true,
-        description: `Les 19 bars et lounges thématiques du ${ship} inclus dans votre forfait boissons.`,
-        places: [
-          {
-            name: "Campari Bar (Pont 7)",
-            category: "Bar Cocktail Design",
-            location: "Pont 7 Positano (Colosseo)",
-            tag: "Aperitivo à l'italienne",
-            description: "Bar emblématique au design rouge passion offrant une vue plongeante sur les spectacles de l'atrium Colosseo. Cocktails et apéritifs italiens.",
-            tips: "Idéal pour déguster un Negroni ou un Campari Spritz avant de monter dîner.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Aperol Spritz Bar (Pont 17)",
-            category: "Bar Piscine & Vue Mer",
-            location: "Pont 17 Bellagio (Ponts extérieurs)",
-            tag: "Coucher de soleil",
-            description: "Bar en plein air les yeux dans le bleu méditerranéen. Dégustez votre Spritz face au sillage du navire lors des fins d'après-midi en mer.",
-            tips: "Inclus dans votre forfait My Drinks ! Ambiance musicale douce au coucher du soleil.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Spazio Bollicine Ferrari (Pont 8)",
-            category: "Bar à Vins Pétillants",
-            location: "Pont 8 Capri",
-            tag: "Prestige & Bulles",
-            description: "Bar de haute volée consacré aux cuvées effervescentes de la prestigieuse maison italienne Ferrari Trento.",
-            tips: "Parfait pour trinquer lors de la soirée du Commandant.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Illy Bar & Café Italien (Pont 6)",
-            category: "Café Italien Authentique",
-            location: "Pont 6 Matera",
-            tag: "Expresso & Cappuccino",
-            description: "Le temple du véritable café italien servi par des baristas passionnés, avec viennoiseries et chocolats chauds crémeux.",
-            tips: "Votre halte matinale préférée pour bien démarrer la journée d'escale.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Grand Bar Mastroianni (Pont 6)",
-            category: "Musique Live & Soirées dansantes",
-            location: "Pont 6 Matera",
-            tag: "Orchestre & Danse",
-            description: "Immense salon central avec grande scène, orchestre live tous les soirs, piste de danse et ambiance très chaleureuse.",
-            tips: "Rendez-vous incontournable pour prendre un verre et danser après le spectacle du soir.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Nutella at Costa & Gelateria Amarillo (Ponts 8 et 17)",
-            category: "Gourmandises & Glaces artisanales",
-            location: "Pont 8 Capri et Pont 17 Bellagio",
-            tag: "Crêpes & Glaces",
-            description: "Glaces italiennes artisanales faites chaque jour à bord avec des ingrédients bio, gaufres et crêpes au Nutella.",
-            tips: "Le plaisir coupable des petits et des grands au retour d'excursion.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          }
-        ]
+        description: `Les bars et salons thématiques du ${ship} inclus dans votre forfait boissons.`,
+        places: detentePlaces
       },
       {
         id: "transports",
@@ -4756,53 +5290,8 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
         icon: "ship",
         color: "#0891b2",
         enabled: true,
-        description: `Plan d'ensemble des 20 ponts du ${ship}, passerelles et orientation à bord.`,
-        places: [
-          {
-            name: "Organisation des 20 Ponts (16 ponts passagers)",
-            category: "Plan d'ensemble du Navire",
-            location: "Du Pont 4 au Pont 20",
-            tag: "Nommés d'après les villes italiennes",
-            description: "Pont 4 (Palermo), Pont 5 (Taormina), Pont 6 (Matera), Pont 7 (Positano), Pont 8 (Capri), Ponts 9-15 (Cabines), Pont 16 (Como/Spa), Pont 17 (Bellagio/Aqua Park), Pont 18 (Torino/Sports), Pont 19 (Cortina/Volare).",
-            tips: "Des plans interactifs tactiles sont disposés devant chaque cage d'ascenseur pour vous guider en 1 clic vers votre cabine ou restaurant.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Passerelle Panoramique 'Volare' (Pont 19)",
-            category: "Promenade Panoramique",
-            location: "Pont 19 Cortina",
-            tag: "Point culminant à 65m",
-            description: "Promenade extérieure suspendue offrant une vue spectaculaire à 360 degrés sur la mer et le ciel, avec sol de verre au-dessus du vide.",
-            tips: "Inoubliable au coucher de soleil et lors des sorties de port.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Atrium Central 'Colosseo' & Ascenseurs Panoramiques",
-            category: "Cœur Battant du Navire",
-            location: "Ponts 6, 7 et 8",
-            tag: "Écrans LED & Spectacles",
-            description: "Le centre névralgique du navire s'étendant sur 3 ponts, entouré de parois de verre géantes et d'écrans LED interactifs.",
-            tips: "Point de ralliement facile pour retrouver vos compagnons de voyage avant les repas ou sorties.",
-            phone: "",
-            lat: 43.3444,
-            lng: 5.3488
-          },
-          {
-            name: "Application Mobile 'MyCosta' (Wi-Fi gratuit du bord)",
-            category: "Guide de Poche & Déplacements",
-            location: "Sur votre smartphone (AppStore / Google Play)",
-            tag: "Indispensable & Gratuit à bord",
-            description: "Permet de consulter le journal de bord 'Oggi a bordo', le plan interactif des ponts, réserver vos excursions et suivre vos dépenses.",
-            tips: "Connectez-vous au réseau Wi-Fi gratuit du navire dès votre arrivée sans consommer votre forfait data terrestre.",
-            phone: "Gratuit en Wi-Fi bord",
-            lat: 43.3444,
-            lng: 5.3488
-          }
-        ]
+        description: `Plan d'ensemble des ponts du ${ship}, passerelles et orientation à bord.`,
+        places: transportPlaces
       }
     ]
   };
@@ -4857,7 +5346,7 @@ function processExtractedTextToTrip(text, sourceName) {
   let detectedShip = "";
   if (isCruise) {
     const shipMatch = text.match(/(?:à bord du|a bord du|navire amiral de|navire|bateau)\s+([A-ZÀ-Ý][\w\s'-]{2,25})(?=[!\r\n,•|]|$)/i)
-                   || text.match(/(?:Votre bateau[\\s\\r\\n]+(?:sous réserve de modification[\\s\\r\\n]+)?(?:Données non contractuelles[\\s\\r\\n]+)?)([A-ZÀ-Ý][\\w\\s'-]{2,25})/i)
+                   || text.match(/(?:Votre bateau[\s\r\n]+(?:sous réserve de modification[\s\r\n]+)?(?:Données non contractuelles[\s\r\n]+)?)([A-ZÀ-Ý][\w\s'-]{2,25})/i)
                    || text.match(/\b(Costa\s+[A-ZÀ-Ý][a-zà-ÿ]+|MSC\s+[A-ZÀ-Ý][a-zà-ÿ]+|CroisiEurope\s+[A-ZÀ-Ý][a-zà-ÿ]+)\b/i);
     if (shipMatch) {
       detectedShip = shipMatch[1].split(/\r?\n|!|[•|]/)[0].trim();
@@ -4879,7 +5368,6 @@ function processExtractedTextToTrip(text, sourceName) {
   let currentDay = null;
   const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—"'«»]\s*(.*))?$/i;
 
-  // Repérer la fin du programme des étapes (ex: "Coordonnées de vos hôtels", "Le voyage n'étant pas une science exacte")
   const stopKeywords = [
     "coordonnées de vos hôtels", "coordonnees de vos hotels", "vos hôtels", "vos hotels",
     "le voyage n’étant pas une science exacte", "le voyage n'etant pas une science exacte",
@@ -4890,15 +5378,51 @@ function processExtractedTextToTrip(text, sourceName) {
   const knownPortCoordinates = {
     "marseille": { city: "Marseille", lat: 43.2965, lng: 5.3698 },
     "barcelone": { city: "Barcelone", lat: 41.3851, lng: 2.1734 },
-    "plaisirs en mer": { city: "Plaisirs en mer", lat: 39.0000, lng: 4.5000 },
+    "tanger": { city: "Tanger (Maroc)", lat: 35.7878, lng: -5.8118 },
+    "casablanca": { city: "Casablanca (Maroc)", lat: 33.6062, lng: -7.6186 },
+    "cadix": { city: "Cadix (Espagne)", lat: 36.5271, lng: -6.2886 },
+    "cadiz": { city: "Cadix (Espagne)", lat: 36.5271, lng: -6.2886 },
+    "gibraltar": { city: "Gibraltar (Royaume-Uni)", lat: 36.1408, lng: -5.3536 },
+    "malaga": { city: "Malaga (Espagne)", lat: 36.7213, lng: -4.4214 },
+    "seville": { city: "Séville (Espagne)", lat: 37.3891, lng: -5.9845 },
+    "séville": { city: "Séville (Espagne)", lat: 37.3891, lng: -5.9845 },
+    "valence": { city: "Valence (Espagne)", lat: 39.4699, lng: -0.3763 },
+    "valencia": { city: "Valence (Espagne)", lat: 39.4699, lng: -0.3763 },
+    "savone": { city: "Savone", lat: 44.3079, lng: 8.4811 },
+    "gênes": { city: "Gênes", lat: 44.4056, lng: 8.9463 },
+    "genes": { city: "Gênes", lat: 44.4056, lng: 8.9463 },
     "cagliari": { city: "Cagliari (Sardaigne)", lat: 39.2238, lng: 9.1217 },
     "palerme": { city: "Palerme (Sicile)", lat: 38.1157, lng: 13.3615 },
     "civitavecchia": { city: "Civitavecchia / Rome", lat: 42.0924, lng: 11.7955 },
     "rome": { city: "Rome", lat: 41.9028, lng: 12.4964 },
-    "savone": { city: "Savone", lat: 44.3079, lng: 8.4811 },
-    "gênes": { city: "Gênes", lat: 44.4056, lng: 8.9463 },
-    "genes": { city: "Gênes", lat: 44.4056, lng: 8.9463 },
-    "palma": { city: "Palma de Majorque", lat: 39.5696, lng: 2.6502 }
+    "naples": { city: "Naples (Italie)", lat: 40.8518, lng: 14.2681 },
+    "ajaccio": { city: "Ajaccio (Corse)", lat: 41.9192, lng: 8.7386 },
+    "toulon": { city: "Toulon (France)", lat: 43.1242, lng: 5.9280 },
+    "nice": { city: "Nice (France)", lat: 43.7102, lng: 7.2620 },
+    "palma": { city: "Palma de Majorque", lat: 39.5696, lng: 2.6502 },
+    "ibiza": { city: "Ibiza", lat: 38.9067, lng: 1.4206 },
+    "lisbonne": { city: "Lisbonne (Portugal)", lat: 38.7223, lng: -9.1393 },
+    "funchal": { city: "Funchal (Madère)", lat: 32.6500, lng: -16.9089 },
+    "madere": { city: "Funchal (Madère)", lat: 32.6500, lng: -16.9089 },
+    "madère": { city: "Funchal (Madère)", lat: 32.6500, lng: -16.9089 },
+    "tenerife": { city: "Santa Cruz de Tenerife", lat: 28.4636, lng: -16.2518 },
+    "las palmas": { city: "Las Palmas (Canaries)", lat: 28.1235, lng: -15.4363 },
+    "heraklion": { city: "Héraklion (Crète)", lat: 35.3387, lng: 25.1442 },
+    "santorin": { city: "Santorin (Grèce)", lat: 36.3932, lng: 25.4615 },
+    "mykonos": { city: "Mykonos (Grèce)", lat: 37.4467, lng: 25.3289 },
+    "piree": { city: "Athènes / Le Pirée", lat: 37.9429, lng: 23.6469 },
+    "pirée": { city: "Athènes / Le Pirée", lat: 37.9429, lng: 23.6469 },
+    "athenes": { city: "Athènes", lat: 37.9838, lng: 23.7275 },
+    "athènes": { city: "Athènes", lat: 37.9838, lng: 23.7275 },
+    "corfou": { city: "Corfou (Grèce)", lat: 39.6243, lng: 19.9217 },
+    "dubrovnik": { city: "Dubrovnik (Croatie)", lat: 42.6507, lng: 18.0944 },
+    "split": { city: "Split (Croatie)", lat: 43.5081, lng: 16.4402 },
+    "venise": { city: "Venise (Italie)", lat: 45.4408, lng: 12.3155 },
+    "trieste": { city: "Trieste (Italie)", lat: 45.6495, lng: 13.7768 },
+    "bari": { city: "Bari (Italie)", lat: 41.1171, lng: 16.8719 },
+    "malte": { city: "La Valette (Malte)", lat: 35.8989, lng: 14.5146 },
+    "valette": { city: "La Valette (Malte)", lat: 35.8989, lng: 14.5146 },
+    "tunis": { city: "Tunis / La Goulette", lat: 36.8189, lng: 10.3050 }
   };
 
   let inItinerarySection = false;
@@ -4925,7 +5449,6 @@ function processExtractedTextToTrip(text, sourceName) {
       const dayNum = parseInt(match[1], 10);
       let dayTitle = (match[2] || "").trim();
       
-      // Si le titre était sur la même ligne ou vide
       if (!dayTitle) {
         dayTitle = `Étape Jour ${dayNum}`;
       }
@@ -4933,12 +5456,24 @@ function processExtractedTextToTrip(text, sourceName) {
       let dayCity = extractProbableCity(dayTitle);
       let dayLat = 0, dayLng = 0;
       const lowerDayTitle = dayTitle.toLowerCase();
-      for (const [key, info] of Object.entries(knownPortCoordinates)) {
-        if (lowerDayTitle.includes(key)) {
-          dayCity = info.city;
-          dayLat = info.lat;
-          dayLng = info.lng;
-          break;
+
+      if (lowerDayTitle.includes("plaisirs en mer") || lowerDayTitle.includes("en mer")) {
+        dayCity = "Plaisirs en mer";
+        if (dayNum <= 4) {
+          dayLat = 38.5000;
+          dayLng = 1.5000;
+        } else {
+          dayLat = 39.5000;
+          dayLng = 3.5000;
+        }
+      } else {
+        for (const [key, info] of Object.entries(knownPortCoordinates)) {
+          if (lowerDayTitle.includes(key)) {
+            dayCity = info.city;
+            dayLat = info.lat;
+            dayLng = info.lng;
+            break;
+          }
         }
       }
 
@@ -4957,8 +5492,9 @@ function processExtractedTextToTrip(text, sourceName) {
     }
 
     if (inItinerarySection && currentDay) {
-      // Détecter si la ligne contient une heure (ex: 09h30, 14:00)
       const timeMatch = line.match(/(?:^|\b)(\d{1,2}[h:]\d{2})\b[:\s\-–—]*(.*)/i);
+      const bulletMatch = line.match(/^[•\-\*]\s*(.+)/);
+
       if (timeMatch) {
         const timeStr = timeMatch[1].replace('h', ':');
         const descStr = timeMatch[2] ? timeMatch[2].trim() : "Visite et découverte";
@@ -4968,8 +5504,14 @@ function processExtractedTextToTrip(text, sourceName) {
           subtitle: descStr,
           icon: detectIconForText(descStr)
         });
+      } else if (bulletMatch && bulletMatch[1].length > 4) {
+        currentDay.timeline.push({
+          time: "Excursion",
+          title: bulletMatch[1].slice(0, 50),
+          subtitle: bulletMatch[1],
+          icon: detectIconForText(bulletMatch[1])
+        });
       } else {
-        // Ajouter au texte descriptif de la journée
         currentDay.description += (currentDay.description ? " " : "") + line;
       }
     }
@@ -4979,7 +5521,7 @@ function processExtractedTextToTrip(text, sourceName) {
     itinerary.push(currentDay);
   }
 
-  // Découper les descriptions longues en timeline chronologique de visites
+  // Découper les descriptions longues en timeline chronologique si aucune visite n'a été trouvée
   itinerary.forEach(d => {
     if (!d.timeline || d.timeline.length === 0) {
       const sentences = (d.description || "").split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
@@ -5014,8 +5556,6 @@ function processExtractedTextToTrip(text, sourceName) {
   const hotelSectionMatch = text.match(hotelSectionRegex);
   const hotelTextToAnalyze = hotelSectionMatch ? hotelSectionMatch[1] : text;
 
-  // Motif typique Girardot :
-  // "du 11 au 13 novembre" suivi de "HOTEL NOM", adresse, code postal, téléphone
   const hotelBlockRegex = /du\s+(\d{1,2}(?:\s+[a-zà-ÿ]+)?\s+au\s+\d{1,2}\s+[a-zà-ÿ]+)([\s\S]*?)(?=(?:du\s+\d{1,2}\s+au|$))/gi;
   let hbMatch;
 
@@ -5051,83 +5591,105 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
-  // Si le motif "du X au Y" n'a pas matché, recherche heuristique par mot-clé HOTEL
-  if (hotels.length === 0) {
-    const fallbackHotelRegex = /(?:hôtel|hotel|lodge|camp)\s+([A-ZÀ-Ý][\w\s'-]{3,35})/gi;
-    let fhMatch;
-    const foundNames = new Set();
-    while ((fhMatch = fallbackHotelRegex.exec(text)) !== null) {
-      const name = fhMatch[0].trim();
-      if (!foundNames.has(name) && name.length < 40) {
-        foundNames.add(name);
-        hotels.push({
-          name: name,
-          dates: "Pendant le circuit",
-          city: "Étape du circuit",
-          address: name,
-          phone: "",
-          lat: 0,
-          lng: 0,
-          notes: ""
-        });
-      }
-    }
+  // Fallback hébergement croisière si aucun hôtel terrestre
+  if (isCruise && hotels.length === 0) {
+    hotels.push({
+      name: `${detectedShip || "Costa Diadema"} (Cabine de bord)`,
+      dates: detectedDates || "Pendant toute la croisière",
+      city: "À bord du navire (Croisière)",
+      address: `Paquebot ${detectedShip || "Costa Diadema"} - Compagnie Costa Croisières`,
+      phone: "Réception 24h/24 à bord",
+      lat: 43.2965,
+      lng: 5.3698,
+      notes: "Cabine tout confort selon catégorie réservée (Service de bord 24h/24)"
+    });
   }
 
-  // 4. Détection des Contacts (Guide local, Accompagnatrice, Urgences / Réceptif)
+  // 4. Détection des Contacts (Accompagnatrice, Guide local, Réceptif & Assistance)
   const contactsList = [];
 
-  // A. Accompagnatrice Girardot
-  const accompMatch = text.match(/Votre accompagnatrice\s*(?:Girardot)?\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)/i);
+  // A. Accompagnatrice Girardot (ligne unique, sans capturer les paragraphes suivants)
+  const accompMatch = text.match(/Votre accompagnatrice(?:\s*Voyages Girardot)?\s*\n+\s*([A-ZÀ-Ý][a-zà-ÿ]+)/i);
+  let accompName = "";
   if (accompMatch) {
-    const accompName = accompMatch[1].trim();
+    accompName = accompMatch[1].trim();
+  }
+  if (!accompName && isCruise) {
+    const m = text.match(/(?:accompagnatrice|accompagnateur)\s+(?:Voyages Girardot\s+)?([A-ZÀ-Ý][a-zà-ÿ]+)/i);
+    if (m) accompName = m[1].trim();
+  }
+
+  if (accompName) {
     contactsList.push({
-      category: "Accompagnatrice Girardot",
+      category: "Accompagnatrice Voyages Girardot",
       name: accompName,
       phone: "",
-      address: "Avec le groupe sur le circuit",
+      address: isCruise ? `À bord du ${detectedShip || "navire"} (Permanence quotidienne Voyages Girardot)` : "Avec le groupe sur le circuit",
       isEmergency: false
     });
   }
 
-  // B. Guide local
-  const guideMatch = text.match(/Votre guide local\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
-  if (guideMatch) {
+  if (isCruise) {
     contactsList.push({
-      category: "Guide Local",
-      name: guideMatch[1].trim(),
-      phone: guideMatch[2] ? guideMatch[2].trim() : "",
-      address: "Guide local francophone",
-      isEmergency: false
+      category: "Réception & Guest Service Navire",
+      name: `Réception ${detectedShip || "Costa Diadema"} (Pont 3 / Atrium Eliodoro)`,
+      phone: "Poste Réception ou Urgence Cabine",
+      address: `À bord du ${detectedShip || "Costa Diadema"} - Disponible 24h/24`,
+      isEmergency: true
     });
-  }
+    contactsList.push({
+      category: "Centre Médical & Infirmerie du Bord",
+      name: `Infirmerie & Médecin de bord (${detectedShip || "Costa Diadema"})`,
+      phone: "Appel d'urgence depuis votre cabine",
+      address: "Pont 1 Timone (Accès direct ascenseurs)",
+      isEmergency: true
+    });
+    contactsList.push({
+      category: "Assistance Girardot 24h/7j",
+      name: "Permanence Urgences Voyages Girardot",
+      phone: "03 85 42 82 50",
+      address: "Chalon-sur-Saône, France",
+      isEmergency: true
+    });
+  } else {
+    // Guide local terrestre
+    const guideMatch = text.match(/Votre guide local\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
+    if (guideMatch) {
+      contactsList.push({
+        category: "Guide Local",
+        name: guideMatch[1].trim().split('\n')[0].trim(),
+        phone: guideMatch[2] ? guideMatch[2].trim() : "",
+        address: "Guide local francophone",
+        isEmergency: false
+      });
+    }
 
-  // C. Réceptif et Urgences
-  const receptifMatch = text.match(/(?:Au Mexique|Réceptif local|En France|Vos contacts)\s*[–-]?\s*([A-ZÀ-Ý\s&’']+)?\s*:\s*([\s\S]*?)(?=(?:Formalités|Bon à savoir|Assurance|$))/i);
-  if (receptifMatch) {
-    const rawContactBlock = receptifMatch[2].slice(0, 450);
-    const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
-    const mainPhone = phones[0] || "";
-    const contactNameMatch = rawContactBlock.match(/(?:Mme|M\.)\s+([A-Za-zÀ-Ý\s-]+)/);
-    const contactName = contactNameMatch ? contactNameMatch[0] : (receptifMatch[1] || "Correspondant Réceptif Local");
+    // Réceptif terrestre
+    const receptifMatch = text.match(/(?:Correspondant local|R[ée]ceptif local|En France|Vos contacts)\s*[–-]?\s*([A-ZÀ-Ý\s&’']+)?\s*:\s*([\s\S]*?)(?=(?:Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i);
+    if (receptifMatch) {
+      const rawContactBlock = receptifMatch[2].slice(0, 450);
+      const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
+      const mainPhone = phones[0] || "";
+      const contactNameMatch = rawContactBlock.match(/(?:Mme|M\.)\s+([A-Za-zÀ-Ý\s-]+)/);
+      const contactName = contactNameMatch ? contactNameMatch[0] : (receptifMatch[1] || "Correspondant Réceptif Local");
+
+      contactsList.push({
+        category: "Correspondant Réceptif & Urgence",
+        name: contactName.trim().split('\n')[0].trim(),
+        phone: mainPhone,
+        address: "Assistance locale 24h/24",
+        isEmergency: true
+      });
+    }
 
     contactsList.push({
-      category: "Correspondant Réceptif & Urgence",
-      name: contactName.trim(),
-      phone: mainPhone,
-      address: "Assistance locale 24h/24",
+      category: "Assistance Girardot 24h/7j",
+      name: "Permanence Urgences Girardot",
+      phone: "03 85 42 82 50",
+      address: "Chalon-sur-Saône, France",
       isEmergency: true
     });
   }
-
-  // D. Assistance Girardot standard
-  contactsList.push({
-    category: "Assistance Girardot 24h/7j",
-    name: "Permanence Urgences Girardot",
-    phone: "03 85 42 82 50",
-    address: "Chalon-sur-Saône, France",
-    isEmergency: true
-  });
 
   // 5. Détection des Vols (Aller / Retour avec numéros de vol, dates, aéroports, horaires)
   const flightsList = [];
@@ -5146,18 +5708,20 @@ function processExtractedTextToTrip(text, sourceName) {
     const comp = (outBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
     const meeting = (outBlock.match(/Heure de pr[ée]sentation\s*:\s*(.*)/i) || [])[1] || "";
 
-    flightsList.push({
-      type: "Aller",
-      airline: comp.trim(),
-      flightNumber: flightNum.trim(),
-      departureAirport: depAero.trim(),
-      departureTime: depTime.trim(),
-      arrivalAirport: arrAero.trim(),
-      arrivalTime: arrTime.trim(),
-      date: outDate.trim(),
-      via: "",
-      notes: meeting ? `Convocation à ${meeting.trim()}` : ""
-    });
+    if (flightNum || (depAero && arrAero)) {
+      flightsList.push({
+        type: "Aller",
+        airline: comp.trim(),
+        flightNumber: flightNum.trim(),
+        departureAirport: depAero.trim(),
+        departureTime: depTime.trim(),
+        arrivalAirport: arrAero.trim(),
+        arrivalTime: arrTime.trim(),
+        date: outDate.trim(),
+        via: "",
+        notes: meeting ? `Convocation à ${meeting.trim()}` : ""
+      });
+    }
   }
 
   // Bloc Retour
@@ -5173,22 +5737,29 @@ function processExtractedTextToTrip(text, sourceName) {
     const arrTime = (inBlock.match(/Arriv[ée]e pr[ée]vue [àa]\s*:\s*(.*)/i) || [])[1] || "";
     const comp = (inBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
 
-    flightsList.push({
-      type: "Retour",
-      airline: comp.trim(),
-      flightNumber: flightNum.trim(),
-      departureAirport: depAero.trim(),
-      departureTime: depTime.trim(),
-      arrivalAirport: arrAero.trim(),
-      arrivalTime: arrTime.trim(),
-      date: inDate.trim(),
-      via: "",
-      notes: ""
-    });
+    if (flightNum || (depAero && arrAero)) {
+      flightsList.push({
+        type: "Retour",
+        airline: comp.trim(),
+        flightNumber: flightNum.trim(),
+        departureAirport: depAero.trim(),
+        departureTime: depTime.trim(),
+        arrivalAirport: arrAero.trim(),
+        arrivalTime: arrTime.trim(),
+        date: inDate.trim(),
+        via: "",
+        notes: ""
+      });
+    }
   }
 
-  // Si pas de bloc formaté détecté, créer au moins un vol générique si le mot vol apparaît
-  if (flightsList.length === 0 && text.match(/vol|avion|aéroport|terminal/i)) {
+  // Pour les croisières : supprimer absolument tout faux vol générique
+  if (isCruise) {
+    const realCruiseFlights = flightsList.filter(f => f.flightNumber || (f.departureAirport && f.arrivalAirport && f.departureAirport !== 'Paris' && f.arrivalAirport !== detectedTitle));
+    flightsList.length = 0;
+    realCruiseFlights.forEach(f => flightsList.push(f));
+  } else if (flightsList.length === 0 && text.match(/\b(?:vol\s+n[°o]|vol\s+spécial|compagnie\s+aérienne|envol\s+pour|décollage\s+de)\b/i)) {
+    // Si circuit terrestre avec mentions claires de vol
     flightsList.push({
       type: "Aller",
       airline: "Compagnie régulière",
@@ -5207,16 +5778,16 @@ function processExtractedTextToTrip(text, sourceName) {
   const newTripId = 'voyage-' + Date.now();
   currentParsedTrip = {
     id: newTripId,
-    title: detectedTitle || "Cocktail Mexicain",
+    title: detectedTitle || "Circuit Découverte",
     subtitle: detectedSubtitle || "Circuit exclusif Voyages Girardot",
-    dates: detectedDates || "Du 11 au 23 novembre 2026",
+    dates: detectedDates || "Dates selon programme",
     startDate: new Date().toISOString().split('T')[0],
     endDate: new Date(Date.now() + (itinerary.length || 14) * 86400000).toISOString().split('T')[0],
-    coverImage: "https://images.unsplash.com/photo-1518105779142-d975f22f1b0a?auto=format&fit=crop&w=1200&q=80",
+    coverImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
     intro: text.slice(0, 320) + "...",
     alert: {
       title: "Formalités indispensables",
-      text: "Passeport biométrique valide 6 mois après la date de retour. Formulaire FMM à conserver précieusement.",
+      text: "Passeport ou pièce d'identité en cours de validité (selon exigences de la destination). Vérifiez vos dates de validité.",
       link: ""
     },
     flightsList: flightsList,
@@ -5225,12 +5796,13 @@ function processExtractedTextToTrip(text, sourceName) {
     documents: [],
     freeTimeSuggestions: [],
     contactsList: contactsList,
+    practicalTipsList: [],
     practicalInfo: {
-      money: "Monnaie : Peso mexicain. Cartes de crédit acceptées. Prévoir des espèces pour les petits commerces.",
-      electricity: "110 volts. Prises à fiches plates américaines (prévoir un adaptateur).",
-      clothing: "Tenue d'été pour la côte, lainages pour les régions en altitude et la climatisation du car.",
-      tips: "Pourboires indicatifs : 3 € / jour / personne pour le guide et 2 € pour le chauffeur.",
-      wifi: "Wi-Fi disponible gratuitement dans les hôtels."
+      money: "Euros ou devise locale selon le pays. Cartes bancaires internationales acceptées. Prévoir des espèces pour les petits commerces.",
+      electricity: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon la destination.",
+      clothing: "Tenue confortable de saison et chaussures adaptées pour les visites à pied.",
+      tips: "Pourboires indicatifs : selon les usages locaux et laissés à votre discrétion.",
+      wifi: "Wi-Fi disponible dans la plupart des hébergements."
     },
     driverDossier: {
       busModel: "Autocar Grand Tourisme",
@@ -5245,7 +5817,8 @@ function processExtractedTextToTrip(text, sourceName) {
 
   if (isCruise) {
     currentParsedTrip.isCruise = true;
-    currentParsedTrip.shipName = detectedShip || "Navire de Croisière";
+    currentParsedTrip.shipName = detectedShip || "Costa Diadema";
+    currentParsedTrip.decks = getCruiseShipDecks(detectedShip);
     currentParsedTrip.conciergerie = buildCruiseConciergerie(detectedShip, itinerary, text);
     currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
     currentParsedTrip.practicalInfo = {
@@ -5255,11 +5828,71 @@ function processExtractedTextToTrip(text, sourceName) {
       tips: "Pourboires au personnel de bord (frais de service) inclus ou prépayés selon contrat. Pourboires libres pour les guides locaux et chauffeurs lors des excursions.",
       wifi: "Wi-Fi gratuit du bord pour utiliser l'application MyCosta (programme 'Oggi a bordo', menus, réservations). Forfait Internet satellite payant disponible pour naviguer sur le web en mer."
     };
+    currentParsedTrip.practicalTipsList = [
+      {
+        title: "Paiement & Monnaie à bord",
+        icon: "credit-card",
+        content: "Aucune circulation d'argent liquide à bord. Votre carte de cabine Costa sert de moyen de paiement unique pour tous vos achats (boutiques, bars, spa, excursions). Enregistrez votre carte bancaire dès les premiers jours aux bornes libre-service du navire (ou dépôt d'espèces de 150 € min/personne)."
+      },
+      {
+        title: "Électricité & Voltage en cabine",
+        icon: "plug",
+        content: "Voltage en cabine : 220V et 110V (60 Hz). Prises européennes standard et américaines disponibles. Pensez à emporter vos chargeurs de smartphones, appareils photos et tablettes."
+      },
+      {
+        title: "Vêtements conseillés & Soirées",
+        icon: "shirt",
+        content: "Tenue décontractée et confortable en journée, chaussures de marche pour les escales. Prévoyez un maillot de bain pour les piscines/jacuzzis et une tenue élégante / de gala pour la soirée du Commandant (ainsi qu'une touche de blanc pour la soirée blanche)."
+      },
+      {
+        title: "Pourboires & Frais de séjour",
+        icon: "hand-holding-dollar",
+        content: "Pour votre confort, les pourboires au personnel de bord Costa (frais de séjour) sont prépayés et inclus dans votre forfait Voyages Girardot. Les pourboires pour les guides et chauffeurs d'excursions restent à votre discrétion."
+      },
+      {
+        title: "Wi-Fi & Application MyCosta",
+        icon: "wifi",
+        content: "L'application MyCosta est indispensable à bord (programme Oggi a bordo, menus, réservation d'excursions, solde). Elle fonctionne gratuitement sur le Wi-Fi du navire. Pensez à mettre votre smartphone en mode avion en mer pour éviter les frais satellites d'itinérance."
+      },
+      {
+        title: "Santé, Médicaments & Mal de mer",
+        icon: "shield-heart",
+        content: "Un service médical avec médecins et infirmières est disponible 24h/24 à bord (soins payants, couverts par assurance multirisque). Conservez vos médicaments et ordonnances en bagage à main. Des comprimés contre le mal de mer sont disponibles à la Réception."
+      }
+    ];
     currentParsedTrip.alert = {
       title: "Procédures pré-départ indispensables (Web Check-In)",
       text: "Effectuez votre enregistrement en ligne (Web Check-In) sur MyCosta dès réception de votre numéro de réservation afin de télécharger vos billets de croisière et étiquettes bagages.",
       link: "https://www.mycosta.com"
     };
+  } else {
+    currentParsedTrip.practicalTipsList = [
+      {
+        title: "Monnaie & Devises",
+        icon: "coins",
+        content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux."
+      },
+      {
+        title: "Électricité & Prises",
+        icon: "plug",
+        content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité."
+      },
+      {
+        title: "Vêtements conseillés",
+        icon: "shirt",
+        content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car."
+      },
+      {
+        title: "Pourboires indicatifs",
+        icon: "hand-holding-dollar",
+        content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar."
+      },
+      {
+        title: "Connexion Wi-Fi",
+        icon: "wifi",
+        content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit."
+      }
+    ];
   }
 
   // Synchronisation rétrocompatible des objets flights et contacts
@@ -5290,9 +5923,30 @@ function processExtractedTextToTrip(text, sourceName) {
       },
       domesticFlights: []
     };
+  } else {
+    currentParsedTrip.flights = null;
   }
 
-  if (contactsList.length > 0) {
+  if (isCruise) {
+    currentParsedTrip.contacts = {
+      receptif: {
+        name: `Réception & Guest Service ${detectedShip || "Costa Diadema"}`,
+        emergency: "Urgences cabine ou 03 85 42 82 50",
+        phone: "Poste Réception à bord (24h/24)",
+        address: `À bord du ${detectedShip || "Costa Diadema"}`
+      },
+      guide: {
+        name: accompName || "Mireille",
+        role: "Accompagnatrice Voyages Girardot",
+        phone: ""
+      },
+      agence: {
+        name: "Voyages Girardot",
+        phone: "03 85 42 82 50",
+        email: "contact@voyages-girardot.com"
+      }
+    };
+  } else if (contactsList.length > 0) {
     const mainRec = contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('urgence')) || contactsList[0];
     currentParsedTrip.contacts = {
       receptif: {
@@ -5300,6 +5954,11 @@ function processExtractedTextToTrip(text, sourceName) {
         emergency: mainRec.phone,
         phone: mainRec.phone,
         address: mainRec.address
+      },
+      guide: {
+        name: accompName || "",
+        role: "Accompagnateur Girardot",
+        phone: ""
       },
       agence: {
         name: "Voyages Girardot",
@@ -5324,7 +5983,7 @@ function processExtractedTextToTrip(text, sourceName) {
     previewSummary.innerHTML = `
       <div style="margin-bottom:6px;"><strong>Destination :</strong> ${currentParsedTrip.title} (${currentParsedTrip.subtitle}) ${isCruise ? `<span style="background:#0284c7; color:white; padding:2px 7px; border-radius:4px; font-size:0.75rem; font-weight:bold;"><i class="fa-solid fa-ship"></i> Bateau : ${detectedShip}</span>` : ""}</div>
       <div style="margin-bottom:6px;"><strong>Dates :</strong> ${currentParsedTrip.dates} • <strong>${itinerary.length} jours au programme</strong></div>
-      <div style="margin-bottom:6px;"><strong>Vols reconnus :</strong> ${flightsList.map(f => `${f.type}: ${f.airline} ${f.flightNumber} (${f.departureAirport} ➔ ${f.arrivalAirport})`).join(' | ')}</div>
+      <div style="margin-bottom:6px;"><strong>Vols reconnus :</strong> ${flightsList.length > 0 ? flightsList.map(f => `${f.type}: ${f.airline} ${f.flightNumber} (${f.departureAirport} ➔ ${f.arrivalAirport})`).join(' | ') : '<em>Aucun vol requis (croisière maritime)</em>'}</div>
       <div style="margin-bottom:6px;"><strong>Hébergement :</strong> ${hotels.map(h => `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${h.name} (${h.dates})</span>`).join('')}</div>
       <div style="margin-bottom:6px;"><strong>Contacts identifiés :</strong> ${contactsList.map(c => `${c.category}: ${c.name} ${c.phone ? `(${c.phone})` : ''}`).join(' | ')}</div>
       <div><strong>Étapes :</strong> ${itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.highlight || d.title.slice(0, 20)}</span>`).join('')}</div>
@@ -5507,6 +6166,8 @@ function syncFormDataIntoTrip() {
         notes: df.notes || df.via || ''
       }))
     };
+  } else {
+    tripData.flights = null;
   }
 
   // Synchronisation rétrocompatible des contacts

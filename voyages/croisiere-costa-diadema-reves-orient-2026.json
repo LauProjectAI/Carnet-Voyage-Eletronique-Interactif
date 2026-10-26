@@ -1,0 +1,1304 @@
+{
+  "id": "croisiere-costa-diadema-reves-orient-2026",
+  "title": "Croisière Rêves d'Orient",
+  "subtitle": "À bord du Costa Diadema (Maroc, Espagne, Gibraltar)",
+  "dates": "Du 07/10 au 17/10/2026",
+  "startDate": "2026-10-26",
+  "endDate": "2026-11-06",
+  "coverImage": "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80",
+  "intro": "En date du 11/09/2026 à 13:20:23\nVotre carnet de voyage Rêves d’Orient mercredi 7 octobre 2026 - samedi 17 octobre 2026\nRêves d’Orient\nÀ bord du Costa Diadema\nCosta Diadema vous emmène pour découvrir les merveilles que le Maroc a à vous offrir !\nEntrez au contact d'une culture millénaire. Des Phéniciens aux Arabes jusq...",
+  "alert": {
+    "title": "Procédures pré-départ indispensables (Web Check-In)",
+    "text": "Effectuez votre enregistrement en ligne (Web Check-In) sur MyCosta dès réception de votre numéro de réservation afin de télécharger vos billets de croisière et étiquettes bagages.",
+    "link": "https://www.mycosta.com"
+  },
+  "flightsList": [],
+  "itinerary": [
+    {
+      "day": 1,
+      "title": "Jour 1 • Votre région - Marseille",
+      "highlight": "Votre région - Marseille",
+      "city": "Marseille",
+      "dateStr": "Jour 1",
+      "description": "Jour consacré à l'acheminement. Transfert au port de Marseille. Déjeuner libre. Formalités et embarquement à bord du Costa Diadema. Appareillage vers 18h. Dîner logement à bord.",
+      "lat": 43.2965,
+      "lng": 5.3698,
+      "timeline": [
+        {
+          "time": "08:00",
+          "title": "Jour consacré à l'acheminement",
+          "subtitle": "Jour consacré à l'acheminement.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "11:00",
+          "title": "Transfert au port de Marseille",
+          "subtitle": "Transfert au port de Marseille.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "14:00",
+          "title": "Déjeuner libre",
+          "subtitle": "Déjeuner libre.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "17:00",
+          "title": "Formalités et embarquement à bord du Costa Diadema",
+          "subtitle": "Formalités et embarquement à bord du Costa Diadema.",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "title": "Jour 2 • Savone 9h - 16h30 (Italie)",
+      "highlight": "Savone 9h - 16h30 (Italie)",
+      "city": "Savone",
+      "dateStr": "Jour 2",
+      "description": "Surplombée par l'imposante forteresse du Priamar, la ville portuaire vous accueille sur son littoral réputé pour ses destinations balnéaires. Une vieille ville à découvrir dans ses moindres détails. Discrète, Savone est pleine de surprises, et prête à dévoiler la magie de ses ruelles, à l'ombre de ses tours, entre une forteresse et la mer de Ligurie. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 44.3079,
+      "lng": 8.4811,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "À la découverte de Gênes et de ses saveurs",
+          "subtitle": "À la découverte de Gênes et de ses saveurs",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Le village marin de Portofino",
+          "subtitle": "Le village marin de Portofino",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 3,
+      "title": "Jour 3 • Barcelone 14h - 19h30 (Espagne)",
+      "highlight": "Barcelone 14h - 19h30 (Espagne)",
+      "city": "Barcelone",
+      "dateStr": "Jour 3",
+      "description": "Barcelone, une ville que vous ne pourrez qu'aimer. Animée, cosmopolite, fière, magnifique et généreuse, elle vous offrira des sensations vives et exaltantes au cours de cette escale. Découvrez les points et les monuments les plus emblématiques : les Ramblas, la Sagrada Familia, le Parc Güell, ou préférez le shopping et les dégustations de tapas. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 41.3851,
+      "lng": 2.1734,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "Visite de Barcelone",
+          "subtitle": "Visite de Barcelone",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Le Monastère de Montserrat",
+          "subtitle": "Le Monastère de Montserrat",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "La Sagrada Familia et autres merveilles de Gaudi",
+          "subtitle": "La Sagrada Familia et autres merveilles de Gaudi",
+          "icon": "ship"
+        }
+      ]
+    },
+    {
+      "day": 4,
+      "title": "Jour 4 • Plaisirs en mer",
+      "highlight": "Plaisirs en mer",
+      "city": "Plaisirs en mer",
+      "dateStr": "Jour 4",
+      "description": "Journée libre en pension complète à bord avec programme d'activités et animations. Chaque jour, vous pourrez vous détendre au bord de la piscine, faire du shopping dans les boutiques, défier vos amis dans la salle de jeux, profiter des salons…",
+      "lat": 38.5,
+      "lng": 1.5,
+      "timeline": [
+        {
+          "time": "08:00",
+          "title": "Journée libre en pension complète à bord avec programme",
+          "subtitle": "Journée libre en pension complète à bord avec programme d'activités et animations.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "11:00",
+          "title": "Chaque jour, vous pourrez vous détendre au bord de la p",
+          "subtitle": "Chaque jour, vous pourrez vous détendre au bord de la piscine, faire du shopping dans les boutiques, défier vos amis dans la salle de jeux, profiter des salons…",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 5,
+      "title": "Jour 5 • Tanger 8h - 18h (Maroc)",
+      "highlight": "Tanger 8h - 18h (Maroc)",
+      "city": "Tanger (Maroc)",
+      "dateStr": "Jour 5",
+      "description": "Tanger et ses ruelles étroites grimpant dans un labyrinthe de maisons et de petites places, sur la colline surplombant le port multiculturel situé sur le détroit de Gibraltar. Cette charmante ville marocaine se distingue par sa médina aux parois blanchies à la chaux, son dédale de ruelles évocatrices, ses places animées et ses habitants fascinants. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 35.7878,
+      "lng": -5.8118,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "Grand souk de Tanger",
+          "subtitle": "Grand souk de Tanger",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Médina de Tanger",
+          "subtitle": "Médina de Tanger",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Avenue Mohamed VI",
+          "subtitle": "Avenue Mohamed VI",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 6,
+      "title": "Jour 6 • Casablanca 7h - 21h (Maroc)",
+      "highlight": "Casablanca 7h - 21h (Maroc)",
+      "city": "Casablanca (Maroc)",
+      "dateStr": "Jour 6",
+      "description": "Casablanca, l'énergie de la modernité. Poumon économique du Maroc, c'est une métropole bouillonnante sans cesse en éveil. Les infrastructures modernes se mêlent aux quartiers de charme, entre héritage arabo-musulman et legs de la période coloniale. Découvrez-en toutes les nuances : promenez-vous dans la médina, l'une des plus tardives du Maroc, traversez le centre et ses immeubles art-déco, rejoignez la mosquée Hassan II, merveille de l'architecture construite sur l'eau. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 33.6062,
+      "lng": -7.6186,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "Le parc de la Ligue arabe",
+          "subtitle": "Le parc de la Ligue arabe",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Le quartier des Habous",
+          "subtitle": "Le quartier des Habous",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "La mosquée Hassan II",
+          "subtitle": "La mosquée Hassan II",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 7,
+      "title": "Jour 7 • Cadix 12h - 21h (Espagne)",
+      "highlight": "Cadix 12h - 21h (Espagne)",
+      "city": "Cadix (Espagne)",
+      "dateStr": "Jour 7",
+      "description": "Découvrez Cadix, l'une des plus anciennes villes d'Europe, un lieu où l'histoire rencontre la mer. La ville possède un patrimoine fascinant. Ses ruelles étroites et pavées vous conduiront à travers des siècles d'histoire. Parmi les sites incontournables, la Cathédrale de Cadix, symbole de la ville, avec sa grande coupole dorée qui domine le paysage. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 36.5271,
+      "lng": -6.2886,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "Promenade à Séville : entre art, culture et gastro",
+          "subtitle": "Promenade à Séville : entre art, culture et gastronomie",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Promenade à Cadix",
+          "subtitle": "Promenade à Cadix",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 8,
+      "title": "Jour 8 • Gibraltar 8h - 20h (Royaume-Uni)",
+      "highlight": "Gibraltar 8h - 20h (Royaume-Uni)",
+      "city": "Gibraltar (Royaume-Uni)",
+      "dateStr": "Jour 8",
+      "description": "Gibraltar révèle le charme de la colonie, un rocher surplombant la mer où des fossiles de l'homme de Néandertal ont été trouvés et où de rares spécimens de macaques vivent en liberté. Le rocher est la principale attraction naturelle, étant donné le nombre d'espèces de plantes qu'il préserve (apparemment 600) et les colonies d'oiseaux migrateurs qu'il accueille : le passage de nuées de cigognes et de rapaces est un véritable spectacle à ne pas manquer. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 36.1408,
+      "lng": -5.3536,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "Visite panoramique de Gibraltar",
+          "subtitle": "Visite panoramique de Gibraltar",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 9,
+      "title": "Jour 9 • Malaga 8h - 17h (Espagne)",
+      "highlight": "Malaga 8h - 17h (Espagne)",
+      "city": "Malaga (Espagne)",
+      "dateStr": "Jour 9",
+      "description": "Perchée sur la Costa del Sol, Malaga est synonyme d'art, de culture et de soleil tandis que les collines vous invitent à explorer la région. La ville est également réputée pour ses magnifiques plages, mais le centre offre d'autres trésors. En effet, c'est à Malaga qu'est né l'un des artistes les plus éminents dans l'histoire de l'art espagnol et international : Pablo Picasso. Journée libre en pension complète à bord avec programme d'activités et animations ou excursions facultatives vendues à bord :",
+      "lat": 36.7213,
+      "lng": -4.4214,
+      "timeline": [
+        {
+          "time": "Excursion",
+          "title": "Le meilleur de Cordou",
+          "subtitle": "Le meilleur de Cordou",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Malaga et les traditions andalouses",
+          "subtitle": "Malaga et les traditions andalouses",
+          "icon": "location-dot"
+        },
+        {
+          "time": "Excursion",
+          "title": "Malaga en tuk-tuk",
+          "subtitle": "Malaga en tuk-tuk",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 10,
+      "title": "Jour 10 • Plaisirs en mer",
+      "highlight": "Plaisirs en mer",
+      "city": "Plaisirs en mer",
+      "dateStr": "Jour 10",
+      "description": "Journée libre en pension complète à bord avec programme d'activités et animations.",
+      "lat": 39.5,
+      "lng": 3.5,
+      "timeline": [
+        {
+          "time": "08:00",
+          "title": "Journée libre en pension complète à bord avec programme",
+          "subtitle": "Journée libre en pension complète à bord avec programme d'activités et animations.",
+          "icon": "location-dot"
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "title": "Jour 11 • Marseille - Votre région",
+      "highlight": "Marseille - Votre région",
+      "city": "Marseille",
+      "dateStr": "Jour 11",
+      "description": "Marseille, arrivée au port vers 9h suivi du débarquement. Déjeuner libre en cours de route. Retour dans l'après-midi dans votre région.",
+      "lat": 43.2965,
+      "lng": 5.3698,
+      "timeline": [
+        {
+          "time": "08:00",
+          "title": "Marseille, arrivée au port vers 9h suivi du débarquemen",
+          "subtitle": "Marseille, arrivée au port vers 9h suivi du débarquement.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "11:00",
+          "title": "Déjeuner libre en cours de route",
+          "subtitle": "Déjeuner libre en cours de route.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "14:00",
+          "title": "Retour dans l'après-midi dans votre région",
+          "subtitle": "Retour dans l'après-midi dans votre région.",
+          "icon": "location-dot"
+        }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "name": "2026.",
+      "dates": "Du 7 au 17 octobre",
+      "city": "Excursions vendues à bord, sous réserve de modification",
+      "address": "Ce voyage vous offrira un bel itinéraire diversifié vers le Maroc, l’enclave anglophone de Gibraltar et deux pays emblématiques de la Méditerranée, l’Italie et l’Espagne., Vous apprécierez également le plaisir de la navigation sur un confortable paquebot., Chaque escale vous permettra au choix de découvrir la destination par vous-même ou d’acheter l’une des excursions ou transfert que vous propose Costa Croisières en option., - A Savone, découvrez à pieds le centre-ville ou optez pour une excursion vers l’historique ville de Gênes et les villages médiévaux des alentours., - Vous pourrez parcourir la magnifique ville catalane de Barcelone qui conjugue monuments classiques et contemporains, admirer les chefs d’œuvres de Gaudi ou vous promener sur les Ramblas., - Pendant les journées en mer, profitez du confort du Costa Diadema pour vous reposer, des multiples équipements du navire et des animations pour vous divertir., - Au Maroc, les escales de Tanger et de Casablanca oscillent entre tradition et modernité avec leurs médinas et souks mais aussi l’impressionnante mosquée Hassan II., - Puis vous découvrirez Cadix, ou pourrez visiter les villages blancs d’Andalousie, Jerez et la superbe et historique Séville., - Gibraltar et son célèbre rocher vous étonnera par son influence britannique en Méditerranée., - Malaga, la ville de Picasso sur la Costa del Sol, conserve de nombreux bâtiments historique et un charmant front de mer., - Lors de cette dernière journée en mer, appréciez le navire ! Ou offrez-vous un peu de détente au spa ! Et profitez des promotions dans les boutiques à bord avant de préparer vos bagages pour débarquer le lendemain à Marseille., A votre arrivée en autocar à Marseille, je vous accueillerai au port pour vous assister avec les formalités d’embarquement au terminal croisières puis la découverte du paquebot., Avant le départ, veuillez placer sur vos bagages une étiquette personnelle avec votre nom, adresse et téléphone portable en plus de l’étiquette Costa (feuille à imprimer et plier en 3 ) avec votre nom et numéro de cabine., Nous enregistrerons les bagages à la gare maritime et ils seront distribués devant la porte de votre cabine dans l’après-midi., Une fois à bord, vous pourrez vous diriger vers le restaurant Corona Blu situé au pont 10 pour déjeuner au buffet., Les cabines sont généralement prêtes autour de 13h00 / 14h00 et une annonce multilingue le précisera. Vous pourrez alors vous y installer., Un exercice de sécurité obligatoire digital ou physique aura lieu dans l’après-midi. Merci de bien suivre les instructions, votre présence devant être validée par l’équipage., Le point de rassemblement d’urgence (Muster Station) porte une lettre et varie selon l’emplacement de votre cabine. La lettre est précisée sur votre carte Costa, à l’arrière de la porte de votre cabine et sur votre gilet de sauvetage placé dans le placard., Une présentation francophone de la vie à bord vous sera proposée par l’équipe Costa. Horaire et lieu à vérifier une fois sur le navire., Dès votre arrivée à bord et dans les 24h, vous pourrez ouvrir votre compte à bord en y déposant des espèces ou enregistrant votre carte de crédit dans les machines prévues à cet effet. Il vous permettra de régler vos achats personnels (excursions, boutiques, spa, coiffeur, photos, boissons non comprises dans le forfait, glaces, consommations en cabine, taxes en Grèce, divers…)., Le soir, je vous retrouverai au restaurant Andularia au pont 3 pour le dîner du 1er service et vous donner chaque jour des informations complémentaires., Je vous préciserai le lieu et les horaires de ma permanence Voyages Girardot., Si vous n’avez pas réservé les excursions en avance sur le site Costa (conseillé pour les plus demandées et en langue française), vous pourrez aussi les acheter à bord grâce à l’application MyCosta et aux horaires d’ouverture du bureau des Excursions (MyTours – MyLand Experiences). Les excursions Costa ne sont garanties qu’à partir d’un certain nombre de participants et peuvent parfois être multilingues., TRES IMPORTANT ! Téléchargez en avance l’application MY COSTA !, Afin de profiter au mieux du navire et de toutes les activités à bord, il est impératif de télécharger un scanner de QR code et l’application gratuite MyCosta sur votre smartphone avant votre départ., Faites-vous aider par votre entourage si vous hésitez ! Téléchargez l’application MyCosta dès aujourd’hui pour vous familiariser avec son contenu !, MyCosta vous permettra de découvrir le bateau et les services à bord (plans, situation des bars, restaurants, boutiques, piscines, spa, liste et le descriptif des excursions, forfaits Internet etc.) et de consulter de nombreuses informations avant de partir., A bord, vous pourrez accéder à des détails complémentaires très utiles, suivre l’agenda du programme du jour (musique, spectacles au théâtre, horaires des bars…) et y retrouver les menus, le détail des boissons comprises dans votre forfait MyDrinks, votre compte avec le détail des dépenses journalières, les rendez-vous pour le départ des excursions optionnelles et de nombreux autres renseignements., Costa ne distribue plus les programmes \"Oggi a Bordo\" sur papier en cabine et les menus imprimés sont rares ! Mais, vous pourrez les consulter ou les télécharger à partir l’application MyCosta sur votre téléphone.., Les communications téléphoniques, accès aux réseaux sociaux et courriels sont possibles lors des escales en Europe dans le cadre de votre forfait mais rarement au Maroc. Veuillez vérifier les conditions avec votre opérateur., Cependant, lors de la navigation, je vous conseille de mettre votre smartphone sur mode avion, afin de pouvoir prendre des photos mais bloquer l’itinérance qui peut entraîner rapidement d’importants surcoûts., Vous pouvez aussi acheter auprès de Costa des forfaits Internet ou accès aux réseaux sociaux., L’ambiance à bord est décontractée, avec un esprit d’élégance le soir dans les salons animés par de talentueux musiciens., Si vous le souhaitez et sans trop vous charger, vous pourrez adopter en soirée une touche de la couleur thématique du moment (soirée blanche, élégante, grecque, espagnole, italienne...)., Mettez dans vos bagages des vêtements de saison pratiques et des chaussures confortables pour les escales., Glissez-y un maillot de bain pour l’accès aux piscines et bains à remous (les serviettes sont fournies à bord) et une tenue de sport si vous souhaitez faire de l’exercice en salle ou votre jogging sur les ponts extérieurs., Attention aux objets interdits à bord ! Par exemple : pas de canifs, ciseaux ni certains appareils électriques… La liste est jointe à votre billet de croisière et peut être consultée sur MyCosta., Par contre, les appareillages médicaux sont autorisés en remplissant un formulaire spécifique et ne doivent pas se trouver dans votre bagage enregistré., Concernant les médicaments, pour vos traitements habituels ou préventifs, mettez-les de préférence dans votre bagage à main et gardez l’ordonnance., Un service médical payant est disponible à bord., Ne vous séparez jamais de votre carte Costa remise à l’embarquement ! Elle vous servira à ouvrir votre cabine et y allumer l’électricité, à régler vos achats et extras, à vous identifier en montant à bord ou quittant le navire, à entrer dans les gares maritimes lors des escales. Elle indique vos noms et prénoms, numéro de cabine, nom du restaurant, horaire  et table assignée pour le diner, le N° de téléphone d’urgence du navire et divers renseignements. Cette carte est reliée à la photo de sécurité qui sera prise à l’enregistrement afin de vous identifier. Elle est personnelle et si vous l’égarez, adressez-vous à la Réception (Guest Service)., Costa propose un programme de fidélité qui procure des avantages en adhérent au C Club. N’hésitez pas à vous inscrire ! Une permanence C Club sera également disponible à bord., Enfin, n’oubliez pas votre passeport, votre billet de croisière et votre carte d’embarquement qui vous seront demandés à la gare maritime à Marseille !, J’aurai le plaisir de vous retrouver chaque jour de l’itinéraire et vous souhaite une très agréable croisière !, Votre bateau, Données non contractuelles, Costa Diadema, Le Costa Diadema est un véritable joyau. Les différents styles qui s’y côtoient harmonieusement vous plongeront dans une élégance somptueuse et raffinée. Déclinant le concept de \"design pur\" de l’architecte Joseph Farcus dans un environnement sophistiqué, ce navire est une invitation à la détente et au bien-être. L’élégance est à l’honneur dans tous les espaces de vie à bord, des restaurants aux lieux de spectacle en passant par le vaste et chaleureux espace de relaxation., Le Costa Diadema sera le théâtre de vos plus belles vacances., DIMENSIONS, Année de construction : 2014, Capacité d’accueil : 4 947 passagers, Membres d'équipage : 1 253, Total cabines : 1 862, Jauge brute : 133 019 t, Longueur : 306 m, Largeur : 37,20 m, Ponts : 20 dont 15 pour les passagers, Vitesse de pointe : 22,5 nœuds, Vitesse de croisière : 20 nœuds, CABINE, 1.862 cabines au total, dont : 130 au sein de l’espace bien-être, 756 avec balcon privé, 64 suites avec balcon privé, 11 suites au sein de l’espace bien-être., Equipements en cabine intérieure :, Climatisation réglable avec thermostat individuel, TV interactive par satellite à écran plat, sèche-cheveux, coffre-fort, connexion wifi disponible (payant), minibar (payant)., Service en cabine 24 heures sur 24 (payant)., Voltage 220/110 volts, 60 Hz., PLAISIRS GOURMANDS, 8 restaurants, dont trois payants et sur réservation (le Restaurant Club, les restaurants Samsara et Teppanyaki), et un payant (la Pizzeria)., 11 bars, dont la Brasserie et la Vinothèque • Glacier., BIEN-ETRE ET SPORTS, Samsara Spa : 6 200 m² sur quatre niveaux, salle de sport, espace thermal, piscine de balnéothérapie, salles de traitement, sauna, hammam, solarium (lampes UVA), cabines et suites • 8 vasques à hydromassage • 3 piscines dont une avec verrière amovible • Terrain multisports • Parcours de footing en plein air., DIVERTISSEMENTS, Cinéma 4D • Théâtre sur trois étages • Casino • Discothèque • Country Rock Club • Vidéo Arcade, espace de jeux vidéo • Star Lazer avec labyrinthe et simulateur de tir • Pont piscine avec verrière amovible et écran géant • Point Internet • Bibliothèque • Galerie marchande • Espace Peppa Pig • Squok Club • Piscine enfants., Excursions vendues à bord, sous réserve de modification",
+      "phone": "",
+      "lat": 0,
+      "lng": 0,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    }
+  ],
+  "documents": [],
+  "freeTimeSuggestions": [],
+  "contactsList": [
+    {
+      "category": "Accompagnatrice Voyages Girardot",
+      "name": "Mireille",
+      "phone": "",
+      "address": "À bord du Costa Diadema (Permanence quotidienne Voyages Girardot)",
+      "isEmergency": false
+    },
+    {
+      "category": "Réception & Guest Service Navire",
+      "name": "Réception Costa Diadema (Pont 3 / Atrium Eliodoro)",
+      "phone": "Poste Réception ou Urgence Cabine",
+      "address": "À bord du Costa Diadema - Disponible 24h/24",
+      "isEmergency": true
+    },
+    {
+      "category": "Centre Médical & Infirmerie du Bord",
+      "name": "Infirmerie & Médecin de bord (Costa Diadema)",
+      "phone": "Appel d'urgence depuis votre cabine",
+      "address": "Pont 1 Timone (Accès direct ascenseurs)",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Voyages Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    }
+  ],
+  "practicalTipsList": [
+    {
+      "title": "Paiement & Monnaie à bord",
+      "icon": "credit-card",
+      "content": "Aucune circulation d'argent liquide à bord. Votre carte de cabine Costa sert de moyen de paiement unique pour tous vos achats (boutiques, bars, spa, excursions). Enregistrez votre carte bancaire dès les premiers jours aux bornes libre-service du navire (ou dépôt d'espèces de 150 € min/personne)."
+    },
+    {
+      "title": "Électricité & Voltage en cabine",
+      "icon": "plug",
+      "content": "Voltage en cabine : 220V et 110V (60 Hz). Prises européennes standard et américaines disponibles. Pensez à emporter vos chargeurs de smartphones, appareils photos et tablettes."
+    },
+    {
+      "title": "Vêtements conseillés & Soirées",
+      "icon": "shirt",
+      "content": "Tenue décontractée et confortable en journée, chaussures de marche pour les escales. Prévoyez un maillot de bain pour les piscines/jacuzzis et une tenue élégante / de gala pour la soirée du Commandant (ainsi qu'une touche de blanc pour la soirée blanche)."
+    },
+    {
+      "title": "Pourboires & Frais de séjour",
+      "icon": "hand-holding-dollar",
+      "content": "Pour votre confort, les pourboires au personnel de bord Costa (frais de séjour) sont prépayés et inclus dans votre forfait Voyages Girardot. Les pourboires pour les guides et chauffeurs d'excursions restent à votre discrétion."
+    },
+    {
+      "title": "Wi-Fi & Application MyCosta",
+      "icon": "wifi",
+      "content": "L'application MyCosta est indispensable à bord (programme Oggi a bordo, menus, réservation d'excursions, solde). Elle fonctionne gratuitement sur le Wi-Fi du navire. Pensez à mettre votre smartphone en mode avion en mer pour éviter les frais satellites d'itinérance."
+    },
+    {
+      "title": "Santé, Médicaments & Mal de mer",
+      "icon": "shield-heart",
+      "content": "Un service médical avec médecins et infirmières est disponible 24h/24 à bord (soins payants, couverts par assurance multirisque). Conservez vos médicaments et ordonnances en bagage à main. Des comprimés contre le mal de mer sont disponibles à la Réception."
+    }
+  ],
+  "practicalInfo": {
+    "money": "Aucune circulation d'argent liquide à bord. Votre carte cabine sert de moyen de paiement unique. Enregistrez votre carte bancaire dès les premiers jours aux bornes automatiques.",
+    "electricity": "Voltage en cabine : 220V et 110V (prises européennes et américaines disponibles).",
+    "clothing": "Tenue décontractée en journée, vêtements confortables pour les escales. Prévoir une tenue de gala / cocktail pour la soirée du Commandant.",
+    "tips": "Pourboires au personnel de bord (frais de service) inclus ou prépayés selon contrat. Pourboires libres pour les guides locaux et chauffeurs lors des excursions.",
+    "wifi": "Wi-Fi gratuit du bord pour utiliser l'application MyCosta (programme 'Oggi a bordo', menus, réservations). Forfait Internet satellite payant disponible pour naviguer sur le web en mer."
+  },
+  "driverDossier": {
+    "busModel": "Autocar Grand Tourisme",
+    "busCapacity": 50,
+    "busPlanUrl": "",
+    "busNotes": "Placement libre ou selon consignes de l'accompagnatrice.",
+    "roomingList": [],
+    "roomingFileUrl": "",
+    "passengersList": []
+  },
+  "isCruise": true,
+  "shipName": "Costa Diadema",
+  "decks": [
+    {
+      "deck": 1,
+      "name": "Timone",
+      "category": "Services Médicaux & Cabines",
+      "description": "Centre Médical & Infirmerie (Avant), Cabines passagers intérieures et vue mer.",
+      "highlights": [
+        {
+          "name": "Centre Médical & Infirmerie",
+          "zone": "Proue (Avant)",
+          "side": "Centre",
+          "icon": "shield-heart",
+          "color": "#2563eb",
+          "desc": "Consultations, soins d'urgence, mal de mer et délivrance de médicaments 24h/24."
+        },
+        {
+          "name": "Cabines Pont 1",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#64748b",
+          "desc": "Cabines passagers calmes proches des ascenseurs."
+        }
+      ]
+    },
+    {
+      "deck": 2,
+      "name": "Sara",
+      "category": "Pont Cabines & Passerelle",
+      "description": "Cabines passagers et passerelle d'accès pour les débarquements en escale.",
+      "highlights": [
+        {
+          "name": "Passerelle de débarquement",
+          "zone": "Centre / Poupe",
+          "side": "Bâbord & Tribord",
+          "icon": "door-open",
+          "color": "#0891b2",
+          "desc": "Accès piéton pour les sorties d'escale et excursions."
+        },
+        {
+          "name": "Cabines Pont 2",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#64748b",
+          "desc": "Cabines avec hublot vue mer et cabines intérieures."
+        }
+      ]
+    },
+    {
+      "deck": 3,
+      "name": "Centenario",
+      "category": "Accueil, Dîner & Théâtre",
+      "description": "Théâtre Emerald (Avant), Réception & Guest Service 24h, Atrium Eliodoro, Restaurant Fiorentino (Arrière), Restaurant Adularia (Centre).",
+      "highlights": [
+        {
+          "name": "Réception & Guest Service (24h/24)",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "bell-concierge",
+          "color": "#059669",
+          "desc": "Accueil francophone permanent, gestion de compte et cartes cabine."
+        },
+        {
+          "name": "Restaurant Adularia (1er Service)",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "utensils",
+          "color": "#e11d48",
+          "desc": "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et régionale servie à table."
+        },
+        {
+          "name": "Restaurant Fiorentino (Niveau 1)",
+          "zone": "Poupe (Arrière)",
+          "side": "Centre",
+          "icon": "utensils",
+          "color": "#be123c",
+          "desc": "Grand restaurant élégant avec vue splendide sur le sillage du navire."
+        },
+        {
+          "name": "Théâtre Emerald (Niveau 1)",
+          "zone": "Proue (Avant)",
+          "side": "Centre",
+          "icon": "masks-theater",
+          "color": "#7c3aed",
+          "desc": "Grandes comédies musicales, danseurs et artistes internationaux."
+        },
+        {
+          "name": "Atrium Eliodoro (Niveau 1)",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "landmark",
+          "color": "#c29958",
+          "desc": "Atrium central spectaculaire avec ascenseurs panoramiques en verre."
+        }
+      ]
+    },
+    {
+      "deck": 4,
+      "name": "Perla di Venere",
+      "category": "Grands Salons & Fêtes",
+      "description": "Théâtre Emerald (Niveau 2), Grand Bar Orlov (Centre), Bar Bollicine, Atrium Eliodoro (Niveau 2), Restaurant Fiorentino (Niveau supérieur).",
+      "highlights": [
+        {
+          "name": "Grand Bar Orlov",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "music",
+          "color": "#9333ea",
+          "desc": "Le grand salon de danse du navire avec orchestre live tous les soirs."
+        },
+        {
+          "name": "Bar Bollicine",
+          "zone": "Centre",
+          "side": "Tribord",
+          "icon": "champagne-glasses",
+          "color": "#c29958",
+          "desc": "Bar à bulles et cocktails de prestige avant le dîner."
+        },
+        {
+          "name": "Théâtre Emerald (Niveau 2)",
+          "zone": "Proue (Avant)",
+          "side": "Centre",
+          "icon": "masks-theater",
+          "color": "#7c3aed",
+          "desc": "Balcon mezzanine du théâtre avec vue plongeante sur la scène."
+        },
+        {
+          "name": "Restaurant Fiorentino (Niveau 2)",
+          "zone": "Poupe (Arrière)",
+          "side": "Centre",
+          "icon": "utensils",
+          "color": "#be123c",
+          "desc": "Niveau supérieur du restaurant panoramique."
+        }
+      ]
+    },
+    {
+      "deck": 5,
+      "name": "Eldorador",
+      "category": "Promenade, Restaurants & Boutiques",
+      "description": "Promenade La Passeggiata (500m), Pizzeria La Tavernetta, Teppanyaki, Birreria Dresden Green, Vinoteca Gran Duca di Toscana, Country Rock Club, Casino Golden Mirage, Boutiques Tax-Free.",
+      "highlights": [
+        {
+          "name": "Promenade extérieure 'La Passeggiata'",
+          "zone": "Tout le tour",
+          "side": "Bâbord & Tribord",
+          "icon": "person-walking",
+          "color": "#0284c7",
+          "desc": "500 mètres de promenade en plein air faisant tout le tour du navire, avec bains à remous suspendus."
+        },
+        {
+          "name": "Pizzeria La Tavernetta",
+          "zone": "Centre",
+          "side": "Bâbord",
+          "icon": "pizza-slice",
+          "color": "#ea580c",
+          "desc": "Véritable pizza italienne artisanale avec pâte levée et mozzarella fraîche du bord."
+        },
+        {
+          "name": "Restaurant Japonais Teppanyaki",
+          "zone": "Centre",
+          "side": "Tribord",
+          "icon": "fire-burner",
+          "color": "#b91c1c",
+          "desc": "Spectacle culinaire japonais sur plaques chauffantes par des maîtres teppanyaki."
+        },
+        {
+          "name": "Birreria Dresden Green",
+          "zone": "Centre",
+          "side": "Bâbord",
+          "icon": "beer-mug-empty",
+          "color": "#b45309",
+          "desc": "Brasserie artisanale avec bières à la pression et ambiance chaleureuse."
+        },
+        {
+          "name": "Vinoteca Gran Duca di Toscana",
+          "zone": "Centre",
+          "side": "Tribord",
+          "icon": "wine-glass",
+          "color": "#9333ea",
+          "desc": "Bar à vins italiens de renom, dégustations avec sommeliers."
+        },
+        {
+          "name": "Country Rock Club",
+          "zone": "Centre",
+          "side": "Bâbord",
+          "icon": "guitar",
+          "color": "#dc2626",
+          "desc": "Concerts rock live, guitares et musique américaine."
+        },
+        {
+          "name": "Galerie Marchande & Duty Free",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "bag-shopping",
+          "color": "#d97706",
+          "desc": "Boutiques détaxées : parfums, mode italienne, montres, souvenirs Costa."
+        },
+        {
+          "name": "Casino Golden Mirage",
+          "zone": "Centre",
+          "side": "Tribord",
+          "icon": "clover",
+          "color": "#059669",
+          "desc": "Roulettes, tables de blackjack, poker et machines à sous."
+        },
+        {
+          "name": "Bar Teodora (Salon Arrière)",
+          "zone": "Poupe (Arrière)",
+          "side": "Centre",
+          "icon": "martini-glass-citrus",
+          "color": "#0891b2",
+          "desc": "Grand salon de détente arrière avec vue panoramique sur l'océan."
+        }
+      ]
+    },
+    {
+      "deck": 6,
+      "name": "Brindisi",
+      "category": "Pont Cabines",
+      "description": "Cabines passagers avec balcon privé, vue mer et intérieures.",
+      "highlights": [
+        {
+          "name": "Cabines Pont 6 (6001 à 6390)",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#64748b",
+          "desc": "Accès immédiat par les 3 cages d'ascenseurs (Avant, Centraux, Arrière)."
+        }
+      ]
+    },
+    {
+      "deck": 7,
+      "name": "Agata",
+      "category": "Pont Cabines",
+      "description": "Cabines avec balcon et suites confortables.",
+      "highlights": [
+        {
+          "name": "Cabines Pont 7 (7001 à 7390)",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#64748b",
+          "desc": "Accès ascenseurs Théâtre Emerald, Atrium Eliodoro ou Arrière."
+        }
+      ]
+    },
+    {
+      "deck": 8,
+      "name": "Topazio",
+      "category": "Pont Cabines",
+      "description": "Cabines passagers avec balcon privé et mini-suites.",
+      "highlights": [
+        {
+          "name": "Cabines Pont 8 (8001 à 8390)",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#64748b",
+          "desc": "Coursives bâbord (pairs) et tribord (impairs)."
+        }
+      ]
+    },
+    {
+      "deck": 9,
+      "name": "Acquamarina",
+      "category": "Pont Cabines",
+      "description": "Cabines supérieures avec balcon et vue panoramique dégagée.",
+      "highlights": [
+        {
+          "name": "Cabines Pont 9 (9001 à 9390)",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#64748b",
+          "desc": "À un seul pont du buffet et des piscines du Pont 10."
+        }
+      ]
+    },
+    {
+      "deck": 10,
+      "name": "Hortensia",
+      "category": "Buffet, Piscines & Glaces",
+      "description": "Buffet Corona Blu (Arrière), Lido Diana (Piscine couverte avec verrière rétractable et écran géant), Lido Stella del Sud (Piscine extérieure), Glacier Amarillo.",
+      "highlights": [
+        {
+          "name": "Restaurant Buffet Corona Blu",
+          "zone": "Poupe (Arrière)",
+          "side": "Centre",
+          "icon": "bowl-food",
+          "color": "#e11d48",
+          "desc": "Buffet libre-service très complet pour petit-déjeuner, déjeuner et dîner décontracté."
+        },
+        {
+          "name": "Lido Diana (Piscine couverte & Écran géant)",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "water-ladder",
+          "color": "#0284c7",
+          "desc": "Grande piscine centrale tempérée sous verrière amovible et écran géant de cinéma."
+        },
+        {
+          "name": "Lido Stella del Sud (Piscine Extérieure)",
+          "zone": "Poupe (Arrière)",
+          "side": "Poupe",
+          "icon": "sun",
+          "color": "#ea580c",
+          "desc": "Piscine plein air et solarium face au sillage du navire."
+        },
+        {
+          "name": "Glacier Italien Amarillo",
+          "zone": "Centre",
+          "side": "Bâbord",
+          "icon": "ice-cream",
+          "color": "#d97706",
+          "desc": "Glaces italiennes artisanales bio fabriquées chaque jour à bord."
+        }
+      ]
+    },
+    {
+      "deck": 11,
+      "name": "Samsara",
+      "category": "Samsara Spa, Fitness & Bien-être",
+      "description": "Samsara Spa (6 200 m² sur 4 étages), Salle de Fitness Technogym vue mer, Balnéothérapie, Hammam, Sauna, Restaurant Samsara.",
+      "highlights": [
+        {
+          "name": "Samsara Spa & Wellness (6 200 m²)",
+          "zone": "Proue (Avant)",
+          "side": "Centre",
+          "icon": "spa",
+          "color": "#0d9488",
+          "desc": "Parcours thermal de luxe, piscine balnéo, sauna finlandais et cabines de soins."
+        },
+        {
+          "name": "Salle de Sport & Gym Panoramique",
+          "zone": "Proue (Avant)",
+          "side": "Tribord",
+          "icon": "dumbbell",
+          "color": "#0284c7",
+          "desc": "Appareils Technogym dernier cri avec baie vitrée plongeant sur l'avant du paquebot."
+        },
+        {
+          "name": "Restaurant Samsara",
+          "zone": "Proue (Avant)",
+          "side": "Bâbord",
+          "icon": "utensils",
+          "color": "#059669",
+          "desc": "Cuisine saine, légère et raffinée dans un décor zen et apaisant."
+        },
+        {
+          "name": "Lido Balbi & Bains à remous",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "hot-tub-person",
+          "color": "#0891b2",
+          "desc": "Bains à remous bouillonnants et transats de relaxation."
+        }
+      ]
+    },
+    {
+      "deck": 12,
+      "name": "Diamante",
+      "category": "Spa Supérieur & Cabines Samsara",
+      "description": "Niveau supérieur du Samsara Spa, solarium UVA et cabines bien-être.",
+      "highlights": [
+        {
+          "name": "Samsara Spa (Niveau supérieur)",
+          "zone": "Proue (Avant)",
+          "side": "Centre",
+          "icon": "spa",
+          "color": "#0d9488",
+          "desc": "Salons de relaxation intimes, lits chauffants en céramique et thérapie."
+        },
+        {
+          "name": "Cabines & Suites Samsara",
+          "zone": "Tout le pont",
+          "side": "Bâbord & Tribord",
+          "icon": "door-closed",
+          "color": "#059669",
+          "desc": "Cabines privilégiées avec accès direct illimité à l'espace thermal."
+        }
+      ]
+    },
+    {
+      "deck": 14,
+      "name": "Rubino",
+      "category": "Sports, Footing & Enfants",
+      "description": "Piste de jogging / footing en plein air, Terrain multisports, Club enfants Squok Club, Piscine enfants Peppa Pig, Cinéma 4D.",
+      "highlights": [
+        {
+          "name": "Piste de Jogging / Footing en mer",
+          "zone": "Tout le tour",
+          "side": "Bâbord & Tribord",
+          "icon": "person-running",
+          "color": "#0284c7",
+          "desc": "Circuit de course à pied en plein air avec vue panoramique sur l'océan."
+        },
+        {
+          "name": "Terrain Multisports Polyvalent",
+          "zone": "Centre",
+          "side": "Centre",
+          "icon": "basketball",
+          "color": "#ea580c",
+          "desc": "Tournois amicaux de basket-ball, football et volley-ball."
+        },
+        {
+          "name": "Squok Club & Piscine Peppa Pig",
+          "zone": "Centre",
+          "side": "Tribord",
+          "icon": "children",
+          "color": "#ec4899",
+          "desc": "Espace d'animation réservé aux enfants avec pataugeoire thématique."
+        },
+        {
+          "name": "Cinéma 4D & Simulateur de tir Star Lazer",
+          "zone": "Centre",
+          "side": "Bâbord",
+          "icon": "film",
+          "color": "#7c3aed",
+          "desc": "Sensations fortes avec effets sensoriels et jeux vidéo arcade."
+        }
+      ]
+    },
+    {
+      "deck": 15,
+      "name": "Smeraldo",
+      "category": "Grand Solarium Panoramique",
+      "description": "Le sommet du paquebot : transats de bronzage, vue panoramique à 360° et observation du grand large.",
+      "highlights": [
+        {
+          "name": "Grand Solarium Supérieur 360°",
+          "zone": "Tout le pont",
+          "side": "Proue & Centre",
+          "icon": "sun",
+          "color": "#f59e0b",
+          "desc": "Point culminant du navire pour admirer les arrivées au port et les couchers de soleil."
+        }
+      ]
+    }
+  ],
+  "conciergerie": {
+    "welcomeMessage": "Bienvenue à bord du Costa Diadema ! Je suis votre Concierge de bord Voyages Girardot. Retrouvez ici les restaurants, bars, boutiques, infirmerie et le plan des ponts pour profiter pleinement de votre croisière.",
+    "themes": [
+      {
+        "id": "resto",
+        "label": "Restaurants du navire",
+        "icon": "utensils",
+        "color": "#e11d48",
+        "enabled": true,
+        "description": "Espaces de restauration à bord du Costa Diadema : tables incluses, buffets et restaurants de spécialités.",
+        "places": [
+          {
+            "name": "Restaurant Adularia (Pont 3)",
+            "category": "Restaurant Principal Inclus",
+            "location": "Pont 3 Centenario (Centre)",
+            "tag": "1er Service réservé",
+            "description": "Votre restaurant principal sélectionné pour le dîner. Cuisine italienne et méditerranéenne soignée servie à table avec rotation quotidienne des menus régionaux.",
+            "tips": "Tenue soignée exigée en soirée. Boissons du forfait My Drinks incluses servies au verre.",
+            "phone": "Service de bord",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Restaurant Fiorentino (Ponts 3 & 4)",
+            "category": "Grand Restaurant Panoramique",
+            "location": "Ponts 3 et 4 (Poupe / Arrière)",
+            "tag": "Vue sur le sillage",
+            "description": "Spectaculaire restaurant sur deux étages offrant une vue grandiose sur l'océan et le sillage du navire.",
+            "tips": "Retrouvez chaque soir la carte et le menu du jour sur l'application MyCosta.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Buffet Corona Blu (Pont 10)",
+            "category": "Buffet Libre-service & Saveurs",
+            "location": "Pont 10 Hortensia (Arrière)",
+            "tag": "Petit-déj, Déjeuner & Dîner",
+            "description": "Buffet géant avec stations de pâtes fraîches, salades composées, poissons, viandes grillées et desserts gourmands. Idéal dès l'embarquement à Marseille !",
+            "tips": "Parfait pour un déjeuner rapide et sans contrainte d'horaire au retour d'une escale.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Pizzeria La Tavernetta (Pont 5)",
+            "category": "Véritable Pizzeria Italienne",
+            "location": "Pont 5 Eldorador (Bâbord)",
+            "tag": "Spécialité italienne",
+            "description": "Pizzas artisanales préparées avec une pâte à fermentation lente et 100% de mozzarella fraîche produite directement à bord.",
+            "tips": "Ambiance trattoria italienne chaleureuse. Restaurant de spécialité avec supplément.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Restaurant Japonais Teppanyaki (Pont 5)",
+            "category": "Show Cooking & Cuisine Japonaise",
+            "location": "Pont 5 Eldorador (Tribord)",
+            "tag": "Spectacle culinaire",
+            "description": "Les chefs cuisinent viandes, poissons et légumes avec virtuosité sur des plaques chauffantes sous vos yeux avec spectacle et acrobaties.",
+            "tips": "Réservation indispensable à l'avance sur l'application MyCosta.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Restaurant Samsara (Pont 11)",
+            "category": "Gastronomie Légère & Bien-être",
+            "location": "Pont 11 Samsara (Avant)",
+            "tag": "Ambiance feutrée & Zen",
+            "description": "Restaurant exclusif dédié à une cuisine équilibrée, innovante et raffinée dans un cadre intime.",
+            "tips": "Sur réservation via l'application MyCosta ou le maître d'hôtel.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          }
+        ]
+      },
+      {
+        "id": "visites",
+        "label": "Synthèse des Excursions & Escales",
+        "icon": "compass",
+        "color": "#059669",
+        "enabled": true,
+        "description": "Temps forts et excursions proposées à chaque escale portuaire de votre itinéraire.",
+        "places": [
+          {
+            "name": "Jour 1 • Votre région - Marseille",
+            "category": "Embarquement",
+            "location": "Marseille • Jour 1",
+            "tag": "Marseille Terminal Croisière",
+            "description": "Jour consacré à l'acheminement. Transfert au port de Marseille. Déjeuner libre. Formalités et embarquement à bord du Costa Diadema. Appareillage vers 18h. Dîner logement à bord.",
+            "tips": "Présentez votre billet de croisière imprimé et votre pièce d'identité à la gare maritime.",
+            "lat": 43.2965,
+            "lng": 5.3698
+          },
+          {
+            "name": "Jour 2 • Savone 9h - 16h30 (Italie)",
+            "category": "Escale Portuaire",
+            "location": "Savone • Jour 2",
+            "tag": "Savone",
+            "description": "Surplombée par l'imposante forteresse du Priamar, la ville portuaire vous accueille sur son littoral réputé pour ses destinations balnéaires. Une vieille ville à découvrir dans ses moindres détails. Discrète, Savone est pleine de surprises, et prête à dévoiler Excursions disponibles : À la découverte de Gênes et de ses saveurs, Le village marin de Portofino.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 44.3079,
+            "lng": 8.4811
+          },
+          {
+            "name": "Jour 3 • Barcelone 14h - 19h30 (Espagne)",
+            "category": "Escale Portuaire",
+            "location": "Barcelone • Jour 3",
+            "tag": "Barcelone",
+            "description": "Barcelone, une ville que vous ne pourrez qu'aimer. Animée, cosmopolite, fière, magnifique et généreuse, elle vous offrira des sensations vives et exaltantes au cours de cette escale. Découvrez les points et les monuments les plus emblématiques : les Ramblas, l Excursions disponibles : Visite de Barcelone, Le Monastère de Montserrat, La Sagrada Familia et autres merveilles de Gaudi.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 41.3851,
+            "lng": 2.1734
+          },
+          {
+            "name": "Jour 4 • Plaisirs en mer",
+            "category": "Journée en Navigation",
+            "location": "Plaisirs en mer • Jour 4",
+            "tag": "Détente & Loisirs à bord",
+            "description": "Journée libre en pension complète à bord avec programme d'activités et animations. Chaque jour, vous pourrez vous détendre au bord de la piscine, faire du shopping dans les boutiques, défier vos amis dans la salle de jeux, profiter des salons…",
+            "tips": "Profitez des piscines, du spa, des boutiques détaxées et du programme d'animations Oggi a bordo.",
+            "lat": 38.5,
+            "lng": 1.5
+          },
+          {
+            "name": "Jour 5 • Tanger 8h - 18h (Maroc)",
+            "category": "Escale Portuaire",
+            "location": "Tanger (Maroc) • Jour 5",
+            "tag": "Tanger (Maroc)",
+            "description": "Tanger et ses ruelles étroites grimpant dans un labyrinthe de maisons et de petites places, sur la colline surplombant le port multiculturel situé sur le détroit de Gibraltar. Cette charmante ville marocaine se distingue par sa médina aux parois blanchies à la Excursions disponibles : Grand souk de Tanger, Médina de Tanger, Avenue Mohamed VI.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 35.7878,
+            "lng": -5.8118
+          },
+          {
+            "name": "Jour 6 • Casablanca 7h - 21h (Maroc)",
+            "category": "Escale Portuaire",
+            "location": "Casablanca (Maroc) • Jour 6",
+            "tag": "Casablanca (Maroc)",
+            "description": "Casablanca, l'énergie de la modernité. Poumon économique du Maroc, c'est une métropole bouillonnante sans cesse en éveil. Les infrastructures modernes se mêlent aux quartiers de charme, entre héritage arabo-musulman et legs de la période coloniale. Découvrez-e Excursions disponibles : Le parc de la Ligue arabe, Le quartier des Habous, La mosquée Hassan II.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 33.6062,
+            "lng": -7.6186
+          },
+          {
+            "name": "Jour 7 • Cadix 12h - 21h (Espagne)",
+            "category": "Escale Portuaire",
+            "location": "Cadix (Espagne) • Jour 7",
+            "tag": "Cadix (Espagne)",
+            "description": "Découvrez Cadix, l'une des plus anciennes villes d'Europe, un lieu où l'histoire rencontre la mer. La ville possède un patrimoine fascinant. Ses ruelles étroites et pavées vous conduiront à travers des siècles d'histoire. Parmi les sites incontournables, la Ca Excursions disponibles : Promenade à Séville : entre art, culture et gastro, Promenade à Cadix.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 36.5271,
+            "lng": -6.2886
+          },
+          {
+            "name": "Jour 8 • Gibraltar 8h - 20h (Royaume-Uni)",
+            "category": "Escale Portuaire",
+            "location": "Gibraltar (Royaume-Uni) • Jour 8",
+            "tag": "Gibraltar (Royaume-Uni)",
+            "description": "Gibraltar révèle le charme de la colonie, un rocher surplombant la mer où des fossiles de l'homme de Néandertal ont été trouvés et où de rares spécimens de macaques vivent en liberté. Le rocher est la principale attraction naturelle, étant donné le nombre d'es Excursions disponibles : Visite panoramique de Gibraltar.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 36.1408,
+            "lng": -5.3536
+          },
+          {
+            "name": "Jour 9 • Malaga 8h - 17h (Espagne)",
+            "category": "Escale Portuaire",
+            "location": "Malaga (Espagne) • Jour 9",
+            "tag": "Malaga (Espagne)",
+            "description": "Perchée sur la Costa del Sol, Malaga est synonyme d'art, de culture et de soleil tandis que les collines vous invitent à explorer la région. La ville est également réputée pour ses magnifiques plages, mais le centre offre d'autres trésors. En effet, c'est à Ma Excursions disponibles : Le meilleur de Cordou, Malaga et les traditions andalouses, Malaga en tuk-tuk.",
+            "tips": "Excursion organisée vendue à bord ou temps libre à terre. Respectez impérativement l'heure limite de retour à bord.",
+            "lat": 36.7213,
+            "lng": -4.4214
+          },
+          {
+            "name": "Jour 10 • Plaisirs en mer",
+            "category": "Journée en Navigation",
+            "location": "Plaisirs en mer • Jour 10",
+            "tag": "Détente & Loisirs à bord",
+            "description": "Journée libre en pension complète à bord avec programme d'activités et animations.",
+            "tips": "Profitez des piscines, du spa, des boutiques détaxées et du programme d'animations Oggi a bordo.",
+            "lat": 39.5,
+            "lng": 3.5
+          },
+          {
+            "name": "Jour 11 • Marseille - Votre région",
+            "category": "Débarquement",
+            "location": "Marseille • Jour 11",
+            "tag": "Fin de croisière",
+            "description": "Marseille, arrivée au port vers 9h suivi du débarquement. Déjeuner libre en cours de route. Retour dans l'après-midi dans votre région.",
+            "tips": "Récupération des valises sous le hangar portuaire et retour dans votre région.",
+            "lat": 43.2965,
+            "lng": 5.3698
+          }
+        ]
+      },
+      {
+        "id": "shopping",
+        "label": "Boutiques & Shopping du navire",
+        "icon": "bag-shopping",
+        "color": "#d97706",
+        "enabled": true,
+        "description": "Galeries marchandes détaxées et souvenirs officiels à bord du Costa Diadema.",
+        "places": [
+          {
+            "name": "Galerie Marchande & Duty Free (Pont 5)",
+            "category": "Boutiques Tax Free en mer",
+            "location": "Pont 5 Eldorador (Centre)",
+            "tag": "Prix détaxés en navigation",
+            "description": "Boutiques détaxées ouvertes en navigation : parfums de grandes marques, cosmétiques, maroquinerie, spiritueux et tabacs.",
+            "tips": "Paiement direct avec votre carte de cabine Costa. Exonération de taxes en mer.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Boutique Officielle Costa Diadema (Pont 5)",
+            "category": "Souvenirs de Croisière",
+            "location": "Pont 5 Eldorador",
+            "tag": "Objets collector",
+            "description": "Maquettes officielles du Costa Diadema, polos, casquettes, serviettes de plage griffées et magnets souvenirs.",
+            "tips": "Idéal pour rapporter des souvenirs du navire à vos proches.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Espace Photo & Photographes Costa (Pont 5)",
+            "category": "Photos & Albums souvenirs",
+            "location": "Pont 5 Eldorador",
+            "tag": "Tirages personnalisés",
+            "description": "Retrouvez et commandez toutes vos photos prises lors de l'embarquement, des soirées de gala et des escales.",
+            "tips": "Visualisez également vos clichés directement sur l'application MyCosta.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Boutique Bijouterie & Mode Italienne (Pont 5)",
+            "category": "Haute Horlogerie & Créateurs",
+            "location": "Pont 5 Eldorador",
+            "tag": "Grandes marques",
+            "description": "Sélection de montres suisses, bijoux en or et argent, lunettes de créateurs et prêt-à-porter italien pour vos soirées de gala.",
+            "tips": "Ventes promotionnelles flash annoncées quotidiennement dans Oggi a bordo.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          }
+        ]
+      },
+      {
+        "id": "pratique",
+        "label": "Infirmerie & Services de bord",
+        "icon": "shield-heart",
+        "color": "#2563eb",
+        "enabled": true,
+        "description": "Centre médical, infirmerie du bord, formalités sanitaires et paiement par carte cabine.",
+        "places": [
+          {
+            "name": "Centre Médical & Infirmerie (Pont 1)",
+            "category": "Service Sanitaire & Soins d'Urgence",
+            "location": "Pont 1 Timone (Accès direct ascenseurs)",
+            "tag": "Médecin et infirmières 24h/24",
+            "description": "Équipe médicale complète pour soins d'urgence, consultations, mal de mer et délivrance de médicaments d'urgence.",
+            "tips": "En cas d'urgence vitale, composez le numéro d'urgence directement depuis le combiné de votre cabine ou contactez la Réception. Les consultations sont à la charge du passager (couvertes par votre assurance multirisque).",
+            "phone": "Urgence Cabine ou Réception",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Réception & Guest Service (Pont 3)",
+            "category": "Accueil & Assistance Voyageurs 24h",
+            "location": "Pont 3 Centenario (Atrium Eliodoro)",
+            "tag": "Ouvert 24h/24 & Francophone",
+            "description": "Personnel francophone disponible jour et nuit pour répondre à toutes vos questions, gérer vos clés de cabine et vous assister.",
+            "tips": "Réunion d'information francophone le jour de l'embarquement et réunion de débarquement l'avant-dernier jour.",
+            "phone": "Poste Réception à bord",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Bornes Carte Cabine (Ponts 3 & 5)",
+            "category": "Paiement & Monétique de bord",
+            "location": "Pont 3 (Réception) et Pont 5 (Casino)",
+            "tag": "Aucun argent liquide à bord",
+            "description": "Votre carte cabine sert de moyen de paiement unique à bord. Enregistrez votre carte bancaire dès les premiers jours aux bornes automatiques.",
+            "tips": "Dépôt d'espèces possible (150 € minimum par personne) aux bornes. Les chèques ne sont pas acceptés à bord.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Consignes de Sécurité & Muster Station",
+            "category": "Sécurité Maritime Obligatoire",
+            "location": "Point de rassemblement indiqué au dos de votre carte Costa",
+            "tag": "Exercice obligatoire Jour 1",
+            "description": "Visionnez le récapitulatif des consignes de sécurité sur l'application MyCosta puis présentez-vous à votre Muster Station pour valider votre présence.",
+            "tips": "Obligatoire dès le premier jour avant l'appareillage du navire.",
+            "phone": "",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Permanence Accompagnatrice Voyages Girardot",
+            "category": "Accompagnement Privatif Girardot",
+            "location": "Restaurant Adularia (Pont 3) & Salons de bord",
+            "tag": "Permanence quotidienne",
+            "description": "Votre accompagnatrice Voyages Girardot est présente chaque jour pour vous informer, coordonner les rendez-vous et faciliter votre séjour.",
+            "tips": "Rendez-vous fixé chaque soir au dîner du 1er service.",
+            "phone": "03 85 42 82 50",
+            "lat": 43.3444,
+            "lng": 5.3488
+          }
+        ]
+      },
+      {
+        "id": "detente",
+        "label": "Bars & Salons du navire",
+        "icon": "martini-glass",
+        "color": "#9333ea",
+        "enabled": true,
+        "description": "Les bars et salons thématiques du Costa Diadema inclus dans votre forfait boissons.",
+        "places": [
+          {
+            "name": "Grand Bar Orlov (Pont 4)",
+            "category": "Grand Salon & Musique Live",
+            "location": "Pont 4 Perla di Venere (Centre)",
+            "tag": "Orchestre & Danse tous les soirs",
+            "description": "Le cœur musical du paquebot : vaste salon avec piste de danse, musiciens live et ambiance festive. Inclus dans votre forfait boissons My Drinks !",
+            "tips": "Idéal pour prendre l'apéritif et danser après le spectacle du soir.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Country Rock Club (Pont 5)",
+            "category": "Bar Concert & Ambiance Rock",
+            "location": "Pont 5 Eldorador (Bâbord)",
+            "tag": "Concerts guitare & Rock",
+            "description": "Le repaire des amateurs de bonne musique live, guitares électriques et cocktails dans une ambiance chaleureuse.",
+            "tips": "Concerts acoustiques et reprises de classiques du rock en soirée.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Brasserie Dresden Green (Pont 5)",
+            "category": "Bières Artisanales du Bord",
+            "location": "Pont 5 Eldorador (Bâbord)",
+            "tag": "Atmosphère bavaroise",
+            "description": "Véritable brasserie à bord proposant bières artisanales à la pression, bretzels et snacks salés.",
+            "tips": "Parfait pour se retrouver entre amis après une longue escale.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Vinoteca Gran Duca di Toscana (Pont 5)",
+            "category": "Bar à Vins & Dégustations",
+            "location": "Pont 5 Eldorador (Tribord)",
+            "tag": "Grands Crus d'Italie",
+            "description": "Bar à vins réputé servant au verre les meilleurs cépages de Toscane, du Piémont et de Vénétie, accompagnés de tapas italiennes.",
+            "tips": "Dégustations guidées organisées par le sommelier du bord.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Bar Lido Diana (Pont 10)",
+            "category": "Bar Piscine & Verrière",
+            "location": "Pont 10 Hortensia (Centre)",
+            "tag": "Piscine couverte",
+            "description": "Boissons rafraîchissantes, cocktails et glaces au bord de la piscine couverte sous la verrière amovible.",
+            "tips": "Ouvert toute la journée pour se désaltérer au retour des baignades.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Glacier Artisanal Amarillo (Pont 10)",
+            "category": "Glaces & Desserts italiens",
+            "location": "Pont 10 Hortensia",
+            "tag": "Glaces faites à bord",
+            "description": "Délicieuses glaces italiennes produites chaque jour à bord avec des ingrédients bio de qualité, gaufres et crêpes gourmandes.",
+            "tips": "Le plaisir incontournable de l'après-midi pour petits et grands !",
+            "lat": 43.3444,
+            "lng": 5.3488
+          }
+        ]
+      },
+      {
+        "id": "transports",
+        "label": "Plan du navire & Ponts",
+        "icon": "ship",
+        "color": "#0891b2",
+        "enabled": true,
+        "description": "Plan d'ensemble des ponts du Costa Diadema, passerelles et orientation à bord.",
+        "places": [
+          {
+            "name": "Organisation des 20 Ponts (15 ponts passagers)",
+            "category": "Plan d'ensemble du Navire",
+            "location": "Du Pont 1 Timone au Pont 15 Smeraldo",
+            "tag": "Architecture Joseph Farcus",
+            "description": "Pont 1 (Timone/Médical), Pont 2 (Sara), Pont 3 (Centenario/Adularia/Réception), Pont 4 (Perla di Venere/Grand Bar), Pont 5 (Eldorador/Promenade 500m/Boutiques), Ponts 6-9 (Cabines), Pont 10 (Hortensia/Corona Blu/Lido Diana), Pont 11 (Samsara Spa), Pont 14 (Rubino/Sports), Pont 15 (Smeraldo/Solarium).",
+            "tips": "Utilisez le plan interactif et le calculateur d'itinéraires intégrés dans votre carnet pour vous déplacer aisément hors-connexion.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Promenade Extérieure 'La Passeggiata' (Pont 5)",
+            "category": "Promenade Panoramique Maritime",
+            "location": "Pont 5 Eldorador",
+            "tag": "500m faisant le tour complet",
+            "description": "Véritable terrasse de promenade faisant tout le tour du Costa Diadema, bordée de bains à remous suspendus au-dessus des flots.",
+            "tips": "Magique à l'heure du coucher du soleil ou lors des manœuvres portuaires.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Samsara Spa & Balnéothérapie (Pont 11)",
+            "category": "Espace Thermal de 6 200 m²",
+            "location": "Ponts 11 et 12 Samsara",
+            "tag": "4 niveaux de bien-être",
+            "description": "Piscine thermale de balnéothérapie, hammam, sauna panoramique finlandais, cabines de soins et salle de fitness Technogym.",
+            "tips": "Accès inclus pour les cabines et suites Samsara, forfaits journée disponibles pour tous les passagers.",
+            "lat": 43.3444,
+            "lng": 5.3488
+          },
+          {
+            "name": "Application Mobile 'MyCosta' (Wi-Fi gratuit du bord)",
+            "category": "Guide de Poche & Déplacements",
+            "location": "Sur votre smartphone (AppStore / Google Play)",
+            "tag": "Indispensable & Gratuit à bord",
+            "description": "Permet de consulter le journal 'Oggi a bordo', le plan interactif des ponts, réserver vos excursions et suivre vos dépenses.",
+            "tips": "Connectez-vous au réseau Wi-Fi gratuit du navire dès votre arrivée sans consommer votre forfait data terrestre.",
+            "phone": "Gratuit en Wi-Fi bord",
+            "lat": 43.3444,
+            "lng": 5.3488
+          }
+        ]
+      }
+    ]
+  },
+  "flights": null,
+  "contacts": {
+    "receptif": {
+      "name": "Réception & Guest Service Costa Diadema",
+      "emergency": "Urgences cabine ou 03 85 42 82 50",
+      "phone": "Poste Réception à bord (24h/24)",
+      "address": "À bord du Costa Diadema"
+    },
+    "guide": {
+      "name": "Mireille",
+      "role": "Accompagnatrice Voyages Girardot",
+      "phone": ""
+    },
+    "agence": {
+      "name": "Voyages Girardot",
+      "phone": "03 85 42 82 50",
+      "email": "contact@voyages-girardot.com"
+    }
+  }
+}

@@ -43,8 +43,7 @@ window.AVAILABLE_TRIPS = [
     subtitle: "Circuit exclusif Voyages Girardot",
     dates: "Selon calendrier des départs",
     file: "voyages/voyage-1792069990645 Mexique.json"
-  }
-,
+  },
   {
     id: "croisiere-costa-smeralda-2026",
     alias: "croisiere",
@@ -53,5 +52,14 @@ window.AVAILABLE_TRIPS = [
     subtitle: "Costa Smeralda (Marseille, Barcelone, Rome)",
     dates: "Du 01/11 au 08/11/2026",
     file: "voyages/croisiere-costa-smeralda-2026.json"
+  },
+  {
+    id: "croisiere-costa-diadema-reves-orient-2026",
+    alias: "reves-orient",
+    aliases: ["reves-orient", "costa-diadema", "diadema"],
+    title: "Croisière Rêves d'Orient",
+    subtitle: "À bord du Costa Diadema (Maroc, Espagne, Gibraltar)",
+    dates: "Du 07/10 au 17/10/2026",
+    file: "voyages/croisiere-costa-diadema-reves-orient-2026.json"
   }
 ];
