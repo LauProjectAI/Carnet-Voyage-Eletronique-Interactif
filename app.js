@@ -1004,6 +1004,56 @@ function renderConciergerie() {
   initConciergeQueryEngine();
 
   themesList.innerHTML = '';
+
+  // Adaptation croisière : Bannière d'orientation & suggestions rapides
+  const isCruise = currentTrip && (currentTrip.isCruise || currentTrip.shipName || (c.themes && c.themes.some(t => t.id === 'transports' && t.icon === 'ship')));
+  const quickSuggestionsEl = document.getElementById('concierge-quick-suggestions');
+  if (quickSuggestionsEl) {
+    if (isCruise) {
+      quickSuggestionsEl.innerHTML = `
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="selectConciergeTheme('transports')">🚢 Plan des 20 Ponts</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où est ma cabine 8214 ?')">🚪 Ma Cabine (Pont & Côté)</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Comment aller à l\\'infirmerie ?')">🏥 Où est l'Infirmerie ?</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Activer la boussole pour m\\'orienter à bord')">🧭 Boussole & Cap</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Quels sont les restaurants inclus à bord ?')">🍽️ Restaurants & Buffets</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où trouver un bar ou un cocktail Spritz ?')">🍸 Bars & Salons</button>
+      `;
+    } else {
+      quickSuggestionsEl.innerHTML = `
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Comment prendre le métro et acheter un pass transport ?')">🚇 Métro, Bus & Pass</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où manger le meilleur burger ?')">🍔 Meilleur Burger</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Trouver un restaurant végétarien ou végane')">🥗 Végétarien & Bio</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Un restaurant asiatique ou des dim sum')">🥢 Asiatique & Dim Sum</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Une table gastronomique ou étoilée')">⭐ Gastronomique / Étoilé</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où manger du poisson ou des fruits de mer ?')">🐟 Poissons & Fruits de mer</button>
+        <button class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;" onclick="setConciergeExample('Où trouver un rooftop avec vue ?')">🍸 Rooftop avec vue</button>
+      `;
+    }
+  }
+
+  if (isCruise) {
+    const banner = document.createElement('div');
+    banner.className = 'cruise-orientation-banner';
+    banner.onclick = () => selectConciergeTheme('transports');
+    banner.innerHTML = `
+      <div>
+        <span style="background:rgba(255,255,255,0.2); font-size:0.7rem; font-weight:800; text-transform:uppercase; padding:3px 8px; border-radius:6px; letter-spacing:0.5px;">
+          <i class="fa-solid fa-compass"></i> 100% Hors-Ligne & Sans GPS
+        </span>
+        <h4 style="font-size:1.05rem; font-weight:800; margin-top:6px; margin-bottom:2px; line-height:1.25;">
+          Plan Interactif des 20 Ponts & Boussole
+        </h4>
+        <p style="font-size:0.8rem; opacity:0.9; margin:0; line-height:1.35;">
+          Repérez votre cabine, explorez les aménagements du ${currentTrip.shipName || 'navire'} et trouvez votre itinéraire sans réseau.
+        </p>
+      </div>
+      <div style="background:white; color:#0369a1; width:38px; height:38px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:1rem; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <i class="fa-solid fa-arrow-right"></i>
+      </div>
+    `;
+    themesList.appendChild(banner);
+  }
+
   // Only display themes that are enabled (or true by default if property omitted)
   const activeThemes = c.themes.filter(th => th.enabled !== false);
 
@@ -1130,6 +1180,82 @@ function executeConciergeQuery(query) {
   let answerIntro = "";
 
   // 1. Détection de requêtes TRANSPORTS / CARTE / ITINÉRAIRES
+  
+  const isCruiseTrip = currentTrip && (currentTrip.isCruise || currentTrip.shipName || (c.themes && c.themes.some(t => t.id === 'transports' && t.icon === 'ship')));
+  if (isCruiseTrip) {
+    const isCruiseNavQuery = q.includes('cabine') || q.includes('chambre') || q.includes('pont') || q.includes('boussole') ||
+      q.includes('cap') || q.includes('orientation') || q.includes('ascenseur') || q.includes('proue') || q.includes('poupe') ||
+      q.includes('babord') || q.includes('bâbord') || q.includes('tribord') || q.includes('infirmerie') || q.includes('navire') ||
+      /\b\d{3,5}\b/.test(q);
+
+    if (isCruiseNavQuery) {
+      const numMatch = q.match(/\b\d{3,5}\b/);
+      let cabinDecoded = null;
+      if (numMatch) {
+        cabinDecoded = decodeCruiseCabin(numMatch[0]);
+      } else {
+        const stored = getCruiseStoredCabin();
+        if (stored) cabinDecoded = decodeCruiseCabin(stored);
+      }
+
+      titleEl.innerHTML = `<i class="fa-solid fa-compass" style="color:#0284c7; margin-right:8px;"></i> Orientation & Déplacements à Bord`;
+
+      let answerHtml = '';
+      if (cabinDecoded) {
+        answerHtml = `
+          <div style="background:#f0fdf4; border:1px solid #86efac; border-radius:16px; padding:16px; margin-bottom:14px;">
+            <h4 style="font-size:0.95rem; font-weight:800; color:#166534; margin-bottom:6px;">
+              <i class="fa-solid fa-door-open"></i> Localisation de la cabine ${cabinDecoded.raw} :
+            </h4>
+            <p style="font-size:0.86rem; color:#14532d; line-height:1.5; margin-bottom:10px;">
+              Votre cabine <strong>${cabinDecoded.raw}</strong> est située au <strong>Pont ${cabinDecoded.deck} (${cabinDecoded.deckName})</strong>, côté <strong>${cabinDecoded.sideName}</strong> (${cabinDecoded.navLight}).
+              Elle se trouve en zone <strong>${cabinDecoded.zoneName}</strong>.
+            </p>
+            <div style="background:white; border-radius:10px; padding:10px 12px; font-size:0.8rem; color:#334155; margin-bottom:10px; border:1px solid #bbf7d0;">
+              <strong>🛗 Ascenseurs recommandés :</strong> ${cabinDecoded.elevatorName}.
+            </div>
+            <button type="button" onclick="selectConciergeTheme('transports'); viewCabinOnDeck(${cabinDecoded.deck});" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
+              <i class="fa-solid fa-map-location-dot"></i> Afficher le plan du Pont ${cabinDecoded.deck}
+            </button>
+          </div>
+        `;
+      } else if (q.includes('infirmerie') || q.includes('docteur') || q.includes('medical') || q.includes('médical') || q.includes('santé')) {
+        answerHtml = `
+          <div style="background:#eff6ff; border:1px solid #bfdbfe; border-radius:16px; padding:16px; margin-bottom:14px;">
+            <h4 style="font-size:0.95rem; font-weight:800; color:#1e40af; margin-bottom:6px;">
+              <i class="fa-solid fa-shield-heart"></i> Centre Médical & Infirmerie du Bord :
+            </h4>
+            <p style="font-size:0.86rem; color:#1e3a8a; line-height:1.5; margin-bottom:10px;">
+              Le Centre Médical est situé au <strong>Pont 4 (Palermo)</strong>, à la <strong>Proue (l'Avant du navire)</strong>, accessible par les ascenseurs Avant (Théâtre). Équipe médicale disponible 24h/24 en cas d'urgence depuis le téléphone de votre cabine.
+            </p>
+            <button type="button" onclick="selectConciergeTheme('transports'); switchCruiseDeck(4);" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
+              <i class="fa-solid fa-map-location-dot"></i> Ouvrir le plan du Pont 4 (Infirmerie)
+            </button>
+          </div>
+        `;
+      } else {
+        answerHtml = `
+          <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:16px; padding:16px; margin-bottom:14px;">
+            <h4 style="font-size:0.95rem; font-weight:800; color:#0369a1; margin-bottom:6px;">
+              <i class="fa-solid fa-compass"></i> Système d'Orientation & Plan des Ponts :
+            </h4>
+            <p style="font-size:0.86rem; color:#0f172a; line-height:1.5; margin-bottom:10px;">
+              À bord du ${currentTrip.shipName || 'navire'}, vous pouvez explorer les 20 ponts, repérer votre cabine (Bâbord/Tribord) et calculer votre itinéraire ou utiliser la boussole marine 100% hors-ligne.
+            </p>
+            <button type="button" onclick="selectConciergeTheme('transports');" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:7px 14px; border:none; cursor:pointer;">
+              <i class="fa-solid fa-ship"></i> Ouvrir le Plan du Navire & Navigation
+            </button>
+          </div>
+        `;
+      }
+
+      listEl.innerHTML = answerHtml;
+      resultsBox.style.display = 'block';
+      resultsBox.scrollIntoView({ behavior: 'smooth' });
+      return;
+    }
+  }
+
   const isTransportQuery = q.includes('aller') || q.includes('rejoindre') || q.includes('transport') || q.includes('comment') || q.includes('taxi') || q.includes('bus') || q.includes('trajet') || q.includes('métro') || q.includes('metro') || q.includes('carte') || q.includes('plan');
 
   if (isTransportQuery) {
@@ -1412,6 +1538,26 @@ function selectConciergeTheme(themeId) {
     </div>
   `;
 
+  const isCruise = currentTrip && (currentTrip.isCruise || currentTrip.shipName || (theme.id === 'transports' && theme.icon === 'ship'));
+
+  // CAS SPÉCIAL CROISIÈRE : Afficher le module d'orientation et de navigation intérieure 100% hors-ligne
+  if (theme.id === 'transports' && isCruise) {
+    renderCruiseDeckOrientationModule(listEl, currentTrip);
+    if (theme.places && theme.places.length > 0) {
+      const placesTitle = document.createElement('h4');
+      placesTitle.style.cssText = 'font-size:1rem; font-weight:800; color:var(--primary-dark); margin:20px 0 10px 0; display:flex; align-items:center; gap:8px;';
+      placesTitle.innerHTML = `<i class="fa-solid fa-ship" style="color:#0891b2;"></i> Espaces & Lieux remarquables du navire`;
+      listEl.appendChild(placesTitle);
+      theme.places.forEach(place => {
+        listEl.appendChild(createConciergePlaceCard(place, theme.id));
+      });
+    }
+    resultsBox.style.display = 'block';
+    resultsBox.scrollIntoView({ behavior: 'smooth' });
+    return;
+  }
+
+
   // 1. Carte Officielle du Réseau de Métro & Transports si disponible (Affichage direct & Téléchargement)
   if (theme.transitMapImageUrl) {
     listEl.innerHTML += `
@@ -1597,6 +1743,1032 @@ function resetConciergeView() {
   document.querySelectorAll('.concierge-theme-pill').forEach(p => p.classList.remove('active'));
   window.scrollTo({ top: 120, behavior: 'smooth' });
 }
+
+
+// =============================================================================
+// NAVIGATION & GÉOLOCALISATION INTÉRIEURE CROISIÈRE (100% HORS-LIGNE)
+// =============================================================================
+
+const CRUISE_SHIP_DECKS = [
+  {
+    deck: 4,
+    name: "Palermo",
+    category: "Services & Cabines",
+    description: "Centre Médical & Infirmerie (Avant), Cabines passagers, Passerelle d'embarquement / débarquement en escale.",
+    highlights: [
+      { name: "Centre Médical & Infirmerie", zone: "Proue (Avant)", side: "Bâbord", icon: "shield-heart", color: "#2563eb", desc: "Soins médicaux, urgences, consultations et médicaments 24h/24." },
+      { name: "Passerelle de débarquement", zone: "Centre / Poupe", side: "Bâbord & Tribord", icon: "door-open", color: "#0891b2", desc: "Accès piéton pour les sorties d'escale et excursions." }
+    ]
+  },
+  {
+    deck: 5,
+    name: "Taormina",
+    category: "Restauration & Cabines",
+    description: "Restaurant Principal La Colombina (Arrière), Cabines passagers.",
+    highlights: [
+      { name: "Restaurant Principal La Colombina", zone: "Poupe (Arrière)", side: "Centre", icon: "utensils", color: "#e11d48", desc: "Dîner inclus servi à table avec carte régionale italienne renouvelée chaque soir." }
+    ]
+  },
+  {
+    deck: 6,
+    name: "Matera",
+    category: "Spectacles & Grands Salons",
+    description: "Grand Théâtre Sanremo (Avant), Grand Bar Mastroianni (Centre), Atrium Colosseo (Centre), Illy Bar & Café, Restaurants Il Meneghino & Arlecchino (Arrière).",
+    highlights: [
+      { name: "Grand Théâtre Sanremo (Niveau 1)", zone: "Proue (Avant)", side: "Centre", icon: "masks-theater", color: "#7c3aed", desc: "Spectacles musicaux, acrobates, danseurs et artistes internationaux." },
+      { name: "Grand Bar Mastroianni", zone: "Centre", side: "Centre", icon: "music", color: "#9333ea", desc: "Grand salon central avec piste de danse et orchestre live." },
+      { name: "Atrium Colosseo (Niveau 1)", zone: "Centre", side: "Centre", icon: "landmark", color: "#c29958", desc: "Cœur battant du navire avec parois vitrées et écrans géants LED." },
+      { name: "Illy Bar & Café Italien", zone: "Centre", side: "Bâbord", icon: "mug-saucer", color: "#b45309", desc: "Véritable expresso italien, cappuccino et pâtisseries." },
+      { name: "Restaurants Il Meneghino & Arlecchino", zone: "Poupe (Arrière)", side: "Bâbord / Tribord", icon: "utensils", color: "#e11d48", desc: "Grands espaces de restauration panoramiques avec vue sur la mer." }
+    ]
+  },
+  {
+    deck: 7,
+    name: "Positano",
+    category: "Accueil & Vie Centrale",
+    description: "Théâtre Sanremo (Avant), Réception & Bureau d'Information 24h, Bornes Carte Cabine, Campari Bar, Piazza di Spagna (Arrière), Tutti a Tavola.",
+    highlights: [
+      { name: "Réception & Bureau d'Information 24h/24", zone: "Centre", side: "Centre", icon: "bell-concierge", color: "#059669", desc: "Accueil permanent en français, questions pratiques et gestion de compte." },
+      { name: "Bornes Enregistrement Carte Cabine", zone: "Centre", side: "Tribord", icon: "credit-card", color: "#2563eb", desc: "Association obligatoire de votre carte bancaire dès le premier jour." },
+      { name: "Campari Bar (Atrium Colosseo)", zone: "Centre", side: "Bâbord", icon: "martini-glass-citrus", color: "#dc2626", desc: "Apéritif italien rouge vif surplombant les shows de l'Atrium." },
+      { name: "Piazza di Spagna & Grand Escalier", zone: "Poupe (Arrière)", side: "Poupe", icon: "sun", color: "#ea580c", desc: "Gradins extérieurs monumentaux ouverts sur l'horizon marin." },
+      { name: "Restaurant Tutti a Tavola", zone: "Poupe (Arrière)", side: "Tribord", icon: "people-roof", color: "#0891b2", desc: "Restaurant familial convivial avec animations." }
+    ]
+  },
+  {
+    deck: 8,
+    name: "Capri",
+    category: "Gastronomie & Boutiques Tax-Free",
+    description: "Galleria Sanremo (Duty Free), Pizzeria Pummid'Oro, Buffet La Sagra dei Sapori, Teppanyaki, Spazio Bollicine Ferrari.",
+    highlights: [
+      { name: "Buffet La Sagra dei Sapori", zone: "Poupe (Arrière)", side: "Centre", icon: "bowl-food", color: "#e11d48", desc: "Buffet libre-service géant : entrées, pâtes fraîches, viandes, desserts." },
+      { name: "Galleria Sanremo & Boutiques Tax-Free", zone: "Centre", side: "Bâbord & Tribord", icon: "bag-shopping", color: "#d97706", desc: "Parfums, cosmétiques, bijoux, maroquinerie italienne et tabacs détaxés." },
+      { name: "Pizzeria Pummid'Oro", zone: "Centre", side: "Bâbord", icon: "pizza-slice", color: "#ea580c", desc: "Pizzas artisanales à fermentation lente et mozzarella 100% faite à bord." },
+      { name: "Restaurant Japonais Teppanyaki", zone: "Poupe (Arrière)", side: "Tribord", icon: "fire-burner", color: "#b91c1c", desc: "Show cooking japonais spectaculaire sous vos yeux." },
+      { name: "Ferrari Spazio Bollicine", zone: "Centre", side: "Tribord", icon: "champagne-glasses", color: "#c29958", desc: "Bar à vins pétillants italiens de la prestigieuse maison Ferrari Trento." }
+    ]
+  },
+  {
+    deck: 9,
+    name: "Napoli",
+    category: "Pont Cabines",
+    description: "Cabines passagers intérieures, extérieures avec vue mer et avec balcon privé. Coursives Bâbord (numéros pairs) et Tribord (numéros impairs).",
+    highlights: [
+      { name: "Cabines Pont 9 (9001 à 9390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès immédiat par les ascenseurs Avant, Centraux ou Arrière." }
+    ]
+  },
+  {
+    deck: 10,
+    name: "Roma",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon et suites élégantes.",
+    highlights: [
+      { name: "Cabines Pont 10 (10001 à 10390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès par les ascenseurs Avant (Théâtre), Centraux (Colosseo) ou Arrière (Piazza)." }
+    ]
+  },
+  {
+    deck: 11,
+    name: "Firenze",
+    category: "Pont Cabines",
+    description: "Cabines passagers et suites avec vue panoramique.",
+    highlights: [
+      { name: "Cabines Pont 11 (11001 à 11390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès direct par les 3 cages d'ascenseurs principales." }
+    ]
+  },
+  {
+    deck: 12,
+    name: "Genova",
+    category: "Pont Cabines",
+    description: "Cabines passagers avec balcon.",
+    highlights: [
+      { name: "Cabines Pont 12 (12001 à 12390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Accès rapide aux ascenseurs Avant, Centraux et Arrière." }
+    ]
+  },
+  {
+    deck: 14,
+    name: "Venezia",
+    category: "Pont Cabines",
+    description: "Cabines et Suites vénitiennes (note maritime : pas de pont 13).",
+    highlights: [
+      { name: "Cabines Pont 14 (14001 à 14390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "Ascenseurs Avant, Centraux et Arrière." }
+    ]
+  },
+  {
+    deck: 15,
+    name: "Milano",
+    category: "Pont Cabines",
+    description: "Cabines avec balcon supérieur et suites. Accès immédiat aux ponts de loisirs 16 et 17.",
+    highlights: [
+      { name: "Cabines Pont 15 (15001 à 15390)", zone: "Tout le pont", side: "Bâbord & Tribord", icon: "door-closed", color: "#64748b", desc: "À un seul escalier du Spa et des piscines supérieures." }
+    ]
+  },
+  {
+    deck: 16,
+    name: "Como",
+    category: "Bien-être, Spa & Piscines",
+    description: "Spa Solemio, Espace Beauté, Sauna, Hammam, Salle de Fitness & Gym panoramique, Piscine intérieure tempérée La Spiaggia.",
+    highlights: [
+      { name: "Spa Solemio & Massages", zone: "Proue (Avant)", side: "Centre", icon: "spa", color: "#0d9488", desc: "Parcours thermal thermal luxueux, cabine de neige, sauna vue mer." },
+      { name: "Salle de Gym & Fitness Panoramique", zone: "Proue (Avant)", side: "Tribord", icon: "dumbbell", color: "#0284c7", desc: "Équipements Technogym avec vue plongeante sur l'étrave du navire." },
+      { name: "Piscine Intérieure Tempérée La Spiaggia", zone: "Centre", side: "Centre", icon: "water-ladder", color: "#0891b2", desc: "Grand bassin couvert avec verrière rétractable et jacuzzis." }
+    ]
+  },
+  {
+    deck: 17,
+    name: "Bellagio",
+    category: "Piscines, Aqua Park & Cocktails",
+    description: "Piscines extérieures La Spiaggia, Bar Aperol Spritz, Nutella Café, Gelateria Amarillo, Aqua Park avec toboggans aquatiques.",
+    highlights: [
+      { name: "Aqua Park & Toboggans", zone: "Centre / Poupe", side: "Centre", icon: "water", color: "#0284c7", desc: "Toboggans aquatiques vertigineux surplombant l'océan." },
+      { name: "Aperol Spritz Bar & Solarium", zone: "Centre", side: "Bâbord", icon: "wine-glass", color: "#f97316", desc: "Cocktails face au coucher de soleil sur le bleu méditerranéen." },
+      { name: "Gelateria Amarillo & Nutella Café", zone: "Centre", side: "Tribord", icon: "ice-cream", color: "#d97706", desc: "Glaces italiennes bio artisanales et crêpes gourmandes." }
+    ]
+  },
+  {
+    deck: 18,
+    name: "Torino",
+    category: "Sports & Solarium",
+    description: "Terrain multisports plein air, Piste de jogging panoramique, Solarium avec transats.",
+    highlights: [
+      { name: "Terrain Multisports Plein Air", zone: "Poupe (Arrière)", side: "Centre", icon: "basketball", color: "#ea580c", desc: "Football, basketball et tennis au grand air de la mer." },
+      { name: "Piste de Jogging Panoramique", zone: "Pourtour du pont", side: "Bâbord & Tribord", icon: "person-running", color: "#059669", desc: "Circuit de marche et course avec panorama à 360° sur les flots." }
+    ]
+  },
+  {
+    deck: 19,
+    name: "Cortina",
+    category: "Passerelle Panoramique Volare",
+    description: "Promenade panoramique suspendue 'Volare' avec plancher de verre surplombant la mer à 65 mètres au-dessus des flots.",
+    highlights: [
+      { name: "Passerelle de Verre 'Volare'", zone: "Poupe (Arrière)", side: "Centre", icon: "eye", color: "#0891b2", desc: "Vue aérienne à couper le souffle, point le plus haut accessible." }
+    ]
+  },
+  {
+    deck: 20,
+    name: "Trieste",
+    category: "Solarium Sommet",
+    description: "Solarium supérieur tout en haut du paquebot, calme absolu sous le ciel méditerranéen.",
+    highlights: [
+      { name: "Solarium Sommet 360°", zone: "Centre", side: "Centre", icon: "sun", color: "#eab308", desc: "Transats exclusifs sous le soleil marin avec horizon infini." }
+    ]
+  }
+];
+
+const CRUISE_KEY_LOCATIONS = [
+  { id: 'infirmerie', name: 'Centre Médical & Infirmerie', deck: 4, deckName: 'Palermo', side: 'Bâbord', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'shield-heart', color: '#2563eb' },
+  { id: 'reception', name: 'Réception & Information 24h', deck: 7, deckName: 'Positano', side: 'Centre', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'bell-concierge', color: '#059669' },
+  { id: 'bornes_carte', name: 'Bornes Enregistrement Carte Cabine', deck: 7, deckName: 'Positano', side: 'Tribord', zone: 'Centre (Près Réception)', elevator: 'Centraux (Colosseo)', icon: 'credit-card', color: '#2563eb' },
+  { id: 'resto_colombina', name: 'Restaurant Principal La Colombina', deck: 5, deckName: 'Taormina', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'utensils', color: '#e11d48' },
+  { id: 'resto_meneghino', name: 'Restaurants Il Meneghino & Arlecchino', deck: 6, deckName: 'Matera', side: 'Bâbord/Tribord', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'utensils', color: '#e11d48' },
+  { id: 'buffet_sagra', name: 'Buffet La Sagra dei Sapori', deck: 8, deckName: 'Capri', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'bowl-food', color: '#e11d48' },
+  { id: 'pizzeria', name: 'Pizzeria Pummid\'Oro', deck: 8, deckName: 'Capri', side: 'Bâbord', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'pizza-slice', color: '#ea580c' },
+  { id: 'teppanyaki', name: 'Restaurant Show Cooking Teppanyaki', deck: 8, deckName: 'Capri', side: 'Tribord', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'fire-burner', color: '#b91c1c' },
+  { id: 'theatre', name: 'Grand Théâtre Sanremo', deck: 6, deckName: 'Matera', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'masks-theater', color: '#7c3aed' },
+  { id: 'bar_campari', name: 'Bar Campari (Atrium Colosseo)', deck: 7, deckName: 'Positano', side: 'Bâbord', zone: 'Centre (Colosseo)', elevator: 'Centraux (Colosseo)', icon: 'martini-glass-citrus', color: '#dc2626' },
+  { id: 'bar_aperol', name: 'Aperol Spritz Bar & Vue Mer', deck: 17, deckName: 'Bellagio', side: 'Bâbord', zone: 'Ponts Extérieurs (Piscine)', elevator: 'Centraux (Colosseo)', icon: 'wine-glass', color: '#f97316' },
+  { id: 'bar_mastroianni', name: 'Grand Bar Mastroianni (Musique Live)', deck: 6, deckName: 'Matera', side: 'Centre', zone: 'Centre', elevator: 'Centraux (Colosseo)', icon: 'music', color: '#9333ea' },
+  { id: 'duty_free', name: 'Galleria Sanremo & Boutiques Tax-Free', deck: 8, deckName: 'Capri', side: 'Bâbord/Tribord', zone: 'Centre (Atrium)', elevator: 'Centraux (Colosseo)', icon: 'bag-shopping', color: '#d97706' },
+  { id: 'piscine', name: 'Piscines La Spiaggia & Aqua Park', deck: 17, deckName: 'Bellagio', side: 'Centre', zone: 'Centre / Extérieur', elevator: 'Centraux (Colosseo)', icon: 'water-ladder', color: '#0284c7' },
+  { id: 'spa', name: 'Spa Solemio & Gym Panoramique', deck: 16, deckName: 'Como', side: 'Centre', zone: 'Proue (Avant)', elevator: 'Avant (Théâtre)', icon: 'spa', color: '#0d9488' },
+  { id: 'volare', name: 'Passerelle Panoramique Volare (Sol verre 65m)', deck: 19, deckName: 'Cortina', side: 'Centre', zone: 'Poupe (Arrière)', elevator: 'Arrière (Piazza)', icon: 'eye', color: '#0891b2' }
+];
+
+// État local du module croisière
+let currentActiveCruiseDeck = 8; // Par défaut Pont 8 (Cœur de vie Capri)
+let currentCruiseCompassHeading = 0;
+let isCruiseCompassActive = false;
+let cruiseCompassOrientationHandler = null;
+
+// Décodeur mathématique de cabine Costa
+function decodeCruiseCabin(rawInput) {
+  if (!rawInput) return null;
+  const cleaned = rawInput.toString().trim().replace(/\D/g, '');
+  if (!cleaned || cleaned.length < 3) return null;
+
+  const num = parseInt(cleaned, 10);
+  let deck = 0;
+  let roomNumber = 0;
+
+  if (cleaned.length === 3) {
+    deck = Math.floor(num / 100);
+    roomNumber = num % 100;
+  } else if (cleaned.length === 4) {
+    deck = Math.floor(num / 1000);
+    roomNumber = num % 1000;
+  } else {
+    // 5 chiffres (ex: 11025 ou 14340)
+    deck = Math.floor(num / 1000);
+    roomNumber = num % 1000;
+  }
+
+  const deckObj = CRUISE_SHIP_DECKS.find(d => d.deck === deck);
+  const deckName = deckObj ? deckObj.name : `Pont ${deck}`;
+
+  // Parité : Pair = Bâbord (gauche, feux rouges), Impair = Tribord (droite, feux verts)
+  const isPortSide = (num % 2 === 0);
+  const sideName = isPortSide ? "Bâbord (Côté Gauche)" : "Tribord (Côté Droit)";
+  const sideBadgeClass = isPortSide ? "side-badge-port" : "side-badge-starboard";
+  const sideIcon = isPortSide ? "fa-circle-arrow-left" : "fa-circle-arrow-right";
+  const navLight = isPortSide ? "Feu Rouge (Gauche)" : "Feu Vert (Droite)";
+
+  // Zone longitudinale & ascenseurs
+  let zoneName = "";
+  let elevatorName = "";
+  let elevatorCode = "";
+  let xRatio = 0.5;
+
+  if (roomNumber < 130) {
+    zoneName = "Proue (Avant du navire)";
+    elevatorName = "Ascenseurs Avant (Théâtre Sanremo)";
+    elevatorCode = "avant";
+    xRatio = 0.22;
+  } else if (roomNumber <= 270) {
+    zoneName = "Milieu / Centre (Atrium)";
+    elevatorName = "Ascenseurs Centraux (Atrium Colosseo)";
+    elevatorCode = "centre";
+    xRatio = 0.50;
+  } else {
+    zoneName = "Poupe (Arrière du navire)";
+    elevatorName = "Ascenseurs Arrière (Piazza di Spagna)";
+    elevatorCode = "arriere";
+    xRatio = 0.78;
+  }
+
+  // Y ratio pour l'affichage SVG (0.28 = Bâbord / haut, 0.72 = Tribord / bas)
+  const yRatio = isPortSide ? 0.30 : 0.70;
+
+  return {
+    raw: cleaned,
+    deck,
+    deckName,
+    roomNumber,
+    isPortSide,
+    sideName,
+    sideBadgeClass,
+    sideIcon,
+    navLight,
+    zoneName,
+    elevatorName,
+    elevatorCode,
+    xRatio,
+    yRatio
+  };
+}
+
+function getCruiseStoredCabin() {
+  if (!currentTrip) return "";
+  const tripKey = currentTrip.id || 'current';
+  return localStorage.getItem(`girardot_cruise_cabin_${tripKey}`) || "";
+}
+
+function saveCruiseStoredCabin(val) {
+  if (!currentTrip) return;
+  const tripKey = currentTrip.id || 'current';
+  if (val) {
+    localStorage.setItem(`girardot_cruise_cabin_${tripKey}`, val.trim());
+  } else {
+    localStorage.removeItem(`girardot_cruise_cabin_${tripKey}`);
+  }
+}
+
+// Dessin SVG vectoriel élégant du navire et positionnement 100% hors-ligne
+function renderShipDeckSvg(deckNum, activeCabin, targetPlace) {
+  const deckObj = CRUISE_SHIP_DECKS.find(d => d.deck === deckNum) || { deck: deckNum, name: `Pont ${deckNum}` };
+  const hasCabinOnDeck = activeCabin && activeCabin.deck === deckNum;
+  const hasTargetOnDeck = targetPlace && targetPlace.deck === deckNum;
+
+  // Coordonnées SVG de la cabine
+  const cabinX = hasCabinOnDeck ? Math.round(70 + activeCabin.xRatio * 380) : 0;
+  const cabinY = hasCabinOnDeck ? Math.round(activeCabin.yRatio * 130) : 0;
+
+  return `
+    <div class="deck-svg-container">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:0.75rem; color:#94a3b8; font-weight:700; text-transform:uppercase; letter-spacing:0.5px;">
+        <div><i class="fa-solid fa-anchor"></i> Proue (Avant)</div>
+        <div style="color:#38bdf8; font-weight:800; font-size:0.85rem;">
+          <i class="fa-solid fa-layer-group"></i> Pont ${deckObj.deck} ${deckObj.name}
+        </div>
+        <div>Poupe (Arrière) <i class="fa-solid fa-water"></i></div>
+      </div>
+
+      <svg viewBox="0 0 520 130" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4));">
+        <defs>
+          <linearGradient id="hullGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#0284c7" stop-opacity="0.35"/>
+            <stop offset="50%" stop-color="#0369a1" stop-opacity="0.25"/>
+            <stop offset="100%" stop-color="#0284c7" stop-opacity="0.35"/>
+          </linearGradient>
+          <radialGradient id="pinGlow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#ef4444" stop-opacity="1"/>
+            <stop offset="70%" stop-color="#ef4444" stop-opacity="0.4"/>
+            <stop offset="100%" stop-color="#ef4444" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <!-- Coque du navire profilée -->
+        <path d="M 60 65 C 75 25, 130 18, 220 18 L 470 18 C 500 18, 510 40, 510 65 C 510 90, 500 112, 470 112 L 220 112 C 130 112, 75 105, 60 65 Z"
+              fill="url(#hullGrad)" stroke="#38bdf8" stroke-width="2"/>
+
+        <!-- Lignes de repère des coursives Bâbord et Tribord -->
+        <line x1="85" y1="42" x2="480" y2="42" stroke="#334155" stroke-dasharray="4,4" stroke-width="1.2"/>
+        <line x1="85" y1="88" x2="480" y2="88" stroke="#334155" stroke-dasharray="4,4" stroke-width="1.2"/>
+
+        <!-- Indications de bord -->
+        <text x="95" y="32" fill="#f87171" font-size="9" font-weight="800" letter-spacing="1">BÂBORD (Gauche - Pairs)</text>
+        <text x="95" y="104" fill="#34d399" font-size="9" font-weight="800" letter-spacing="1">TRIBORD (Droite - Impairs)</text>
+
+        <!-- Cage d'Ascenseurs Avant -->
+        <g transform="translate(150, 48)">
+          <rect width="32" height="34" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+          <text x="16" y="16" fill="#38bdf8" font-size="10" text-anchor="middle">🛗</text>
+          <text x="16" y="28" fill="#e2e8f0" font-size="6.5" font-weight="800" text-anchor="middle">AVANT</text>
+        </g>
+
+        <!-- Cage d'Ascenseurs Centraux (Colosseo) -->
+        <g transform="translate(265, 48)">
+          <rect width="36" height="34" rx="6" fill="#1e293b" stroke="#c29958" stroke-width="1.5"/>
+          <text x="18" y="16" fill="#c29958" font-size="10" text-anchor="middle">🛗</text>
+          <text x="18" y="28" fill="#f7e7ce" font-size="6.5" font-weight="800" text-anchor="middle">CENTRE</text>
+        </g>
+
+        <!-- Cage d'Ascenseurs Arrière (Piazza di Spagna) -->
+        <g transform="translate(395, 48)">
+          <rect width="32" height="34" rx="6" fill="#1e293b" stroke="#38bdf8" stroke-width="1.2"/>
+          <text x="16" y="16" fill="#38bdf8" font-size="10" text-anchor="middle">🛗</text>
+          <text x="16" y="28" fill="#e2e8f0" font-size="6.5" font-weight="800" text-anchor="middle">ARRIÈRE</text>
+        </g>
+
+        <!-- Marqueur pulsant de la Cabine si présente sur ce pont -->
+        ${hasCabinOnDeck ? `
+          <circle cx="${cabinX}" cy="${cabinY}" r="16" fill="url(#pinGlow)">
+            <animate attributeName="r" values="8;20;8" dur="2s" repeatCount="indefinite"/>
+            <animate attributeName="opacity" values="0.8;0.2;0.8" dur="2s" repeatCount="indefinite"/>
+          </circle>
+          <circle cx="${cabinX}" cy="${cabinY}" r="6" fill="#ef4444" stroke="#ffffff" stroke-width="2"/>
+          <g transform="translate(${cabinX - 35}, ${cabinY > 65 ? cabinY - 26 : cabinY + 12})">
+            <rect width="70" height="18" rx="4" fill="#ef4444" stroke="#ffffff" stroke-width="1"/>
+            <text x="35" y="12" fill="#ffffff" font-size="7.5" font-weight="900" text-anchor="middle">
+              CABINE ${activeCabin.raw}
+            </text>
+          </g>
+        ` : ''}
+
+        <!-- Marqueur lieu de destination si présent sur ce pont -->
+        ${hasTargetOnDeck ? `
+          <g transform="translate(330, 25)">
+            <circle cx="0" cy="0" r="14" fill="#0284c7" opacity="0.4">
+              <animate attributeName="r" values="8;18;8" dur="2.2s" repeatCount="indefinite"/>
+            </circle>
+            <circle cx="0" cy="0" r="5" fill="#0284c7" stroke="#ffffff" stroke-width="1.5"/>
+            <rect x="-45" y="8" width="90" height="16" rx="4" fill="#0f172a" stroke="#38bdf8" stroke-width="1"/>
+            <text x="0" y="20" fill="#38bdf8" font-size="7" font-weight="800" text-anchor="middle">
+              ${targetPlace.name.substring(0, 15)}...
+            </text>
+          </g>
+        ` : ''}
+      </svg>
+
+      <div style="display:flex; justify-content:space-around; align-items:center; margin-top:8px; font-size:0.75rem; color:#cbd5e1; flex-wrap:wrap; gap:8px;">
+        <div><span style="color:#f87171;">●</span> Coursive Bâbord (Gauche)</div>
+        <div><span style="color:#38bdf8;">🛗</span> 3 Noyaux d'Ascenseurs</div>
+        <div><span style="color:#34d399;">●</span> Coursive Tribord (Droite)</div>
+      </div>
+    </div>
+  `;
+}
+
+// Algorithme de calcul d'itinéraire intérieur (Wayfinding)
+function calculateCruiseRoute(fromCabinInput, targetId) {
+  const target = CRUISE_KEY_LOCATIONS.find(l => l.id === targetId);
+  if (!target) return null;
+
+  const cabin = decodeCruiseCabin(fromCabinInput);
+  const steps = [];
+
+  if (cabin) {
+    // 1. Sortie de cabine
+    steps.push({
+      num: 1,
+      icon: cabin.sideIcon,
+      color: cabin.sideColor,
+      title: `Sortie de votre cabine ${cabin.raw}`,
+      desc: `Sortez de votre cabine et engagez-vous sur la coursive <strong>${cabin.sideName}</strong> (${cabin.navLight}).`
+    });
+
+    // 2. Choix de la cage d'ascenseur
+    steps.push({
+      num: 2,
+      icon: "fa-elevator",
+      color: "#0284c7",
+      title: `Rejoignez les ${cabin.elevatorName}`,
+      desc: `Marchez le long du couloir vers la zone <strong>${cabin.zoneName}</strong> pour atteindre les ascenseurs (distance : environ 25 à 40 mètres).`
+    });
+
+    // 3. Mouvement vertical (Ponts)
+    const delta = target.deck - cabin.deck;
+    if (delta === 0) {
+      steps.push({
+        num: 3,
+        icon: "fa-person-walking",
+        color: "#059669",
+        title: `Même niveau : Pont ${cabin.deck} (${cabin.deckName})`,
+        desc: `Vous êtes déjà sur le bon pont ! Aucun ascenseur requis. Marchez directement le long de la coursive vers la zone ${target.zone}.`
+      });
+    } else if (delta > 0) {
+      steps.push({
+        num: 3,
+        icon: "fa-arrow-up",
+        color: "#0284c7",
+        title: `Montez de ${delta} pont${delta > 1 ? 's' : ''}`,
+        desc: `Prenez l'ascenseur ou l'escalier et <strong>MONTEZ du Pont ${cabin.deck} au Pont ${target.deck} (${target.deckName})</strong>.`
+      });
+    } else {
+      const down = Math.abs(delta);
+      steps.push({
+        num: 3,
+        icon: "fa-arrow-down",
+        color: "#d97706",
+        title: `Descendez de ${down} pont${down > 1 ? 's' : ''}`,
+        desc: `Prenez l'ascenseur ou l'escalier et <strong>DESCENDEZ du Pont ${cabin.deck} au Pont ${target.deck} (${target.deckName})</strong>.`
+      });
+    }
+
+    // 4. Arrivée à destination
+    steps.push({
+      num: 4,
+      icon: "fa-location-dot",
+      color: target.color,
+      title: `Arrivée au Pont ${target.deck} (${target.deckName})`,
+      desc: `À la sortie des ascenseurs, suivez le fléchage vers <strong>${target.zone}</strong> (côté ${target.side}). Votre destination <strong>${target.name}</strong> est à quelques pas.`
+    });
+  } else {
+    // Départ depuis un lieu ou pont général
+    steps.push({
+      num: 1,
+      icon: "fa-elevator",
+      color: "#0284c7",
+      title: `Rejoignez les ascenseurs ${target.elevator}`,
+      desc: `Prenez les ascenseurs recommandés les plus proches de votre position actuelle.`
+    });
+    steps.push({
+      num: 2,
+      icon: "fa-layer-group",
+      color: target.color,
+      title: `Rendez-vous au Pont ${target.deck} (${target.deckName})`,
+      desc: `Sélectionnez le <strong>Pont ${target.deck}</strong> dans la cabine d'ascenseur.`
+    });
+    steps.push({
+      num: 3,
+      icon: "fa-location-dot",
+      color: target.color,
+      title: `Arrivée : ${target.name}`,
+      desc: `Suivez la signalétique vers la zone <strong>${target.zone}</strong> (côté ${target.side}).`
+    });
+  }
+
+  const estimatedMinutes = Math.min(4, Math.max(1, Math.round(1 + Math.abs(target.deck - (cabin ? cabin.deck : target.deck)) * 0.4)));
+  const estimatedMeters = 40 + Math.abs(target.deck - (cabin ? cabin.deck : target.deck)) * 15 + 40;
+
+  return {
+    target,
+    cabin,
+    steps,
+    estimatedMinutes,
+    estimatedMeters
+  };
+}
+
+// Module Principal d'Orientation à bord (Interface utilisateur)
+function renderCruiseDeckOrientationModule(containerEl, trip) {
+  const shipName = trip.shipName || "Costa Smeralda";
+  const storedCabin = getCruiseStoredCabin();
+  const initialCabinDecoded = storedCabin ? decodeCruiseCabin(storedCabin) : null;
+  if (initialCabinDecoded) {
+    currentActiveCruiseDeck = initialCabinDecoded.deck;
+  }
+
+  const wrapper = document.createElement('div');
+  wrapper.className = 'deck-nav-wrapper';
+  wrapper.id = 'cruise-deck-navigator-module';
+
+  wrapper.innerHTML = `
+    <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:14px;">
+      <div>
+        <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase; letter-spacing:0.4px;">
+          <i class="fa-solid fa-compass"></i> Orientation 100% Hors-Ligne & Embarquée
+        </span>
+        <h3 style="font-size:1.15rem; font-weight:800; color:var(--primary-dark); margin-top:4px;">
+          Navigation à Bord & Plan des Ponts
+        </h3>
+        <p style="font-size:0.8rem; color:#64748b; margin:0;">
+          La coque en acier bloquant le signal GPS, ce système calcule votre position et itinéraire à bord du ${shipName} sans connexion.
+        </p>
+      </div>
+    </div>
+
+    <!-- Encart : Ma Cabine & Mon Repère -->
+    <div class="cabin-decoder-card" id="cruise-cabin-box">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <i class="fa-solid fa-door-open" style="color:#059669; font-size:1.1rem;"></i>
+          <strong style="font-size:0.92rem; color:#14532d;">Ma Cabine à bord :</strong>
+        </div>
+        <div style="display:flex; gap:6px;">
+          <input type="text" id="cruise-cabin-input" value="${storedCabin}" placeholder="Ex: 8214 ou 11025"
+                 style="width:130px; padding:6px 10px; border-radius:8px; border:1px solid #86efac; font-size:0.85rem; font-weight:700; text-align:center;"
+                 maxlength="6" oninput="onCruiseCabinInputChange(this.value)">
+          <button type="button" onclick="saveCruiseCabinBtn()" class="btn-entry-gps" style="background:#059669; color:white; font-size:0.78rem; padding:6px 12px; border:none; cursor:pointer;">
+            <i class="fa-solid fa-floppy-disk"></i> Mémoriser
+          </button>
+        </div>
+      </div>
+
+      <div id="cruise-cabin-decode-feedback">
+        ${initialCabinDecoded ? renderCabinDecodedBadge(initialCabinDecoded) : `
+          <p style="font-size:0.78rem; color:#166534; margin:0;">
+            <i class="fa-solid fa-circle-info"></i> Saisissez le numéro de votre cabine (figurant sur votre carte Costa ou carnet) pour calculer vos trajets personnalisés et afficher votre repère sur les plans.
+          </p>
+        `}
+      </div>
+    </div>
+
+    <!-- Onglets de navigation : Plan des Ponts | Itinéraires | Boussole Marine -->
+    <div class="deck-tabs-header">
+      <button type="button" class="deck-tab-btn active" id="btn-subtab-decks" onclick="switchCruiseSubTab('decks')">
+        <i class="fa-solid fa-layer-group"></i> Plan des Ponts
+      </button>
+      <button type="button" class="deck-tab-btn" id="btn-subtab-wayfinder" onclick="switchCruiseSubTab('wayfinder')">
+        <i class="fa-solid fa-route"></i> Itinéraires
+      </button>
+      <button type="button" class="deck-tab-btn" id="btn-subtab-compass" onclick="switchCruiseSubTab('compass')">
+        <i class="fa-solid fa-compass"></i> Boussole Marine
+      </button>
+    </div>
+
+    <!-- CONTENU VUE 1 : PLAN DES PONTS & DÉTAILS -->
+    <div id="cruise-subtab-content-decks">
+      <!-- Sélecteur horizontal des ponts -->
+      <div class="deck-selector-strip" id="cruise-deck-pills-strip"></div>
+
+      <!-- Plan SVG Interactif du navire pour le pont sélectionné -->
+      <div id="cruise-deck-svg-mount"></div>
+
+      <!-- Fiche détaillée du pont actif -->
+      <div id="cruise-deck-details-mount" style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:14px; margin-top:12px;"></div>
+    </div>
+
+    <!-- CONTENU VUE 2 : CALCULATEUR D'ITINÉRAIRES INTÉRIEURS -->
+    <div id="cruise-subtab-content-wayfinder" style="display:none;">
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:16px; padding:16px; margin-bottom:14px;">
+        <h4 style="font-size:0.95rem; font-weight:800; color:#0369a1; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-route"></i> Comment aller à bord ?
+        </h4>
+
+        <div style="margin-bottom:10px;">
+          <label style="font-size:0.78rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Point de départ :</label>
+          <div style="display:flex; gap:6px; align-items:center;">
+            <input type="text" id="wayfinder-from-cabin" value="${storedCabin ? 'Ma Cabine ' + storedCabin : ''}" placeholder="Ex: Cabine 8214"
+                   style="flex:1; padding:7px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem;">
+            <button type="button" onclick="useStoredCabinAsWayfinderStart()" class="btn-entry-gps" style="background:#f1f5f9; color:#334155; font-size:0.75rem; padding:7px 10px;">
+              Ma Cabine
+            </button>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <label style="font-size:0.78rem; font-weight:700; color:#475569; display:block; margin-bottom:4px;">Où souhaitez-vous vous rendre ?</label>
+          <select id="wayfinder-to-select" style="width:100%; padding:8px 10px; border-radius:8px; border:1px solid #cbd5e1; font-size:0.85rem; font-weight:600; background:white;">
+            <option value="infirmerie">🏥 Centre Médical & Infirmerie (Pont 4)</option>
+            <option value="resto_colombina">🍽️ Restaurant Principal La Colombina (Pont 5)</option>
+            <option value="theatre">🎭 Grand Théâtre Sanremo (Pont 6 & 7)</option>
+            <option value="reception">🛎️ Réception Centrale 24h & Bureau Information (Pont 7)</option>
+            <option value="bornes_carte">💳 Bornes Enregistrement Carte Cabine (Pont 7)</option>
+            <option value="bar_campari">🍹 Bar Campari & Atrium Colosseo (Pont 7)</option>
+            <option value="buffet_sagra">🥗 Buffet La Sagra dei Sapori (Pont 8)</option>
+            <option value="pizzeria">🍕 Pizzeria Pummid'Oro (Pont 8)</option>
+            <option value="teppanyaki">🔥 Restaurant Teppanyaki (Pont 8)</option>
+            <option value="duty_free">🛍️ Galleria Duty Free & Boutiques (Pont 8)</option>
+            <option value="spa">🧘 Spa Solemio & Salle de Gym (Pont 16)</option>
+            <option value="piscine">🏊 Piscines La Spiaggia & Aqua Park (Pont 17)</option>
+            <option value="bar_aperol">🍸 Aperol Spritz Bar & Solarium (Pont 17)</option>
+            <option value="volare">🌅 Passerelle Panoramique Volare (Sol verre 65m - Pont 19)</option>
+          </select>
+        </div>
+
+        <button type="button" onclick="executeCruiseRouteWayfinder()" class="btn-entry-gps" style="width:100%; background:#0284c7; color:white; font-size:0.88rem; font-weight:700; padding:10px 16px; border:none; cursor:pointer; border-radius:10px; display:flex; align-items:center; justify-content:center; gap:8px;">
+          <i class="fa-solid fa-calculator"></i> Calculer mon itinéraire intérieur
+        </button>
+      </div>
+
+      <div id="cruise-wayfinder-results"></div>
+    </div>
+
+    <!-- CONTENU VUE 3 : BOUSSOLE MARINE ÉLECTRONIQUE HORS-LIGNE -->
+    <div id="cruise-subtab-content-compass" style="display:none; text-align:center;">
+      <div style="background:#0f172a; border-radius:18px; padding:18px; color:white; margin-bottom:14px; box-shadow:0 8px 25px rgba(15,23,42,0.4);">
+        <span style="background:rgba(2,132,199,0.25); color:#38bdf8; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">
+          Capteurs Smartphone 100% Hors-Ligne
+        </span>
+        <h4 style="font-size:1.05rem; font-weight:800; margin-top:6px; margin-bottom:4px; color:#ffffff;">
+          Boussole Marine d'Orientation
+        </h4>
+        <p style="font-size:0.8rem; color:#94a3b8; margin:0 auto 12px; max-width:420px; line-height:1.4;">
+          Utilise le magnétomètre et gyroscope intégrés de votre smartphone pour vous orienter dans les coursives sans réseau cellulaire.
+        </p>
+
+        <!-- Cadran rotatif de la boussole -->
+        <div style="position:relative; width:170px; height:170px; margin:0 auto 12px;">
+          <div class="marine-compass-dial" id="marine-compass-dial-el">
+            <div style="position:absolute; top:6px; font-size:0.75rem; font-weight:900; color:#ef4444;">N</div>
+            <div style="position:absolute; bottom:6px; font-size:0.75rem; font-weight:900; color:#cbd5e1;">S</div>
+            <div style="position:absolute; right:8px; font-size:0.75rem; font-weight:900; color:#cbd5e1;">E</div>
+            <div style="position:absolute; left:8px; font-size:0.75rem; font-weight:900; color:#cbd5e1;">O</div>
+            <div class="marine-compass-needle" id="marine-compass-needle-el"></div>
+          </div>
+        </div>
+
+        <div style="margin-bottom:12px;">
+          <div id="marine-compass-heading-text" style="font-size:1.6rem; font-weight:900; color:#38bdf8; letter-spacing:1px;">
+            0° NORD
+          </div>
+          <div id="marine-compass-ship-relative" style="font-size:0.82rem; color:#f1f5f9; margin-top:2px;">
+            Orientation : Face à la <strong>Proue (Avant du navire)</strong>
+          </div>
+        </div>
+
+        <button type="button" id="btn-toggle-compass" onclick="toggleCruiseCompass()" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.82rem; padding:8px 18px; border:none; cursor:pointer; border-radius:20px; font-weight:700;">
+          <i class="fa-solid fa-play"></i> Activer les capteurs de bord
+        </button>
+      </div>
+
+      <!-- Contrôles manuels pour tester sur ordinateur / sans magnétomètre -->
+      <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:14px; padding:12px; font-size:0.78rem; color:#64748b;">
+        <div style="font-weight:700; color:#334155; margin-bottom:6px;">Simulation manuelle de cap (si PC ou capteur absent) :</div>
+        <div style="display:flex; justify-content:center; gap:6px; flex-wrap:wrap;">
+          <button type="button" onclick="rotateManualCompass(-30)" class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;">-30°</button>
+          <button type="button" onclick="setManualCompassHeading(0)" class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;">⚓ Proue 0°</button>
+          <button type="button" onclick="setManualCompassHeading(90)" class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;">🟢 Tribord 90°</button>
+          <button type="button" onclick="setManualCompassHeading(180)" class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;">⚓ Poupe 180°</button>
+          <button type="button" onclick="setManualCompassHeading(270)" class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;">🔴 Bâbord 270°</button>
+          <button type="button" onclick="rotateManualCompass(30)" class="day-pill-btn" style="font-size:0.72rem; padding:4px 10px;">+30°</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  containerEl.appendChild(wrapper);
+
+  // Rendu initial des ponts
+  renderCruiseDeckPills();
+  renderActiveCruiseDeckView();
+}
+
+function renderCabinDecodedBadge(cabin) {
+  return `
+    <div style="background:white; border:1px solid #86efac; border-radius:12px; padding:10px 14px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <div>
+        <div style="font-size:0.92rem; font-weight:800; color:#14532d; display:flex; align-items:center; gap:6px;">
+          <span>Cabine ${cabin.raw} :</span>
+          <span style="color:#0284c7;">Pont ${cabin.deck} (${cabin.deckName})</span>
+          <span class="${cabin.sideBadgeClass}">
+            <i class="fa-solid ${cabin.sideIcon}"></i> ${cabin.sideName}
+          </span>
+        </div>
+        <div style="font-size:0.78rem; color:#475569; margin-top:3px;">
+          <i class="fa-solid fa-location-crosshairs"></i> Emplacement : <strong>${cabin.zoneName}</strong> &bull; ${cabin.elevatorName}
+        </div>
+      </div>
+      <button type="button" onclick="viewCabinOnDeck(${cabin.deck})" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.75rem; padding:5px 12px; border:none; cursor:pointer;">
+        <i class="fa-solid fa-eye"></i> Voir sur le plan
+      </button>
+    </div>
+  `;
+}
+
+function onCruiseCabinInputChange(val) {
+  const feedbackEl = document.getElementById('cruise-cabin-decode-feedback');
+  if (!feedbackEl) return;
+  const decoded = decodeCruiseCabin(val);
+  if (decoded) {
+    feedbackEl.innerHTML = renderCabinDecodedBadge(decoded);
+    const wayfinderInput = document.getElementById('wayfinder-from-cabin');
+    if (wayfinderInput) wayfinderInput.value = 'Ma Cabine ' + decoded.raw;
+  } else {
+    feedbackEl.innerHTML = `
+      <p style="font-size:0.78rem; color:#166534; margin:0;">
+        <i class="fa-solid fa-circle-info"></i> Saisissez un numéro de cabine valide (ex: 8214, 11025) pour obtenir le décodage immédiat.
+      </p>
+    `;
+  }
+}
+
+function saveCruiseCabinBtn() {
+  const input = document.getElementById('cruise-cabin-input');
+  if (!input) return;
+  const val = input.value.trim();
+  const decoded = decodeCruiseCabin(val);
+  if (!decoded) {
+    alert("Veuillez saisir un numéro de cabine valide (ex: 8214 pour le Pont 8).");
+    return;
+  }
+  saveCruiseStoredCabin(decoded.raw);
+  alert(`Cabine ${decoded.raw} enregistrée avec succès ! Pont ${decoded.deck} (${decoded.deckName}), côté ${decoded.sideName}.`);
+  switchCruiseDeck(decoded.deck);
+}
+
+function viewCabinOnDeck(deckNum) {
+  switchCruiseSubTab('decks');
+  switchCruiseDeck(deckNum);
+}
+
+function renderCruiseDeckPills() {
+  const strip = document.getElementById('cruise-deck-pills-strip');
+  if (!strip) return;
+  strip.innerHTML = '';
+
+  CRUISE_SHIP_DECKS.forEach(d => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `deck-btn-pill ${d.deck === currentActiveCruiseDeck ? 'active' : ''}`;
+    btn.onclick = () => switchCruiseDeck(d.deck);
+    btn.innerHTML = `
+      <div>Pont ${d.deck}</div>
+      <div class="sub-name">${d.name}</div>
+    `;
+    strip.appendChild(btn);
+  });
+}
+
+function switchCruiseDeck(deckNum) {
+  currentActiveCruiseDeck = deckNum;
+  document.querySelectorAll('.deck-btn-pill').forEach(btn => {
+    const txt = btn.innerText;
+    if (txt.includes(`Pont ${deckNum}`)) btn.classList.add('active');
+    else btn.classList.remove('active');
+  });
+  renderActiveCruiseDeckView();
+}
+
+function renderActiveCruiseDeckView() {
+  const svgMount = document.getElementById('cruise-deck-svg-mount');
+  const detailsMount = document.getElementById('cruise-deck-details-mount');
+  if (!svgMount || !detailsMount) return;
+
+  const storedCabin = getCruiseStoredCabin();
+  const cabinDecoded = storedCabin ? decodeCruiseCabin(storedCabin) : null;
+  const deckObj = CRUISE_SHIP_DECKS.find(d => d.deck === currentActiveCruiseDeck) || { deck: currentActiveCruiseDeck, name: '', description: '', highlights: [] };
+
+  svgMount.innerHTML = renderShipDeckSvg(currentActiveCruiseDeck, cabinDecoded, null);
+
+  let highlightsHtml = '';
+  if (deckObj.highlights && deckObj.highlights.length > 0) {
+    highlightsHtml = `
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:10px; margin-top:10px;">
+        ${deckObj.highlights.map(h => `
+          <div style="background:white; border-radius:12px; border:1px solid #e2e8f0; padding:10px 12px; display:flex; gap:10px; align-items:flex-start;">
+            <div style="width:34px; height:34px; border-radius:8px; background:${h.color || '#0284c7'}; color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+              <i class="fa-solid fa-${h.icon || 'star'}"></i>
+            </div>
+            <div style="flex:1;">
+              <div style="font-size:0.85rem; font-weight:800; color:#0f172a; line-height:1.25;">${h.name}</div>
+              <div style="font-size:0.72rem; color:#64748b; margin-top:2px;">
+                <span style="font-weight:700; color:#0284c7;">${h.zone}</span> &bull; Côté ${h.side}
+              </div>
+              <div style="font-size:0.75rem; color:#334155; margin-top:4px; line-height:1.35;">${h.desc}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+  }
+
+  detailsMount.innerHTML = `
+    <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:8px;">
+      <div>
+        <h4 style="font-size:1.05rem; font-weight:800; color:#0f172a; margin:0;">
+          Pont ${deckObj.deck} &mdash; ${deckObj.name}
+        </h4>
+        <div style="font-size:0.75rem; font-weight:700; color:#0284c7; text-transform:uppercase; margin-top:2px;">
+          ${deckObj.category}
+        </div>
+      </div>
+      <button type="button" onclick="planWayfinderToDeck(${deckObj.deck})" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.75rem; padding:5px 12px; border:none; cursor:pointer;">
+        <i class="fa-solid fa-route"></i> Comment y aller
+      </button>
+    </div>
+
+    <p style="font-size:0.82rem; color:#475569; margin:8px 0 0 0; line-height:1.45;">
+      ${deckObj.description}
+    </p>
+
+    ${highlightsHtml}
+  `;
+}
+
+function planWayfinderToDeck(deckNum) {
+  switchCruiseSubTab('wayfinder');
+  const target = CRUISE_KEY_LOCATIONS.find(l => l.deck === deckNum);
+  if (target) {
+    const sel = document.getElementById('wayfinder-to-select');
+    if (sel) sel.value = target.id;
+  }
+  executeCruiseRouteWayfinder();
+}
+
+function switchCruiseSubTab(tabId) {
+  const tabs = ['decks', 'wayfinder', 'compass'];
+  tabs.forEach(t => {
+    const btn = document.getElementById(`btn-subtab-${t}`);
+    const content = document.getElementById(`cruise-subtab-content-${t}`);
+    if (btn) {
+      if (t === tabId) btn.classList.add('active');
+      else btn.classList.remove('active');
+    }
+    if (content) {
+      if (t === tabId) content.style.display = 'block';
+      else content.style.display = 'none';
+    }
+  });
+
+  if (tabId === 'compass' && !isCruiseCompassActive) {
+    // Proposer l'activation
+  }
+}
+
+function useStoredCabinAsWayfinderStart() {
+  const stored = getCruiseStoredCabin();
+  const input = document.getElementById('wayfinder-from-cabin');
+  if (input) {
+    input.value = stored ? ('Ma Cabine ' + stored) : '';
+  }
+}
+
+function executeCruiseRouteWayfinder() {
+  const fromInput = document.getElementById('wayfinder-from-cabin');
+  const toSelect = document.getElementById('wayfinder-to-select');
+  const resultsMount = document.getElementById('cruise-wayfinder-results');
+  if (!toSelect || !resultsMount) return;
+
+  const fromVal = fromInput ? fromInput.value : '';
+  const toId = toSelect.value;
+  const route = calculateCruiseRoute(fromVal, toId);
+  if (!route) return;
+
+  resultsMount.innerHTML = `
+    <div style="background:white; border:1px solid #bae6fd; border-radius:16px; padding:16px; box-shadow:0 4px 15px rgba(2,132,199,0.06);">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:12px; padding-bottom:10px; border-bottom:1px solid #f1f5f9;">
+        <div>
+          <span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; font-weight:800; padding:3px 8px; border-radius:6px; text-transform:uppercase;">
+            Feuille de Route Intérieure
+          </span>
+          <h4 style="font-size:1.02rem; font-weight:800; color:#0f172a; margin-top:4px;">
+            Itinéraire vers ${route.target.name}
+          </h4>
+          <div style="font-size:0.78rem; color:#64748b;">
+            Destination : <strong>Pont ${route.target.deck} (${route.target.deckName})</strong> &bull; ${route.target.zone}
+          </div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:1.1rem; font-weight:900; color:#0284c7;">~ ${route.estimatedMinutes} min</div>
+          <div style="font-size:0.72rem; color:#64748b;">${route.estimatedMeters} mètres à pied</div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:14px;">
+        ${route.steps.map(s => `
+          <div class="wayfinding-step">
+            <div class="wayfinding-step-num" style="background:${s.color || '#0284c7'};">${s.num}</div>
+            <div style="flex:1;">
+              <div style="font-size:0.86rem; font-weight:800; color:#0f172a;">${s.title}</div>
+              <div style="font-size:0.8rem; color:#334155; line-height:1.4; margin-top:2px;">${s.desc}</div>
+            </div>
+          </div>
+        `).join('')}
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button type="button" onclick="switchCruiseDeck(${route.target.deck}); switchCruiseSubTab('decks');" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.78rem; padding:6px 14px; border:none; cursor:pointer;">
+          <i class="fa-solid fa-eye"></i> Voir le Pont ${route.target.deck} sur le plan
+        </button>
+      </div>
+    </div>
+  `;
+}
+
+// Boussole Marine (Capteurs locaux Smartphone 100% Offline)
+function toggleCruiseCompass() {
+  const btn = document.getElementById('btn-toggle-compass');
+  if (isCruiseCompassActive) {
+    stopCruiseCompass();
+    if (btn) {
+      btn.innerHTML = '<i class="fa-solid fa-play"></i> Activer les capteurs de bord';
+      btn.style.background = '#0284c7';
+    }
+  } else {
+    startCruiseCompass();
+  }
+}
+
+function startCruiseCompass() {
+  const btn = document.getElementById('btn-toggle-compass');
+  if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+    // iOS 13+ permission request
+    DeviceOrientationEvent.requestPermission()
+      .then(response => {
+        if (response === 'granted') {
+          attachCompassEventListener();
+        } else {
+          alert("Accès aux capteurs refusé par le navigateur. Vous pouvez utiliser les boutons manuels pour simuler votre cap.");
+        }
+      })
+      .catch(err => {
+        attachCompassEventListener();
+      });
+  } else {
+    attachCompassEventListener();
+  }
+}
+
+function attachCompassEventListener() {
+  const btn = document.getElementById('btn-toggle-compass');
+  cruiseCompassOrientationHandler = (event) => {
+    let heading = 0;
+    if (event.webkitCompassHeading) {
+      // iOS
+      heading = event.webkitCompassHeading;
+    } else if (event.alpha !== null) {
+      // Android / W3C standard
+      heading = (360 - event.alpha) % 360;
+    }
+    updateCompassDisplay(Math.round(heading));
+  };
+
+  window.addEventListener('deviceorientation', cruiseCompassOrientationHandler, true);
+  isCruiseCompassActive = true;
+  if (btn) {
+    btn.innerHTML = '<i class="fa-solid fa-pause"></i> Capteurs Actifs (Pause)';
+    btn.style.background = '#059669';
+  }
+}
+
+function stopCruiseCompass() {
+  if (cruiseCompassOrientationHandler) {
+    window.removeEventListener('deviceorientation', cruiseCompassOrientationHandler, true);
+    cruiseCompassOrientationHandler = null;
+  }
+  isCruiseCompassActive = false;
+}
+
+function updateCompassDisplay(heading) {
+  currentCruiseCompassHeading = heading;
+  const dialEl = document.getElementById('marine-compass-dial-el');
+  const headingText = document.getElementById('marine-compass-heading-text');
+  const shipRelative = document.getElementById('marine-compass-ship-relative');
+
+  if (dialEl) {
+    dialEl.style.transform = `rotate(-${heading}deg)`;
+  }
+
+  // Direction cardinale
+  const cardinals = ["NORD", "NORD-EST", "EST", "SUD-EST", "SUD", "SUD-OUEST", "OUEST", "NORD-OUEST"];
+  const cardinalIndex = Math.round(heading / 45) % 8;
+  const cardinal = cardinals[cardinalIndex];
+
+  if (headingText) {
+    headingText.innerText = `${heading}° ${cardinal}`;
+  }
+
+  // Orientation par rapport à la proue du navire
+  if (shipRelative) {
+    let shipDir = "Proue (Avant du navire)";
+    if (heading >= 45 && heading < 135) {
+      shipDir = "<span style='color:#34d399;'>Tribord (Côté Droit / Mer)</span>";
+    } else if (heading >= 135 && heading < 225) {
+      shipDir = "Poupe (Arrière du navire)";
+    } else if (heading >= 225 && heading < 315) {
+      shipDir = "<span style='color:#f87171;'>Bâbord (Côté Gauche / Mer)</span>";
+    }
+    shipRelative.innerHTML = `Orientation : Face à la <strong>${shipDir}</strong>`;
+  }
+}
+
+function setManualCompassHeading(deg) {
+  stopCruiseCompass();
+  const btn = document.getElementById('btn-toggle-compass');
+  if (btn) {
+    btn.innerHTML = '<i class="fa-solid fa-play"></i> Activer les capteurs de bord';
+    btn.style.background = '#0284c7';
+  }
+  updateCompassDisplay(deg);
+}
+
+function rotateManualCompass(delta) {
+  stopCruiseCompass();
+  let next = (currentCruiseCompassHeading + delta) % 360;
+  if (next < 0) next += 360;
+  updateCompassDisplay(next);
+}
+
 
 // 5. RENDER HOTELS, FLIGHTS & PRATIQUE
 function renderHotelsAndFlights() {

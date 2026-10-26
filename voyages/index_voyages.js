@@ -44,4 +44,14 @@ window.AVAILABLE_TRIPS = [
     dates: "Selon calendrier des départs",
     file: "voyages/voyage-1792069990645 Mexique.json"
   }
+,
+  {
+    id: "croisiere-costa-smeralda-2026",
+    alias: "croisiere",
+    aliases: ["croisiere", "costa-smeralda", "smeralda"],
+    title: "Croisière Méditerranée",
+    subtitle: "Costa Smeralda (Marseille, Barcelone, Rome)",
+    dates: "Du 01/11 au 08/11/2026",
+    file: "voyages/croisiere-costa-smeralda-2026.json"
+  }
 ];
