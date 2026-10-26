@@ -1,4 +1,4 @@
-# Cree un raccourci sur le Bureau avec l'icone officielle Voyages Girardot
+# Cree ou met a jour le raccourci sur le Bureau avec l'icone officielle Voyages Girardot
 $wsh = New-Object -ComObject WScript.Shell
 $desktop = [Environment]::GetFolderPath("Desktop")
 $shortcutPath = Join-Path $desktop "Carnet de Voyage Girardot.lnk"
@@ -12,7 +12,7 @@ $shortcut.WorkingDirectory = $PSScriptRoot
 if (Test-Path $iconPath) {
     $shortcut.IconLocation = "$iconPath,0"
 }
-$shortcut.Description = "Lancer l application Carnet de Voyage - Voyages Girardot"
+$shortcut.Description = "Lancer l'application Carnet de Voyage - Voyages Girardot"
 $shortcut.Save()
 
-Write-Host "Raccourci Bureau cree avec succes avec l icone Girardot." -ForegroundColor Green
+Write-Host "Raccourci Bureau mis a jour avec succes avec l'icone Girardot." -ForegroundColor Green
