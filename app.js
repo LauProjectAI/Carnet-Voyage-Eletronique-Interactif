@@ -1769,7 +1769,7 @@ function renderHotelsAndFlights() {
   if (currentTrip.hotels) {
     hotelsContainer.innerHTML = `
       <h3 style="font-size:1.1rem; font-weight:800; color:var(--primary-dark); margin-bottom:10px;">
-        <i class="fa-solid fa-hotel" style="color:var(--accent-gold); margin-right:6px;"></i> Vos Hôtels
+        <i class="fa-solid fa-bed" style="color:var(--accent-gold); margin-right:6px;"></i> Hébergement
       </h3>
     `;
     currentTrip.hotels.forEach(h => {
@@ -1780,7 +1780,7 @@ function renderHotelsAndFlights() {
         <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800;">${h.dates}</div>
         <div style="font-size:0.95rem; font-weight:800; color:var(--text-main);">${h.name}</div>
         <div style="font-size:0.8rem; color:#64748b; margin:2px 0 6px;">${h.address}</div>
-        <a href="${gpsUrl}" target="_blank" class="btn-entry-gps"><i class="fa-solid fa-location-arrow"></i> GPS Hôtel</a>
+        <a href="${gpsUrl}" target="_blank" class="btn-entry-gps"><i class="fa-solid fa-location-arrow"></i> GPS Hébergement</a>
       `;
       hotelsContainer.appendChild(el);
     });
@@ -2115,9 +2115,9 @@ function renderMapMarkers(filterCategory = 'all') {
           const marker = L.marker([hLat, hLng], { icon: icon }).addTo(leafletMap);
           marker.bindPopup(`
             <div style="font-family:'Archivo',sans-serif; max-width:220px;">
-              <strong style="color:#c29958;"><i class="fa-solid fa-hotel"></i> ${hotel.name}</strong><br>
+              <strong style="color:#c29958;"><i class="fa-solid fa-bed"></i> ${hotel.name}</strong><br>
               <span style="font-size:11px; color:#64748b;">${hotel.dates}</span><br>
-              <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:6px; background:#0284c7; color:white; padding:4px 10px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">GPS Hôtel</a>
+              <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:6px; background:#0284c7; color:white; padding:4px 10px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">GPS Hébergement</a>
             </div>
           `);
           mapMarkers.push(marker);

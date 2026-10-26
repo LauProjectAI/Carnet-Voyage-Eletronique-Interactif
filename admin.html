@@ -274,7 +274,7 @@
       <button onclick="switchAdminTab('itinerary')"><i class="fa-solid fa-route"></i> Programme (Jours)</button>
       <button onclick="switchAdminTab('driver')"><i class="fa-solid fa-bus"></i> Dossier Conducteur (Pro)</button>
       <button onclick="switchAdminTab('documents')"><i class="fa-solid fa-ticket"></i> Billets & Documents</button>
-      <button onclick="switchAdminTab('hotels')"><i class="fa-solid fa-hotel"></i> Hôtels</button>
+      <button onclick="switchAdminTab('hotels')"><i class="fa-solid fa-bed"></i> Hébergement</button>
       <button onclick="switchAdminTab('freetime')"><i class="fa-solid fa-compass"></i> Suggestions</button>
       <button onclick="switchAdminTab('concierge')"><i class="fa-solid fa-bell-concierge"></i> Conciergerie IA</button>
       <button onclick="switchAdminTab('contacts')"><i class="fa-solid fa-phone"></i> Contacts & Pratique</button>
@@ -426,7 +426,7 @@
         <div class="section-box" style="border-left:4px solid #10b981; margin-bottom:20px;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; flex-wrap:wrap; gap:8px;">
             <h4 style="font-size:1rem; font-weight:800; color:#1e293b; margin:0; display:flex; align-items:center; gap:8px;">
-              <i class="fa-solid fa-bed" style="color:#10b981;"></i> 2. Rooming List des Hôtels
+              <i class="fa-solid fa-bed" style="color:#10b981;"></i> 2. Rooming List (Hébergement)
             </h4>
             <div style="display:flex; gap:6px; flex-wrap:wrap;">
               <button type="button" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" onclick="document.getElementById('adm-driver-rooming-data-upload').click()" title="Importer les chambres depuis un fichier PDF, CSV, Excel ou texte">
@@ -517,9 +517,9 @@
       <!-- 3. HOTELS -->
       <div id="adm-sec-hotels" class="admin-section" style="display:none;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
-          <h3 style="font-size:1.1rem; color:var(--primary-dark);">3. Hébergements & Hôtels</h3>
+          <h3 style="font-size:1.1rem; color:var(--primary-dark);"><i class="fa-solid fa-bed" style="color:var(--accent-gold); margin-right:6px;"></i> 3. Hébergement (Hôtels ou Navire)</h3>
           <button type="button" onclick="addNewHotel()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
-            <i class="fa-solid fa-plus"></i> Ajouter un hôtel
+            <i class="fa-solid fa-plus"></i> Ajouter un hébergement
           </button>
         </div>
         <div id="adm-hotels-list"></div>
