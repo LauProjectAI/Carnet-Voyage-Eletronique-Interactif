@@ -746,6 +746,26 @@
       </div>
 
       <div style="padding:20px; overflow-y:auto; flex:1; background:#f8fafc;">
+        <!-- SÉLECTEUR DE PROFIL DU VOYAGE AVANT IMPORT -->
+        <div style="background:#fffbeb; border:1px solid #fde68a; border-radius:12px; padding:12px 16px; margin-bottom:16px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; flex-wrap:wrap; gap:6px;">
+            <label for="pdf-import-profile-select" style="font-size:0.85rem; font-weight:800; color:#92400e; display:flex; align-items:center; gap:8px; margin:0;">
+              <i class="fa-solid fa-layer-group" style="color:#d97706;"></i> Profil du voyage à importer :
+            </label>
+            <span style="font-size:0.75rem; background:#fef3c7; color:#b45309; padding:2px 8px; border-radius:6px; font-weight:700;">Modifiable avant et après import</span>
+          </div>
+          <select id="pdf-import-profile-select" class="form-control" style="font-size:0.85rem; font-weight:700; background:white; border-color:#f59e0b; padding:8px 12px; color:#1e293b;">
+            <option value="guided" selected>🧭 Circuit Accompagné / Terrestre (Hôtels terrestres, étapes, autocar/avion, conciergerie temps libre)</option>
+            <option value="cruise">🚢 Croisière (Maritime ou fluviale, plans des ponts, cabines, vie de bord)</option>
+            <option value="full">🏙️ Séjour Libre / City-Break (Conciergerie complète de la ville)</option>
+            <option value="disabled">🚫 100% Guidé sans aucun temps libre (Conciergerie totalement masquée)</option>
+            <option value="auto">🔍 Détection automatique (selon le contenu du document)</option>
+          </select>
+          <small style="color:#78350f; font-size:0.75rem; display:block; margin-top:6px; line-height:1.4;">
+            💡 <strong>Conseil :</strong> Pour un circuit terrestre (Mexique, USA, Dolomites, trains suisses...), sélectionnez « Circuit Accompagné ». Ainsi, même si le texte mentionne une balade en barque ou en bateau, le carnet ne sera jamais confondu avec une croisière !
+          </small>
+        </div>
+
         <!-- Zone de dépôt / sélection fichier PDF -->
         <div id="pdf-drop-zone" style="border:2px dashed #cbd5e1; border-radius:14px; padding:28px 20px; text-align:center; background:white; cursor:pointer; margin-bottom:16px; transition:border-color 0.2s;" onclick="document.getElementById('pdf-file-input').click()">
           <i class="fa-solid fa-cloud-arrow-up" style="font-size:2.4rem; color:#dc2626; margin-bottom:10px;"></i>
@@ -777,6 +797,17 @@
             <i class="fa-solid fa-circle-check" style="color:#16a34a;"></i> Résumé du circuit détecté :
           </h4>
           <div id="pdf-preview-summary" style="font-size:0.82rem; color:#475569; line-height:1.5;"></div>
+          <div style="margin-top:12px; padding:10px 14px; background:#f1f5f9; border-radius:10px; border:1px solid #cbd5e1; display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
+            <div style="font-size:0.8rem; font-weight:700; color:#1e293b; display:flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-arrows-rotate" style="color:#0284c7;"></i> Profil appliqué pour ce carnet :
+            </div>
+            <select id="pdf-preview-profile-select" class="form-control" style="font-size:0.8rem; font-weight:700; width:auto; min-width:240px; padding:5px 10px; background:white;" onchange="onParsedProfilePreviewChange(this.value)">
+              <option value="guided">🧭 Circuit Accompagné / Terrestre</option>
+              <option value="cruise">🚢 Croisière</option>
+              <option value="full">🏙️ Séjour Libre / City-Break</option>
+              <option value="disabled">🚫 100% Guidé sans temps libre</option>
+            </select>
+          </div>
         </div>
       </div>
 

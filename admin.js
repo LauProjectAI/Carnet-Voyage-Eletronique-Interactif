@@ -5311,12 +5311,57 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
 }
 
 // Moteur heuristique d'analyse et de structuration du programme Girardot
+// -----------------------------------------------------------------------------
+// EXTRACTION DES INFOS PRATIQUES DE DESTINATION (CIRCUITS TERRESTRES)
+// -----------------------------------------------------------------------------
+function extractDestinationPracticalInfoFromText(text) {
+  const sections = [
+    { title: "Monnaie & Devises", icon: "coins", field: "money", patterns: [/(?:^|\n)\s*Monnaie(?:\s*nationale|\s*locale)?\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i, /(?:^|\n)\s*Devises?\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] },
+    { title: "Électricité & Prises", icon: "plug", field: "electricity", patterns: [/(?:^|\n)\s*[EÉ]lectricit[ée]\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i, /(?:^|\n)\s*Prises?\s*[\n:]+([^\n]+(?:\n[^\n]+){0,2})/i] },
+    { title: "Décalage horaire", icon: "clock", field: "timezone", patterns: [/(?:^|\n)\s*D[ée]calage horaire\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
+    { title: "Climat & Météo", icon: "cloud-sun", field: "climate", patterns: [/(?:^|\n)\s*Climat\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
+    { title: "Vêtements & Valise", icon: "suitcase-rolling", field: "clothing", patterns: [/(?:^|\n)\s*Valise\s*\n+([^\n]+(?:\n[^\n]+){0,5})/i, /(?:^|\n)\s*V[êe]tements?(?:\s*conseill[ée]s)?\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
+    { title: "Pourboires", icon: "hand-holding-dollar", field: "tips", patterns: [/(?:^|\n)\s*Pourboires?\s*\n+(?:Suggestions pour les pourboires\s*:\s*)?([^\n]+(?:\n[^\n]+){0,4})/i, /Les pourboires sont laiss[ée]s [àa] discr[ée]tion[\s\S]*?(?=\n\n|\.\s+[A-Z]|$)/i] },
+    { title: "Santé & Alimentation", icon: "shield-heart", field: "health", patterns: [/(?:^|\n)\s*Sant[ée]\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i, /(?:^|\n)\s*Cuisine\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
+    { title: "Téléphone & Réseau", icon: "phone", field: "phone", patterns: [/(?:^|\n)\s*T[ée]l[ée]phone\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] },
+    { title: "Formalités d'entrée", icon: "passport", field: "formalities", patterns: [/(?:^|\n)\s*Formalit[ée]s(?:\s*indispensables)?\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] }
+  ];
+
+  const tipsList = [];
+  const practicalInfo = {};
+
+  sections.forEach(sec => {
+    let matchedText = "";
+    for (const pat of sec.patterns) {
+      const m = text.match(pat);
+      if (m) {
+        matchedText = (m[1] || m[0]).trim().replace(/\r?\n+/g, ' ');
+        break;
+      }
+    }
+    if (matchedText) {
+      practicalInfo[sec.field] = matchedText;
+      tipsList.push({
+        title: sec.title,
+        icon: sec.icon,
+        content: matchedText
+      });
+    }
+  });
+
+  return { tipsList, practicalInfo };
+}
+
 function processExtractedTextToTrip(text, sourceName) {
   const statusEl = document.getElementById('pdf-import-status');
   const previewBox = document.getElementById('pdf-preview-container');
   const previewSummary = document.getElementById('pdf-preview-summary');
   const btnDownload = document.getElementById('btn-download-parsed-json');
   const btnApply = document.getElementById('btn-apply-parsed-trip');
+
+  // Choix explicite du profil avant import
+  const profileSelect = document.getElementById('pdf-import-profile-select');
+  const chosenProfile = profileSelect ? profileSelect.value : 'guided';
 
   const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
 
@@ -5354,21 +5399,6 @@ function processExtractedTextToTrip(text, sourceName) {
     detectedTitle = detectedTitle.replace(/(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}.*$/i, '').trim();
   }
 
-  // Détection automatique : Croisière maritime/fluviale vs Circuit Terrestre
-  const isCruise = /croisi[eè]re|bateau|navire|\bpaquebot\b|\bà bord du\b|\ba bord du\b|\bcosta\b|\bmsc\b|\bcroisieurope\b|\bponant\b|\bhurtigruten\b|\bgrands espaces\b|\bpolarfront\b|\bvoyages d'exception\b|\bfluviale?\b|\bms\s+[a-zà-ÿ]+/i.test(text);
-  let detectedShip = "";
-  if (isCruise) {
-    const shipMatch = text.match(/(?:à bord du|a bord du|navire amiral de|navire|bateau)\s+([A-ZÀ-Ý][\w\s'-]{2,25})(?=[!\r\n,•|]|$)/i)
-                   || text.match(/(?:Votre bateau[\s\r\n]+(?:sous réserve de modification[\s\r\n]+)?(?:Données non contractuelles[\s\r\n]+)?)([A-ZÀ-Ý][\w\s'-]{2,25})/i)
-                   || text.match(/\b(Costa\s+[A-ZÀ-Ý][a-zà-ÿ]+|MSC\s+[A-ZÀ-Ý][a-zà-ÿ]+|CroisiEurope\s+[A-ZÀ-Ý][a-zà-ÿ]+|MS\s+[A-ZÀ-Ý][a-zà-ÿ]+|Le\s+Boréal|L'Austral|Le\s+Soléal|Le\s+Lyrial|Le\s+Commandant\s+Charcot|Le\s+Polarfront|Polarfront|Le\s+Nanook|Ocean\s+Nova)\b/i);
-    if (shipMatch) {
-      detectedShip = shipMatch[1].split(/\r?\n|!|[•|]/)[0].trim();
-    }
-    if (!detectedShip && detectedSubtitle && /à bord du\s+([^|]+)/i.test(detectedSubtitle)) {
-      detectedShip = detectedSubtitle.match(/à bord du\s+([^|]+)/i)[1].trim();
-    }
-  }
-
   if (!detectedTitle && sourceName && !sourceName.toLowerCase().includes("programme importé")) {
     detectedTitle = sourceName.replace(/\.pdf$/i, "").replace(/[_-]/g, " ").trim();
   }
@@ -5398,132 +5428,74 @@ function processExtractedTextToTrip(text, sourceName) {
     "gibraltar": { city: "Gibraltar (Royaume-Uni)", lat: 36.1408, lng: -5.3536 },
     "malaga": { city: "Malaga (Espagne)", lat: 36.7213, lng: -4.4214 },
     "seville": { city: "Séville (Espagne)", lat: 37.3891, lng: -5.9845 },
-    "séville": { city: "Séville (Espagne)", lat: 37.3891, lng: -5.9845 },
-    "valence": { city: "Valence (Espagne)", lat: 39.4699, lng: -0.3763 },
-    "valencia": { city: "Valence (Espagne)", lat: 39.4699, lng: -0.3763 },
-    "savone": { city: "Savone", lat: 44.3079, lng: 8.4811 },
-    "gênes": { city: "Gênes", lat: 44.4056, lng: 8.9463 },
-    "genes": { city: "Gênes", lat: 44.4056, lng: 8.9463 },
-    "cagliari": { city: "Cagliari (Sardaigne)", lat: 39.2238, lng: 9.1217 },
-    "palerme": { city: "Palerme (Sicile)", lat: 38.1157, lng: 13.3615 },
-    "civitavecchia": { city: "Civitavecchia / Rome", lat: 42.0924, lng: 11.7955 },
-    "rome": { city: "Rome", lat: 41.9028, lng: 12.4964 },
-    "naples": { city: "Naples (Italie)", lat: 40.8518, lng: 14.2681 },
-    "ajaccio": { city: "Ajaccio (Corse)", lat: 41.9192, lng: 8.7386 },
-    "toulon": { city: "Toulon (France)", lat: 43.1242, lng: 5.9280 },
-    "nice": { city: "Nice (France)", lat: 43.7102, lng: 7.2620 },
-    "palma": { city: "Palma de Majorque", lat: 39.5696, lng: 2.6502 },
-    "ibiza": { city: "Ibiza", lat: 38.9067, lng: 1.4206 },
-    "lisbonne": { city: "Lisbonne (Portugal)", lat: 38.7223, lng: -9.1393 },
-    "funchal": { city: "Funchal (Madère)", lat: 32.6500, lng: -16.9089 },
-    "madere": { city: "Funchal (Madère)", lat: 32.6500, lng: -16.9089 },
-    "madère": { city: "Funchal (Madère)", lat: 32.6500, lng: -16.9089 },
-    "tenerife": { city: "Santa Cruz de Tenerife", lat: 28.4636, lng: -16.2518 },
-    "las palmas": { city: "Las Palmas (Canaries)", lat: 28.1235, lng: -15.4363 },
-    "heraklion": { city: "Héraklion (Crète)", lat: 35.3387, lng: 25.1442 },
-    "santorin": { city: "Santorin (Grèce)", lat: 36.3932, lng: 25.4615 },
-    "mykonos": { city: "Mykonos (Grèce)", lat: 37.4467, lng: 25.3289 },
-    "piree": { city: "Athènes / Le Pirée", lat: 37.9429, lng: 23.6469 },
-    "pirée": { city: "Athènes / Le Pirée", lat: 37.9429, lng: 23.6469 },
-    "athenes": { city: "Athènes", lat: 37.9838, lng: 23.7275 },
-    "athènes": { city: "Athènes", lat: 37.9838, lng: 23.7275 },
-    "corfou": { city: "Corfou (Grèce)", lat: 39.6243, lng: 19.9217 },
-    "dubrovnik": { city: "Dubrovnik (Croatie)", lat: 42.6507, lng: 18.0944 },
-    "split": { city: "Split (Croatie)", lat: 43.5081, lng: 16.4402 },
-    "venise": { city: "Venise (Italie)", lat: 45.4408, lng: 12.3155 },
-    "trieste": { city: "Trieste (Italie)", lat: 45.6495, lng: 13.7768 },
-    "bari": { city: "Bari (Italie)", lat: 41.1171, lng: 16.8719 },
-    "malte": { city: "La Valette (Malte)", lat: 35.8989, lng: 14.5146 },
-    "valette": { city: "La Valette (Malte)", lat: 35.8989, lng: 14.5146 },
-    "tunis": { city: "Tunis / La Goulette", lat: 36.8189, lng: 10.3050 }
+    "savone": { city: "Savone (Italie)", lat: 44.3079, lng: 8.4811 },
+    "palerme": { city: "Palerme (Italie)", lat: 38.1157, lng: 13.3615 },
+    "cagliari": { city: "Cagliari (Italie)", lat: 39.2238, lng: 9.1217 },
+    "civitavecchia": { city: "Civitavecchia / Rome (Italie)", lat: 42.0924, lng: 11.7954 },
+    "genes": { city: "Gênes (Italie)", lat: 44.4056, lng: 8.9463 },
+    "naples": { city: "Naples (Italie)", lat: 40.8518, lng: 14.2681 }
   };
-
-  let inItinerarySection = false;
 
   for (let i = 0; i < rawLines.length; i++) {
     const line = rawLines[i];
     const lowerLine = line.toLowerCase();
 
-    // Arrêt si on atteint la fin du programme
-    if (itinerary.length > 0 && stopKeywords.some(sk => lowerLine.startsWith(sk) || lowerLine.includes(sk))) {
-      if (currentDay) {
-        itinerary.push(currentDay);
-        currentDay = null;
-      }
+    if (stopKeywords.some(kw => lowerLine.startsWith(kw))) {
       break;
     }
 
-    const match = line.match(dayHeaderRegex);
-    if (match) {
-      inItinerarySection = true;
+    const matchDay = line.match(dayHeaderRegex);
+    if (matchDay) {
       if (currentDay) {
         itinerary.push(currentDay);
       }
-      const dayNum = parseInt(match[1], 10);
-      let dayTitle = (match[2] || "").trim();
-      
-      if (!dayTitle) {
-        dayTitle = `Étape Jour ${dayNum}`;
+
+      const dayNum = parseInt(matchDay[1], 10);
+      let dayTitle = (matchDay[2] || "").trim();
+
+      if (!dayTitle && i + 1 < rawLines.length && !dayHeaderRegex.test(rawLines[i + 1])) {
+        dayTitle = rawLines[i + 1];
+        i++;
       }
 
-      let dayCity = extractProbableCity(dayTitle);
-      let dayLat = 0, dayLng = 0;
-      const lowerDayTitle = dayTitle.toLowerCase();
+      let probCity = extractProbableCity(dayTitle);
+      let probLat = 0;
+      let probLng = 0;
 
-      if (lowerDayTitle.includes("plaisirs en mer") || lowerDayTitle.includes("en mer")) {
-        dayCity = "Plaisirs en mer";
-        if (dayNum <= 4) {
-          dayLat = 38.5000;
-          dayLng = 1.5000;
-        } else {
-          dayLat = 39.5000;
-          dayLng = 3.5000;
-        }
-      } else {
-        for (const [key, info] of Object.entries(knownPortCoordinates)) {
-          if (lowerDayTitle.includes(key)) {
-            dayCity = info.city;
-            dayLat = info.lat;
-            dayLng = info.lng;
-            break;
-          }
+      const normTitle = dayTitle.toLowerCase();
+      for (const [portKey, portData] of Object.entries(knownPortCoordinates)) {
+        if (normTitle.includes(portKey)) {
+          probCity = portData.city;
+          probLat = portData.lat;
+          probLng = portData.lng;
+          break;
         }
       }
 
       currentDay = {
         day: dayNum,
-        title: `Jour ${dayNum} • ${dayTitle.replace(/^(?:Jour\s*\d+\s*[•:\-–—"'«»]\s*)/i, '')}`,
-        highlight: dayTitle.replace(/^(?:Jour\s*\d+\s*[•:\-–—"'«»]\s*)/i, ''),
-        city: dayCity,
-        dateStr: `Jour ${dayNum}`,
+        title: dayTitle || `Étape Jour ${dayNum}`,
+        city: probCity,
+        lat: probLat,
+        lng: probLng,
+        highlight: dayTitle,
         description: "",
-        lat: dayLat,
-        lng: dayLng,
+        weather: "",
+        dateStr: "",
         timeline: []
       };
-      continue;
-    }
-
-    if (inItinerarySection && currentDay) {
-      const timeMatch = line.match(/(?:^|\b)(\d{1,2}[h:]\d{2})\b[:\s\-–—]*(.*)/i);
-      const bulletMatch = line.match(/^[•\-\*]\s*(.+)/);
-
-      if (timeMatch) {
-        const timeStr = timeMatch[1].replace('h', ':');
-        const descStr = timeMatch[2] ? timeMatch[2].trim() : "Visite et découverte";
-        currentDay.timeline.push({
-          time: timeStr.length === 4 ? '0' + timeStr : timeStr,
-          title: descStr.slice(0, 50) || "Visite programmée",
-          subtitle: descStr,
-          icon: detectIconForText(descStr)
-        });
-      } else if (bulletMatch && bulletMatch[1].length > 4) {
-        currentDay.timeline.push({
-          time: "Excursion",
-          title: bulletMatch[1].slice(0, 50),
-          subtitle: bulletMatch[1],
-          icon: detectIconForText(bulletMatch[1])
-        });
+    } else if (currentDay) {
+      if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
+        const visitTitle = line.replace(/^[•\-\*]\s*/, '').trim();
+        if (visitTitle.length > 2) {
+          const itemTime = 9 + currentDay.timeline.length * 2;
+          currentDay.timeline.push({
+            time: `${itemTime < 10 ? '0' : ''}${itemTime}:00`,
+            title: visitTitle,
+            subtitle: "Visite ou temps fort au programme.",
+            icon: detectIconForText(visitTitle)
+          });
+        }
       } else {
         currentDay.description += (currentDay.description ? " " : "") + line;
       }
@@ -5534,7 +5506,6 @@ function processExtractedTextToTrip(text, sourceName) {
     itinerary.push(currentDay);
   }
 
-  // Découper les descriptions longues en timeline chronologique si aucune visite n'a été trouvée
   itinerary.forEach(d => {
     if (!d.timeline || d.timeline.length === 0) {
       const sentences = (d.description || "").split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
@@ -5604,6 +5575,43 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
+  // 4. Détermination Intelligente du Profil & Croisière vs Circuit Terrestre
+  let isCruise = false;
+  let conciergeMode = 'guided';
+
+  const shipMatch = text.match(/(?:à bord du|a bord du|navire amiral de|navire|bateau)\s+([A-ZÀ-Ý][\w\s'-]{2,25})(?=[!\r\n,•|]|$)/i)
+                 || text.match(/(?:Votre bateau[\s\r\n]+(?:sous réserve de modification[\s\r\n]+)?(?:Données non contractuelles[\s\r\n]+)?)([A-ZÀ-Ý][\w\s'-]{2,25})/i)
+                 || text.match(/\b(Costa\s+[A-ZÀ-Ý][a-zà-ÿ]+|MSC\s+[A-ZÀ-Ý][a-zà-ÿ]+|CroisiEurope\s+[A-ZÀ-Ý][a-zà-ÿ]+|MS\s+[A-ZÀ-Ý][a-zà-ÿ]+|Le\s+Boréal|L'Austral|Le\s+Soléal|Le\s+Lyrial|Le\s+Commandant\s+Charcot|Le\s+Polarfront|Polarfront|Le\s+Nanook|Ocean\s+Nova)\b/i);
+  let detectedShip = "";
+  if (shipMatch) {
+    detectedShip = shipMatch[1].split(/\r?\n|!|[•|]/)[0].trim();
+  }
+  if (!detectedShip && detectedSubtitle && /à bord du\s+([^|]+)/i.test(detectedSubtitle)) {
+    detectedShip = detectedSubtitle.match(/à bord du\s+([^|]+)/i)[1].trim();
+  }
+
+  if (chosenProfile === 'cruise') {
+    isCruise = true;
+    conciergeMode = 'cruise';
+  } else if (chosenProfile === 'guided' || chosenProfile === 'full' || chosenProfile === 'disabled') {
+    isCruise = false;
+    conciergeMode = chosenProfile;
+  } else {
+    // Mode 'auto' : détection contextuelle rigoureuse
+    const titleHasCruise = /croisi[eè]re/i.test(detectedTitle || "") || /croisi[eè]re/i.test(detectedSubtitle || "");
+    const explicitShipPattern = /(?:à bord du|a bord du)\s+(?:Costa|MSC|CroisiEurope|Ponant|Hurtigruten|MS\s+|Le\s+Boréal|L'Austral|Le\s+Soléal|Le\s+Lyrial|Le\s+Commandant|Polarfront|Ocean\s+Nova)/i;
+    const shipSpecsPattern = /(?:Votre bateau[\s\S]{0,120}?(?:Dimensions|Capacité|Ponts|Tonnage|Tirant d'eau))/i;
+    const hasManyTerrestrialHotels = (hotels && hotels.length >= 2);
+
+    if (titleHasCruise || (!hasManyTerrestrialHotels && (explicitShipPattern.test(text) || shipSpecsPattern.test(text)))) {
+      isCruise = true;
+      conciergeMode = 'cruise';
+    } else {
+      isCruise = false;
+      conciergeMode = 'guided';
+    }
+  }
+
   // Fallback hébergement croisière si aucun hôtel terrestre
   if (isCruise && hotels.length === 0) {
     hotels.push({
@@ -5618,11 +5626,9 @@ function processExtractedTextToTrip(text, sourceName) {
     });
   }
 
-  // 4. Détection des Contacts (Accompagnatrice, Guide local, Réceptif & Assistance)
+  // 5. Contacts (Accompagnatrice, Guide local, Réceptif & Assistance)
   const contactsList = [];
-
-  // A. Accompagnatrice Girardot (ligne unique, sans capturer les paragraphes suivants)
-  const accompMatch = text.match(/Votre accompagnatrice(?:\s*Voyages Girardot)?\s*\n+\s*([A-ZÀ-Ý][a-zà-ÿ]+)/i);
+  const accompMatch = text.match(/Votre accompagnatrice(?:\s*(?:Voyages\s+)?Girardot)?\s*\n+\s*([A-ZÀ-Ý][a-zà-ÿ]+)/i);
   let accompName = "";
   if (accompMatch) {
     accompName = accompMatch[1].trim();
@@ -5642,77 +5648,52 @@ function processExtractedTextToTrip(text, sourceName) {
     });
   }
 
-  if (isCruise) {
+  // Guide local terrestre
+  const guideMatch = text.match(/Votre guide local\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
+  if (guideMatch && !isCruise) {
     contactsList.push({
-      category: "Réception & Guest Service Navire",
-      name: `Réception ${detectedShip || "Costa Diadema"} (Pont 3 / Atrium Eliodoro)`,
-      phone: "Poste Réception ou Urgence Cabine",
-      address: `À bord du ${detectedShip || "Costa Diadema"} - Disponible 24h/24`,
-      isEmergency: true
+      category: "Guide Local",
+      name: guideMatch[1].trim().split('\n')[0].trim(),
+      phone: guideMatch[2] ? guideMatch[2].trim() : "",
+      address: "Guide local francophone",
+      isEmergency: false
     });
-    contactsList.push({
-      category: "Centre Médical & Infirmerie du Bord",
-      name: `Infirmerie & Médecin de bord (${detectedShip || "Costa Diadema"})`,
-      phone: "Appel d'urgence depuis votre cabine",
-      address: "Pont 1 Timone (Accès direct ascenseurs)",
-      isEmergency: true
-    });
-    contactsList.push({
-      category: "Assistance Girardot 24h/7j",
-      name: "Permanence Urgences Voyages Girardot",
-      phone: "03 85 42 82 50",
-      address: "Chalon-sur-Saône, France",
-      isEmergency: true
-    });
-  } else {
-    // Guide local terrestre
-    const guideMatch = text.match(/Votre guide local\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
-    if (guideMatch) {
-      contactsList.push({
-        category: "Guide Local",
-        name: guideMatch[1].trim().split('\n')[0].trim(),
-        phone: guideMatch[2] ? guideMatch[2].trim() : "",
-        address: "Guide local francophone",
-        isEmergency: false
-      });
-    }
+  }
 
-    // Réceptif terrestre
-    const receptifMatch = text.match(/(?:Correspondant local|R[ée]ceptif local|En France|Vos contacts)\s*[–-]?\s*([A-ZÀ-Ý\s&’']+)?\s*:\s*([\s\S]*?)(?=(?:Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i);
-    if (receptifMatch) {
-      const rawContactBlock = receptifMatch[2].slice(0, 450);
-      const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
-      const mainPhone = phones[0] || "";
-      const contactNameMatch = rawContactBlock.match(/(?:Mme|M\.)\s+([A-Za-zÀ-Ý\s-]+)/);
-      const contactName = contactNameMatch ? contactNameMatch[0] : (receptifMatch[1] || "Correspondant Réceptif Local");
-
-      contactsList.push({
-        category: "Correspondant Réceptif & Urgence",
-        name: contactName.trim().split('\n')[0].trim(),
-        phone: mainPhone,
-        address: "Assistance locale 24h/24",
-        isEmergency: true
-      });
-    }
+  // Réceptif terrestre
+  const receptifMatch = text.match(/(?:Correspondant local|R[ée]ceptif local|En France|Au Mexique|À l[’']étranger|A l[’']etranger|Vos contacts)\s*[–-]?\s*([A-ZÀ-Ý\s&’']+)?\s*:\s*([\s\S]*?)(?=(?:Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i);
+  if (receptifMatch && !isCruise) {
+    const rawContactBlock = receptifMatch[2].slice(0, 450);
+    const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
+    const mainPhone = phones[0] || "";
+    const contactNameMatch = rawContactBlock.match(/(?:Mme|M\.)\s+([A-Za-zÀ-Ý\s-]+)/);
+    const contactName = contactNameMatch ? contactNameMatch[0] : (receptifMatch[1] || "Correspondant Réceptif Local");
 
     contactsList.push({
-      category: "Assistance Girardot 24h/7j",
-      name: "Permanence Urgences Girardot",
-      phone: "03 85 42 82 50",
-      address: "Chalon-sur-Saône, France",
+      category: "Correspondant Réceptif & Urgence",
+      name: contactName.trim().split('\n')[0].trim(),
+      phone: mainPhone,
+      address: "Assistance locale 24h/24",
       isEmergency: true
     });
   }
 
-  // 5. Détection des Vols (Aller / Retour avec numéros de vol, dates, aéroports, horaires)
+  contactsList.push({
+    category: "Assistance Girardot 24h/7j",
+    name: "Permanence Urgences Girardot",
+    phone: "03 85 42 82 50",
+    address: "Chalon-sur-Saône, France",
+    isEmergency: true
+  });
+
+  const landContactsCopy = JSON.parse(JSON.stringify(contactsList));
+
+  // 6. Détection des Vols (Aller / Retour)
   const flightsList = [];
-  
-  // Bloc Aller
   const outboundMatch = text.match(/Aller\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})([\s\S]*?)(?=Retour|$)/i);
   if (outboundMatch) {
     const outDate = outboundMatch[1];
     const outBlock = outboundMatch[2];
-
     const depAero = (outBlock.match(/D[ée]collage de l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
     const arrAero = (outBlock.match(/A l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
     const flightNum = (outBlock.match(/N°\s*de vol\s*:\s*(.*)/i) || [])[1] || "";
@@ -5737,12 +5718,10 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
-  // Bloc Retour
   const inboundMatch = text.match(/Retour\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})([\s\S]*?)(?=Nous attirons|Bagages|Jour 1|$)/i);
   if (inboundMatch) {
     const inDate = inboundMatch[1];
     const inBlock = inboundMatch[2];
-
     const depAero = (inBlock.match(/D[ée]collage de l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
     const arrAero = (inBlock.match(/A l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
     const flightNum = (inBlock.match(/N°\s*de vol\s*:\s*(.*)/i) || [])[1] || "";
@@ -5766,28 +5745,7 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
-  // Pour les croisières : supprimer absolument tout faux vol générique
-  if (isCruise) {
-    const realCruiseFlights = flightsList.filter(f => f.flightNumber || (f.departureAirport && f.arrivalAirport && f.departureAirport !== 'Paris' && f.arrivalAirport !== detectedTitle));
-    flightsList.length = 0;
-    realCruiseFlights.forEach(f => flightsList.push(f));
-  } else if (flightsList.length === 0 && text.match(/\b(?:vol\s+n[°o]|vol\s+spécial|compagnie\s+aérienne|envol\s+pour|décollage\s+de)\b/i)) {
-    // Si circuit terrestre avec mentions claires de vol
-    flightsList.push({
-      type: "Aller",
-      airline: "Compagnie régulière",
-      flightNumber: "",
-      departureAirport: "Paris",
-      departureTime: "",
-      arrivalAirport: detectedTitle,
-      arrivalTime: "",
-      date: "Jour 1",
-      via: "",
-      notes: ""
-    });
-  }
-
-  // 6. Objet Voyage Final
+  // 7. Objet Voyage Final
   const newTripId = 'voyage-' + Date.now();
   currentParsedTrip = {
     id: newTripId,
@@ -5800,7 +5758,7 @@ function processExtractedTextToTrip(text, sourceName) {
     intro: text.slice(0, 320) + "...",
     alert: {
       title: "Formalités indispensables",
-      text: "Passeport ou pièce d'identité en cours de validité (selon exigences de la destination). Vérifiez vos dates de validité.",
+      text: "Passeport ou pièce d'identité en cours de validité. Vérifiez vos dates de validité.",
       link: ""
     },
     flightsList: flightsList,
@@ -5825,9 +5783,15 @@ function processExtractedTextToTrip(text, sourceName) {
       roomingList: [],
       roomingFileUrl: "",
       passengersList: []
-    }
+    },
+    _rawImportedText: text,
+    _landContactsList: landContactsCopy,
+    _detectedShip: detectedShip,
+    _accompName: accompName,
+    conciergeMode: conciergeMode
   };
 
+  // Traitement Croisière vs Circuit Terrestre
   if (isCruise) {
     currentParsedTrip.isCruise = true;
     const cruiseInfo = (typeof detectCruiseLineAndShip === 'function')
@@ -5837,82 +5801,58 @@ function processExtractedTextToTrip(text, sourceName) {
     currentParsedTrip.shipName = detectedShip || cruiseInfo.shipName || "Costa Diadema";
     currentParsedTrip.cruiseCompany = cruiseInfo.companyName;
     currentParsedTrip.cruiseCategory = cruiseInfo.category;
-    currentParsedTrip.decks = getCruiseShipDecks(currentParsedTrip.shipName, text);
-    currentParsedTrip.conciergerie = buildCruiseConciergerie(currentParsedTrip.shipName, itinerary, text);
+    currentParsedTrip.decks = (typeof getCruiseShipDecks === 'function') ? getCruiseShipDecks(currentParsedTrip.shipName, text) : [];
+    currentParsedTrip.conciergerie = (typeof buildCruiseConciergerie === 'function') ? buildCruiseConciergerie(currentParsedTrip.shipName, itinerary, text) : null;
 
-    if (cruiseInfo.isPolar) {
-      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1517411032315-54ef2cb783bb?auto=format&fit=crop&w=1200&q=80";
-      currentParsedTrip.alert = {
-        title: "Équipements Polaires & Formalités",
-        text: "Passeport individuel valide 6 mois après retour. Parkas et bottes thermiques Muck Boots fournies à bord pour les sorties en Zodiacs.",
-        link: ""
-      };
-    } else if (cruiseInfo.isRiver) {
-      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1506973035872-a4ec16b8e8d9?auto=format&fit=crop&w=1200&q=80";
-      currentParsedTrip.alert = {
-        title: "Formalités & Embarquement Fluvial",
-        text: "Carte nationale d'identité ou passeport en cours de validité. Présentation des bons de voyage Girardot lors de l'embarquement à quai.",
-        link: ""
-      };
-    } else if (cruiseInfo.line === 'ponant') {
-      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=1200&q=80";
-      currentParsedTrip.alert = {
-        title: "Fiche Médicale & Formalités Ponant",
-        text: "Passeport valide et questionnaire médical d'embarquement obligatoire à compléter avant le départ.",
-        link: "https://www.ponant.com"
-      };
-    } else {
-      currentParsedTrip.coverImage = "https://images.unsplash.com/photo-1548574505-5e239809ee19?auto=format&fit=crop&w=1200&q=80";
-      currentParsedTrip.alert = {
-        title: "Procédures pré-départ indispensables (Web Check-In)",
-        text: "Effectuez votre enregistrement en ligne (Web Check-In) dès réception de votre numéro de réservation afin de télécharger vos billets de croisière et étiquettes bagages.",
-        link: cruiseInfo.line === 'msc' ? "https://www.msccroisieres.fr" : "https://www.mycosta.com"
-      };
-    }
+    if (typeof getCruisePracticalInfo === 'function') currentParsedTrip.practicalInfo = getCruisePracticalInfo(currentParsedTrip.shipName, text);
+    if (typeof getCruisePracticalTips === 'function') currentParsedTrip.practicalTipsList = getCruisePracticalTips(currentParsedTrip.shipName, text);
+    if (typeof getCruiseContacts === 'function') currentParsedTrip.contactsList = getCruiseContacts(currentParsedTrip.shipName, accompName || "Mireille");
 
-    if (typeof getCruisePracticalInfo === 'function') {
-      currentParsedTrip.practicalInfo = getCruisePracticalInfo(currentParsedTrip.shipName, text);
-    }
-    if (typeof getCruisePracticalTips === 'function') {
-      currentParsedTrip.practicalTipsList = getCruisePracticalTips(currentParsedTrip.shipName, text);
-    }
-    if (typeof getCruiseContacts === 'function') {
-      currentParsedTrip.contactsList = getCruiseContacts(currentParsedTrip.shipName, accompName || "Mireille");
-    }
+    // Supprimer les vols fictifs pour croisière maritime si non explicites
+    const realCruiseFlights = flightsList.filter(f => f.flightNumber || (f.departureAirport && f.arrivalAirport && f.departureAirport !== 'Paris' && f.arrivalAirport !== detectedTitle));
+    currentParsedTrip.flightsList = realCruiseFlights;
+
   } else {
-    currentParsedTrip.practicalTipsList = [
-      {
-        title: "Monnaie & Devises",
-        icon: "coins",
-        content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux."
-      },
-      {
-        title: "Électricité & Prises",
-        icon: "plug",
-        content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité."
-      },
-      {
-        title: "Vêtements conseillés",
-        icon: "shirt",
-        content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car."
-      },
-      {
-        title: "Pourboires indicatifs",
-        icon: "hand-holding-dollar",
-        content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar."
-      },
-      {
-        title: "Connexion Wi-Fi",
-        icon: "wifi",
-        content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit."
-      }
-    ];
+    // CIRCUIT TERRESTRE
+    currentParsedTrip.isCruise = false;
+    currentParsedTrip.shipName = "";
+    currentParsedTrip.decks = [];
+
+    // Extraction des vraies informations pratiques de destination du PDF
+    const destPractical = extractDestinationPracticalInfoFromText(text);
+    if (destPractical.tipsList && destPractical.tipsList.length > 0) {
+      currentParsedTrip.practicalTipsList = destPractical.tipsList;
+      currentParsedTrip.practicalInfo = Object.assign(currentParsedTrip.practicalInfo, destPractical.practicalInfo);
+    } else {
+      currentParsedTrip.practicalTipsList = [
+        { title: "Monnaie & Devises", icon: "coins", content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux." },
+        { title: "Électricité & Prises", icon: "plug", content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité." },
+        { title: "Vêtements conseillés", icon: "shirt", content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car." },
+        { title: "Pourboires indicatifs", icon: "hand-holding-dollar", content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar." },
+        { title: "Connexion Wi-Fi", icon: "wifi", content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit." }
+      ];
+    }
+
+    // Formalités passeport si mentionnées
+    const passMatch = text.match(/Passeport\s+valide[^\n.]+/i);
+    if (passMatch) {
+      currentParsedTrip.alert = {
+        title: "Formalités indispensables",
+        text: passMatch[0].trim(),
+        link: ""
+      };
+    }
+
+    // Conciergerie par défaut standard
+    currentParsedTrip.conciergerie = (window.defaultTravelData && window.defaultTravelData.conciergerie)
+      ? JSON.parse(JSON.stringify(window.defaultTravelData.conciergerie))
+      : { welcomeMessage: "Bienvenue sur votre carnet de voyage Girardot !", themes: [] };
   }
 
   // Synchronisation rétrocompatible des objets flights et contacts
-  if (flightsList.length > 0) {
-    const outF = flightsList.find(f => f.type === 'Aller') || flightsList[0];
-    const inF = flightsList.find(f => f.type === 'Retour') || flightsList[flightsList.length - 1];
+  if (currentParsedTrip.flightsList && currentParsedTrip.flightsList.length > 0) {
+    const outF = currentParsedTrip.flightsList.find(f => f.type === 'Aller') || currentParsedTrip.flightsList[0];
+    const inF = currentParsedTrip.flightsList.find(f => f.type === 'Retour') || currentParsedTrip.flightsList[currentParsedTrip.flightsList.length - 1];
     currentParsedTrip.flights = {
       outbound: {
         airline: outF.airline,
@@ -5941,27 +5881,8 @@ function processExtractedTextToTrip(text, sourceName) {
     currentParsedTrip.flights = null;
   }
 
-  if (isCruise) {
-    currentParsedTrip.contacts = {
-      receptif: {
-        name: `Réception & Guest Service ${detectedShip || "Costa Diadema"}`,
-        emergency: "Urgences cabine ou 03 85 42 82 50",
-        phone: "Poste Réception à bord (24h/24)",
-        address: `À bord du ${detectedShip || "Costa Diadema"}`
-      },
-      guide: {
-        name: accompName || "Mireille",
-        role: "Accompagnatrice Voyages Girardot",
-        phone: ""
-      },
-      agence: {
-        name: "Voyages Girardot",
-        phone: "03 85 42 82 50",
-        email: "contact@voyages-girardot.com"
-      }
-    };
-  } else if (contactsList.length > 0) {
-    const mainRec = contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('urgence')) || contactsList[0];
+  if (currentParsedTrip.contactsList && currentParsedTrip.contactsList.length > 0) {
+    const mainRec = currentParsedTrip.contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('urgence')) || currentParsedTrip.contactsList[0];
     currentParsedTrip.contacts = {
       receptif: {
         name: mainRec.name,
@@ -5982,27 +5903,9 @@ function processExtractedTextToTrip(text, sourceName) {
     };
   }
 
-  // Affichage du résultat dans le modal
-  if (statusEl) {
-    statusEl.style.display = 'block';
-    statusEl.style.borderColor = '#86efac';
-    statusEl.style.background = '#f0fdf4';
-    statusEl.style.color = '#15803d';
-    const cruiseBadge = isCruise ? ` [🚢 Croisière : ${detectedShip || "Navire"}]` : "";
-    statusEl.innerHTML = `<i class="fa-solid fa-check"></i> <strong>Conversion réussie !${cruiseBadge}</strong> ${itinerary.length} étape(s), ${hotels.length} hébergement(s), ${flightsList.length} vol(s) et ${contactsList.length} contact(s) reconnus.`;
-  }
-
-  if (previewBox && previewSummary) {
-    previewBox.style.display = 'block';
-    previewSummary.innerHTML = `
-      <div style="margin-bottom:6px;"><strong>Destination :</strong> ${currentParsedTrip.title} (${currentParsedTrip.subtitle}) ${isCruise ? `<span style="background:#0284c7; color:white; padding:2px 7px; border-radius:4px; font-size:0.75rem; font-weight:bold;"><i class="fa-solid fa-ship"></i> Bateau : ${detectedShip}</span>` : ""}</div>
-      <div style="margin-bottom:6px;"><strong>Dates :</strong> ${currentParsedTrip.dates} • <strong>${itinerary.length} jours au programme</strong></div>
-      <div style="margin-bottom:6px;"><strong>Vols reconnus :</strong> ${flightsList.length > 0 ? flightsList.map(f => `${f.type}: ${f.airline} ${f.flightNumber} (${f.departureAirport} ➔ ${f.arrivalAirport})`).join(' | ') : '<em>Aucun vol requis (croisière maritime)</em>'}</div>
-      <div style="margin-bottom:6px;"><strong>Hébergement :</strong> ${hotels.map(h => `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${h.name} (${h.dates})</span>`).join('')}</div>
-      <div style="margin-bottom:6px;"><strong>Contacts identifiés :</strong> ${contactsList.map(c => `${c.category}: ${c.name} ${c.phone ? `(${c.phone})` : ''}`).join(' | ')}</div>
-      <div><strong>Étapes :</strong> ${itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.highlight || d.title.slice(0, 20)}</span>`).join('')}</div>
-    `;
-  }
+  // Affichage du résultat dans le modal via le helper dédié
+  if (previewBox) previewBox.style.display = 'block';
+  renderParsedTripSummaryInModal();
 
   if (btnDownload) btnDownload.style.display = 'inline-block';
   if (btnApply) btnApply.style.display = 'inline-block';
@@ -6541,8 +6444,50 @@ function populateConciergeMode() {
 function onConciergeModeChange(mode, userInitiated = true) {
   if (tripData) {
     tripData.conciergeMode = mode;
-    if (mode === 'cruise') tripData.isCruise = true;
-    else if (mode === 'guided' || mode === 'full' || mode === 'disabled') tripData.isCruise = false;
+    if (mode === 'cruise') {
+      tripData.isCruise = true;
+      if (!tripData.shipName && tripData._detectedShip) {
+        tripData.shipName = tripData._detectedShip;
+      }
+    } else {
+      tripData.isCruise = false;
+      tripData.shipName = "";
+      tripData.decks = [];
+
+      // Si les infos pratiques actuelles étaient pour une croisière, basculer sur des infos terrestres
+      if (tripData.practicalTipsList && tripData.practicalTipsList.some(t => /croisière|paquebot|cabine|ponts|muster/i.test(t.title + ' ' + t.content))) {
+        if (tripData._rawImportedText) {
+          const destPractical = extractDestinationPracticalInfoFromText(tripData._rawImportedText);
+          if (destPractical.tipsList && destPractical.tipsList.length > 0) {
+            tripData.practicalTipsList = destPractical.tipsList;
+            tripData.practicalInfo = Object.assign(tripData.practicalInfo || {}, destPractical.practicalInfo);
+          }
+        }
+        if (!tripData.practicalTipsList || tripData.practicalTipsList.some(t => /croisière|paquebot/i.test(t.title))) {
+          tripData.practicalTipsList = [
+            { title: "Monnaie & Devises", icon: "coins", content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux." },
+            { title: "Électricité & Prises", icon: "plug", content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité." },
+            { title: "Vêtements conseillés", icon: "shirt", content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car." },
+            { title: "Pourboires indicatifs", icon: "hand-holding-dollar", content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar." },
+            { title: "Connexion Wi-Fi", icon: "wifi", content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit." }
+          ];
+        }
+        if (typeof renderAdminPractical === 'function') renderAdminPractical();
+      }
+
+      // Si les contacts étaient des contacts de bord de croisière
+      if (tripData.contactsList && tripData.contactsList.some(c => /réception\s+costa|guest\s+service|infirmerie/i.test(c.category + ' ' + c.name))) {
+        if (tripData._landContactsList && tripData._landContactsList.length > 0) {
+          tripData.contactsList = JSON.parse(JSON.stringify(tripData._landContactsList));
+        } else {
+          tripData.contactsList = [
+            { category: "Accompagnateur Voyages Girardot", name: "Accompagnateur du circuit", phone: "", address: "Avec le groupe", isEmergency: false },
+            { category: "Assistance Girardot 24h/7j", name: "Permanence Urgences Girardot", phone: "03 85 42 82 50", address: "Chalon-sur-Saône, France", isEmergency: true }
+          ];
+        }
+        if (typeof renderAdminContacts === 'function') renderAdminContacts();
+      }
+    }
   }
 
   const desc = document.getElementById('adm-concierge-mode-desc');
@@ -6572,5 +6517,95 @@ function populateGeminiDaySelector() {
       opt.innerText = `Jour ${d.day} : ${cleanCity}`;
       daySelect.appendChild(opt);
     });
+  }
+}
+
+
+function onParsedProfilePreviewChange(newMode) {
+  if (!currentParsedTrip) return;
+  currentParsedTrip.conciergeMode = newMode;
+  const rawText = currentParsedTrip._rawImportedText || '';
+
+  if (newMode === 'cruise') {
+    currentParsedTrip.isCruise = true;
+    const detectedShip = currentParsedTrip._detectedShip || "Costa Diadema";
+    currentParsedTrip.shipName = detectedShip;
+    currentParsedTrip.decks = (typeof getCruiseShipDecks === 'function') ? getCruiseShipDecks(detectedShip, rawText) : [];
+    currentParsedTrip.conciergerie = (typeof buildCruiseConciergerie === 'function') ? buildCruiseConciergerie(detectedShip, currentParsedTrip.itinerary, rawText) : null;
+    if (typeof getCruisePracticalInfo === 'function') currentParsedTrip.practicalInfo = getCruisePracticalInfo(detectedShip, rawText);
+    if (typeof getCruisePracticalTips === 'function') currentParsedTrip.practicalTipsList = getCruisePracticalTips(detectedShip, rawText);
+    if (typeof getCruiseContacts === 'function') currentParsedTrip.contactsList = getCruiseContacts(detectedShip, currentParsedTrip._accompName || "Mireille");
+  } else {
+    currentParsedTrip.isCruise = false;
+    currentParsedTrip.shipName = "";
+    currentParsedTrip.decks = [];
+
+    // Restaurer les infos pratiques de la destination terrestre
+    const destPractical = extractDestinationPracticalInfoFromText(rawText);
+    if (destPractical.tipsList && destPractical.tipsList.length > 0) {
+      currentParsedTrip.practicalTipsList = destPractical.tipsList;
+      currentParsedTrip.practicalInfo = Object.assign(currentParsedTrip.practicalInfo || {}, destPractical.practicalInfo);
+    } else {
+      currentParsedTrip.practicalTipsList = [
+        { title: "Monnaie & Devises", icon: "coins", content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux." },
+        { title: "Électricité & Prises", icon: "plug", content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité." },
+        { title: "Vêtements conseillés", icon: "shirt", content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car." },
+        { title: "Pourboires indicatifs", icon: "hand-holding-dollar", content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar." },
+        { title: "Connexion Wi-Fi", icon: "wifi", content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit." }
+      ];
+    }
+
+    if (currentParsedTrip._landContactsList && currentParsedTrip._landContactsList.length > 0) {
+      currentParsedTrip.contactsList = JSON.parse(JSON.stringify(currentParsedTrip._landContactsList));
+    }
+  }
+
+  // Mettre à jour le résumé du modal
+  renderParsedTripSummaryInModal();
+}
+
+function renderParsedTripSummaryInModal() {
+  const statusEl = document.getElementById('pdf-import-status');
+  const previewSummary = document.getElementById('pdf-preview-summary');
+  const sel = document.getElementById('pdf-preview-profile-select');
+  if (sel && currentParsedTrip) sel.value = currentParsedTrip.conciergeMode || 'guided';
+
+  if (!currentParsedTrip) return;
+  const isC = currentParsedTrip.isCruise;
+  const mode = currentParsedTrip.conciergeMode;
+
+  let modeBadge = '';
+  if (mode === 'cruise' || isC) modeBadge = '<span style="background:#0284c7; color:white; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:bold;"><i class="fa-solid fa-ship"></i> Profil Croisière (' + (currentParsedTrip.shipName || 'Navire') + ')</span>';
+  else if (mode === 'guided') modeBadge = '<span style="background:#059669; color:white; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:bold;"><i class="fa-solid fa-compass"></i> Profil Circuit Accompagné (Temps libre ciblé)</span>';
+  else if (mode === 'full') modeBadge = '<span style="background:#4f46e5; color:white; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:bold;"><i class="fa-solid fa-city"></i> Profil Séjour Libre / City-Break</span>';
+  else modeBadge = '<span style="background:#64748b; color:white; padding:3px 8px; border-radius:6px; font-size:0.75rem; font-weight:bold;">100% Guidé</span>';
+
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.borderColor = '#86efac';
+    statusEl.style.background = '#f0fdf4';
+    statusEl.style.color = '#15803d';
+    statusEl.innerHTML = `<i class="fa-solid fa-check"></i> <strong>Conversion prête :</strong> ${currentParsedTrip.itinerary.length} étape(s), ${currentParsedTrip.hotels.length} hébergement(s), ${(currentParsedTrip.flightsList || []).length} vol(s) et ${(currentParsedTrip.contactsList || []).length} contact(s).`;
+  }
+
+  if (previewSummary) {
+    const flights = currentParsedTrip.flightsList || [];
+    const hotels = currentParsedTrip.hotels || [];
+    const contacts = currentParsedTrip.contactsList || [];
+    const practicals = currentParsedTrip.practicalTipsList || [];
+
+    previewSummary.innerHTML = `
+      <div style="margin-bottom:8px; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+        <strong>Destination :</strong> <span style="font-size:0.95rem; font-weight:800; color:#0f172a;">${currentParsedTrip.title}</span>
+        ${modeBadge}
+      </div>
+      <div style="margin-bottom:6px;"><strong>Sous-titre / Itinéraire :</strong> ${currentParsedTrip.subtitle || 'Voyages Girardot'}</div>
+      <div style="margin-bottom:6px;"><strong>Dates :</strong> ${currentParsedTrip.dates || 'À définir'} • <strong>${currentParsedTrip.itinerary.length} jours au programme</strong></div>
+      <div style="margin-bottom:6px;"><strong>Vols reconnus :</strong> ${flights.length > 0 ? flights.map(f => `${f.type}: ${f.airline} ${f.flightNumber} (${f.departureAirport} ➔ ${f.arrivalAirport})`).join(' | ') : '<em>Aucun vol (trajet autocar ou croisière)</em>'}</div>
+      <div style="margin-bottom:6px;"><strong>Hébergements (${hotels.length}) :</strong> ${hotels.map(h => `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${h.name} (${h.dates})</span>`).join('')}</div>
+      <div style="margin-bottom:6px;"><strong>Contacts identifiés :</strong> ${contacts.map(c => `${c.category}: ${c.name} ${c.phone ? `(${c.phone})` : ''}`).join(' | ')}</div>
+      <div style="margin-bottom:6px;"><strong>Infos pratiques extraites (${practicals.length}) :</strong> ${practicals.map(p => `<span style="display:inline-block; background:#fef3c7; color:#92400e; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${p.title}</span>`).join('')}</div>
+      <div><strong>Étapes :</strong> ${currentParsedTrip.itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.highlight || d.title.slice(0, 20)}</span>`).join('')}</div>
+    `;
   }
 }
