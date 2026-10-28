@@ -167,6 +167,9 @@
         <p style="font-size:0.85rem; color:#64748b;">Espace d'administration Voyages Girardot — Créez et personnalisez vos carnets clients sans coder.</p>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
+        <button type="button" onclick="openGeminiConfigModal()" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;" title="Configurer l'API Google Gemini 2.0 Flash / 1.5 Flash (Free Tier)">
+          <i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6;"></i> <span id="gemini-status-indicator">IA Gemini (Free)</span>
+        </button>
         <button type="button" onclick="openGitHubConfigModal()" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
           <i class="fa-brands fa-github"></i> <span id="github-status-indicator">Synchro GitHub</span>
         </button>
@@ -285,6 +288,25 @@
 
       <!-- 1. GENERAL & VOLS -->
       <div id="adm-sec-general" class="admin-section">
+        <div class="section-box" style="border-left:4px solid var(--accent-gold); background:#fffbeb; margin-bottom:20px; padding:14px 16px;">
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:800; color:#92400e; font-size:0.9rem;">
+                <i class="fa-solid fa-sliders" style="color:var(--accent-gold);"></i> Profil du Voyage & Mode Conciergerie :
+              </label>
+              <select id="adm-concierge-mode" class="form-control" onchange="onConciergeModeChange(this.value)" style="font-weight:700; background:white; border-color:#fcd34d;">
+                <option value="guided">Circuit Accompagné / Guidé (Conciergerie générale masquée, uniquement temps libre ciblé)</option>
+                <option value="cruise">Croisière (Plan du navire, cabine, ponts, vie de bord)</option>
+                <option value="full">Séjour Libre / City-break (Conciergerie complète de la ville active)</option>
+                <option value="disabled">100% Guidé sans aucun temps libre (Conciergerie totalement masquée)</option>
+              </select>
+              <small id="adm-concierge-mode-desc" style="color:#78350f; font-size:0.75rem; display:block; margin-top:4px;">
+                💡 En circuit accompagné, évite de surcharger les clients avec 50 restaurants génériques : seuls les temps libres prévus seront suggérés.
+              </small>
+            </div>
+          </div>
+        </div>
+
         <h3 style="font-size:1.1rem; color:var(--primary-dark); margin-bottom:14px;">1. Informations Générales du Séjour</h3>
         
         <div class="form-row">
@@ -527,6 +549,63 @@
 
       <!-- 4. SUGGESTIONS TEMPS LIBRE -->
       <div id="adm-sec-freetime" class="admin-section" style="display:none;">
+        <!-- ENCADRÉ ASSISTANT IA GEMINI (OPTION B) -->
+        <div style="background:linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color:white; border-radius:16px; padding:18px 20px; margin-bottom:22px; box-shadow:0 10px 25px -5px rgba(49, 46, 129, 0.25);">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <div style="width:38px; height:38px; border-radius:10px; background:rgba(255,255,255,0.15); display:flex; align-items:center; justify-content:center; font-size:1.2rem;">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color:#fde047;"></i>
+              </div>
+              <div>
+                <h4 style="margin:0; font-size:1.05rem; font-weight:800; color:white;">Assistant IA Gemini : Recherche Ciblée pour Temps Libre</h4>
+                <p style="margin:0; font-size:0.75rem; color:#c7d2fe;">Générez en 2 secondes des visites et restaurants recommandés pour une demi-journée ou soirée libre</p>
+              </div>
+            </div>
+            <button type="button" onclick="openGeminiConfigModal()" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:rgba(255,255,255,0.15); color:white; border:1px solid rgba(255,255,255,0.3); border-radius:8px;">
+              <i class="fa-solid fa-key"></i> Clé Gemini API : <span id="gemini-header-status-badge" style="font-weight:bold;">Vérification...</span>
+            </button>
+          </div>
+
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:12px; margin-bottom:12px;">
+            <div>
+              <label style="font-size:0.75rem; color:#e0e7ff; font-weight:700; display:block; margin-bottom:4px;">Étape / Ville du temps libre :</label>
+              <select id="gemini-day-select" class="form-control" style="font-size:0.82rem; background:white; color:#0f172a; padding:8px 10px; font-weight:600;">
+                <option value="">Sélectionner une étape du circuit...</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; color:#e0e7ff; font-weight:700; display:block; margin-bottom:4px;">Moment du temps libre :</label>
+              <select id="gemini-moment-select" class="form-control" style="font-size:0.82rem; background:white; color:#0f172a; padding:8px 10px; font-weight:600;">
+                <option value="Après-midi libre">Après-midi libre</option>
+                <option value="Dîner libre">Dîner libre</option>
+                <option value="Soirée libre">Soirée libre</option>
+                <option value="Matinée libre">Matinée libre</option>
+                <option value="Journée libre">Journée complète libre</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size:0.75rem; color:#e0e7ff; font-weight:700; display:block; margin-bottom:4px;">Type d'adresses souhaitées :</label>
+              <select id="gemini-target-type" class="form-control" style="font-size:0.82rem; background:white; color:#0f172a; padding:8px 10px; font-weight:600;">
+                <option value="mix">Mix : 2-3 Restos typiques + 2 Visites à pied</option>
+                <option value="food">Restaurants typiques, Trattorias & Cafés</option>
+                <option value="visits">Visites libres, Musées & Balades</option>
+                <option value="shopping">Artisanat local & Boutiques gourmandes</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+            <div style="flex:1; min-width:260px;">
+              <input type="text" id="gemini-custom-prompt" class="form-control" placeholder="Optionnel : consigne spécifique (ex: restos avec terrasse à moins de 10 min de l'hôtel...)" style="font-size:0.82rem; background:rgba(255,255,255,0.95); padding:8px 12px;">
+            </div>
+            <button type="button" id="btn-trigger-gemini-freetime" onclick="generateFreeTimeWithGemini()" class="btn-save-main" style="background:#fde047; color:#1e1b4b; font-size:0.85rem; padding:9px 20px; border-radius:8px; font-weight:800; white-space:nowrap; box-shadow:0 4px 12px rgba(253,224,71,0.3);">
+              <i class="fa-solid fa-sparkles"></i> Générer avec Gemini
+            </button>
+          </div>
+
+          <div id="gemini-freetime-status" style="display:none; font-size:0.82rem; margin-top:12px; padding:10px 14px; border-radius:8px;"></div>
+        </div>
+
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
           <h3 style="font-size:1.1rem; color:var(--primary-dark);">4. Coups de Cœur & Visites Libres</h3>
           <button type="button" onclick="addNewSuggestion()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
@@ -725,6 +804,7 @@
   <script src="voyages/index_voyages.js"></script>
   <script src="data.js"></script>
   <script src="cruise_fleet.js"></script>
+  <script src="gemini_service.js"></script>
   <script src="admin.js"></script>
 
   <!-- MODALE CONFIGURATION & SYNCHRO GITHUB API -->
@@ -779,6 +859,94 @@
             Sauvegarder
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- MODALE CONFIGURATION API GOOGLE GEMINI (FREE TIER) -->
+  <div id="gemini-config-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); z-index:99999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:white; border-radius:18px; width:100%; max-width:560px; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+      <div style="padding:16px 20px; background:linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color:white; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <i class="fa-solid fa-wand-magic-sparkles" style="font-size:1.4rem; color:#fde047;"></i>
+          <div>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:white;">Configuration IA Google Gemini (Gratuit)</h3>
+            <p style="margin:0; font-size:0.75rem; color:#c7d2fe;">Génération intelligente d'adresses et visites pour les temps libres</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeGeminiConfigModal()" style="background:none; border:none; color:#c7d2fe; font-size:1.3rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <div style="padding:20px;">
+        <div style="background:#f5f3ff; border:1px solid #ddd6fe; border-radius:12px; padding:12px 14px; font-size:0.82rem; color:#5b21b6; margin-bottom:16px; line-height:1.5;">
+          <i class="fa-solid fa-circle-check" style="color:#7c3aed;"></i> <strong>Option B — 100% Gratuite (Palier Free Tier) :</strong><br>
+          Google offre gratuitement jusqu'à <strong>1 500 requêtes / jour</strong> sur les modèles Gemini Flash, sans aucune carte bancaire requise. Votre clé est mémorisée uniquement dans ce navigateur.
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-size:0.82rem; font-weight:700;">Modèle Gemini :</label>
+          <select id="gemini-model-select" class="form-control">
+            <option value="gemini-2.0-flash" selected>gemini-2.0-flash (Recommandé — Dernière génération, ultra-rapide)</option>
+            <option value="gemini-1.5-flash">gemini-1.5-flash (Standard éprouvé)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom:14px;">
+          <label style="font-size:0.82rem; font-weight:700;">Clé API Google Gemini (Free Tier) :</label>
+          <input type="password" id="gemini-api-key-input" class="form-control" placeholder="AIzaSy...">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; flex-wrap:wrap; gap:6px;">
+            <small style="font-size:0.75rem; color:#64748b;">
+              Obtenez votre clé gratuite en 2 clics sur <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" style="color:#4f46e5; font-weight:700; text-decoration:underline;">Google AI Studio</a>.
+            </small>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener noreferrer" class="btn-secondary" style="font-size:0.72rem; padding:3px 8px; color:#4f46e5; border-color:#c7d2fe;">
+              <i class="fa-solid fa-arrow-up-right-from-square"></i> Ouvrir Google AI Studio
+            </a>
+          </div>
+        </div>
+
+        <div id="gemini-test-feedback" style="font-size:0.82rem; font-weight:bold; margin-top:10px;"></div>
+      </div>
+
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" onclick="disconnectGeminiKey()" class="btn-secondary" style="color:#dc2626; border-color:#fca5a5; font-size:0.8rem;">
+          Effacer la clé
+        </button>
+        <div style="display:flex; gap:8px;">
+          <button type="button" onclick="testGeminiConnection()" class="btn-secondary" style="font-size:0.82rem;">
+            Tester la clé
+          </button>
+          <button type="button" onclick="saveGeminiConfig()" class="btn-save-main" style="background:#4f46e5; font-size:0.85rem; padding:8px 18px;">
+            Sauvegarder
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODALE PRÉVISUALISATION DES SUGGESTIONS GEMINI -->
+  <div id="gemini-results-modal" style="display:none; position:fixed; inset:0; background:rgba(15,23,42,0.7); backdrop-filter:blur(4px); z-index:99999; align-items:center; justify-content:center; padding:16px;">
+    <div style="background:white; border-radius:18px; width:100%; max-width:680px; max-height:90vh; display:flex; flex-direction:column; box-shadow:0 25px 50px -12px rgba(0,0,0,0.3); overflow:hidden;">
+      <div style="padding:16px 20px; background:linear-gradient(135deg, #1e1b4b 0%, #312e81 100%); color:white; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <i class="fa-solid fa-sparkles" style="color:#fde047; font-size:1.3rem;"></i>
+          <div>
+            <h3 id="gemini-results-modal-title" style="margin:0; font-size:1.05rem; font-weight:800; color:white;">Suggestions générées par Gemini</h3>
+            <p id="gemini-results-modal-sub" style="margin:0; font-size:0.75rem; color:#c7d2fe;">Sélectionnez ou ajustez avant d'insérer dans votre carnet</p>
+          </div>
+        </div>
+        <button type="button" onclick="closeGeminiResultsModal()" style="background:none; border:none; color:#c7d2fe; font-size:1.3rem; cursor:pointer;">&times;</button>
+      </div>
+
+      <div id="gemini-results-modal-content" style="padding:20px; overflow-y:auto; flex:1;"></div>
+
+      <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center;">
+        <button type="button" onclick="closeGeminiResultsModal()" class="btn-secondary" style="font-size:0.82rem;">
+          Annuler
+        </button>
+        <button type="button" onclick="applyGeminiSuggestionsToCarnet()" class="btn-save-main" style="background:#059669; font-size:0.85rem; padding:8px 20px;">
+          <i class="fa-solid fa-check"></i> Insérer dans le carnet de voyage
+        </button>
       </div>
     </div>
   </div>

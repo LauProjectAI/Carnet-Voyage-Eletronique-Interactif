@@ -641,6 +641,13 @@ function populateForm() {
   ensureContactsAndPracticalStructure();
   renderAdminContacts();
   renderAdminPractical();
+
+  // 6. Profil Conciergerie & IA Gemini
+  populateConciergeMode();
+  populateGeminiDaySelector();
+  if (typeof updateGeminiStatusIndicator === 'function') {
+    updateGeminiStatusIndicator();
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -6177,6 +6184,17 @@ function syncFormDataIntoTrip() {
     tripData.flights = null;
   }
 
+  // Synchronisation du profil conciergerie & mode
+  const modeSel = document.getElementById('adm-concierge-mode');
+  if (modeSel) {
+    tripData.conciergeMode = modeSel.value;
+    if (tripData.conciergeMode === 'cruise') {
+      tripData.isCruise = true;
+    } else if (tripData.conciergeMode === 'guided' || tripData.conciergeMode === 'full' || tripData.conciergeMode === 'disabled') {
+      tripData.isCruise = false;
+    }
+  }
+
   // Synchronisation rétrocompatible des contacts
   if (tripData.contactsList && tripData.contactsList.length > 0) {
     const mainRec = tripData.contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('local')) || tripData.contactsList[0];
@@ -6502,3 +6520,57 @@ async function saveTripDirectToGitHub() {
   }
 }
 
+
+
+// =============================================================================
+// GESTION DU PROFIL DU VOYAGE & MODE CONCIERGERIE (CIRCUIT / CROISIÈRE / SÉJOUR)
+// =============================================================================
+function populateConciergeMode() {
+  const sel = document.getElementById('adm-concierge-mode');
+  if (!sel || !tripData) return;
+
+  let mode = tripData.conciergeMode;
+  if (!mode) {
+    mode = tripData.isCruise ? 'cruise' : (tripData.freeTimeSuggestions && tripData.freeTimeSuggestions.length > 0 ? 'guided' : 'full');
+    tripData.conciergeMode = mode;
+  }
+  sel.value = mode;
+  onConciergeModeChange(mode, false);
+}
+
+function onConciergeModeChange(mode, userInitiated = true) {
+  if (tripData) {
+    tripData.conciergeMode = mode;
+    if (mode === 'cruise') tripData.isCruise = true;
+    else if (mode === 'guided' || mode === 'full' || mode === 'disabled') tripData.isCruise = false;
+  }
+
+  const desc = document.getElementById('adm-concierge-mode-desc');
+  if (!desc) return;
+
+  if (mode === 'guided') {
+    desc.innerHTML = "💡 <strong>Circuit Accompagné / Guidé :</strong> La conciergerie générale est masquée. Seuls les temps libres prévus (ci-dessous ou générés par Gemini) seront mis en avant pour vos clients.";
+  } else if (mode === 'cruise') {
+    desc.innerHTML = "🚢 <strong>Croisière :</strong> Plan d'ensemble du navire, sélection des ponts, décodeur de cabine, boussole marine et vie à bord actifs.";
+  } else if (mode === 'full') {
+    desc.innerHTML = "🏙️ <strong>Séjour Libre / City-break :</strong> Conciergerie complète de la ville activée (restaurants, bars, cafés, transports, visites libres).";
+  } else if (mode === 'disabled') {
+    desc.innerHTML = "🚫 <strong>100% Guidé sans aucun temps libre :</strong> L'onglet Conciergerie est totalement masqué dans le carnet du voyageur pour une clarté maximale.";
+  }
+}
+
+function populateGeminiDaySelector() {
+  const daySelect = document.getElementById('gemini-day-select');
+  if (!daySelect || !tripData) return;
+  daySelect.innerHTML = '<option value="">Sélectionner une étape du circuit...</option>';
+
+  if (tripData.itinerary && Array.isArray(tripData.itinerary)) {
+    tripData.itinerary.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = d.day;
+      const cleanCity = d.city || (typeof extractProbableCity === 'function' ? extractProbableCity(d.title) : "") || d.title;
+      opt.innerText = `Jour ${d.day} : ${cleanCity}`;
+      daySelect.appendChild(opt);
+    });
+  }
+}

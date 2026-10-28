@@ -467,6 +467,7 @@ document.addEventListener('DOMContentLoaded', () => {
   loadTripData();
   normalizeTripItinerary();
   renderClientTripSelector();
+  updateNavigationForConciergeMode();
   activeDayIndex = determineInitialDayIndex();
   
   // 3. Rendu sécurisé de chaque sous-composant
@@ -639,6 +640,29 @@ function renderTodayFocus() {
 
     timelineStream.appendChild(itemEl);
   });
+
+  // Notification temps libre ciblé pour la journée si présent
+  if (currentTrip.freeTimeSuggestions && currentTrip.freeTimeSuggestions.length > 0) {
+    const dayFreeTime = currentTrip.freeTimeSuggestions.filter(s => String(s.day) === String(currentDay.day));
+    if (dayFreeTime.length > 0) {
+      const bannerEl = document.createElement('div');
+      bannerEl.style.cssText = "margin-top:20px; padding:16px; background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1px solid #86efac; border-radius:16px; display:flex; justify-content:space-between; align-items:center; gap:12px; box-shadow:0 4px 12px rgba(16,185,129,0.08); flex-wrap:wrap;";
+      bannerEl.innerHTML = `
+        <div style="flex:1; min-width:200px;">
+          <div style="font-weight:800; color:#166534; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-compass" style="color:#059669; font-size:1.1rem;"></i> Temps Libre Prévu Aujourd'hui
+          </div>
+          <div style="font-size:0.8rem; color:#15803d; margin-top:3px;">
+            ${dayFreeTime.length} sélection(s) coup de cœur (restaurants & visites) pour votre moment libre.
+          </div>
+        </div>
+        <button type="button" onclick="switchMainTab('tab-conciergerie')" style="background:#059669; color:white; border:none; padding:8px 16px; border-radius:10px; font-size:0.82rem; font-weight:700; cursor:pointer; white-space:nowrap; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 6px rgba(5,150,105,0.25);">
+          Découvrir les adresses <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      `;
+      timelineStream.appendChild(bannerEl);
+    }
+  }
 }
 
 function toggleTimelineCheck(dayIdx, entryIdx) {
@@ -1027,7 +1051,15 @@ function renderSouvenirs() {
 // 4. bis - CONCIERGERIE IA EMBARQUÉE (100% Offline & Recherche Voix / Texte)
 function renderConciergerie() {
   const themesList = document.getElementById('concierge-themes-list');
-  if (!themesList || !currentTrip.conciergerie) return;
+  if (!themesList) return;
+
+  // Si circuit accompagné avec temps libre uniquement
+  if (currentTrip && currentTrip.conciergeMode === 'guided') {
+    renderTargetedFreeTimeView();
+    return;
+  }
+
+  if (!currentTrip.conciergerie) return;
 
   const c = currentTrip.conciergerie;
   if (c.welcomeMessage) {
@@ -4283,4 +4315,145 @@ function viewClientDocDetails(docId, focusQr = false) {
 function closeDocViewerModal() {
   const modal = document.getElementById('doc-viewer-modal');
   if (modal) modal.style.display = 'none';
+}
+
+
+// =============================================================================
+// ADAPTATION DU MODE CONCIERGERIE & TEMPS LIBRE CIBLÉ (CIRCUIT / CROISIÈRE / SÉJOUR)
+// =============================================================================
+function updateNavigationForConciergeMode() {
+  if (!currentTrip) return;
+
+  const conciergeBtn = document.querySelector('.nav-tab-btn[data-tab="tab-conciergerie"]');
+  if (!conciergeBtn) return;
+
+  const isCruise = currentTrip.isCruise || (currentTrip.shipName && currentTrip.shipName.trim()) || (currentTrip.conciergeMode === 'cruise');
+  let mode = currentTrip.conciergeMode;
+  if (!mode) {
+    mode = isCruise ? 'cruise' : (currentTrip.freeTimeSuggestions && currentTrip.freeTimeSuggestions.length > 0 ? 'guided' : 'full');
+  }
+
+  const iconEl = conciergeBtn.querySelector('i');
+  const labelEl = conciergeBtn.querySelector('span');
+
+  if (mode === 'disabled') {
+    conciergeBtn.style.display = 'none';
+  } else if (mode === 'cruise' || isCruise) {
+    conciergeBtn.style.display = 'flex';
+    if (iconEl) iconEl.className = 'fa-solid fa-ship';
+    if (labelEl) labelEl.innerText = 'Navire';
+  } else if (mode === 'guided') {
+    const hasFreeTime = currentTrip.freeTimeSuggestions && currentTrip.freeTimeSuggestions.length > 0;
+    if (hasFreeTime) {
+      conciergeBtn.style.display = 'flex';
+      if (iconEl) iconEl.className = 'fa-solid fa-compass';
+      if (labelEl) labelEl.innerText = 'Temps Libre';
+    } else {
+      conciergeBtn.style.display = 'none';
+    }
+  } else {
+    // 'full'
+    conciergeBtn.style.display = 'flex';
+    if (iconEl) iconEl.className = 'fa-solid fa-bell-concierge';
+    if (labelEl) labelEl.innerText = 'Concierge';
+  }
+}
+
+function renderTargetedFreeTimeView() {
+  const container = document.getElementById('tab-conciergerie');
+  if (!container) return;
+
+  const suggestions = currentTrip.freeTimeSuggestions || [];
+
+  container.innerHTML = `
+    <div style="max-width:680px; margin:0 auto; padding:10px 0 30px;">
+      <div style="background:linear-gradient(135deg, #184232 0%, #0d281e 100%); color:white; border-radius:20px; padding:22px 20px; margin-bottom:20px; box-shadow:0 8px 24px rgba(24,66,50,0.15);">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:6px;">
+          <span style="font-size:1.4rem;">🧭</span>
+          <h2 style="font-size:1.25rem; font-weight:800; color:white; margin:0;">Vos Moments de Liberté & Coups de Cœur</h2>
+        </div>
+        <p style="font-size:0.84rem; color:#d1e0d7; line-height:1.5; margin:0;">
+          Sur ce circuit organisé Girardot, vos repas et visites guidées sont pris en charge. Voici notre sélection d'adresses vérifiées pour vos moments de liberté :
+        </p>
+      </div>
+
+      <div id="freetime-cards-container"></div>
+    </div>
+  `;
+
+  const cardsBox = document.getElementById('freetime-cards-container');
+  if (!cardsBox) return;
+
+  if (suggestions.length === 0) {
+    cardsBox.innerHTML = `
+      <div style="background:white; border-radius:16px; border:1px solid #e2e8f0; padding:30px 20px; text-align:center; color:#64748b;">
+        <i class="fa-solid fa-mug-hot" style="font-size:2rem; color:#94a3b8; margin-bottom:12px;"></i>
+        <h4 style="font-size:1rem; color:#1e293b; margin-bottom:6px;">Programme 100% accompagné</h4>
+        <p style="font-size:0.85rem; margin:0;">Tous vos repas et visites sont organisés par votre accompagnateur Girardot. Profitez pleinement de votre séjour !</p>
+      </div>
+    `;
+    return;
+  }
+
+  // Grouper par jour / moment
+  const grouped = {};
+  suggestions.forEach(sug => {
+    const key = sug.moment ? `${sug.moment} — ${sug.city || 'Étape'}` : (sug.city || 'Coups de Cœur');
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(sug);
+  });
+
+  Object.entries(grouped).forEach(([groupTitle, list]) => {
+    const groupEl = document.createElement('div');
+    groupEl.style.marginBottom = '24px';
+    groupEl.innerHTML = `
+      <h3 style="font-size:1.02rem; font-weight:800; color:var(--primary-dark); margin:0 0 12px 4px; display:flex; align-items:center; gap:8px;">
+        <i class="fa-solid fa-clock" style="color:var(--accent-gold);"></i> ${groupTitle}
+      </h3>
+    `;
+
+    list.forEach(item => {
+      const card = document.createElement('div');
+      card.style = "background:white; border-radius:16px; border:1px solid #e2e8f0; padding:16px; margin-bottom:12px; box-shadow:0 4px 12px rgba(15,23,42,0.04);";
+      
+      const gpsUrl = (item.lat && item.lng) ? getGpsUrl(item.lat, item.lng, item.name) : (item.address ? getGpsUrl(item.lat || 0, item.lng || 0, item.address) : null);
+
+      card.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px; margin-bottom:6px;">
+          <div>
+            <div style="font-size:1rem; font-weight:800; color:var(--primary-dark);">${item.name}</div>
+            <div style="display:flex; gap:6px; margin-top:3px; flex-wrap:wrap;">
+              <span style="background:#eef7f2; color:var(--primary-color); font-size:0.72rem; padding:2px 8px; border-radius:6px; font-weight:700;">${item.category || 'Visite'}</span>
+              ${item.tag ? `<span style="background:#fef3c7; color:#92400e; font-size:0.72rem; padding:2px 8px; border-radius:6px; font-weight:700;">${item.tag}</span>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <p style="font-size:0.86rem; color:#334155; line-height:1.5; margin:8px 0 10px 0;">${item.description || ''}</p>
+
+        ${item.address ? `
+          <div style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">
+            <i class="fa-solid fa-location-dot" style="color:#0284c7; margin-right:4px;"></i> ${item.address}
+          </div>
+        ` : ''}
+
+        ${item.tips ? `
+          <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:8px 12px; font-size:0.8rem; color:#166534; margin-bottom:10px;">
+            <i class="fa-solid fa-lightbulb" style="color:#16a34a; margin-right:4px;"></i> <strong>Conseil Girardot :</strong> ${item.tips}
+          </div>
+        ` : ''}
+
+        ${gpsUrl ? `
+          <div style="text-align:right;">
+            <a href="${gpsUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white; font-size:0.8rem; padding:6px 14px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-location-arrow"></i> Itinéraire GPS
+            </a>
+          </div>
+        ` : ''}
+      `;
+      groupEl.appendChild(card);
+    });
+
+    cardsBox.appendChild(groupEl);
+  });
 }
