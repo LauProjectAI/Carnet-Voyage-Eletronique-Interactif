@@ -167,7 +167,7 @@
         <p style="font-size:0.85rem; color:#64748b;">Espace d'administration Voyages Girardot — Créez et personnalisez vos carnets clients sans coder.</p>
       </div>
       <div style="display:flex; gap:8px; align-items:center;">
-        <button type="button" onclick="openGeminiConfigModal()" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;" title="Configurer l'API Google Gemini 2.5 Flash / 1.5 Flash (Free Tier)">
+        <button type="button" onclick="openGeminiConfigModal()" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:700;" title="Configurer l'API Google Gemini 3.5 Flash-Lite / Flash (Free Tier)">
           <i class="fa-solid fa-wand-magic-sparkles" style="color:#8b5cf6;"></i> <span id="gemini-status-indicator">IA Gemini (Free)</span>
         </button>
         <button type="button" onclick="openGitHubConfigModal()" class="btn-secondary" style="display:inline-flex; align-items:center; gap:6px;">
@@ -918,9 +918,10 @@
         <div class="form-group" style="margin-bottom:14px;">
           <label style="font-size:0.82rem; font-weight:700;">Modèle Gemini :</label>
           <select id="gemini-model-select" class="form-control">
-            <option value="gemini-2.5-flash" selected>gemini-2.5-flash (Recommandé par Google — Actif & Rapide)</option>
-            <option value="gemini-1.5-flash">gemini-1.5-flash (Standard stable et éprouvé)</option>
-            <option value="gemini-2.5-flash-lite">gemini-2.5-flash-lite (Ultra-léger)</option>
+            <option value="gemini-3.5-flash-lite" selected>gemini-3.5-flash-lite (Recommandé par Google — Actif, Rapide & Gratuit)</option>
+            <option value="gemini-3.5-flash">gemini-3.5-flash (Standard performant)</option>
+            <option value="gemini-3.8-flash">gemini-3.8-flash (Dernière génération avancée)</option>
+            <option value="gemini-flash-latest">gemini-flash-latest (Alias dynamique toujours à jour)</option>
           </select>
         </div>
 

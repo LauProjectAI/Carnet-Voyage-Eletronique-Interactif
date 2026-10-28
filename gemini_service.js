@@ -5,7 +5,7 @@
 
 (function(global) {
 
-  const DEFAULT_MODEL = 'gemini-2.5-flash';
+  const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
 
   function getStoredGeminiKey() {
     return localStorage.getItem('girardot_gemini_api_key') || '';
@@ -13,8 +13,8 @@
 
   function getStoredGeminiModel() {
     let m = localStorage.getItem('girardot_gemini_model');
-    // Migration automatique si l'ancien modèle 2.0-flash obsolète était encore en cache
-    if (!m || m.includes('2.0') || m === 'gemini-2.0-flash' || m === 'gemini-2.0-flash-exp') {
+    // Migration automatique si un ancien modèle obsolète (2.0, 2.5, 1.5) était encore en cache
+    if (!m || m.includes('2.0') || m.includes('2.5') || m.includes('1.5') || m === 'gemini-2.0-flash' || m === 'gemini-2.5-flash') {
       m = DEFAULT_MODEL;
       localStorage.setItem('girardot_gemini_model', m);
     }
@@ -54,10 +54,26 @@
     const select = document.getElementById('gemini-model-select');
     const feedback = document.getElementById('gemini-test-feedback');
 
-    if (input) input.value = getStoredGeminiKey();
+    const key = getStoredGeminiKey();
+    if (input) input.value = key;
     if (select) select.value = getStoredGeminiModel();
     if (feedback) feedback.innerHTML = '';
     modal.style.display = 'flex';
+
+    if (key && select) {
+      discoverAvailableGeminiModels(key).then(models => {
+        if (models && models.length > 0) {
+          models.forEach(m => {
+            if (!Array.from(select.options).some(opt => opt.value === m)) {
+              const opt = document.createElement('option');
+              opt.value = m;
+              opt.innerText = `${m} (Détecté actif pour votre compte)`;
+              select.appendChild(opt);
+            }
+          });
+        }
+      });
+    }
   }
 
   function closeGeminiConfigModal() {
@@ -98,15 +114,42 @@
   }
 
 
+    // ---------------------------------------------------------------------------
+  // DÉCOUVERTE DYNAMIQUE DES MODÈLES DISPONIBLES SUR LA CLÉ
+  // ---------------------------------------------------------------------------
+  async function discoverAvailableGeminiModels(apiKey) {
+    if (!apiKey) return [];
+    try {
+      const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`;
+      const res = await fetch(url);
+      if (!res.ok) return [];
+      const data = await res.json();
+      if (!data.models || !Array.isArray(data.models)) return [];
+      return data.models
+        .filter(m => (m.supportedGenerationMethods && m.supportedGenerationMethods.includes('generateContent')) || (m.supportedActions && m.supportedActions.includes('generateContent')))
+        .map(m => m.name.replace(/^models\//, ''))
+        .filter(name => name.includes('flash') || name.includes('lite'));
+    } catch (e) {
+      return [];
+    }
+  }
+
   // ---------------------------------------------------------------------------
   // EXÉCUTION AVEC BASCULE AUTOMATIQUE SUR MODÈLES DE SECOURS (FALLBACK CHAIN)
   // ---------------------------------------------------------------------------
   async function callGeminiApiWithFallback(apiKey, preferredModel, payload) {
+    let discovered = [];
+    try {
+      discovered = await discoverAvailableGeminiModels(apiKey);
+    } catch (e) {}
+
     const candidateModels = [
       preferredModel,
-      'gemini-2.5-flash',
-      'gemini-1.5-flash',
-      'gemini-2.5-flash-lite'
+      ...discovered,
+      'gemini-3.5-flash-lite',
+      'gemini-3.5-flash',
+      'gemini-3.8-flash',
+      'gemini-flash-latest'
     ].filter((v, i, a) => v && a.indexOf(v) === i);
 
     let lastError = null;
