@@ -6531,8 +6531,12 @@ function populateGeminiDaySelector() {
     tripData.itinerary.forEach(d => {
       const opt = document.createElement('option');
       opt.value = d.day;
-      const cleanCity = d.city || (typeof extractProbableCity === 'function' ? extractProbableCity(d.title) : "") || d.title;
-      opt.innerText = `Jour ${d.day} : ${cleanCity}`;
+      let displayCity = d.city || "";
+      if (!displayCity || displayCity.toLowerCase().includes('votre') || displayCity.length <= 4) {
+        let clean = d.title.replace(/votre\s+r[ée]gion\s*[-–—•]\s*/i, '').trim();
+        displayCity = clean || d.title;
+      }
+      opt.innerText = `Jour ${d.day} : ${displayCity}`;
       daySelect.appendChild(opt);
     });
   }

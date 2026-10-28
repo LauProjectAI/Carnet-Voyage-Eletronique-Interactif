@@ -5,14 +5,20 @@
 
 (function(global) {
 
-  const DEFAULT_MODEL = 'gemini-2.0-flash';
+  const DEFAULT_MODEL = 'gemini-2.5-flash';
 
   function getStoredGeminiKey() {
     return localStorage.getItem('girardot_gemini_api_key') || '';
   }
 
   function getStoredGeminiModel() {
-    return localStorage.getItem('girardot_gemini_model') || DEFAULT_MODEL;
+    let m = localStorage.getItem('girardot_gemini_model');
+    // Migration automatique si l'ancien modèle 2.0-flash obsolète était encore en cache
+    if (!m || m.includes('2.0') || m === 'gemini-2.0-flash' || m === 'gemini-2.0-flash-exp') {
+      m = DEFAULT_MODEL;
+      localStorage.setItem('girardot_gemini_model', m);
+    }
+    return m;
   }
 
   function updateGeminiStatusIndicator() {
@@ -91,12 +97,66 @@
     if (feedback) feedback.innerHTML = `<span style="color:#64748b;">Clé Gemini effacée de ce navigateur.</span>`;
   }
 
+
+  // ---------------------------------------------------------------------------
+  // EXÉCUTION AVEC BASCULE AUTOMATIQUE SUR MODÈLES DE SECOURS (FALLBACK CHAIN)
+  // ---------------------------------------------------------------------------
+  async function callGeminiApiWithFallback(apiKey, preferredModel, payload) {
+    const candidateModels = [
+      preferredModel,
+      'gemini-2.5-flash',
+      'gemini-1.5-flash',
+      'gemini-2.5-flash-lite'
+    ].filter((v, i, a) => v && a.indexOf(v) === i);
+
+    let lastError = null;
+
+    for (const m of candidateModels) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${m}:generateContent?key=${apiKey}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          const errMsg = err.error?.message || `Erreur HTTP ${res.status}`;
+          if (res.status === 404 || /not found|no longer available|is not supported|deprecated/i.test(errMsg)) {
+            console.warn(`[Gemini] Modèle ${m} indisponible (${errMsg}), tentative avec le modèle suivant...`);
+            lastError = new Error(errMsg);
+            continue;
+          }
+          throw new Error(errMsg);
+        }
+
+        const data = await res.json();
+        if (m !== preferredModel) {
+          console.info(`[Gemini] Bascule automatique réussie sur le modèle actif : ${m}`);
+          localStorage.setItem('girardot_gemini_model', m);
+          updateGeminiStatusIndicator();
+        }
+        return { data, workingModel: m };
+
+      } catch (err) {
+        lastError = err;
+        if (/not found|no longer available|is not supported|404/i.test(err.message)) {
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    throw lastError || new Error("Aucun modèle Gemini actif n'a pu répondre avec cette clé.");
+  }
+
   async function testGeminiConnection() {
     const input = document.getElementById('gemini-api-key-input');
     const select = document.getElementById('gemini-model-select');
     const feedback = document.getElementById('gemini-test-feedback');
     const key = (input ? input.value : '').trim();
-    const model = select ? select.value : DEFAULT_MODEL;
+    let model = select ? select.value : DEFAULT_MODEL;
 
     if (!key) {
       if (feedback) feedback.innerHTML = `<span style="color:#dc2626;">Veuillez saisir une clé API à tester.</span>`;
@@ -106,25 +166,18 @@
     if (feedback) feedback.innerHTML = `<i class="fa-solid fa-spinner fa-spin" style="color:#4f46e5;"></i> Test de connexion en cours avec Google Gemini (${model})...`;
 
     try {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${key}`;
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: "Bonjour, réponds en un mot : OK" }] }]
-        })
+      const { data, workingModel } = await callGeminiApiWithFallback(key, model, {
+        contents: [{ parts: [{ text: "Bonjour, réponds en un mot : OK" }] }]
       });
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || `Erreur HTTP ${res.status}`);
+      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || "OK";
+
+      if (select && workingModel !== model) {
+        select.value = workingModel;
       }
 
-      const data = await res.json();
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-
       if (feedback) {
-        feedback.innerHTML = `<span style="color:#059669;"><i class="fa-solid fa-check"></i> Connexion réussie à Google Gemini (${model}) ! Réponse : "${reply}".</span>`;
+        feedback.innerHTML = `<span style="color:#059669;"><i class="fa-solid fa-check"></i> Connexion réussie à Google Gemini (${workingModel}) ! Réponse : "${reply}".</span>`;
       }
     } catch (err) {
       if (feedback) {
@@ -167,7 +220,16 @@
       const dayObj = tripData.itinerary.find(d => String(d.day) === String(selectedDayValue));
       if (dayObj) {
         dayNum = dayObj.day;
-        cityName = dayObj.city || (typeof extractProbableCity === 'function' ? extractProbableCity(dayObj.title) : "") || "";
+        cityName = dayObj.city || "";
+        if (!cityName || cityName.toLowerCase().includes('votre') || cityName.length <= 4) {
+          let cleanTitle = dayObj.title.replace(/votre\s+r[ée]gion\s*[-–—•]\s*/i, '').trim();
+          if (cleanTitle.includes('-') || cleanTitle.includes('—') || cleanTitle.includes('–')) {
+            const parts = cleanTitle.split(/[-–—•]/).map(p => p.trim()).filter(Boolean);
+            cityName = parts[parts.length - 1] || cleanTitle;
+          } else {
+            cityName = cleanTitle;
+          }
+        }
       }
     }
     if (!cityName && typeof tripData !== 'undefined' && tripData) {
@@ -219,26 +281,15 @@ Pour chaque suggestion, fournis obligatoirement :
 Réponds STRICTEMENT sous format JSON valide avec la clé racine "suggestions": [ ... ].`;
 
       const model = getStoredGeminiModel();
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      const payload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json"
+        }
+      };
 
-      const res = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{ parts: [{ text: prompt }] }],
-          generationConfig: {
-            temperature: 0.2,
-            responseMimeType: "application/json"
-          }
-        })
-      });
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err.error?.message || `Erreur API Gemini [${res.status}]`);
-      }
-
-      const data = await res.json();
+      const { data, workingModel } = await callGeminiApiWithFallback(apiKey, model, payload);
       const jsonText = data.candidates?.[0]?.content?.parts?.[0]?.text;
       const parsed = JSON.parse(jsonText);
       const suggestions = parsed.suggestions || (Array.isArray(parsed) ? parsed : []);
