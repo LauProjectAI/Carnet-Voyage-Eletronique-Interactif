@@ -5409,13 +5409,16 @@ function processExtractedTextToTrip(text, sourceName) {
   // 2. Détection précise des étapes "Jour X"
   const itinerary = [];
   let currentDay = null;
-  const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—"'«»]\s*(.*))?$/i;
+  const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—."'«»]\s*(.*))?$/i;
+  const altDayRegex = /^(?:1er|\d{1,2}(?:er|[eè]me)?)\s+jour\b(?:\s*[•:\-–—."'«»]\s*(.*))?$/i;
 
-  const stopKeywords = [
+  // Mots qui marquent la FIN définitive du déroulé des étapes (SEULEMENT APRÈS AVOIR COMMENCÉ À TROUVER DES JOURS)
+  const endOfItineraryKeywords = [
     "coordonnées de vos hôtels", "coordonnees de vos hotels", "vos hôtels", "vos hotels",
     "le voyage n’étant pas une science exacte", "le voyage n'etant pas une science exacte",
-    "votre accompagnatrice", "votre guide", "vos contacts", "convocation aérienne",
-    "votre bateau", "dimensions", "restauration / forfait boissons", "les procédures pré départ", "cabines"
+    "votre accompagnatrice", "votre guide", "vos contacts",
+    "formalités indispensables", "formalites indispensables", "bon à savoir", "bon a savoir",
+    "assurance multirisque"
   ];
 
   const knownPortCoordinates = {
@@ -5440,20 +5443,35 @@ function processExtractedTextToTrip(text, sourceName) {
     const line = rawLines[i];
     const lowerLine = line.toLowerCase();
 
-    if (stopKeywords.some(kw => lowerLine.startsWith(kw))) {
-      break;
+    // Arrêt uniquement si nous avons déjà trouvé au moins un jour ET que nous atteignons la section finale
+    if (currentDay !== null || itinerary.length > 0) {
+      if (endOfItineraryKeywords.some(kw => lowerLine.startsWith(kw))) {
+        break;
+      }
     }
 
-    const matchDay = line.match(dayHeaderRegex);
+    let matchDay = line.match(dayHeaderRegex);
+    let dayNum = 0;
+    let dayTitle = "";
+
+    if (matchDay) {
+      dayNum = parseInt(matchDay[1], 10);
+      dayTitle = (matchDay[2] || "").trim();
+    } else {
+      const matchAlt = line.match(altDayRegex);
+      if (matchAlt) {
+        dayNum = parseInt(matchAlt[0].match(/\d+/)?.[0] || "1", 10);
+        dayTitle = (matchAlt[1] || "").trim();
+        matchDay = matchAlt;
+      }
+    }
+
     if (matchDay) {
       if (currentDay) {
         itinerary.push(currentDay);
       }
 
-      const dayNum = parseInt(matchDay[1], 10);
-      let dayTitle = (matchDay[2] || "").trim();
-
-      if (!dayTitle && i + 1 < rawLines.length && !dayHeaderRegex.test(rawLines[i + 1])) {
+      if (!dayTitle && i + 1 < rawLines.length && !dayHeaderRegex.test(rawLines[i + 1]) && !altDayRegex.test(rawLines[i + 1])) {
         dayTitle = rawLines[i + 1];
         i++;
       }
