@@ -1,375 +1,734 @@
 {
   "id": "voyage-1792069990645",
-  "title": "Votre carnet de voyage Cocktail Mexicain mercredi 11 novembr",
-  "subtitle": "Circuit exclusif Voyages Girardot",
-  "dates": "Selon calendrier des départs",
-  "startDate": "2026-10-15",
-  "endDate": "2026-10-29",
-  "coverImage": "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=1200&q=80",
-  "intro": "Votre carnet de voyage Cocktail Mexicain mercredi 11 novembre 2026 - lundi 23 novembre 2026  En date du 13/10/2026 à 14:53:44  Cocktail Mexicain  \nDe Mexico au Yucatan en passant par les Chiapas  Pays fabuleux,   le Mexique est une destination haute en couleurs qui séduit tous ses   visiteurs avec l'opulence de  sa nat...",
+  "title": "Cocktail Mexicain",
+  "subtitle": "De Mexico au Yucatan en passant par les Chiapas",
+  "dates": "11 au 24 novembre 2026",
+  "startDate": "2026-11-11",
+  "endDate": "2026-11-24",
+  "coverImage": "https://images.unsplash.com/photo-1518638150340-f706e86654de?auto=format&fit=crop&w=1200&q=80",
+  "intro": "Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Trois mille ans d'Histoire, des paysages éblouissants baignés de soleil, une biodiversité époustouflante, des trésors naturels à profusion, un climat exceptionnel et une cuisine traditionnelle classée au Patrimoine de l'Humanité rendent le Mexique toujours plus surprenant.",
   "alert": {
     "title": "Formalités indispensables",
-    "text": "Vérifier la validité de votre passeport biométrique et formalités sanitaires éventuelles avant départ.",
+    "text": "Passeport obligatoire valide au moins 6 mois après la date de retour.",
     "link": ""
   },
   "flightsList": [
     {
       "type": "Aller",
-      "airline": "Compagnie aérienne régulière",
-      "flightNumber": "",
-      "departureAirport": "Aéroport de départ",
-      "departureTime": "",
-      "arrivalAirport": "Aéroport d'arrivée",
-      "arrivalTime": "",
-      "date": "Jour 1",
+      "airline": "Air France",
+      "flightNumber": "AF 178",
+      "departureAirport": "Paris Charles de Gaulle, Terminal 2E",
+      "departureTime": "11h45",
+      "arrivalAirport": "Mexico",
+      "arrivalTime": "16h55",
+      "date": "11/11/2026",
       "via": "",
-      "notes": "Présentation au comptoir avec passeport en cours de validité."
+      "notes": "Convocation à 09h15 au comptoir d'enregistrement"
+    },
+    {
+      "type": "Retour",
+      "airline": "Air France",
+      "flightNumber": "AF 651",
+      "departureAirport": "Cancun",
+      "departureTime": "21h00",
+      "arrivalAirport": "Paris Roissy Charles de Gaulle, Terminal 2E",
+      "arrivalTime": "12h30 le 24/11/2026",
+      "date": "23/11/2026",
+      "via": "",
+      "notes": "Prestations à bord"
     }
   ],
   "itinerary": [
     {
       "day": 1,
-      "title": "Jour 1 • • Votre région - Paris - Mexico  Jour consacré à l'acheminement. Transfert à l'aéroport de   Paris . Formalités d'embarquement.   Embarquement à destination de   Mexico.   Arrivée à   Mexico, accueil par votre guide et transfert à l'hôtel.   Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Dîner libre. Logement.",
-      "highlight": "• Votre région - Paris - Mexico  Jour consacré à l'acheminement. Transfert à l'aéroport de   Paris . Formalités d'embarquement.   Embarquement à destination de   Mexico.   Arrivée à   Mexico, accueil par votre guide et transfert à l'hôtel.   Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Dîner libre. Logement.",
-      "city": "Votre",
-      "dateStr": "Jour 1",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Votre région - Paris - Mexico",
+      "highlight": "",
+      "description": "Jour consacré à l'acheminement. Transfert à l'aéroport de Paris . Formalités d'embarquement. Embarquement à destination de Mexico. Arrivée à Mexico, accueil par votre guide et transfert à l'hôtel. Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Dîner libre. Logement.",
+      "city": "Paris",
+      "lat": 48.8566,
+      "lng": 2.3522,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Votre région - Paris - Mexico  Jour consacré à l'acheminement. Transfert à l'aéroport de   Paris . Formalités d'embarquement.   Embarquement à destination de   Mexico.   Arrivée à   Mexico, accueil par votre guide et transfert à l'hôtel.   Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Dîner libre. Logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Jour consacré à l'acheminement.",
+          "subtitle": "Jour consacré à l'acheminement.",
+          "icon": "plane-departure"
+        },
+        {
+          "time": "",
+          "title": "Transfert à l'aéroport de Paris .",
+          "subtitle": "Transfert à l'aéroport de Paris .",
+          "icon": "plane-departure"
+        },
+        {
+          "time": "",
+          "title": "Formalités d'embarquement.",
+          "subtitle": "Formalités d'embarquement.",
+          "icon": "plane-departure"
+        },
+        {
+          "time": "",
+          "title": "Embarquement à destination de Mexico.",
+          "subtitle": "Embarquement à destination de Mexico.",
+          "icon": "plane-departure"
+        },
+        {
+          "time": "",
+          "title": "Arrivée à Mexico",
+          "subtitle": "Arrivée à Mexico, accueil par votre guide et transfert à l'hôtel.",
+          "icon": "hotel"
         }
       ]
     },
     {
       "day": 2,
-      "title": "Jour 2 • • Mexico  Visite du   musée d'Anthropologie .   Continuation vers   Xochimilco .   Déjeuner à bord des barques   colorées sur les canaux .   Visite du   centre-ville de Mexico   et notamment   la   c athédrale , édifice religieux parmi les   plus anciens et les plus massifs du monde occidental,   la cité antique   ( Tenochtitlan ) enfouie sous la cité moderne depuis des siècles. Dîner logement.",
-      "highlight": "• Mexico  Visite du   musée d'Anthropologie .   Continuation vers   Xochimilco .   Déjeuner à bord des barques   colorées sur les canaux .   Visite du   centre-ville de Mexico   et notamment   la   c athédrale , édifice religieux parmi les   plus anciens et les plus massifs du monde occidental,   la cité antique   ( Tenochtitlan ) enfouie sous la cité moderne depuis des siècles. Dîner logement.",
-      "city": "Mexico",
-      "dateStr": "Jour 2",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Mexico",
+      "highlight": "",
+      "description": "Visite du musée d'Anthropologie . Continuation vers Xochimilco . Déjeuner à bord des barques colorées sur les canaux . Visite du centre-ville de Mexico et notamment la c athédrale , édifice religieux parmi les plus anciens et les plus massifs du monde occidental, la cité antique ( Tenochtitlan ) enfouie sous la cité moderne depuis des siècles. Dîner logement.",
+      "city": "Mexico (CDMX)",
+      "lat": 19.4326,
+      "lng": -99.1332,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Mexico  Visite du   musée d'Anthropologie .   Continuation vers   Xochimilco .   Déjeuner à bord des barques   colorées sur les canaux .   Visite du   centre-ville de Mexico   et notamment   la   c athédrale , édifice religieux parmi les   plus anciens et les plus massifs du monde occidental,   la cité antique   ( Tenochtitlan ) enfouie sous la cité moderne depuis des siècles. Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Visite du musée d'Anthropologie .",
+          "subtitle": "Visite du musée d'Anthropologie .",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Continuation vers Xochimilco .",
+          "subtitle": "Continuation vers Xochimilco .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner à bord des barques colorées sur les canaux .",
+          "subtitle": "Déjeuner à bord des barques colorées sur les canaux .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Visite du centre-ville de Mexico et notamment la c athédra...",
+          "subtitle": "Visite du centre-ville de Mexico et notamment la c athédrale , édifice religieux parmi les plus anciens et les plus massifs du monde occidental, la cité antique ( Tenochtitlan ) enfouie sous la cité moderne depuis des siècles.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Dîner logement.",
+          "subtitle": "Dîner logement.",
+          "icon": "hotel"
         }
       ]
     },
     {
       "day": 3,
-      "title": "Jour 3 • • Mexico - Teotihuacan - Puebla  Route vers   Teotihuacan .   Arrêt sur la   Place des Trois Cultures .   Visite de la   b asilique Notre-Dame de Guadalupe ,   lieu de pèlerinage le plus vénéré du Mexique.   Dégustation de Pulque et Tequila .   Déjeuner buffet de   spécialités .   Visite du   site archéologique .   Balade sur la Chaussée des Morts , découverte du   temple de Quetzalcóatl ,   du   temple   des   Coquillages,   des   pyramides   de   la   Lune   et   du   Soleil,   du   Palais   des Jaguars ...   Route vers   Puebla . Dîner logement.",
-      "highlight": "• Mexico - Teotihuacan - Puebla  Route vers   Teotihuacan .   Arrêt sur la   Place des Trois Cultures .   Visite de la   b asilique Notre-Dame de Guadalupe ,   lieu de pèlerinage le plus vénéré du Mexique.   Dégustation de Pulque et Tequila .   Déjeuner buffet de   spécialités .   Visite du   site archéologique .   Balade sur la Chaussée des Morts , découverte du   temple de Quetzalcóatl ,   du   temple   des   Coquillages,   des   pyramides   de   la   Lune   et   du   Soleil,   du   Palais   des Jaguars ...   Route vers   Puebla . Dîner logement.",
-      "city": "Mexico",
-      "dateStr": "Jour 3",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Mexico - Teotihuacan - Puebla",
+      "highlight": "",
+      "description": "Route vers Teotihuacan . Arrêt sur la Place des Trois Cultures . Visite de la b asilique Notre-Dame de Guadalupe , lieu de pèlerinage le plus vénéré du Mexique. Dégustation de Pulque et Tequila . Déjeuner buffet de spécialités . Visite du site archéologique . Balade sur la Chaussée des Morts , découverte du temple de Quetzalcóatl , du temple des Coquillages, des pyramides de la Lune et du Soleil, du Palais des Jaguars ... Route vers Puebla . Dîner logement.",
+      "city": "Teotihuacán",
+      "lat": 19.6925,
+      "lng": -98.8437,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Mexico - Teotihuacan - Puebla  Route vers   Teotihuacan .   Arrêt sur la   Place des Trois Cultures .   Visite de la   b asilique Notre-Dame de Guadalupe ,   lieu de pèlerinage le plus vénéré du Mexique.   Dégustation de Pulque et Tequila .   Déjeuner buffet de   spécialités .   Visite du   site archéologique .   Balade sur la Chaussée des Morts , découverte du   temple de Quetzalcóatl ,   du   temple   des   Coquillages,   des   pyramides   de   la   Lune   et   du   Soleil,   du   Palais   des Jaguars ...   Route vers   Puebla . Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Route vers Teotihuacan .",
+          "subtitle": "Route vers Teotihuacan .",
+          "icon": "bus"
+        },
+        {
+          "time": "",
+          "title": "Arrêt sur la Place des Trois Cultures .",
+          "subtitle": "Arrêt sur la Place des Trois Cultures .",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Visite de la b asilique Notre-Dame de Guadalupe",
+          "subtitle": "Visite de la b asilique Notre-Dame de Guadalupe , lieu de pèlerinage le plus vénéré du Mexique.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Dégustation de Pulque et Tequila .",
+          "subtitle": "Dégustation de Pulque et Tequila .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner buffet de spécialités .",
+          "subtitle": "Déjeuner buffet de spécialités .",
+          "icon": "utensils"
         }
       ]
     },
     {
       "day": 4,
-      "title": "Jour 4 • • Puebla - Oaxaca  Visite   de   Puebla,   capitale   de   la   faïence .   Visite   de   l'église   de   Santo   Domingo ,   du   Zocalo,   la  c athédrale .   Route vers   Oaxaca . Déjeuner.   Découverte du   Marché Indien , un des plus vivants et dynamiques du pays. Dîner logement.",
-      "highlight": "• Puebla - Oaxaca  Visite   de   Puebla,   capitale   de   la   faïence .   Visite   de   l'église   de   Santo   Domingo ,   du   Zocalo,   la  c athédrale .   Route vers   Oaxaca . Déjeuner.   Découverte du   Marché Indien , un des plus vivants et dynamiques du pays. Dîner logement.",
-      "city": "Puebla",
-      "dateStr": "Jour 4",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Puebla - Oaxaca",
+      "highlight": "",
+      "description": "Visite de Puebla, capitale de la faïence . Visite de l'église de Santo Domingo , du Zocalo, la c athédrale . Route vers Oaxaca . Déjeuner. Découverte du Marché Indien , un des plus vivants et dynamiques du pays. Dîner logement.",
+      "city": "Oaxaca",
+      "lat": 17.0732,
+      "lng": -96.7266,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Puebla - Oaxaca  Visite   de   Puebla,   capitale   de   la   faïence .   Visite   de   l'église   de   Santo   Domingo ,   du   Zocalo,   la  c athédrale .   Route vers   Oaxaca . Déjeuner.   Découverte du   Marché Indien , un des plus vivants et dynamiques du pays. Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Visite de Puebla, capitale de la faïence .",
+          "subtitle": "Visite de Puebla, capitale de la faïence .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Visite de l'église de Santo Domingo",
+          "subtitle": "Visite de l'église de Santo Domingo , du Zocalo, la c athédrale .",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Route vers Oaxaca .",
+          "subtitle": "Route vers Oaxaca .",
+          "icon": "bus"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner.",
+          "subtitle": "Déjeuner.",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Découverte du Marché Indien",
+          "subtitle": "Découverte du Marché Indien , un des plus vivants et dynamiques du pays.",
+          "icon": "location-dot"
         }
       ]
     },
     {
       "day": 5,
-      "title": "Jour 5 • • Oaxaca - Ixtepec Visite du   centre historique d'Oaxaca . Découverte du   site archéologique de Monte Alban,   classé patrimoine mondial par l'Unesco, présentant des   vestiges d'influences olmèques, zapotèques, mayas, mixtèques et   classiques...   Déjeuner.   Rencontre de familles à Teotitlan Del Valle . Découverte des   peintures textiles et tapisseries   faites à la main selon des techniques   ancestrales.   Départ vers   Ixtepec   par une route   panoramique sur les   plantations de maguey . Dîner logement.",
-      "highlight": "• Oaxaca - Ixtepec Visite du   centre historique d'Oaxaca . Découverte du   site archéologique de Monte Alban,   classé patrimoine mondial par l'Unesco, présentant des   vestiges d'influences olmèques, zapotèques, mayas, mixtèques et   classiques...   Déjeuner.   Rencontre de familles à Teotitlan Del Valle . Découverte des   peintures textiles et tapisseries   faites à la main selon des techniques   ancestrales.   Départ vers   Ixtepec   par une route   panoramique sur les   plantations de maguey . Dîner logement.",
-      "city": "Oaxaca",
-      "dateStr": "Jour 5",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Oaxaca - Ixtepec",
+      "highlight": "",
+      "description": "Visite du centre historique d'Oaxaca . Découverte du site archéologique de Monte Alban, classé patrimoine mondial par l'Unesco, présentant des vestiges d'influences olmèques, zapotèques, mayas, mixtèques et classiques... Déjeuner. Rencontre de familles à Teotitlan Del Valle . Découverte des peintures textiles et tapisseries faites à la main selon des techniques ancestrales. Départ vers Ixtepec par une route panoramique sur les plantations de maguey . Dîner logement.",
+      "city": "Ixtepec",
+      "lat": 16.5593,
+      "lng": -95.0975,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Oaxaca - Ixtepec Visite du   centre historique d'Oaxaca . Découverte du   site archéologique de Monte Alban,   classé patrimoine mondial par l'Unesco, présentant des   vestiges d'influences olmèques, zapotèques, mayas, mixtèques et   classiques...   Déjeuner.   Rencontre de familles à Teotitlan Del Valle . Découverte des   peintures textiles et tapisseries   faites à la main selon des techniques   ancestrales.   Départ vers   Ixtepec   par une route   panoramique sur les   plantations de maguey . Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Visite du centre historique d'Oaxaca .",
+          "subtitle": "Visite du centre historique d'Oaxaca .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Découverte du site archéologique de Monte Alban",
+          "subtitle": "Découverte du site archéologique de Monte Alban, classé patrimoine mondial par l'Unesco, présentant des vestiges d'influences olmèques, zapotèques, mayas, mixtèques et classiques...",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner.",
+          "subtitle": "Déjeuner.",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Rencontre de familles à Teotitlan Del Valle .",
+          "subtitle": "Rencontre de familles à Teotitlan Del Valle .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Découverte des peintures textiles et tapisseries faites à...",
+          "subtitle": "Découverte des peintures textiles et tapisseries faites à la main selon des techniques ancestrales.",
+          "icon": "location-dot"
         }
       ]
     },
     {
       "day": 6,
-      "title": "Jour 6 • • Ixtepec - San Cristobal de las Casas  Départ vers   San Cristobal de las Casas .   Déjeuner de   spécialités, animé par des Marimbas .   Promenade en barque   dans les   gorges Del Sumidero.   Poursuite vers   San Cristobal de las Casas , considérée comme la  colonie espagnole la plus ancienne de l'état du Chiapas...   Empreinte d'éléments indiens son atmosphère est très particulière. C'est la   vraie rencontre du voyageur   avec la communauté indienne maya . Dîner logement.",
-      "highlight": "• Ixtepec - San Cristobal de las Casas  Départ vers   San Cristobal de las Casas .   Déjeuner de   spécialités, animé par des Marimbas .   Promenade en barque   dans les   gorges Del Sumidero.   Poursuite vers   San Cristobal de las Casas , considérée comme la  colonie espagnole la plus ancienne de l'état du Chiapas...   Empreinte d'éléments indiens son atmosphère est très particulière. C'est la   vraie rencontre du voyageur   avec la communauté indienne maya . Dîner logement.",
-      "city": "Ixtepec",
-      "dateStr": "Jour 6",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Ixtepec - San Cristobal de las Casas",
+      "highlight": "",
+      "description": "Départ vers San Cristobal de las Casas . Déjeuner de spécialités, animé par des Marimbas . Promenade en barque dans les gorges Del Sumidero. Poursuite vers San Cristobal de las Casas , considérée comme la colonie espagnole la plus ancienne de l'état du Chiapas... Empreinte d'éléments indiens son atmosphère est très particulière. C'est la vraie rencontre du voyageur avec la communauté indienne maya . Dîner logement.",
+      "city": "San Cristóbal de las Casas",
+      "lat": 16.737,
+      "lng": -92.6376,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Ixtepec - San Cristobal de las Casas  Départ vers   San Cristobal de las Casas .   Déjeuner de   spécialités, animé par des Marimbas .   Promenade en barque   dans les   gorges Del Sumidero.   Poursuite vers   San Cristobal de las Casas , considérée comme la  colonie espagnole la plus ancienne de l'état du Chiapas...   Empreinte d'éléments indiens son atmosphère est très particulière. C'est la   vraie rencontre du voyageur   avec la communauté indienne maya . Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Départ vers San Cristobal de las Casas .",
+          "subtitle": "Départ vers San Cristobal de las Casas .",
+          "icon": "bus"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner de spécialités, animé par des Marimbas .",
+          "subtitle": "Déjeuner de spécialités, animé par des Marimbas .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Promenade en barque dans les gorges Del Sumidero.",
+          "subtitle": "Promenade en barque dans les gorges Del Sumidero.",
+          "icon": "ship"
+        },
+        {
+          "time": "",
+          "title": "Poursuite vers San Cristobal de las Casas",
+          "subtitle": "Poursuite vers San Cristobal de las Casas , considérée comme la colonie espagnole la plus ancienne de l'état du Chiapas...",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Empreinte d'éléments indiens son atmosphère est très parti...",
+          "subtitle": "Empreinte d'éléments indiens son atmosphère est très particulière.",
+          "icon": "location-dot"
         }
       ]
     },
     {
       "day": 7,
-      "title": "Jour 7 • • San Cristobal de las Casas  Visite du   village indien de San Juan Chamula . A   Zinacantan ,   une   famille indienne   vous   initiera à la préparation des tacos et dégustation . Déjeuner.   Découverte du   centre historique de San Cristobal   et son   marché indien,   un des plus vivants et dynamiques du   pays. C'est un   fantastique mélange   d'odeurs et de couleurs . Dîner avec   spectacle folklorique . Logement.",
-      "highlight": "• San Cristobal de las Casas  Visite du   village indien de San Juan Chamula . A   Zinacantan ,   une   famille indienne   vous   initiera à la préparation des tacos et dégustation . Déjeuner.   Découverte du   centre historique de San Cristobal   et son   marché indien,   un des plus vivants et dynamiques du   pays. C'est un   fantastique mélange   d'odeurs et de couleurs . Dîner avec   spectacle folklorique . Logement.",
-      "city": "Cristobal",
-      "dateStr": "Jour 7",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "San Cristobal de las Casas",
+      "highlight": "",
+      "description": "Visite du village indien de San Juan Chamula . A Zinacantan , une famille indienne vous initiera à la préparation des tacos et dégustation . Déjeuner. Découverte du centre historique de San Cristobal et son marché indien, un des plus vivants et dynamiques du pays. C'est un fantastique mélange d'odeurs et de couleurs . Dîner avec spectacle folklorique . Logement.",
+      "city": "San Cristóbal de las Casas",
+      "lat": 16.737,
+      "lng": -92.6376,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• San Cristobal de las Casas  Visite du   village indien de San Juan Chamula . A   Zinacantan ,   une   famille indienne   vous   initiera à la préparation des tacos et dégustation . Déjeuner.   Découverte du   centre historique de San Cristobal   et son   marché indien,   un des plus vivants et dynamiques du   pays. C'est un   fantastique mélange   d'odeurs et de couleurs . Dîner avec   spectacle folklorique . Logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Visite du village indien de San Juan Chamula .",
+          "subtitle": "Visite du village indien de San Juan Chamula .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "A Zinacantan , une famille indienne vous initiera à la pré...",
+          "subtitle": "A Zinacantan , une famille indienne vous initiera à la préparation des tacos et dégustation .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner.",
+          "subtitle": "Déjeuner.",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Découverte du centre historique de San Cristobal et son ma...",
+          "subtitle": "Découverte du centre historique de San Cristobal et son marché indien, un des plus vivants et dynamiques du pays.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "C'est un fantastique mélange d'odeurs et de couleurs .",
+          "subtitle": "C'est un fantastique mélange d'odeurs et de couleurs .",
+          "icon": "location-dot"
         }
       ]
     },
     {
       "day": 8,
-      "title": "Jour 8 • • San Cristobal de las Casas - Palenque  Route vers   Palenque .   Arrêt aux cascades   Agua Azul .   Déjeuner de poissons grillés .   Continuation vers Palenque et installation à l'hôtel.   Soirée Piñata .   Vivez une tradition du Mexique : les yeux bandés, faites exploser la piñata et régalez-vous avec les bonbons qu'elle contient ! Dîner Logement.",
-      "highlight": "• San Cristobal de las Casas - Palenque  Route vers   Palenque .   Arrêt aux cascades   Agua Azul .   Déjeuner de poissons grillés .   Continuation vers Palenque et installation à l'hôtel.   Soirée Piñata .   Vivez une tradition du Mexique : les yeux bandés, faites exploser la piñata et régalez-vous avec les bonbons qu'elle contient ! Dîner Logement.",
-      "city": "Cristobal",
-      "dateStr": "Jour 8",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "San Cristobal de las Casas - Palenque",
+      "highlight": "",
+      "description": "Route vers Palenque . Arrêt aux cascades Agua Azul . Déjeuner de poissons grillés . Continuation vers Palenque et installation à l'hôtel. Soirée Piñata . Vivez une tradition du Mexique : les yeux bandés, faites exploser la piñata et régalez-vous avec les bonbons qu'elle contient ! Dîner Logement.",
+      "city": "San Cristóbal de las Casas",
+      "lat": 16.737,
+      "lng": -92.6376,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• San Cristobal de las Casas - Palenque  Route vers   Palenque .   Arrêt aux cascades   Agua Azul .   Déjeuner de poissons grillés .   Continuation vers Palenque et installation à l'hôtel.   Soirée Piñata .   Vivez une tradition du Mexique : les yeux bandés, faites exploser la piñata et régalez-vous avec les bonbons qu'elle contient ! Dîner Logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Route vers Palenque .",
+          "subtitle": "Route vers Palenque .",
+          "icon": "bus"
+        },
+        {
+          "time": "",
+          "title": "Arrêt aux cascades Agua Azul .",
+          "subtitle": "Arrêt aux cascades Agua Azul .",
+          "icon": "ship"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner de poissons grillés .",
+          "subtitle": "Déjeuner de poissons grillés .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Continuation vers Palenque et installation à l'hôtel.",
+          "subtitle": "Continuation vers Palenque et installation à l'hôtel.",
+          "icon": "hotel"
+        },
+        {
+          "time": "",
+          "title": "Soirée Piñata .",
+          "subtitle": "Soirée Piñata .",
+          "icon": "location-dot"
         }
       ]
     },
     {
       "day": 9,
-      "title": "Jour 9 • • Palenque - Campeche  Découverte du   site archéologique de Palenque .   Grand site Maya   enfoui dans la forêt tropicale , c'est un des   sites archéologiques majeurs   du Mexique.... Découvrez la   Pyramide des Inscriptions , avec la tombe du Roi Pakal, le   Palais, un aqueduc , le seul   connu de l'architecture maya, le   Temple du Soleil,   le temple de la Croix...   Déjeuner de   spécialités .   Continuation vers Campeche. Dîner logement.",
-      "highlight": "• Palenque - Campeche  Découverte du   site archéologique de Palenque .   Grand site Maya   enfoui dans la forêt tropicale , c'est un des   sites archéologiques majeurs   du Mexique.... Découvrez la   Pyramide des Inscriptions , avec la tombe du Roi Pakal, le   Palais, un aqueduc , le seul   connu de l'architecture maya, le   Temple du Soleil,   le temple de la Croix...   Déjeuner de   spécialités .   Continuation vers Campeche. Dîner logement.",
+      "title": "Palenque - Campeche",
+      "highlight": "",
+      "description": "Découverte du site archéologique de Palenque . Grand site Maya enfoui dans la forêt tropicale , c'est un des sites archéologiques majeurs du Mexique.... Découvrez la Pyramide des Inscriptions , avec la tombe du Roi Pakal, le Palais, un aqueduc , le seul connu de l'architecture maya, le Temple du Soleil, le temple de la Croix... Déjeuner de spécialités . Continuation vers Campeche. Dîner logement.",
       "city": "Palenque",
-      "dateStr": "Jour 9",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "lat": 17.5095,
+      "lng": -91.9825,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Palenque - Campeche  Découverte du   site archéologique de Palenque .   Grand site Maya   enfoui dans la forêt tropicale , c'est un des   sites archéologiques majeurs   du Mexique.... Découvrez la   Pyramide des Inscriptions , avec la tombe du Roi Pakal, le   Palais, un aqueduc , le seul   connu de l'architecture maya, le   Temple du Soleil,   le temple de la Croix...   Déjeuner de   spécialités .   Continuation vers Campeche. Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Découverte du site archéologique de Palenque .",
+          "subtitle": "Découverte du site archéologique de Palenque .",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Grand site Maya enfoui dans la forêt tropicale",
+          "subtitle": "Grand site Maya enfoui dans la forêt tropicale , c'est un des sites archéologiques majeurs du Mexique....",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Découvrez la Pyramide des Inscriptions",
+          "subtitle": "Découvrez la Pyramide des Inscriptions , avec la tombe du Roi Pakal, le Palais, un aqueduc , le seul connu de l'architecture maya, le Temple du Soleil, le temple de la Croix...",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner de spécialités .",
+          "subtitle": "Déjeuner de spécialités .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Continuation vers Campeche.",
+          "subtitle": "Continuation vers Campeche.",
+          "icon": "location-dot"
         }
       ]
     },
     {
       "day": 10,
-      "title": "Jour 10 • • Campeche - Merida  Découverte de   Campeche,   port fortifié . Visite du   village de Becal , très connu pour ses chapeaux panama ou \"jipis\".   Rencontre avec les tisserands.   Route pour   Uxmal . Déjeuner. Visite du   site archéologique avec   la pyramide du Devin , seule pyramide ovale du Mexique, le   Quadrilatère des Nonnes ...   Route vers   Merida , la ville blanche. Dîner logement.",
-      "highlight": "• Campeche - Merida  Découverte de   Campeche,   port fortifié . Visite du   village de Becal , très connu pour ses chapeaux panama ou \"jipis\".   Rencontre avec les tisserands.   Route pour   Uxmal . Déjeuner. Visite du   site archéologique avec   la pyramide du Devin , seule pyramide ovale du Mexique, le   Quadrilatère des Nonnes ...   Route vers   Merida , la ville blanche. Dîner logement.",
+      "title": "Campeche - Merida",
+      "highlight": "",
+      "description": "Découverte de Campeche, port fortifié . Visite du village de Becal , très connu pour ses chapeaux panama ou \"jipis\". Rencontre avec les tisserands. Route pour Uxmal . Déjeuner. Visite du site archéologique avec la pyramide du Devin , seule pyramide ovale du Mexique, le Quadrilatère des Nonnes ... Route vers Merida , la ville blanche. Dîner logement.",
       "city": "Campeche",
-      "dateStr": "Jour 10",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "lat": 19.8301,
+      "lng": -90.5349,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Campeche - Merida  Découverte de   Campeche,   port fortifié . Visite du   village de Becal , très connu pour ses chapeaux panama ou \"jipis\".   Rencontre avec les tisserands.   Route pour   Uxmal . Déjeuner. Visite du   site archéologique avec   la pyramide du Devin , seule pyramide ovale du Mexique, le   Quadrilatère des Nonnes ...   Route vers   Merida , la ville blanche. Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Découverte de Campeche, port fortifié .",
+          "subtitle": "Découverte de Campeche, port fortifié .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Visite du village de Becal",
+          "subtitle": "Visite du village de Becal , très connu pour ses chapeaux panama ou \"jipis\".",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Rencontre avec les tisserands.",
+          "subtitle": "Rencontre avec les tisserands.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Route pour Uxmal .",
+          "subtitle": "Route pour Uxmal .",
+          "icon": "bus"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner.",
+          "subtitle": "Déjeuner.",
+          "icon": "utensils"
         }
       ]
     },
     {
       "day": 11,
-      "title": "Jour 11 • • Merida Départ pour   Celestun . Visite de la   réserve de la biosphère , sanctuaire pour de nombreuses espèces d'oiseaux et notamment des   flamants roses.   Balade en bateau .   Déjeuner de   poissons grillés sur la plage, face à la mer .   Retour à   Mérida   et   visite   de cette jolie   ville coloniale à l'élégance nonchalante.   Dîner   au restaurant \"La Negrita   Cantina\",   l'une   des   cantinas   les   plus   célèbres   et   emblématiques   de   la   ville,   avec   de   la musique   salsa et une ambiance locale . Logement.",
-      "highlight": "• Merida Départ pour   Celestun . Visite de la   réserve de la biosphère , sanctuaire pour de nombreuses espèces d'oiseaux et notamment des   flamants roses.   Balade en bateau .   Déjeuner de   poissons grillés sur la plage, face à la mer .   Retour à   Mérida   et   visite   de cette jolie   ville coloniale à l'élégance nonchalante.   Dîner   au restaurant \"La Negrita   Cantina\",   l'une   des   cantinas   les   plus   célèbres   et   emblématiques   de   la   ville,   avec   de   la musique   salsa et une ambiance locale . Logement.",
-      "city": "Merida",
-      "dateStr": "Jour 11",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Merida",
+      "highlight": "",
+      "description": "Départ pour Celestun . Visite de la réserve de la biosphère , sanctuaire pour de nombreuses espèces d'oiseaux et notamment des flamants roses. Balade en bateau . Déjeuner de poissons grillés sur la plage, face à la mer . Retour à Mérida et visite de cette jolie ville coloniale à l'élégance nonchalante. Dîner au restaurant \"La Negrita Cantina\", l'une des cantinas les plus célèbres et emblématiques de la ville, avec de la musique salsa et une ambiance locale . Logement.",
+      "city": "Celestún",
+      "lat": 20.86,
+      "lng": -90.398,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Merida Départ pour   Celestun . Visite de la   réserve de la biosphère , sanctuaire pour de nombreuses espèces d'oiseaux et notamment des   flamants roses.   Balade en bateau .   Déjeuner de   poissons grillés sur la plage, face à la mer .   Retour à   Mérida   et   visite   de cette jolie   ville coloniale à l'élégance nonchalante.   Dîner   au restaurant \"La Negrita   Cantina\",   l'une   des   cantinas   les   plus   célèbres   et   emblématiques   de   la   ville,   avec   de   la musique   salsa et une ambiance locale . Logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Départ pour Celestun .",
+          "subtitle": "Départ pour Celestun .",
+          "icon": "bus"
+        },
+        {
+          "time": "",
+          "title": "Visite de la réserve de la biosphère",
+          "subtitle": "Visite de la réserve de la biosphère , sanctuaire pour de nombreuses espèces d'oiseaux et notamment des flamants roses.",
+          "icon": "paw"
+        },
+        {
+          "time": "",
+          "title": "Balade en bateau .",
+          "subtitle": "Balade en bateau .",
+          "icon": "ship"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner de poissons grillés sur la plage, face à la mer .",
+          "subtitle": "Déjeuner de poissons grillés sur la plage, face à la mer .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Retour à Mérida et visite de cette jolie ville coloniale à...",
+          "subtitle": "Retour à Mérida et visite de cette jolie ville coloniale à l'élégance nonchalante.",
+          "icon": "ship"
         }
       ]
     },
     {
       "day": 12,
-      "title": "Jour 12 • • Merida - Chichen Itza - Valladolid  Départ vers le   site archéologique   de   Chichen Itza,   un des plus grands sites archéologiques Maya du Mexique :   le   Chac   Mol ,   la   pyramide   du   Kukulcan,   le   temple   des   Jaguars ...   Déjeuner   avec   spectacle folklorique .   Découverte d'un   cenote   (puits naturels). Continuation vers   Valladolid.   Visite notamment   de l' église de San Bernardino de Siena   et l'ancien   couvent El Sisal ... Dîner logement.",
-      "highlight": "• Merida - Chichen Itza - Valladolid  Départ vers le   site archéologique   de   Chichen Itza,   un des plus grands sites archéologiques Maya du Mexique :   le   Chac   Mol ,   la   pyramide   du   Kukulcan,   le   temple   des   Jaguars ...   Déjeuner   avec   spectacle folklorique .   Découverte d'un   cenote   (puits naturels). Continuation vers   Valladolid.   Visite notamment   de l' église de San Bernardino de Siena   et l'ancien   couvent El Sisal ... Dîner logement.",
-      "city": "Merida",
-      "dateStr": "Jour 12",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "title": "Merida - Chichen Itza - Valladolid",
+      "highlight": "",
+      "description": "Départ vers le site archéologique de Chichen Itza, un des plus grands sites archéologiques Maya du Mexique : le Chac Mol , la pyramide du Kukulcan, le temple des Jaguars ... Déjeuner avec spectacle folklorique . Découverte d'un cenote (puits naturels). Continuation vers Valladolid. Visite notamment de l' église de San Bernardino de Siena et l'ancien couvent El Sisal ... Dîner logement.",
+      "city": "Chichén Itzá",
+      "lat": 20.6843,
+      "lng": -88.5678,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Merida - Chichen Itza - Valladolid  Départ vers le   site archéologique   de   Chichen Itza,   un des plus grands sites archéologiques Maya du Mexique :   le   Chac   Mol ,   la   pyramide   du   Kukulcan,   le   temple   des   Jaguars ...   Déjeuner   avec   spectacle folklorique .   Découverte d'un   cenote   (puits naturels). Continuation vers   Valladolid.   Visite notamment   de l' église de San Bernardino de Siena   et l'ancien   couvent El Sisal ... Dîner logement.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Départ vers le site archéologique de Chichen Itza",
+          "subtitle": "Départ vers le site archéologique de Chichen Itza, un des plus grands sites archéologiques Maya du Mexique : le Chac Mol , la pyramide du Kukulcan, le temple des Jaguars ...",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner avec spectacle folklorique .",
+          "subtitle": "Déjeuner avec spectacle folklorique .",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Découverte d'un cenote (puits naturels).",
+          "subtitle": "Découverte d'un cenote (puits naturels).",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Continuation vers Valladolid.",
+          "subtitle": "Continuation vers Valladolid.",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Visite notamment de l' église de San Bernardino de Siena e...",
+          "subtitle": "Visite notamment de l' église de San Bernardino de Siena et l'ancien couvent El Sisal ...",
+          "icon": "landmark"
         }
       ]
     },
     {
       "day": 13,
-      "title": "Jour 13 • • Valladolid - Tulum - Cancun -Paris  Visite du   site archéologique de Tulum . Seul site Maya à avoir été construit en bordure de l'océan et   dominant  les eaux turquoises de la Mer des Caraïbes .   Déjeuner de poissons et fruits de mer.   Transfert vers l' aéroport de   Cancun , assistance aux formalités d'enregistrement et vol à destination de la France.   Repas et nuit à bord.",
-      "highlight": "• Valladolid - Tulum - Cancun -Paris  Visite du   site archéologique de Tulum . Seul site Maya à avoir été construit en bordure de l'océan et   dominant  les eaux turquoises de la Mer des Caraïbes .   Déjeuner de poissons et fruits de mer.   Transfert vers l' aéroport de   Cancun , assistance aux formalités d'enregistrement et vol à destination de la France.   Repas et nuit à bord.",
+      "title": "Valladolid - Tulum - Cancun -Paris",
+      "highlight": "",
+      "description": "Visite du site archéologique de Tulum . Seul site Maya à avoir été construit en bordure de l'océan et dominant les eaux turquoises de la Mer des Caraïbes . Déjeuner de poissons et fruits de mer. Transfert vers l' aéroport de Cancun , assistance aux formalités d'enregistrement et vol à destination de la France. Repas et nuit à bord.",
       "city": "Valladolid",
-      "dateStr": "Jour 13",
-      "description": "",
-      "lat": 0,
-      "lng": 0,
+      "lat": 20.6896,
+      "lng": -88.2024,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Valladolid - Tulum - Cancun -Paris  Visite du   site archéologique de Tulum . Seul site Maya à avoir été construit en bordure de l'océan et   dominant  les eaux turquoises de la Mer des Caraïbes .   Déjeuner de poissons et fruits de mer.   Transfert vers l' aéroport de   Cancun , assistance aux formalités d'enregistrement et vol à destination de la France.   Repas et nuit à bord.",
-          "subtitle": "Programme et déroulé de l'étape.",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Visite du site archéologique de Tulum .",
+          "subtitle": "Visite du site archéologique de Tulum .",
+          "icon": "landmark"
+        },
+        {
+          "time": "",
+          "title": "Seul site Maya à avoir été construit en bordure de l'océan...",
+          "subtitle": "Seul site Maya à avoir été construit en bordure de l'océan et dominant les eaux turquoises de la Mer des Caraïbes .",
+          "icon": "ship"
+        },
+        {
+          "time": "",
+          "title": "Déjeuner de poissons et fruits de mer.",
+          "subtitle": "Déjeuner de poissons et fruits de mer.",
+          "icon": "utensils"
+        },
+        {
+          "time": "",
+          "title": "Transfert vers l' aéroport de Cancun",
+          "subtitle": "Transfert vers l' aéroport de Cancun , assistance aux formalités d'enregistrement et vol à destination de la France.",
+          "icon": "plane-departure"
+        },
+        {
+          "time": "",
+          "title": "Repas et nuit à bord.",
+          "subtitle": "Repas et nuit à bord.",
+          "icon": "utensils"
         }
       ]
     },
     {
       "day": 14,
-      "title": "Jour 14 • • Paris - Votre région  Jour consacré au réacheminement. Arrivée à   Paris . Retour dans votre région.",
-      "highlight": "• Paris - Votre région  Jour consacré au réacheminement. Arrivée à   Paris . Retour dans votre région.",
+      "title": "Paris - Votre région",
+      "highlight": "",
+      "description": "Jour consacré au réacheminement. Arrivée à Paris . Retour dans votre région.",
       "city": "Paris",
-      "dateStr": "Jour 14",
-      "description": "Le voyage n’étant pas une science exacte, votre programme peut être amené à subir quelques modifications bien indépendantes de notre volonté.  En pareilles circonstances, nous faisons appel à votre compréhension si toutefois le déroulé de celui-ci se trouvait devoir être modifié, inversé, adapté, réorganisé en fonction de la circulation, des retards aériens, des conditions climatiques, événements géopolitiques, fermetures exceptionnelles de sites, routes, musées...  Nous vous souhaitons un beau voyage.",
-      "lat": 0,
-      "lng": 0,
+      "lat": 48.8566,
+      "lng": 2.3522,
       "timeline": [
         {
-          "time": "10:00",
-          "title": "• Paris - Votre région  Jour consacré au réacheminement. Arrivée à   Paris . Retour dans votre région.",
-          "subtitle": "Le voyage n’étant pas une science exacte, votre programme peut être amené à subir quelques modificat",
-          "icon": "route",
-          "address": ""
+          "time": "",
+          "title": "Jour consacré au réacheminement.",
+          "subtitle": "Jour consacré au réacheminement.",
+          "icon": "plane-departure"
+        },
+        {
+          "time": "",
+          "title": "Arrivée à Paris .",
+          "subtitle": "Arrivée à Paris .",
+          "icon": "location-dot"
+        },
+        {
+          "time": "",
+          "title": "Retour dans votre région.",
+          "subtitle": "Retour dans votre région.",
+          "icon": "location-dot"
         }
       ]
     }
   ],
   "hotels": [
     {
-      "name": "HOTEL REGENTE Paris No",
-      "city": "Étape du circuit",
-      "rating": "Hôtel sélectionné",
-      "checkIn": "Pendant le circuit",
-      "phone": "",
-      "address": "HOTEL REGENTE Paris No",
-      "description": "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-      "photos": []
+      "name": "HOTEL REGENTE",
+      "dates": "Du 11 au 13 novembre",
+      "city": "Mexico (CDMX)",
+      "address": "Paris No. 9 Col. Tabacalera, Delegacion Cuauhtemoc, 06030 Mexico, CDMX",
+      "phone": "+55 10 84 87 00",
+      "lat": 19.4326,
+      "lng": -99.1332,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
     },
     {
-      "name": "HOTEL LOS OLIVOS SPA  Francisco I",
-      "city": "Étape du circuit",
-      "rating": "Hôtel sélectionné",
-      "checkIn": "Pendant le circuit",
-      "phone": "",
-      "address": "HOTEL LOS OLIVOS SPA  Francisco I",
-      "description": "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-      "photos": []
+      "name": "HOTEL PALACE PUEBLA",
+      "dates": "Du 13 au 14 novembre",
+      "city": "Puebla",
+      "address": "Av 2 Ote 13, Centro histórico de Puebla, 72000 Puebla",
+      "phone": "+52 222 232 2430",
+      "lat": 19.0414,
+      "lng": -98.2063,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
     },
     {
-      "name": "HOTEL TULIJA EXPRESS PALENQUE  5a",
-      "city": "Étape du circuit",
-      "rating": "Hôtel sélectionné",
-      "checkIn": "Pendant le circuit",
-      "phone": "",
-      "address": "HOTEL TULIJA EXPRESS PALENQUE  5a",
-      "description": "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-      "photos": []
+      "name": "HOTEL LOS OLIVOS SPA",
+      "dates": "Du 14 au 15 novembre",
+      "city": "Oaxaca de Juárez",
+      "address": "Francisco I. Madero 1254 Col,, Santa María del Marquesado, Ex-Marquezado,, 68030 Oaxaca de Juárez, Mexico",
+      "phone": "+52 800 202 0739",
+      "lat": 17.0732,
+      "lng": -96.7266,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
     },
     {
-      "name": "HOTEL OCEAN VIEW  Av",
-      "city": "Étape du circuit",
-      "rating": "Hôtel sélectionné",
-      "checkIn": "Pendant le circuit",
-      "phone": "",
-      "address": "HOTEL OCEAN VIEW  Av",
-      "description": "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-      "photos": []
+      "name": "HOTEL MANZUR",
+      "dates": "Du 15 au 16 novembre",
+      "city": "Ixtepec",
+      "address": "Avenida 16 De Septiembre 110, 70110 Ixtepec",
+      "phone": "+52 971 688 2931",
+      "lat": 16.5593,
+      "lng": -95.0975,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
     },
     {
-      "name": "HOTEL DEL GOBERNADOR  Calle 59 No",
-      "city": "Étape du circuit",
-      "rating": "Hôtel sélectionné",
-      "checkIn": "Pendant le circuit",
-      "phone": "",
-      "address": "HOTEL DEL GOBERNADOR  Calle 59 No",
-      "description": "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-      "photos": []
+      "name": "HOTEL MANSION VALLE",
+      "dates": "Du 16 au 18 novembre",
+      "city": "San Cristóbal de las Casas",
+      "address": "Calle Diego de Mazariegos 39-Interior #1, Barrio de la Merced, 29240 San Cristobal de las Casas",
+      "phone": "+52 967 678 2582",
+      "lat": 16.737,
+      "lng": -92.6376,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
     },
     {
-      "name": "HOTEL FUNDADORES  Calle 42 por 35 y 37",
-      "city": "Étape du circuit",
-      "rating": "Hôtel sélectionné",
-      "checkIn": "Pendant le circuit",
-      "phone": "",
-      "address": "HOTEL FUNDADORES  Calle 42 por 35 y 37",
-      "description": "Hébergement sélectionné par Voyages Girardot pour le confort de ses voyageurs.",
-      "photos": []
+      "name": "HOTEL TULIJA EXPRESS PALENQUE",
+      "dates": "Du 18 au 19 novembre",
+      "city": "Palenque",
+      "address": "5a. Avenida Nte. Pte. 36, Zona Hotelera, 29960 Palenque",
+      "phone": "+52 (916) 345 0165 / 345 0166",
+      "lat": 17.5095,
+      "lng": -91.9825,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL OCEAN VIEW",
+      "dates": "Du 19 au 20 novembre",
+      "city": "Campeche",
+      "address": "Av. Pedro Sainz de Baranda, Joaquín Clausell con, 24010 Campeche",
+      "phone": "+52 981 811 9999",
+      "lat": 19.8301,
+      "lng": -90.5349,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL DEL GOBERNADOR",
+      "dates": "Du 20 au 22 novembre",
+      "city": "Mérida",
+      "address": "Calle 59 No. 535 por 66, Col. Centro, 97000 Mérida, Yuc",
+      "phone": "+52 999 930 4141",
+      "lat": 20.9674,
+      "lng": -89.5926,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL FUNDADORES",
+      "dates": "Du 22 au 23 novembre",
+      "city": "Valladolid",
+      "address": "Calle 42 por 35 y 37 # 183, E Centro, 97780 Valladolid, Yucatan",
+      "phone": "+52 985 856 2437",
+      "lat": 20.6896,
+      "lng": -88.2024,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
     }
   ],
   "documents": [],
   "freeTimeSuggestions": [],
   "practicalInfo": {
-    "money": "Monnaie locale : Cartes de crédit acceptées. Prévoir des espèces pour les petits commerces.",
-    "electricity": "Courant électrique standard. Prévoir un adaptateur universel.",
-    "clothing": "Tenue confortable et chaussures de marche recommandées pour les visites de journée.",
-    "tips": "Pourboires indicatifs : 2 à 3 €/jour/personne pour le guide et 1 € pour le chauffeur.",
-    "wifi": "Wi-Fi disponible gratuitement dans la majorité des hôtels du circuit."
+    "money": "Le peso mexicain (MXN). Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux.",
+    "electricity": "Voltage 110V avec prises à fiches plates (types A et B). Prévoir un adaptateur universel.",
+    "clothing": "Tenue confortable et chaussures de marche pour les sites archéologiques. Vêtement chaud pour les soirées en altitude.",
+    "tips": "Pourboires indicatifs : 2 à 3 €/jour/personne pour le guide et 1 à 2 € pour le chauffeur.",
+    "wifi": "Wi-Fi disponible gratuitement dans la plupart des hôtels du circuit."
   },
   "contactsList": [
     {
+      "category": "Accompagnatrice Voyages Girardot",
+      "name": "Hélène",
+      "phone": "",
+      "address": "Avec le groupe sur le circuit",
+      "isEmergency": false
+    },
+    {
+      "category": "Guide Local",
+      "name": "Socorro Chavez",
+      "phone": "+52 1 55 2745 5778",
+      "address": "Guide local francophone",
+      "isEmergency": false
+    },
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "Francisca Mercado Sanchez (Caractères du Mexique)",
+      "phone": "(+52) 223 4780899 / 559 1852294",
+      "address": "Bureau à Mexico & Assistance WhatsApp",
+      "isEmergency": true
+    },
+    {
       "category": "Assistance Girardot 24h/7j",
       "name": "Permanence Urgences Girardot",
-      "phone": "+33 3 85 00 00 00",
+      "phone": "03 85 42 82 50",
       "address": "Chalon-sur-Saône, France",
       "isEmergency": true
     }
@@ -675,58 +1034,185 @@
     {
       "title": "Monnaie & Devises",
       "icon": "coins",
-      "content": "Monnaie locale : Cartes de crédit acceptées. Prévoir des espèces pour les petits commerces."
+      "content": "Le peso mexicain (MXN). Cartes bancaires internationales acceptées dans les grandes villes et hôtels. Prévoyez des espèces en pesos pour les pourboires, petits marchés et artisanat local."
     },
     {
       "title": "Électricité & Prises",
       "icon": "plug",
-      "content": "Courant électrique standard. Prévoir un adaptateur universel."
+      "content": "Voltage 110 volts avec prises américaines à fiches plates (types A et B). Prévoir un adaptateur universel et éventuellement un transformateur si vos appareils ne supportent pas le bi-voltage (110-240V)."
     },
     {
-      "title": "Vêtements conseillés",
-      "icon": "shirt",
-      "content": "Tenue confortable et chaussures de marche recommandées pour les visites de journée."
+      "title": "Décalage horaire",
+      "icon": "clock",
+      "content": "-7h par rapport à la France métropolitaine pour la majeure partie du pays (Mexico, Oaxaca, Chiapas) et -6h pour le Quintana Roo (Cancun, Tulum)."
+    },
+    {
+      "title": "Climat & Météo",
+      "icon": "cloud-sun",
+      "content": "Climat agréable en novembre, fin de la saison des pluies. Températures douces en altitude (Mexico, San Cristobal : prévoir une veste chaude pour les soirées) et chaudes sur les côtes (Yucatan, Cancun)."
+    },
+    {
+      "title": "Vêtements & Valise",
+      "icon": "suitcase-rolling",
+      "content": "Tenues confortables en coton, bonnes chaussures de marche pour les sites archéologiques (pavés et marches raides), chapeau, lunettes de soleil, répulsif anti-moustiques et maillot de bain."
     },
     {
       "title": "Pourboires",
       "icon": "hand-holding-dollar",
-      "content": "Pourboires indicatifs : 2 à 3 €/jour/personne pour le guide et 1 € pour le chauffeur."
+      "content": "Les pourboires font partie intégrante des usages au Mexique (la 'propina'). Suggestions : 2 à 3 € par jour et par personne pour le guide local, 1 à 2 € pour le chauffeur d'autocar."
     },
     {
-      "title": "Connexion Wi-Fi",
-      "icon": "wifi",
-      "content": "Wi-Fi disponible gratuitement dans la majorité des hôtels du circuit."
+      "title": "Santé & Alimentation",
+      "icon": "shield-heart",
+      "content": "Aucun vaccin obligatoire. Ne pas boire l'eau du robinet (consommer exclusivement de l'eau en bouteille capsulée). Éviter les glaçons non industriels et peler les fruits."
+    },
+    {
+      "title": "Téléphone & Réseau",
+      "icon": "phone",
+      "content": "Indicatif international +52. Bonne couverture 4G/Wi-Fi dans les villes et hôtels. Pensez à désactiver les données mobiles à l'étranger si votre forfait ne comprend pas le Mexique."
+    },
+    {
+      "title": "Formalités d'entrée",
+      "icon": "passport",
+      "content": "Passeport obligatoire valide au moins 6 mois après la date de retour. Formulaire migratoire remis dans l'avion à conserver précieusement jusqu'au retour."
     }
   ],
   "flights": {
     "outbound": {
-      "airline": "Compagnie aérienne régulière",
-      "flightNumber": "",
-      "departureAirport": "Aéroport de départ",
-      "departureTime": "",
-      "arrivalAirport": "Aéroport d'arrivée",
-      "arrivalTime": "",
-      "date": "Jour 1",
-      "layover": ""
+      "airline": "Air France",
+      "flightNumber": "AF 178",
+      "departureAirport": "Paris Charles de Gaulle, Terminal 2E",
+      "departureTime": "11h45",
+      "arrivalAirport": "Mexico",
+      "arrivalTime": "16h55",
+      "date": "11/11/2026",
+      "layover": "",
+      "meetingTime": "09h15 au comptoir d'enregistrement"
     },
     "inbound": {
-      "airline": "Compagnie aérienne régulière",
-      "flightNumber": "",
-      "departureAirport": "Aéroport de départ",
-      "departureTime": "",
-      "arrivalAirport": "Aéroport d'arrivée",
-      "arrivalTime": "",
-      "date": "Jour 1",
+      "airline": "Air France",
+      "flightNumber": "AF 651",
+      "departureAirport": "Cancun",
+      "departureTime": "21h00",
+      "arrivalAirport": "Paris Roissy Charles de Gaulle, Terminal 2E",
+      "arrivalTime": "12h30 le 24/11/2026",
+      "date": "23/11/2026",
       "layover": ""
     },
     "domesticFlights": []
   },
   "contacts": {
     "receptif": {
-      "name": "Permanence Urgences Girardot",
-      "emergency": "+33 3 85 00 00 00",
-      "phone": "+33 3 85 00 00 00",
-      "address": "Chalon-sur-Saône, France"
+      "name": "Francisca Mercado Sanchez (Caractères du Mexique)",
+      "emergency": "(+52) 223 4780899",
+      "phone": "559 1852294",
+      "address": "Mexico"
+    },
+    "guide": {
+      "name": "Hélène",
+      "role": "Accompagnatrice Girardot",
+      "phone": ""
+    },
+    "agence": {
+      "name": "Voyages Girardot",
+      "phone": "03 85 42 82 50",
+      "email": "contact@voyages-girardot.com"
     }
-  }
+  },
+  "isCruise": false,
+  "conciergeMode": "guided",
+  "shipName": "",
+  "decks": [],
+  "hotelsList": [
+    {
+      "name": "HOTEL REGENTE",
+      "dates": "Du 11 au 13 novembre",
+      "city": "Mexico (CDMX)",
+      "address": "Paris No. 9 Col. Tabacalera, Delegacion Cuauhtemoc, 06030 Mexico, CDMX",
+      "phone": "+55 10 84 87 00",
+      "lat": 19.4326,
+      "lng": -99.1332,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL PALACE PUEBLA",
+      "dates": "Du 13 au 14 novembre",
+      "city": "Puebla",
+      "address": "Av 2 Ote 13, Centro histórico de Puebla, 72000 Puebla",
+      "phone": "+52 222 232 2430",
+      "lat": 19.0414,
+      "lng": -98.2063,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL LOS OLIVOS SPA",
+      "dates": "Du 14 au 15 novembre",
+      "city": "Oaxaca de Juárez",
+      "address": "Francisco I. Madero 1254 Col,, Santa María del Marquesado, Ex-Marquezado,, 68030 Oaxaca de Juárez, Mexico",
+      "phone": "+52 800 202 0739",
+      "lat": 17.0732,
+      "lng": -96.7266,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL MANZUR",
+      "dates": "Du 15 au 16 novembre",
+      "city": "Ixtepec",
+      "address": "Avenida 16 De Septiembre 110, 70110 Ixtepec",
+      "phone": "+52 971 688 2931",
+      "lat": 16.5593,
+      "lng": -95.0975,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL MANSION VALLE",
+      "dates": "Du 16 au 18 novembre",
+      "city": "San Cristóbal de las Casas",
+      "address": "Calle Diego de Mazariegos 39-Interior #1, Barrio de la Merced, 29240 San Cristobal de las Casas",
+      "phone": "+52 967 678 2582",
+      "lat": 16.737,
+      "lng": -92.6376,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL TULIJA EXPRESS PALENQUE",
+      "dates": "Du 18 au 19 novembre",
+      "city": "Palenque",
+      "address": "5a. Avenida Nte. Pte. 36, Zona Hotelera, 29960 Palenque",
+      "phone": "+52 (916) 345 0165 / 345 0166",
+      "lat": 17.5095,
+      "lng": -91.9825,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL OCEAN VIEW",
+      "dates": "Du 19 au 20 novembre",
+      "city": "Campeche",
+      "address": "Av. Pedro Sainz de Baranda, Joaquín Clausell con, 24010 Campeche",
+      "phone": "+52 981 811 9999",
+      "lat": 19.8301,
+      "lng": -90.5349,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL DEL GOBERNADOR",
+      "dates": "Du 20 au 22 novembre",
+      "city": "Mérida",
+      "address": "Calle 59 No. 535 por 66, Col. Centro, 97000 Mérida, Yuc",
+      "phone": "+52 999 930 4141",
+      "lat": 20.9674,
+      "lng": -89.5926,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    },
+    {
+      "name": "HOTEL FUNDADORES",
+      "dates": "Du 22 au 23 novembre",
+      "city": "Valladolid",
+      "address": "Calle 42 por 35 y 37 # 183, E Centro, 97780 Valladolid, Yucatan",
+      "phone": "+52 985 856 2437",
+      "lat": 20.6896,
+      "lng": -88.2024,
+      "notes": "Hôtel sélectionné par Voyages Girardot"
+    }
+  ]
 }

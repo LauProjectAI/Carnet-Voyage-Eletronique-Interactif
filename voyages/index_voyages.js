@@ -40,8 +40,8 @@ window.AVAILABLE_TRIPS = [
     alias: "mexique",
     aliases: ["mexique", "cocktail-mexicain"],
     title: "Cocktail Mexicain",
-    subtitle: "Circuit exclusif Voyages Girardot",
-    dates: "Selon calendrier des départs",
+    subtitle: "De Mexico au Yucatan en passant par les Chiapas",
+    dates: "11 au 24 novembre 2026",
     file: "voyages/voyage-1792069990645 Mexique.json"
   },
   {

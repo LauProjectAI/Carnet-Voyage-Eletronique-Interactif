@@ -599,7 +599,7 @@ function renderTodayFocus() {
 
     itemEl.innerHTML = `
       <div class="timeline-track-col">
-        <span class="timeline-time-label">${entry.time || ''}</span>
+        ${entry.time ? `<span class="timeline-time-label">${entry.time}</span>` : ''}
         <div class="timeline-node-icon ${isChecked ? 'done' : (idx === 1 ? 'next' : '')}" id="node-icon-${idx}" onclick="toggleTimelineCheck(${activeDayIndex}, ${idx})">
           <i class="fa-solid ${isChecked ? 'fa-check' : (entry.icon || 'location-dot')}"></i>
         </div>

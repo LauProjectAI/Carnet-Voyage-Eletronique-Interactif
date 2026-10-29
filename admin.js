@@ -2102,6 +2102,16 @@ function renderAdminHotels() {
           <input type="text" class="form-control" value="${hotel.dates || ''}" placeholder="Ex: Du 13 au 14 octobre" onchange="updateHotelField(${index}, 'dates', this.value)">
         </div>
       </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Téléphone de l'hébergement :</label>
+          <input type="text" class="form-control" value="${hotel.phone || ''}" placeholder="Ex: +52 222 232 2430" onchange="updateHotelField(${index}, 'phone', this.value)">
+        </div>
+        <div class="form-group">
+          <label>Ville / Étape :</label>
+          <input type="text" class="form-control" value="${hotel.city || ''}" placeholder="Ex: Puebla" onchange="updateHotelField(${index}, 'city', this.value)">
+        </div>
+      </div>
       <div class="form-group">
         <label>Adresse ou Port d'embarquement (calcul GPS) :</label>
         <div style="display:flex; gap:8px;">
@@ -5352,6 +5362,137 @@ function extractDestinationPracticalInfoFromText(text) {
   return { tipsList, practicalInfo };
 }
 
+const DESTINATION_CITY_COORDINATES = {
+  "san cristobal de las casas": { lat: 16.7370, lng: -92.6376, city: "San Cristóbal de las Casas" },
+  "san cristobal": { lat: 16.7370, lng: -92.6376, city: "San Cristóbal de las Casas" },
+  "oaxaca de juarez": { lat: 17.0732, lng: -96.7266, city: "Oaxaca de Juárez" },
+  "oaxaca": { lat: 17.0732, lng: -96.7266, city: "Oaxaca" },
+  "puebla": { lat: 19.0414, lng: -98.2063, city: "Puebla" },
+  "ixtepec": { lat: 16.5593, lng: -95.0975, city: "Ixtepec" },
+  "palenque": { lat: 17.5095, lng: -91.9825, city: "Palenque" },
+  "campeche": { lat: 19.8301, lng: -90.5349, city: "Campeche" },
+  "merida": { lat: 20.9674, lng: -89.5926, city: "Mérida" },
+  "valladolid": { lat: 20.6896, lng: -88.2024, city: "Valladolid" },
+  "cancun": { lat: 21.1619, lng: -86.8515, city: "Cancún" },
+  "tulum": { lat: 20.2114, lng: -87.4654, city: "Tulum" },
+  "celestun": { lat: 20.8600, lng: -90.3980, city: "Celestún" },
+  "chichen itza": { lat: 20.6843, lng: -88.5678, city: "Chichén Itzá" },
+  "teotihuacan": { lat: 19.6925, lng: -98.8437, city: "Teotihuacán" },
+  "mexico cdmx": { lat: 19.4326, lng: -99.1332, city: "Mexico (CDMX)" },
+  "cdmx": { lat: 19.4326, lng: -99.1332, city: "Mexico (CDMX)" },
+  "mexico": { lat: 19.4326, lng: -99.1332, city: "Mexico (CDMX)" },
+  "chicago": { lat: 41.8781, lng: -87.6298, city: "Chicago" },
+  "san francisco": { lat: 37.7749, lng: -122.4194, city: "San Francisco" },
+  "paris": { lat: 48.8566, lng: 2.3522, city: "Paris" },
+  "marseille": { lat: 43.2965, lng: 5.3698, city: "Marseille" },
+  "barcelone": { lat: 41.3851, lng: 2.1734, city: "Barcelone" },
+  "tanger": { lat: 35.7878, lng: -5.8118, city: "Tanger" },
+  "casablanca": { lat: 33.6062, lng: -7.6186, city: "Casablanca" },
+  "cadix": { lat: 36.5271, lng: -6.2886, city: "Cadix" },
+  "gibraltar": { lat: 36.1408, lng: -5.3536, city: "Gibraltar" },
+  "malaga": { lat: 36.7213, lng: -4.4214, city: "Malaga" },
+  "seville": { lat: 37.3891, lng: -5.9845, city: "Séville" },
+  "savone": { lat: 44.3079, lng: 8.4811, city: "Savone" },
+  "palerme": { lat: 38.1157, lng: 13.3615, city: "Palerme" },
+  "cagliari": { lat: 39.2238, lng: 9.1217, city: "Cagliari" },
+  "civitavecchia": { lat: 42.0924, lng: 11.7954, city: "Civitavecchia / Rome" },
+  "genes": { lat: 44.4056, lng: 8.9463, city: "Gênes" },
+  "naples": { lat: 40.8518, lng: 14.2681, city: "Naples" },
+  "le cap": { lat: -33.9249, lng: 18.4241, city: "Le Cap" },
+  "pretoria": { lat: -25.7479, lng: 28.2293, city: "Pretoria" },
+  "johannesburg": { lat: -26.2041, lng: 28.0473, city: "Johannesburg" }
+};
+
+function separateDayTitleAndText(rawText) {
+  let cleaned = (rawText || "").replace(/^[•\-\*·\s]+/, '').trim();
+  cleaned = cleaned.replace(/^[•\-\*·\s]+/, '').trim();
+
+  const reg = /(?:^|\s+)(Jour\s+consacr[eé]|Visite|Route|D[ée]part|D[ée]couverte|Matin[ée]e|Apr[èe]s-midi|Accueil|Transfert|Embarquement|Envol|Arriv[ée]e)(?![a-zA-Zà-ÿÀ-Ý])/i;
+  const m = cleaned.match(reg);
+  if (m && m.index > 2) {
+    const candidateTitle = cleaned.slice(0, m.index).replace(/[•:\-–—."'«»\s]+$/, '').trim();
+    const candidateDesc = cleaned.slice(m.index).trim();
+    if (candidateTitle.length >= 2 && candidateTitle.length <= 70) {
+      return { title: candidateTitle, extraDesc: candidateDesc };
+    }
+  }
+
+  const doubleSpaceMatch = cleaned.match(/^([A-ZÀ-Ý0-9][\w\s'’/&,.-]{1,60}?)\s{2,}(.*)$/s);
+  if (doubleSpaceMatch) {
+    const candidateTitle = doubleSpaceMatch[1].trim();
+    const rest = doubleSpaceMatch[2].trim();
+    if (candidateTitle.includes('-') || candidateTitle.includes('–') || candidateTitle.split(/\s+/).length <= 6) {
+      return { title: candidateTitle, extraDesc: rest };
+    }
+  }
+
+  if (cleaned.length <= 65) return { title: cleaned, extraDesc: '' };
+  return { title: cleaned.slice(0, 50).trim(), extraDesc: cleaned.slice(50).trim() };
+}
+
+function extractVisitsFromDay(description, dayTitle) {
+  const visits = [];
+  if (!description) {
+    return [{
+      time: "",
+      title: dayTitle || "Étape du jour",
+      subtitle: "Déroulé de la journée.",
+      icon: "route"
+    }];
+  }
+
+  const rawItems = description
+    .split(/(?:\r?\n|(?<=[.!?])\s+)/)
+    .map(s => s.replace(/^[•\-\*·\s]+/, '').trim())
+    .filter(s => s.length > 8);
+
+  const filterOutIntro = rawItems.filter(s => {
+    const l = (s || "").normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    return !l.startsWith('pays fabuleux') &&
+           !l.startsWith('trois mille ans') &&
+           !l.startsWith('le voyage n’etant pas une science exacte') &&
+           !l.startsWith('le voyage n\'etant pas une science exacte') &&
+           !l.startsWith('nous attirons votre attention') &&
+           !l.startsWith('sous reserve de modification');
+  });
+
+  const candidates = filterOutIntro.length > 0 ? filterOutIntro : rawItems;
+
+  candidates.slice(0, 5).forEach(item => {
+    let detectedTime = "";
+    const timeMatch = item.match(/\b([01]?\d|2[0-3])[hH:]([0-5]\d)\b/) || item.match(/\b([01]?\d|2[0-3])\s*[hH]\b/);
+    if (timeMatch) {
+      const h = timeMatch[1].padStart(2, '0');
+      const m = timeMatch[2] ? timeMatch[2] : "00";
+      detectedTime = `${h}:${m}`;
+    }
+
+    let cleanTitle = item.replace(/^(?:[àa]\s*)?(?:[01]?\d|2[0-3])[hH:][0-5]\d\s*[:–-]?\s*/i, '').trim();
+    if (cleanTitle.length > 60) {
+      const commaIdx = cleanTitle.indexOf(',');
+      if (commaIdx > 15 && commaIdx < 60) {
+        cleanTitle = cleanTitle.slice(0, commaIdx).trim();
+      } else {
+        cleanTitle = cleanTitle.slice(0, 58).replace(/[.,;:!?\s]+$/, '') + '...';
+      }
+    }
+
+    visits.push({
+      time: detectedTime,
+      title: cleanTitle,
+      subtitle: item,
+      icon: (typeof detectIconForText === 'function') ? detectIconForText(item) : 'location-dot'
+    });
+  });
+
+  return visits.length > 0 ? visits : [{
+    time: "",
+    title: dayTitle,
+    subtitle: description,
+    icon: "route"
+  }];
+}
+
 function processExtractedTextToTrip(text, sourceName) {
   const statusEl = document.getElementById('pdf-import-status');
   const previewBox = document.getElementById('pdf-preview-container');
@@ -5476,44 +5617,39 @@ function processExtractedTextToTrip(text, sourceName) {
         i++;
       }
 
-      let probCity = extractProbableCity(dayTitle);
-      let probLat = 0;
-      let probLng = 0;
-
-      const normTitle = dayTitle.toLowerCase();
-      for (const [portKey, portData] of Object.entries(knownPortCoordinates)) {
-        if (normTitle.includes(portKey)) {
-          probCity = portData.city;
-          probLat = portData.lat;
-          probLng = portData.lng;
-          break;
-        }
-      }
+      const separated = (typeof separateDayTitleAndText === 'function') 
+        ? separateDayTitleAndText(dayTitle) 
+        : { title: dayTitle, extraDesc: "" };
 
       currentDay = {
         day: dayNum,
-        title: dayTitle || `Étape Jour ${dayNum}`,
-        city: probCity,
-        lat: probLat,
-        lng: probLng,
-        highlight: dayTitle,
-        description: "",
+        title: separated.title || `Étape Jour ${dayNum}`,
+        city: "",
+        lat: 0,
+        lng: 0,
+        highlight: "", // Thématique / Point fort : reste vide et sera rempli à la main par l'administrateur
+        description: separated.extraDesc || "",
         weather: "",
-        dateStr: "",
+        dateStr: `Jour ${dayNum}`,
         timeline: []
       };
     } else if (currentDay) {
       if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
         const visitTitle = line.replace(/^[•\-\*]\s*/, '').trim();
         if (visitTitle.length > 2) {
-          const itemTime = 9 + currentDay.timeline.length * 2;
+          let itemTime = "";
+          const tm = visitTitle.match(/\b([01]?\d|2[0-3])[hH:]([0-5]\d)\b/) || visitTitle.match(/\b([01]?\d|2[0-3])\s*[hH]\b/);
+          if (tm) {
+            itemTime = `${tm[1].padStart(2, '0')}:${tm[2] ? tm[2] : '00'}`;
+          }
           currentDay.timeline.push({
-            time: `${itemTime < 10 ? '0' : ''}${itemTime}:00`,
+            time: itemTime, // Pas d'horaires inventés si non spécifiés dans le document
             title: visitTitle,
             subtitle: "Visite ou temps fort au programme.",
             icon: detectIconForText(visitTitle)
           });
         }
+        currentDay.description += (currentDay.description ? " " : "") + visitTitle;
       } else {
         currentDay.description += (currentDay.description ? " " : "") + line;
       }
@@ -5524,35 +5660,54 @@ function processExtractedTextToTrip(text, sourceName) {
     itinerary.push(currentDay);
   }
 
+  // Clés de coordonnées triées par spécificité (les noms les plus longs d'abord)
+  const sortedCoordsKeys = (typeof DESTINATION_CITY_COORDINATES !== 'undefined') 
+    ? Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length)
+    : [];
+
   itinerary.forEach(d => {
+    // Si aucune visite extraite par puces, extraire les étapes depuis les phrases du descriptif (SANS inventer d'horaires)
     if (!d.timeline || d.timeline.length === 0) {
-      const sentences = (d.description || "").split(/(?<=[.!?])\s+/).filter(s => s.trim().length > 10);
-      if (sentences.length > 0) {
-        d.timeline = sentences.slice(0, 4).map((sentence, idx) => {
-          const hour = 8 + (idx * 3);
-          const timeStr = `${hour < 10 ? '0' : ''}${hour}:00`;
-          let shortTitle = sentence.slice(0, 55).replace(/[.!?]$/, '').trim();
-          return {
-            time: timeStr,
-            title: shortTitle,
-            subtitle: sentence,
-            icon: detectIconForText(sentence)
-          };
-        });
+      if (typeof extractVisitsFromDay === 'function') {
+        d.timeline = extractVisitsFromDay(d.description, d.title);
       } else {
-        d.timeline = [
-          {
-            time: "10:00",
-            title: d.highlight || d.title,
-            subtitle: d.description || "Déroulé de la journée.",
-            icon: "route"
-          }
-        ];
+        d.timeline = [{
+          time: "",
+          title: d.title,
+          subtitle: d.description || "Déroulé de la journée.",
+          icon: "route"
+        }];
       }
     }
+
+    // Résolution précise de la Ville et des coordonnées GPS de l'étape
+    const normSearch = (d.title + " " + d.description).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    for (const k of sortedCoordsKeys) {
+      if (normSearch.includes(k)) {
+        const c = DESTINATION_CITY_COORDINATES[k];
+        d.city = c.city;
+        d.lat = c.lat;
+        d.lng = c.lng;
+        break;
+      }
+    }
+
+    // Vérification des ports connus pour croisières
+    if (!d.lat && !d.lng) {
+      for (const [portKey, portData] of Object.entries(knownPortCoordinates)) {
+        if (normSearch.includes(portKey)) {
+          d.city = portData.city;
+          d.lat = portData.lat;
+          d.lng = portData.lng;
+          break;
+        }
+      }
+    }
+
+    if (!d.city) d.city = extractProbableCity(d.title);
   });
 
-  // 3. Détection des Hôtels avec Dates et Adresses complètes
+  // 3. Détection des Hôtels avec Dates, Adresses complètes et coordonnées GPS
   const hotels = [];
   const hotelSectionRegex = /(?:coordonn[ée]es de vos h[ôo]tels|vos h[ôo]tels)([\s\S]*?)(?:votre accompagnatrice|votre guide|vos contacts|formalités|bon à savoir|$)/i;
   const hotelSectionMatch = text.match(hotelSectionRegex);
@@ -5580,14 +5735,50 @@ function processExtractedTextToTrip(text, sourceName) {
         }
       }
 
+      const fullAddress = addressParts.join(", ") || hotelName;
+      const lastAddrLine = addressParts[addressParts.length - 1] || "";
+      let detectedCity = lastAddrLine.replace(/^\d{4,5}\s+/, '').replace(/,\s*[A-Z]{2,4}$/, '').trim();
+      let lat = 0;
+      let lng = 0;
+
+      const normAddr = fullAddress.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const normDetectedCity = (detectedCity || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const normSearch = (hotelName + " " + fullAddress + " " + detectedCity).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+      // 1. Tester d'abord la ville détectée dans la dernière ligne d'adresse
+      let matchedCoord = null;
+      for (const k of sortedCoordsKeys) {
+        if (normDetectedCity && (normDetectedCity.includes(k) || k.includes(normDetectedCity))) {
+          matchedCoord = DESTINATION_CITY_COORDINATES[k];
+          break;
+        }
+      }
+
+      // 2. Sinon chercher dans l'adresse complète (en évitant le piège du nom de rue ex: "Paris No. 9" à Mexico)
+      if (!matchedCoord) {
+        for (const k of sortedCoordsKeys) {
+          if (k === 'paris' && (normAddr.includes('mexico') || normAddr.includes('cdmx'))) continue;
+          if (normSearch.includes(k)) {
+            matchedCoord = DESTINATION_CITY_COORDINATES[k];
+            break;
+          }
+        }
+      }
+
+      if (matchedCoord) {
+        lat = matchedCoord.lat;
+        lng = matchedCoord.lng;
+        detectedCity = matchedCoord.city;
+      }
+
       hotels.push({
         name: hotelName,
         dates: datesStay,
-        city: addressParts[addressParts.length - 1] || "Étape du circuit",
-        address: addressParts.join(", ") || hotelName,
+        city: detectedCity || "Étape du circuit",
+        address: fullAddress,
         phone: phone,
-        lat: 0,
-        lng: 0,
+        lat: lat,
+        lng: lng,
         notes: "Hôtel sélectionné par Voyages Girardot"
       });
     }
@@ -5708,17 +5899,20 @@ function processExtractedTextToTrip(text, sourceName) {
 
   // 6. Détection des Vols (Aller / Retour)
   const flightsList = [];
-  const outboundMatch = text.match(/Aller\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})([\s\S]*?)(?=Retour|$)/i);
+  const outboundMatch = text.match(/(?:Vol\s+)?Aller\s*[:–-]?\s*([0-9a-zA-Zà-ÿ\s/.-]*?)(?:\r?\n)([\s\S]*?)(?=(?:Vol\s+)?Retour|Nous attirons|Bagages|Jour 1|$)/i);
   if (outboundMatch) {
-    const outDate = outboundMatch[1];
+    const outHeader = outboundMatch[1].trim();
     const outBlock = outboundMatch[2];
-    const depAero = (outBlock.match(/D[ée]collage de l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
-    const arrAero = (outBlock.match(/A l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
-    const flightNum = (outBlock.match(/N°\s*de vol\s*:\s*(.*)/i) || [])[1] || "";
-    const depTime = (outBlock.match(/D[ée]collage pr[ée]vu [àa]\s*:\s*(.*)/i) || [])[1] || "";
-    const arrTime = (outBlock.match(/Arriv[ée]e pr[ée]vue [àa]\s*:\s*(.*)/i) || [])[1] || "";
+    const outDateMatch = outHeader.match(/\d{1,2}\/\d{1,2}\/\d{4}/) || outBlock.match(/Date\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i) || outHeader.match(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i);
+    const outDate = outDateMatch ? outDateMatch[0] : (outHeader || detectedStartDate || "Jour 1");
+
+    const depAero = (outBlock.match(/(?:D[ée]collage de l[’']a[ée]roport de|D[ée]part de|A[ée]roport de d[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
+    const arrAero = (outBlock.match(/(?:A l[’']a[ée]roport de|Arriv[ée]e [àa]|A[ée]roport d'arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
+    const flightNum = (outBlock.match(/(?:N°\s*(?:de\s*)?vol|Vol)\s*:\s*(.*)/i) || [])[1] || "";
+    const depTime = (outBlock.match(/(?:D[ée]collage pr[ée]vu [àa]|D[ée]part pr[ée]vu [àa]|D[ée]collage|D[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
+    const arrTime = (outBlock.match(/(?:Arriv[ée]e pr[ée]vue [àa]|Arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
     const comp = (outBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
-    const meeting = (outBlock.match(/Heure de pr[ée]sentation\s*:\s*(.*)/i) || [])[1] || "";
+    const meeting = (outBlock.match(/(?:Heure de pr[ée]sentation|Convocation)\s*(?:[àa]\s*l[’']a[ée]roport)?\s*:\s*(.*)/i) || [])[1] || "";
 
     if (flightNum || (depAero && arrAero)) {
       flightsList.push({
@@ -5736,15 +5930,18 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
-  const inboundMatch = text.match(/Retour\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})([\s\S]*?)(?=Nous attirons|Bagages|Jour 1|$)/i);
+  const inboundMatch = text.match(/(?:Vol\s+)?Retour\s*[:–-]?\s*([0-9a-zA-Zà-ÿ\s/.-]*?)(?:\r?\n)([\s\S]*?)(?=Nous attirons|Bagages|Jour 1|Coordonnées|Vos hôtels|$)/i);
   if (inboundMatch) {
-    const inDate = inboundMatch[1];
+    const inHeader = inboundMatch[1].trim();
     const inBlock = inboundMatch[2];
-    const depAero = (inBlock.match(/D[ée]collage de l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
-    const arrAero = (inBlock.match(/A l[’']a[ée]roport de\s*:\s*(.*)/i) || [])[1] || "";
-    const flightNum = (inBlock.match(/N°\s*de vol\s*:\s*(.*)/i) || [])[1] || "";
-    const depTime = (inBlock.match(/D[ée]collage pr[ée]vu [àa]\s*:\s*(.*)/i) || [])[1] || "";
-    const arrTime = (inBlock.match(/Arriv[ée]e pr[ée]vue [àa]\s*:\s*(.*)/i) || [])[1] || "";
+    const inDateMatch = inHeader.match(/\d{1,2}\/\d{1,2}\/\d{4}/) || inBlock.match(/Date\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i) || inHeader.match(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i);
+    const inDate = inDateMatch ? inDateMatch[0] : (inHeader || detectedEndDate || "Dernier jour");
+
+    const depAero = (inBlock.match(/(?:D[ée]collage de l[’']a[ée]roport de|D[ée]part de|A[ée]roport de d[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
+    const arrAero = (inBlock.match(/(?:A l[’']a[ée]roport de|Arriv[ée]e [àa]|A[ée]roport d'arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
+    const flightNum = (inBlock.match(/(?:N°\s*(?:de\s*)?vol|Vol)\s*:\s*(.*)/i) || [])[1] || "";
+    const depTime = (inBlock.match(/(?:D[ée]collage pr[ée]vu [àa]|D[ée]part pr[ée]vu [àa]|D[ée]collage|D[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
+    const arrTime = (inBlock.match(/(?:Arriv[ée]e pr[ée]vue [àa]|Arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
     const comp = (inBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
 
     if (flightNum || (depAero && arrAero)) {
@@ -5763,6 +5960,33 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
+  // Backup scan automatique des numéros de vols réels (ex: AF 178, AF 651) si le format différé n'a pas répondu
+  if (flightsList.length === 0) {
+    const flightRegex = /\b(AF|IB|LH|UX|BA|EK|QR|SN|KL|AT)\s*(\d{2,4})\b/g;
+    let fm;
+    const foundNumbers = [];
+    while ((fm = flightRegex.exec(text)) !== null) {
+      const fullNum = `${fm[1]} ${fm[2]}`;
+      if (!foundNumbers.includes(fullNum)) {
+        foundNumbers.push(fullNum);
+        flightsList.push({
+          type: foundNumbers.length === 1 ? "Aller" : "Retour",
+          airline: fm[1] === 'AF' ? "Air France" : (fm[1] === 'IB' ? "Iberia" : (fm[1] === 'LH' ? "Lufthansa" : "Compagnie aérienne")),
+          flightNumber: fullNum,
+          departureAirport: foundNumbers.length === 1 ? "Paris Charles de Gaulle" : "Aéroport international de destination",
+          departureTime: "",
+          arrivalAirport: foundNumbers.length === 1 ? (detectedTitle || "Destination") : "Paris Charles de Gaulle",
+          arrivalTime: "",
+          date: detectedDates || "",
+          via: "",
+          notes: ""
+        });
+      }
+    }
+  }
+
+  const landFlightsCopy = JSON.parse(JSON.stringify(flightsList));
+
   // 7. Objet Voyage Final
   const newTripId = 'voyage-' + Date.now();
   currentParsedTrip = {
@@ -5780,8 +6004,10 @@ function processExtractedTextToTrip(text, sourceName) {
       link: ""
     },
     flightsList: flightsList,
+    flights: flightsList,
     itinerary: itinerary,
     hotels: hotels,
+    hotelsList: hotels,
     documents: [],
     freeTimeSuggestions: [],
     contactsList: contactsList,
@@ -5804,6 +6030,7 @@ function processExtractedTextToTrip(text, sourceName) {
     },
     _rawImportedText: text,
     _landContactsList: landContactsCopy,
+    _landFlightsList: landFlightsCopy,
     _detectedShip: detectedShip,
     _accompName: accompName,
     conciergeMode: conciergeMode
@@ -6579,6 +6806,9 @@ function onParsedProfilePreviewChange(newMode) {
 
     if (currentParsedTrip._landContactsList && currentParsedTrip._landContactsList.length > 0) {
       currentParsedTrip.contactsList = JSON.parse(JSON.stringify(currentParsedTrip._landContactsList));
+    }
+    if (currentParsedTrip._landFlightsList && currentParsedTrip._landFlightsList.length > 0) {
+      currentParsedTrip.flightsList = JSON.parse(JSON.stringify(currentParsedTrip._landFlightsList));
     }
   }
 

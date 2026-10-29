@@ -299,6 +299,10 @@ body {
   letter-spacing: -0.02em;
 }
 
+.timeline-track-col > .timeline-node-icon:first-child {
+  margin-top: 10px;
+}
+
 .timeline-node-icon {
   width: 26px;
   height: 26px;
