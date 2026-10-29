@@ -6544,9 +6544,10 @@ async function saveTripDirectToGitHub() {
     renderTripSelectorOptions();
     updateShareLink();
 
+    const cleanFilePath = filePath.split('/').map(encodeURIComponent).join('/');
     let existingSha = null;
     try {
-      const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(filePath)}?ref=${branch}`, {
+      const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}?ref=${branch}`, {
         headers: {
           'Authorization': `Bearer ${cfg.token}`,
           'Accept': 'application/vnd.github.v3+json'
@@ -6568,7 +6569,7 @@ async function saveTripDirectToGitHub() {
     };
     if (existingSha) putBody.sha = existingSha;
 
-    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${encodeURIComponent(filePath)}`, {
+    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${cfg.token}`,

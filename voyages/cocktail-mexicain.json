@@ -44,9 +44,9 @@
       "title": "Votre région - Paris - Mexico",
       "highlight": "",
       "description": "Jour consacré à l'acheminement. Transfert à l'aéroport de Paris . Formalités d'embarquement. Embarquement à destination de Mexico. Arrivée à Mexico, accueil par votre guide et transfert à l'hôtel. Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Dîner libre. Logement.",
-      "city": "Mexico",
-      "lat": 19.3207722,
-      "lng": -99.1514677,
+      "city": "Paris",
+      "lat": 48.8566,
+      "lng": 2.3522,
       "timeline": [
         {
           "time": "",
@@ -655,9 +655,9 @@
       "title": "Paris - Votre région",
       "highlight": "",
       "description": "Jour consacré au réacheminement. Arrivée à Paris . Retour dans votre région.",
-      "city": "Cancun",
-      "lat": 21.1527467,
-      "lng": -86.8425761,
+      "city": "Paris",
+      "lat": 48.8566,
+      "lng": 2.3522,
       "timeline": [
         {
           "time": "",
