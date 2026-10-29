@@ -1,5 +1,15 @@
 window.AVAILABLE_TRIPS = [
   {
+    id: "cocktail-mexicain",
+    alias: "cocktail-mexicain",
+    aliases: ["cocktail-mexicain"],
+    title: "Cocktail Mexicain",
+    subtitle: "De Mexico au Yucatan en passant par les Chiapas",
+    dates: "11 au 24 novembre 2026",
+    file: "voyages/cocktail-mexicain.json"
+  },
+
+  {
     id: "afrique-du-sud-2026",
     alias: "afrique-du-sud",
     aliases: ["afrique-du-sud"],
