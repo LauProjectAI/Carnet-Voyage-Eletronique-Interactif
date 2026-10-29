@@ -44,9 +44,9 @@
       "title": "Votre région - Paris - Mexico",
       "highlight": "",
       "description": "Jour consacré à l'acheminement. Transfert à l'aéroport de Paris . Formalités d'embarquement. Embarquement à destination de Mexico. Arrivée à Mexico, accueil par votre guide et transfert à l'hôtel. Pays fabuleux, le Mexique est une destination haute en couleurs qui séduit tous ses visiteurs avec l'opulence de sa nature, la splendeur de sa culture et la générosité de son peuple ! Dîner libre. Logement.",
-      "city": "Paris",
-      "lat": 48.8566,
-      "lng": 2.3522,
+      "city": "Mexico",
+      "lat": 19.3207722,
+      "lng": -99.1514677,
       "timeline": [
         {
           "time": "",
@@ -655,9 +655,9 @@
       "title": "Paris - Votre région",
       "highlight": "",
       "description": "Jour consacré au réacheminement. Arrivée à Paris . Retour dans votre région.",
-      "city": "Paris",
-      "lat": 48.8566,
-      "lng": 2.3522,
+      "city": "Cancun",
+      "lat": 21.1527467,
+      "lng": -86.8425761,
       "timeline": [
         {
           "time": "",
@@ -865,55 +865,55 @@
     "busNotes": "1er rang réservé aux personnes sensibles au mal des transports.",
     "roomingList": [
       {
-        "roomNumber": "101",
+        "roomNumber": "",
         "type": "Individuelle (Single)",
         "occupants": "MRS MORIN MIREILLE",
         "notes": ""
       },
       {
-        "roomNumber": "102",
+        "roomNumber": "",
         "type": "Individuelle (Single)",
         "occupants": "MRS AIRES MARIANNE",
         "notes": ""
       },
       {
-        "roomNumber": "103",
+        "roomNumber": "",
         "type": "Individuelle (Single)",
         "occupants": "MR BAUDOT HUGUES",
         "notes": ""
       },
       {
-        "roomNumber": "104",
+        "roomNumber": "",
         "type": "Individuelle (Single)",
         "occupants": "Accompagnateur",
         "notes": "Chambre Accompagnateur"
       },
       {
-        "roomNumber": "105",
+        "roomNumber": "",
         "type": "Double (Grand Lit)",
         "occupants": "MR TRIOUX JOSE / MRS DANHIEZ DANILA",
         "notes": ""
       },
       {
-        "roomNumber": "106",
+        "roomNumber": "",
         "type": "Double (Grand Lit)",
         "occupants": "MRS JOREZ ANNICK / MR BLANCHARD JEAN",
         "notes": ""
       },
       {
-        "roomNumber": "107",
+        "roomNumber": "",
         "type": "Double (Grand Lit)",
         "occupants": "MR TROUVAT DIDIER / MRS TROUVAT FRANCOISE",
         "notes": ""
       },
       {
-        "roomNumber": "108",
+        "roomNumber": "",
         "type": "Double (Grand Lit)",
         "occupants": "MR TERESZKO MIROSLAW / MRS CLINARD MIREILLE",
         "notes": ""
       },
       {
-        "roomNumber": "109",
+        "roomNumber": "",
         "type": "Double (Grand Lit)",
         "occupants": "MR GUY JEAN-LOUIS / MRS REY MARIA",
         "notes": ""
