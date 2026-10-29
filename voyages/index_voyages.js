@@ -1,5 +1,15 @@
 window.AVAILABLE_TRIPS = [
   {
+    id: "san-francisco-perso",
+    alias: "san-francisco-perso",
+    aliases: ["san-francisco-perso"],
+    title: "San Francisco - Perso",
+    subtitle: "Voyage Famille",
+    dates: "13/02 au 21/02/2027",
+    file: "voyages/san-francisco-perso.json"
+  },
+
+  {
     id: "cocktail-mexicain",
     alias: "cocktail-mexicain",
     aliases: ["cocktail-mexicain"],
