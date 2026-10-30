@@ -1,15 +1,5 @@
 window.AVAILABLE_TRIPS = [
   {
-    id: "san-francisco-perso",
-    alias: "san-francisco-perso",
-    aliases: ["san-francisco-perso"],
-    title: "San Francisco - Perso",
-    subtitle: "Voyage Famille",
-    dates: "13/02 au 21/02/2027",
-    file: "voyages/san-francisco-perso.json"
-  },
-
-  {
     id: "cocktail-mexicain",
     alias: "mexique",
     aliases: ["cocktail-mexicain", "mexique", "voyage-1792069990645"],
@@ -17,6 +7,15 @@ window.AVAILABLE_TRIPS = [
     subtitle: "De Mexico au Yucatan en passant par les Chiapas",
     dates: "11 au 24 novembre 2026",
     file: "voyages/cocktail-mexicain.json"
+  },
+  {
+    id: "san-francisco-perso",
+    alias: "san-francisco",
+    aliases: ["san-francisco", "san-francisco-perso", "voyage-1791900707100"],
+    title: "San Francisco - Perso",
+    subtitle: "Voyage Famille",
+    dates: "13/02 au 21/02/2027",
+    file: "voyages/san-francisco-perso.json"
   },
   {
     id: "afrique-du-sud-2026",
@@ -44,15 +43,6 @@ window.AVAILABLE_TRIPS = [
     subtitle: "Elan Chalon",
     dates: "23/02/2027 au 28/02/2027",
     file: "voyages/voyage-1791552514414 Chicago Elan.json"
-  },
-  {
-    id: "san-francisco-perso",
-    alias: "san-francisco",
-    aliases: ["san-francisco", "voyage-1791900707100"],
-    title: "San Francisco - Perso",
-    subtitle: "Voyage Famille",
-    dates: "13/02 au 21/02/2027",
-    file: "voyages/san-francisco-perso.json"
   },
   {
     id: "croisiere-costa-smeralda-2026",
