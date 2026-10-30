@@ -6387,15 +6387,35 @@ function syncFormDataIntoTrip() {
   // Synchronisation directe de l'itinéraire
   if (tripData.itinerary && Array.isArray(tripData.itinerary)) {
     tripData.itinerary.forEach((day, dayIndex) => {
+      const titleInput = document.getElementById(`day-title-${dayIndex}`);
+      if (titleInput && titleInput.value.trim() !== '') day.title = titleInput.value.trim();
+
+      const dateInput = document.getElementById(`day-date-${dayIndex}`);
+      if (dateInput) day.dateStr = dateInput.value.trim();
+
+      const descInput = document.getElementById(`day-desc-${dayIndex}`);
+      if (descInput) day.description = descInput.value;
+
+      const imgInput = document.getElementById(`day-image-${dayIndex}`);
+      if (imgInput) day.image = imgInput.value.trim();
+
       const latInput = document.getElementById(`day-lat-${dayIndex}`);
       const lngInput = document.getElementById(`day-lng-${dayIndex}`);
-      if (latInput && latInput.value !== '') {
-        const parsedLat = parseFloat(latInput.value);
-        if (!isNaN(parsedLat)) day.lat = parsedLat;
+      if (latInput) {
+        if (latInput.value.trim() !== '') {
+          const parsedLat = parseFloat(latInput.value);
+          if (!isNaN(parsedLat)) day.lat = parsedLat;
+        } else {
+          day.lat = null;
+        }
       }
-      if (lngInput && lngInput.value !== '') {
-        const parsedLng = parseFloat(lngInput.value);
-        if (!isNaN(parsedLng)) day.lng = parsedLng;
+      if (lngInput) {
+        if (lngInput.value.trim() !== '') {
+          const parsedLng = parseFloat(lngInput.value);
+          if (!isNaN(parsedLng)) day.lng = parsedLng;
+        } else {
+          day.lng = null;
+        }
       }
 
       if (day.timeline && Array.isArray(day.timeline)) {
@@ -6403,16 +6423,55 @@ function syncFormDataIntoTrip() {
           const vLatInp = document.getElementById(`visit-lat-${dayIndex}-${vIdx}`);
           const vLngInp = document.getElementById(`visit-lng-${dayIndex}-${vIdx}`);
           const vAddrInp = document.getElementById(`visit-addr-${dayIndex}-${vIdx}`);
-          if (vLatInp && vLatInp.value !== '') {
-            const p = parseFloat(vLatInp.value);
-            if (!isNaN(p)) v.lat = p;
+          if (vLatInp) {
+            if (vLatInp.value.trim() !== '') {
+              const p = parseFloat(vLatInp.value);
+              if (!isNaN(p)) v.lat = p;
+            } else {
+              v.lat = null;
+            }
           }
-          if (vLngInp && vLngInp.value !== '') {
-            const p = parseFloat(vLngInp.value);
-            if (!isNaN(p)) v.lng = p;
+          if (vLngInp) {
+            if (vLngInp.value.trim() !== '') {
+              const p = parseFloat(vLngInp.value);
+              if (!isNaN(p)) v.lng = p;
+            } else {
+              v.lng = null;
+            }
           }
           if (vAddrInp) v.address = vAddrInp.value;
         });
+      }
+    });
+  }
+
+  // Synchronisation des suggestions de temps libre
+  if (tripData.freeTimeSuggestions && Array.isArray(tripData.freeTimeSuggestions)) {
+    tripData.freeTimeSuggestions.forEach((sug, index) => {
+      const nameInp = document.getElementById(`sug-name-${index}`);
+      if (nameInp) sug.name = nameInp.value.trim();
+      const addrInp = document.getElementById(`sug-addr-${index}`);
+      if (addrInp) {
+        sug.address = addrInp.value.trim();
+        sug.location = addrInp.value.trim();
+      }
+      const latInp = document.getElementById(`sug-lat-${index}`);
+      const lngInp = document.getElementById(`sug-lng-${index}`);
+      if (latInp) {
+        if (latInp.value.trim() !== '') {
+          const pLat = parseFloat(latInp.value);
+          if (!isNaN(pLat)) sug.lat = pLat;
+        } else {
+          sug.lat = null;
+        }
+      }
+      if (lngInp) {
+        if (lngInp.value.trim() !== '') {
+          const pLng = parseFloat(lngInp.value);
+          if (!isNaN(pLng)) sug.lng = pLng;
+        } else {
+          sug.lng = null;
+        }
       }
     });
   }
@@ -6658,12 +6717,11 @@ async function getGitHubFileSha(repo, filePath, branch, token) {
   const cleanPath = filePath.split('/').map(encodeURIComponent).join('/');
   const cacheBuster = Date.now();
 
-  // 1. Essai principal direct via Contents API avec no-store et timestamp
+  // 1. Essai principal direct via Contents API (SANS cache: 'no-store' qui brise les requêtes CORS vers GitHub)
   try {
     const res = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanPath}?ref=${encodeURIComponent(branch)}&_=${cacheBuster}`, {
-      cache: 'no-store',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -6675,12 +6733,34 @@ async function getGitHubFileSha(repo, filePath, branch, token) {
     console.warn("Contents API SHA check failed:", e);
   }
 
-  // 2. Fallback via Commits API si la Contents API est en retard ou indisponible
+  // 2. Essai via Git Trees API (ultra rapide, direct et non affecté par les délais de mise à jour)
+  try {
+    const parts = cleanPath.split('/');
+    const folder = parts.length > 1 ? parts.slice(0, -1).join('/') : '';
+    const targetFileName = decodeURIComponent(parts[parts.length - 1]);
+    const treeRef = folder ? `${encodeURIComponent(branch)}:${folder}` : encodeURIComponent(branch);
+    const treeRes = await fetch(`https://api.github.com/repos/${repo}/git/trees/${treeRef}?_=${cacheBuster}`, {
+      headers: {
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (treeRes.ok) {
+      const treeData = await treeRes.json();
+      if (treeData && Array.isArray(treeData.tree)) {
+        const found = treeData.tree.find(item => item.path === targetFileName);
+        if (found && found.sha) return found.sha;
+      }
+    }
+  } catch (e) {
+    console.warn("Git Trees API SHA check failed:", e);
+  }
+
+  // 3. Fallback via Commits API si la Contents API ou Trees API sont indisponibles
   try {
     const commitRes = await fetch(`https://api.github.com/repos/${repo}/commits?path=${cleanPath}&sha=${encodeURIComponent(branch)}&per_page=1&_=${cacheBuster}`, {
-      cache: 'no-store',
       headers: {
-        'Authorization': `Bearer ${token}`,
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
         'Accept': 'application/vnd.github.v3+json'
       }
     });
@@ -6688,9 +6768,8 @@ async function getGitHubFileSha(repo, filePath, branch, token) {
       const commits = await commitRes.json();
       if (Array.isArray(commits) && commits.length > 0 && commits[0].sha) {
         const detailRes = await fetch(`https://api.github.com/repos/${repo}/commits/${commits[0].sha}`, {
-          cache: 'no-store',
           headers: {
-            'Authorization': `Bearer ${token}`,
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
             'Accept': 'application/vnd.github.v3+json'
           }
         });
@@ -6703,6 +6782,21 @@ async function getGitHubFileSha(repo, filePath, branch, token) {
     }
   } catch (e) {
     console.warn("Commits API SHA check failed:", e);
+  }
+
+  // 4. Fallback sans Authorization si le dépôt est public (au cas où le jeton a un scope restreint en lecture)
+  try {
+    const publicRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanPath}?ref=${encodeURIComponent(branch)}&_=${cacheBuster}`, {
+      headers: {
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (publicRes.ok) {
+      const publicData = await publicRes.json();
+      if (publicData && publicData.sha) return publicData.sha;
+    }
+  } catch (e) {
+    console.warn("Public Contents API SHA check failed:", e);
   }
 
   return null;
@@ -6766,11 +6860,11 @@ async function saveTripDirectToGitHub() {
       body: JSON.stringify(putBody)
     });
 
-    // Si GitHub répond 422 ("sha wasn't supplied" ou conflit), récupération forcée immédiate et nouvelle tentative
-    if (!putRes.ok && putRes.status === 422) {
-      console.warn("GitHub 422 reçu, nouvelle tentative avec récupération forcée du SHA...");
+    // Si GitHub répond 422 ("sha wasn't supplied" ou conflit) ou 409 (Conflict), récupération forcée immédiate et nouvelle tentative
+    if (!putRes.ok && (putRes.status === 422 || putRes.status === 409)) {
+      console.warn(`GitHub ${putRes.status} reçu, nouvelle tentative avec récupération forcée du SHA...`);
       const freshSha = await getGitHubFileSha(repo, filePath, branch, cfg.token);
-      if (freshSha && freshSha !== existingSha) {
+      if (freshSha) {
         putBody.sha = freshSha;
         putBody.message = `feat(voyages): mise à jour du carnet ${tripData.title}`;
         putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}`, {
@@ -6796,7 +6890,6 @@ async function saveTripDirectToGitHub() {
       const cleanIndexPath = indexPath.split('/').map(encodeURIComponent).join('/');
       const indexSha = await getGitHubFileSha(repo, indexPath, branch, cfg.token);
       const getIndexRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanIndexPath}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
-        cache: 'no-store',
         headers: {
           'Authorization': `Bearer ${cfg.token}`,
           'Accept': 'application/vnd.github.v3+json'
@@ -6821,7 +6914,7 @@ async function saveTripDirectToGitHub() {
             updatedIndexContent = indexContent + `\nwindow.AVAILABLE_TRIPS.push(${JSON.stringify({ id: slug, title: tripData.title, file: filePath })});\n`;
           }
 
-          await fetch(`https://api.github.com/repos/${repo}/contents/${indexPath}`, {
+          await fetch(`https://api.github.com/repos/${repo}/contents/${cleanIndexPath}`, {
             method: 'PUT',
             headers: {
               'Authorization': `Bearer ${cfg.token}`,
