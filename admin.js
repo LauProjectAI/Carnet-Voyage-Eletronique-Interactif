@@ -7071,3 +7071,365 @@ function renderParsedTripSummaryInModal() {
     `;
   }
 }
+
+// ============================================================
+// ENRICHISSEMENT DU PROGRAMME VIA UN PDF PARTENAIRE (RÉCEPTIF)
+// ============================================================
+let currentPartnerParsedDays = [];
+
+function openPartnerEnrichModal() {
+  if (!tripData || !tripData.title) {
+    alert("⚠️ Aucun voyage actif n'est chargé dans l'administration.\nVeuillez d'abord sélectionner ou importer un voyage Girardot avant d'enrichir ses étapes.");
+    return;
+  }
+
+  const titleEl = document.getElementById('partner-target-title');
+  const metaEl = document.getElementById('partner-target-meta');
+  if (titleEl) titleEl.textContent = tripData.title + (tripData.subtitle ? ` — ${tripData.subtitle}` : '');
+  if (metaEl) {
+    const daysCount = tripData.itinerary ? tripData.itinerary.length : 0;
+    const hotelsCount = tripData.hotels ? tripData.hotels.length : 0;
+    const flightsCount = tripData.flightsList ? tripData.flightsList.length : 0;
+    metaEl.textContent = `${daysCount} jour(s) • ${hotelsCount} hôtel(s) • ${flightsCount} vol(s)`;
+  }
+
+  resetPartnerEnrichModalState();
+  const modal = document.getElementById('partner-enrich-modal');
+  if (modal) modal.style.display = 'flex';
+}
+
+function closePartnerEnrichModal() {
+  const modal = document.getElementById('partner-enrich-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function resetPartnerEnrichModalState() {
+  currentPartnerParsedDays = [];
+  const statusEl = document.getElementById('partner-enrich-status');
+  const previewEl = document.getElementById('partner-preview-container');
+  const btnApply = document.getElementById('btn-apply-partner-enrich');
+  const rawInput = document.getElementById('partner-raw-text-input');
+  const fileInput = document.getElementById('partner-pdf-file-input');
+
+  if (statusEl) statusEl.style.display = 'none';
+  if (previewEl) previewEl.style.display = 'none';
+  if (btnApply) btnApply.style.display = 'none';
+  if (rawInput) rawInput.value = '';
+  if (fileInput) fileInput.value = '';
+}
+
+function handlePartnerPdfFileSelected(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  const statusEl = document.getElementById('partner-enrich-status');
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.borderColor = '#93c5fd';
+    statusEl.style.background = '#eff6ff';
+    statusEl.style.color = '#1d4ed8';
+    statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lecture et analyse du PDF partenaire "${file.name}" en cours...`;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const typedarray = new Uint8Array(e.target.result);
+    extractTextFromPartnerPdfArray(typedarray, file.name);
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function extractTextFromPartnerPdfArray(typedarray, originalFileName) {
+  const statusEl = document.getElementById('partner-enrich-status');
+  if (!window.pdfjsLib) {
+    if (statusEl) {
+      statusEl.style.borderColor = '#fca5a5';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#b91c1c';
+      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> La bibliothèque PDF.js n'a pas pu être chargée. Vous pouvez copier/coller directement le texte du PDF dans l'encadré ci-dessous.`;
+    }
+    return;
+  }
+
+  window.pdfjsLib.getDocument({ data: typedarray }).promise.then(async function(pdf) {
+    let fullText = "";
+    for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+      const page = await pdf.getPage(pageNum);
+      const textContent = await page.getTextContent();
+      const items = textContent.items;
+      if (!items || items.length === 0) continue;
+
+      items.sort((a, b) => {
+        const yA = a.transform[5];
+        const yB = b.transform[5];
+        if (Math.abs(yA - yB) > 5) return yB - yA;
+        return a.transform[4] - b.transform[4];
+      });
+
+      let pageLines = [];
+      let currentLineY = null;
+      let currentLineText = "";
+
+      for (const item of items) {
+        const str = item.str;
+        if (!str) continue;
+        const itemY = item.transform[5];
+
+        if (currentLineY === null) {
+          currentLineY = itemY;
+          currentLineText = str;
+        } else if (Math.abs(itemY - currentLineY) > 5) {
+          pageLines.push(currentLineText.trim());
+          currentLineY = itemY;
+          currentLineText = str;
+        } else {
+          currentLineText += (currentLineText.endsWith(" ") || str.startsWith(" ") ? "" : " ") + str;
+        }
+      }
+      if (currentLineText.trim()) pageLines.push(currentLineText.trim());
+      fullText += pageLines.join("\n") + "\n\n";
+    }
+
+    processPartnerPdfText(fullText, originalFileName);
+  }).catch(function(err) {
+    if (statusEl) {
+      statusEl.style.borderColor = '#fca5a5';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#b91c1c';
+      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Erreur lors de la lecture du PDF : ${err.message}`;
+    }
+  });
+}
+
+function parsePastedPartnerText() {
+  const rawInput = document.getElementById('partner-raw-text-input');
+  if (!rawInput || !rawInput.value.trim()) {
+    alert("Veuillez d'abord coller le texte du programme partenaire.");
+    return;
+  }
+  processPartnerPdfText(rawInput.value.trim(), "Texte collé");
+}
+
+function parsePartnerItinerary(fullText) {
+  const progIdx = fullText.search(/(?:^|\n)\s*LE\s+PROGRAMME\b/i);
+  const textToScan = progIdx !== -1 ? fullText.slice(progIdx) : fullText;
+
+  const endIdx = textToScan.search(/(?:HOTELS\s+NORMES|HOTELS\s+SELECTIONNES|DEVIS\s+N|TARIFS\s+EN\s+EUROS|NOS\s+PRIX\s+COMPRENNENT)/i);
+  const cleanProgText = endIdx !== -1 ? textToScan.slice(0, endIdx) : textToScan;
+
+  const dayHeaderRegex = /(?:^|\n)\s*(?:JOUR|J)\s*(\d{1,2})\s*[:–-]\s*([^\n\r]+)/gi;
+  const days = [];
+  let match;
+  const indices = [];
+
+  while ((match = dayHeaderRegex.exec(cleanProgText)) !== null) {
+    indices.push({
+      dayNum: parseInt(match[1], 10),
+      rawHeader: match[2].trim(),
+      startIndex: match.index,
+      headerLength: match[0].length
+    });
+  }
+
+  for (let i = 0; i < indices.length; i++) {
+    const cur = indices[i];
+    const nextStart = (i + 1 < indices.length) ? indices[i + 1].startIndex : cleanProgText.length;
+    const bodyRaw = cleanProgText.slice(cur.startIndex + cur.headerLength, nextStart).trim();
+
+    const cleanLines = bodyRaw.split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => {
+        if (!l) return false;
+        if (/^---\s*PAGE\s*\d+\s*---/i.test(l)) return false;
+        if (/25\s+Boulevard\s+des\s+Martyrs\s+Nantais/i.test(l)) return false;
+        if (/ZEN\s+ASIE\s+SAS\s+TOTRAVEL/i.test(l)) return false;
+        if (/SIRET\s+\d+|GARANTIE\s+APST/i.test(l)) return false;
+        return true;
+      });
+
+    let rawTitle = cur.rawHeader;
+    let remainingLines = [...cleanLines];
+
+    if (remainingLines.length > 0) {
+      const firstLine = remainingLines[0];
+      const isDate = /^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i.test(firstLine);
+      const isContinuation = /^([A-Z0-9\s()\/–-]+(?:KM|H|\)))/i.test(firstLine) || /^[)]/.test(firstLine);
+      if (!isDate && isContinuation) {
+        rawTitle += ' ' + firstLine;
+        remainingLines.shift();
+      }
+    }
+
+    let dateStr = '';
+    if (remainingLines.length > 0) {
+      const isDate = /^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i.test(remainingLines[0]);
+      if (isDate) {
+        dateStr = remainingLines[0];
+        remainingLines.shift();
+      }
+    }
+
+    let cleanTitle = rawTitle
+      .replace(/[\u2708\uFE0F\uD83D\uDEEB✈️]+/g, ' - ')
+      .replace(/\s*\/\s*/g, ' - ')
+      .replace(/\s*-\s*-\s*/g, ' - ')
+      .replace(/\s{2,}/g, ' ')
+      .trim();
+
+    const description = remainingLines.join('\n\n');
+
+    let detectedCity = "";
+    let lat = null;
+    let lng = null;
+    const normSearch = (cleanTitle + " " + description).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    for (const k of sortedCoordsKeys) {
+      if (normSearch.includes(k)) {
+        const c = DESTINATION_CITY_COORDINATES[k];
+        detectedCity = c.city;
+        lat = c.lat;
+        lng = c.lng;
+        break;
+      }
+    }
+
+    days.push({
+      day: cur.dayNum,
+      title: cleanTitle,
+      dateStr: dateStr,
+      city: detectedCity,
+      lat: lat,
+      lng: lng,
+      description: description,
+      timeline: extractVisitsFromDay(description, cleanTitle)
+    });
+  }
+
+  return days;
+}
+
+function processPartnerPdfText(fullText, sourceName) {
+  const statusEl = document.getElementById('partner-enrich-status');
+  const previewEl = document.getElementById('partner-preview-container');
+  const btnApply = document.getElementById('btn-apply-partner-enrich');
+  const countEl = document.getElementById('partner-days-count');
+  const listEl = document.getElementById('partner-comparison-list');
+
+  const partnerDays = parsePartnerItinerary(fullText);
+
+  if (!partnerDays || partnerDays.length === 0) {
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.borderColor = '#fca5a5';
+      statusEl.style.background = '#fef2f2';
+      statusEl.style.color = '#b91c1c';
+      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Aucune étape (ex: "JOUR 01 : ...") n'a été détectée dans ce document. Vérifiez le format du fichier PDF ou collez directement son texte.`;
+    }
+    return;
+  }
+
+  currentPartnerParsedDays = partnerDays;
+
+  if (statusEl) {
+    statusEl.style.display = 'block';
+    statusEl.style.borderColor = '#86efac';
+    statusEl.style.background = '#f0fdf4';
+    statusEl.style.color = '#15803d';
+    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <strong>${partnerDays.length} étape(s) détectée(s)</strong> dans le document partenaire. Vérifiez l'aperçu ci-dessous et appliquez la mise à jour.`;
+  }
+
+  if (countEl) countEl.textContent = partnerDays.length;
+
+  if (listEl) {
+    const existingDays = tripData.itinerary || [];
+    listEl.innerHTML = partnerDays.map(p => {
+      const cur = existingDays.find(d => d.day === p.day);
+      const curTitle = cur ? cur.title : '<em>(Nouveau jour à créer)</em>';
+      const curDescLen = cur && cur.description ? cur.description.length : 0;
+      const newDescLen = p.description ? p.description.length : 0;
+      const visitsCount = p.timeline ? p.timeline.length : 0;
+
+      return `
+        <div style="border-bottom:1px solid #f1f5f9; padding:10px; font-size:0.8rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
+            <div style="font-weight:800; color:#1e293b;">
+              <span style="display:inline-block; background:#2563eb; color:white; border-radius:4px; padding:1px 6px; font-size:0.72rem; margin-right:6px;">Jour ${p.day}</span>
+              ${p.title}
+            </div>
+            <div style="font-size:0.75rem; color:#64748b;">
+              ${p.dateStr ? `<i class="fa-regular fa-calendar"></i> ${p.dateStr} • ` : ''}
+              <strong>${visitsCount} visite(s)</strong>
+            </div>
+          </div>
+          <div style="font-size:0.75rem; color:#475569; margin-bottom:4px;">
+            <span style="color:#64748b;">Trajet actuel :</span> ${curTitle}
+          </div>
+          <div style="font-size:0.75rem; color:#0f172a; background:#f8fafc; border-left:3px solid #2563eb; padding:6px 10px; border-radius:0 6px 6px 0; max-height:60px; overflow:hidden; text-overflow:ellipsis;">
+            ${p.description.slice(0, 180)}...
+            <span style="color:#2563eb; font-weight:700;">(${newDescLen} car. vs ${curDescLen} car.)</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (previewEl) previewEl.style.display = 'block';
+  if (btnApply) btnApply.style.display = 'inline-flex';
+}
+
+function applyPartnerEnrichmentToCurrentTrip() {
+  if (!currentPartnerParsedDays || currentPartnerParsedDays.length === 0) return;
+  if (!tripData) return;
+
+  const updateDesc = document.getElementById('chk-partner-desc') ? document.getElementById('chk-partner-desc').checked : true;
+  const updateTitle = document.getElementById('chk-partner-title') ? document.getElementById('chk-partner-title').checked : true;
+  const updateVisits = document.getElementById('chk-partner-visits') ? document.getElementById('chk-partner-visits').checked : true;
+  const keepHighlights = document.getElementById('chk-partner-keep-highlights') ? document.getElementById('chk-partner-keep-highlights').checked : true;
+
+  if (!tripData.itinerary) tripData.itinerary = [];
+
+  let updatedCount = 0;
+  let addedCount = 0;
+
+  currentPartnerParsedDays.forEach(p => {
+    let dayObj = tripData.itinerary.find(d => d.day === p.day);
+    if (dayObj) {
+      if (updateTitle && p.title) dayObj.title = p.title;
+      if (updateDesc && p.description) dayObj.description = p.description;
+      if (updateVisits && p.timeline && p.timeline.length > 0) dayObj.timeline = p.timeline;
+      if (p.dateStr && !dayObj.dateStr) dayObj.dateStr = p.dateStr;
+      if (p.city && (!dayObj.city || dayObj.city.length <= 3)) {
+        dayObj.city = p.city;
+        if (p.lat && !dayObj.lat) {
+          dayObj.lat = p.lat;
+          dayObj.lng = p.lng;
+        }
+      }
+      if (!keepHighlights) dayObj.highlight = "";
+      updatedCount++;
+    } else {
+      tripData.itinerary.push({
+        day: p.day,
+        title: p.title,
+        city: p.city || "",
+        dateStr: p.dateStr || `Jour ${p.day}`,
+        highlight: "",
+        weather: "",
+        description: p.description,
+        lat: p.lat,
+        lng: p.lng,
+        timeline: p.timeline || []
+      });
+      addedCount++;
+    }
+  });
+
+  // Trier les jours par numéro croissant
+  tripData.itinerary.sort((a, b) => a.day - b.day);
+
+  // Sauvegarder dans IndexedDB & localStorage sans toucher aux hôtels, vols et contacts
+  saveTripToCatalogAndStorage(tripData);
+  renderAdminDays();
+  closePartnerEnrichModal();
+
+  alert(`✓ Enrichissement réussi du voyage "${tripData.title}" !\n\n• ${updatedCount} journée(s) enrichie(s)\n${addedCount > 0 ? `• ${addedCount} nouvelle(s) étape(s) ajoutée(s)\n` : ''}• Vos hôtels, vols et contacts Girardot ont été rigoureusement conservés.`);
+}
