@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnet-girardot-v12';
+const CACHE_NAME = 'carnet-girardot-v13';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -51,8 +51,11 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   const url = event.request.url;
-  // Let map tiles and cross-origin images/CDNs fetch naturally without service worker interference
-  if (url.includes('tile.openstreetmap.org') || url.includes('basemaps.cartocdn.com') || url.includes('openstreetmap.fr')) {
+  // Let GitHub API, map tiles and cross-origin services fetch naturally without service worker interference
+  if (url.includes('api.github.com') ||
+      url.includes('tile.openstreetmap.org') ||
+      url.includes('basemaps.cartocdn.com') ||
+      url.includes('openstreetmap.fr')) {
     return;
   }
 
@@ -60,7 +63,7 @@ self.addEventListener('fetch', (event) => {
     caches.match(event.request).then((response) => {
       return response || fetch(event.request).then((fetchRes) => {
         return caches.open(CACHE_NAME).then((cache) => {
-          if (event.request.method === 'GET' && url.startsWith('http')) {
+          if (event.request.method === 'GET' && url.startsWith('http') && fetchRes && fetchRes.status === 200) {
             try {
               cache.put(event.request, fetchRes.clone());
             } catch(e) {}

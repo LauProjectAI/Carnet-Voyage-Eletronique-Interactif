@@ -5426,7 +5426,26 @@ const DESTINATION_CITY_COORDINATES = {
   "naples": { lat: 40.8518, lng: 14.2681, city: "Naples" },
   "le cap": { lat: -33.9249, lng: 18.4241, city: "Le Cap" },
   "pretoria": { lat: -25.7479, lng: 28.2293, city: "Pretoria" },
-  "johannesburg": { lat: -26.2041, lng: 28.0473, city: "Johannesburg" }
+  "johannesburg": { lat: -26.2041, lng: 28.0473, city: "Johannesburg" },
+  "new delhi": { lat: 28.6139, lng: 77.2090, city: "New Delhi" },
+  "delhi": { lat: 28.6139, lng: 77.2090, city: "Delhi" },
+  "mandawa": { lat: 28.0551, lng: 75.1485, city: "Mandawa" },
+  "bikaner": { lat: 28.0229, lng: 73.3119, city: "Bikaner" },
+  "jaisalmer": { lat: 26.9157, lng: 70.9083, city: "Jaisalmer" },
+  "sam": { lat: 26.8322, lng: 70.5050, city: "Dunes de Sam" },
+  "jodhpur": { lat: 26.2389, lng: 73.0243, city: "Jodhpur" },
+  "luni": { lat: 26.1022, lng: 73.0189, city: "Luni" },
+  "jaipur": { lat: 26.9124, lng: 75.7873, city: "Jaipur" },
+  "abhaneri": { lat: 27.0094, lng: 76.6025, city: "Abhaneri" },
+  "agra": { lat: 27.1767, lng: 78.0081, city: "Agra (Taj Mahal)" },
+  "jhansi": { lat: 25.4484, lng: 78.5685, city: "Jhansi" },
+  "orchha": { lat: 25.3516, lng: 78.6433, city: "Orchha" },
+  "orccha": { lat: 25.3516, lng: 78.6433, city: "Orchha" },
+  "khajuraho": { lat: 24.8318, lng: 79.9199, city: "Khajuraho" },
+  "varanasi": { lat: 25.3176, lng: 82.9739, city: "Varanasi (Bénarès)" },
+  "benares": { lat: 25.3176, lng: 82.9739, city: "Varanasi (Bénarès)" },
+  "sarnath": { lat: 25.3716, lng: 83.0252, city: "Sarnath" },
+  "geneve": { lat: 46.2044, lng: 6.1432, city: "Genève" }
 };
 
 function separateDayTitleAndText(rawText) {
@@ -5563,7 +5582,8 @@ function processExtractedTextToTrip(text, sourceName) {
 
   // Nettoyage du titre si la date est accolée
   if (detectedTitle) {
-    detectedTitle = detectedTitle.replace(/(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}.*$/i, '').trim();
+    detectedTitle = detectedTitle.replace(/(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b.*$/i, '').trim();
+    detectedTitle = detectedTitle.replace(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}.*$/i, '').trim();
   }
 
   if (!detectedTitle && sourceName && !sourceName.toLowerCase().includes("programme importé")) {
@@ -5735,7 +5755,7 @@ function processExtractedTextToTrip(text, sourceName) {
 
   // 3. Détection des Hôtels avec Dates, Adresses complètes et coordonnées GPS
   const hotels = [];
-  const hotelSectionRegex = /(?:coordonn[ée]es de vos h[ôo]tels|vos h[ôo]tels)([\s\S]*?)(?:votre accompagnatrice|votre guide|vos contacts|formalités|bon à savoir|$)/i;
+  const hotelSectionRegex = /(?:Coordonn[ée]es de (?:vos|votre) h[ôo]tels?|(?:^|\n)\s*Vos h[ôo]tels?)\s*(?:sous r[ée]serve[^\n]*)?\n*([\s\S]*?)(?=(?:Votre accompagnat|Votre guide|Votre contact|Vos contacts|Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i;
   const hotelSectionMatch = text.match(hotelSectionRegex);
   const hotelTextToAnalyze = hotelSectionMatch ? hotelSectionMatch[1] : text;
 
@@ -5810,6 +5830,69 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
+  // Fallback si aucun bloc avec date "Du ... au ..." n'a été trouvé mais qu'un hôtel est présent dans la section
+  if (hotels.length === 0 && hotelSectionMatch && hotelSectionMatch[1].trim()) {
+    const rawLines = hotelSectionMatch[1].split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l.length > 0 && !/^sous r[ée]serve/i.test(l) && !/^coordonn[ée]es/i.test(l));
+
+    if (rawLines.length > 0) {
+      const hotelName = rawLines[0];
+      let addressParts = [];
+      let phone = "";
+      for (let j = 1; j < rawLines.length; j++) {
+        const l = rawLines[j];
+        if (/^t[ée]l\.?\s*:/i.test(l)) {
+          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+        } else {
+          addressParts.push(l);
+        }
+      }
+      const fullAddress = addressParts.join(", ") || hotelName;
+      const lastAddrLine = addressParts[addressParts.length - 1] || "";
+      let detectedCity = lastAddrLine.replace(/^\d{4,6}\s+/, '').replace(/-\d{4,6}$/, '').replace(/,\s*[A-Z]{2,4}$/, '').trim();
+      let lat = 0;
+      let lng = 0;
+
+      const normAddr = fullAddress.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const normDetectedCity = (detectedCity || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+      const normSearch = (hotelName + " " + fullAddress + " " + detectedCity).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+
+      let matchedCoord = null;
+      for (const k of sortedCoordsKeys) {
+        if (normDetectedCity && (normDetectedCity.includes(k) || k.includes(normDetectedCity))) {
+          matchedCoord = DESTINATION_CITY_COORDINATES[k];
+          break;
+        }
+      }
+      if (!matchedCoord) {
+        for (const k of sortedCoordsKeys) {
+          if (k === 'paris' && (normAddr.includes('mexico') || normAddr.includes('cdmx'))) continue;
+          if (normSearch.includes(k)) {
+            matchedCoord = DESTINATION_CITY_COORDINATES[k];
+            break;
+          }
+        }
+      }
+      if (matchedCoord) {
+        lat = matchedCoord.lat;
+        lng = matchedCoord.lng;
+        detectedCity = matchedCoord.city;
+      }
+
+      hotels.push({
+        name: hotelName,
+        dates: detectedDates || "Pendant le séjour",
+        city: detectedCity || "Étape du circuit",
+        address: fullAddress,
+        phone: phone,
+        lat: lat,
+        lng: lng,
+        notes: "Hôtel sélectionné par Voyages Girardot"
+      });
+    }
+  }
+
   // 4. Détermination Intelligente du Profil & Croisière vs Circuit Terrestre
   let isCruise = false;
   let conciergeMode = 'guided';
@@ -5863,7 +5946,7 @@ function processExtractedTextToTrip(text, sourceName) {
 
   // 5. Contacts (Accompagnatrice, Guide local, Réceptif & Assistance)
   const contactsList = [];
-  const accompMatch = text.match(/Votre accompagnatrice(?:\s*(?:Voyages\s+)?Girardot)?\s*\n+\s*([A-ZÀ-Ý][a-zà-ÿ]+)/i);
+  const accompMatch = text.match(/Votre accompagnatrice(?:\s*(?:Voyages\s+)?Girardot)?[\s\r\n]+([A-ZÀ-Ý][a-zà-ÿ]+)/i);
   let accompName = "";
   if (accompMatch) {
     accompName = accompMatch[1].trim();
@@ -5884,33 +5967,49 @@ function processExtractedTextToTrip(text, sourceName) {
   }
 
   // Guide local terrestre
-  const guideMatch = text.match(/Votre guide local\s*\n+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
+  const guideMatch = text.match(/Votre guide(?:\s+local)?[\s\r\n]+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
   if (guideMatch && !isCruise) {
-    contactsList.push({
-      category: "Guide Local",
-      name: guideMatch[1].trim().split('\n')[0].trim(),
-      phone: guideMatch[2] ? guideMatch[2].trim() : "",
-      address: "Guide local francophone",
-      isEmergency: false
-    });
+    const candidateName = guideMatch[1].trim().split('\n')[0].trim();
+    if (candidateName && !/^(?:Votre contact|Formalit|Bon [àa] savoir)/i.test(candidateName)) {
+      contactsList.push({
+        category: "Guide Local",
+        name: candidateName,
+        phone: guideMatch[2] ? guideMatch[2].trim() : "",
+        address: "Guide local francophone",
+        isEmergency: false
+      });
+    }
   }
 
-  // Réceptif terrestre
-  const receptifMatch = text.match(/(?:Correspondant local|R[ée]ceptif local|En France|Au Mexique|À l[’']étranger|A l[’']etranger|Vos contacts)\s*[–-]?\s*([A-ZÀ-Ý\s&’']+)?\s*:\s*([\s\S]*?)(?=(?:Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i);
+  // Réceptif terrestre / Contact sur place
+  const receptifMatch = text.match(/(?:Votre contact sur place|Correspondant local|R[ée]ceptif local|En France|Au Mexique|À l[’']étranger|A l[’']etranger|Vos contacts)\s*[:–-]?[\s\r\n]+([\s\S]*?)(?=(?:Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i);
   if (receptifMatch && !isCruise) {
-    const rawContactBlock = receptifMatch[2].slice(0, 450);
-    const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
-    const mainPhone = phones[0] || "";
-    const contactNameMatch = rawContactBlock.match(/(?:Mme|M\.)\s+([A-Za-zÀ-Ý\s-]+)/);
-    const contactName = contactNameMatch ? contactNameMatch[0] : (receptifMatch[1] || "Correspondant Réceptif Local");
-
-    contactsList.push({
-      category: "Correspondant Réceptif & Urgence",
-      name: contactName.trim().split('\n')[0].trim(),
-      phone: mainPhone,
-      address: "Assistance locale 24h/24",
-      isEmergency: true
-    });
+    const rawContactBlock = receptifMatch[1].slice(0, 450);
+    const cLines = rawContactBlock.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+    if (cLines.length > 0) {
+      let contactName = cLines[0].replace(/^[:–-]\s*/, '').trim();
+      let addressParts = [];
+      let phone = "";
+      for (let j = 1; j < cLines.length; j++) {
+        const l = cLines[j];
+        if (/^t[ée]l\.?\s*:/i.test(l)) {
+          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+        } else {
+          addressParts.push(l);
+        }
+      }
+      if (!phone) {
+        const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
+        phone = phones[0] || "";
+      }
+      contactsList.push({
+        category: "Correspondant Réceptif & Urgence",
+        name: contactName,
+        phone: phone,
+        address: addressParts.join(", ") || "Assistance locale 24h/24",
+        isEmergency: true
+      });
+    }
   }
 
   contactsList.push({
@@ -6104,12 +6203,34 @@ function processExtractedTextToTrip(text, sourceName) {
       ];
     }
 
-    // Formalités passeport si mentionnées
-    const passMatch = text.match(/Passeport\s+valide[^\n.]+/i);
-    if (passMatch) {
+    // Formalités passeport et sanitaires (Visa, Air Suvidha, etc.)
+    const formalitesMatch = text.match(/Formalit[ée]s indispensables\s*[:–-]?\s*\n*([\s\S]*?)(?=(?:03\/07|\d{2}\/\d{2}\/\d{4}|Bon [àa] savoir|Inclus|$))/i);
+    let formalitiesText = formalitesMatch ? formalitesMatch[1].trim().replace(/\r?\n+/g, ' ') : '';
+    formalitiesText = formalitiesText.replace(/---\s*PAGE\s*\d+\s*---/gi, '').trim();
+    if (!formalitiesText) {
+      const passMatch = text.match(/Passeport\s+valide[^\n.]+/i);
+      if (passMatch) formalitiesText = passMatch[0].trim();
+    }
+
+    const airSuvidhaMatch = text.match(/(?:Air Suvidha|d[ée]claration de sant[ée])[\s\S]*?airsuvidha\.civilaviation\.gov\.in[\s\S]*?(?=(?:Bon [àa] savoir|Inclus|$))/i);
+    if (airSuvidhaMatch) {
+      currentParsedTrip.alert = {
+        title: "Formalités indispensables (Visa & Déclaration Air Suvidha)",
+        text: (formalitiesText ? formalitiesText + " — " : "") + "Déclaration de santé 'Air Suvidha' obligatoire à remplir en ligne sur airsuvidha.civilaviation.gov.in dans les 24h avant l'arrivée en Inde.",
+        link: "https://airsuvidha.civilaviation.gov.in"
+      };
+
+      if (currentParsedTrip.practicalTipsList) {
+        currentParsedTrip.practicalTipsList.unshift({
+          title: "Déclaration de santé Air Suvidha (Obligatoire)",
+          icon: "file-shield",
+          content: "Obligatoire pour l'Inde. Le formulaire officiel doit être impérativement complété en ligne sur airsuvidha.civilaviation.gov.in dans les 24h avant l'atterrissage (le portail bloque si rempli plus tôt). Présenter le document avec QR Code généré à l'embarquement."
+        });
+      }
+    } else if (formalitiesText) {
       currentParsedTrip.alert = {
         title: "Formalités indispensables",
-        text: passMatch[0].trim(),
+        text: formalitiesText,
         link: ""
       };
     }
@@ -6533,6 +6654,60 @@ function encodeUtf8Base64(str) {
 function decodeUtf8Base64(b64) {
   return decodeURIComponent(escape(window.atob(b64.replace(/\s/g, ''))));
 }
+async function getGitHubFileSha(repo, filePath, branch, token) {
+  const cleanPath = filePath.split('/').map(encodeURIComponent).join('/');
+  const cacheBuster = Date.now();
+
+  // 1. Essai principal direct via Contents API avec no-store et timestamp
+  try {
+    const res = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanPath}?ref=${encodeURIComponent(branch)}&_=${cacheBuster}`, {
+      cache: 'no-store',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.sha) return data.sha;
+    }
+  } catch (e) {
+    console.warn("Contents API SHA check failed:", e);
+  }
+
+  // 2. Fallback via Commits API si la Contents API est en retard ou indisponible
+  try {
+    const commitRes = await fetch(`https://api.github.com/repos/${repo}/commits?path=${cleanPath}&sha=${encodeURIComponent(branch)}&per_page=1&_=${cacheBuster}`, {
+      cache: 'no-store',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Accept': 'application/vnd.github.v3+json'
+      }
+    });
+    if (commitRes.ok) {
+      const commits = await commitRes.json();
+      if (Array.isArray(commits) && commits.length > 0 && commits[0].sha) {
+        const detailRes = await fetch(`https://api.github.com/repos/${repo}/commits/${commits[0].sha}`, {
+          cache: 'no-store',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Accept': 'application/vnd.github.v3+json'
+          }
+        });
+        if (detailRes.ok) {
+          const detail = await detailRes.json();
+          const targetFile = (detail.files || []).find(f => f.filename === filePath);
+          if (targetFile && targetFile.sha) return targetFile.sha;
+        }
+      }
+    }
+  } catch (e) {
+    console.warn("Commits API SHA check failed:", e);
+  }
+
+  return null;
+}
+
 
 async function saveTripDirectToGitHub() {
   if (!syncFormDataIntoTrip()) return;
@@ -6571,21 +6746,7 @@ async function saveTripDirectToGitHub() {
     updateShareLink();
 
     const cleanFilePath = filePath.split('/').map(encodeURIComponent).join('/');
-    let existingSha = null;
-    try {
-      const getFileRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}?ref=${branch}`, {
-        headers: {
-          'Authorization': `Bearer ${cfg.token}`,
-          'Accept': 'application/vnd.github.v3+json'
-        }
-      });
-      if (getFileRes.ok) {
-        const fileData = await getFileRes.json();
-        existingSha = fileData.sha;
-      }
-    } catch (e) {
-      console.warn("Vérification existence fichier:", e);
-    }
+    let existingSha = await getGitHubFileSha(repo, filePath, branch, cfg.token);
 
     const tripJsonString = JSON.stringify(tripData, null, 2);
     const putBody = {
@@ -6595,7 +6756,7 @@ async function saveTripDirectToGitHub() {
     };
     if (existingSha) putBody.sha = existingSha;
 
-    const putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}`, {
+    let putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${cfg.token}`,
@@ -6605,6 +6766,25 @@ async function saveTripDirectToGitHub() {
       body: JSON.stringify(putBody)
     });
 
+    // Si GitHub répond 422 ("sha wasn't supplied" ou conflit), récupération forcée immédiate et nouvelle tentative
+    if (!putRes.ok && putRes.status === 422) {
+      console.warn("GitHub 422 reçu, nouvelle tentative avec récupération forcée du SHA...");
+      const freshSha = await getGitHubFileSha(repo, filePath, branch, cfg.token);
+      if (freshSha && freshSha !== existingSha) {
+        putBody.sha = freshSha;
+        putBody.message = `feat(voyages): mise à jour du carnet ${tripData.title}`;
+        putRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanFilePath}`, {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${cfg.token}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.github.v3+json'
+          },
+          body: JSON.stringify(putBody)
+        });
+      }
+    }
+
     if (!putRes.ok) {
       const err = await putRes.json().catch(() => ({ message: putRes.statusText }));
       throw new Error(`Erreur lors de la publication du JSON (${putRes.status}) : ${err.message}`);
@@ -6613,7 +6793,10 @@ async function saveTripDirectToGitHub() {
     // Mise à jour de index_voyages.js
     try {
       const indexPath = 'voyages/index_voyages.js';
-      const getIndexRes = await fetch(`https://api.github.com/repos/${repo}/contents/${indexPath}?ref=${branch}`, {
+      const cleanIndexPath = indexPath.split('/').map(encodeURIComponent).join('/');
+      const indexSha = await getGitHubFileSha(repo, indexPath, branch, cfg.token);
+      const getIndexRes = await fetch(`https://api.github.com/repos/${repo}/contents/${cleanIndexPath}?ref=${encodeURIComponent(branch)}&_=${Date.now()}`, {
+        cache: 'no-store',
         headers: {
           'Authorization': `Bearer ${cfg.token}`,
           'Accept': 'application/vnd.github.v3+json'
