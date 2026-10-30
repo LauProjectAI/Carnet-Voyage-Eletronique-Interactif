@@ -480,7 +480,106 @@ document.addEventListener('DOMContentLoaded', () => {
   try { renderContactsAndAlert(); } catch(e) { console.error('Contacts error:', e); }
   try { renderClientDocuments(); } catch(e) { console.error('ClientDocs error:', e); }
   try { initCaptureFeature(); } catch(e) { console.error('Capture error:', e); }
+
+  // 4. Revalidation automatique en tâche de fond (Stale-While-Revalidate)
+  setTimeout(() => {
+    try { revalidateTripDataFromServer(); } catch(e) { console.warn('Erreur revalidation:', e); }
+  }, 600);
 });
+
+function showDiscreetSyncToast(message) {
+  let toast = document.getElementById('girardot-sync-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'girardot-sync-toast';
+    toast.style.cssText = `
+      position: fixed;
+      bottom: 84px;
+      left: 50%;
+      transform: translateX(-50%) translateY(30px);
+      background: #184232;
+      color: white;
+      padding: 10px 18px;
+      border-radius: 30px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: none;
+    `;
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<i class="fa-solid fa-arrows-rotate fa-spin" style="color:#86efac;"></i> <span>${message}</span>`;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(30px)';
+  }, 4000);
+}
+
+function revalidateTripDataFromServer() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const candidateId = urlParams.get('id') || urlParams.get('trip');
+  const targetId = candidateId || (currentTrip ? currentTrip.id : null);
+  if (!targetId || targetId.length > 50) return;
+
+  const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => 
+    t.id === targetId || 
+    t.alias === targetId || 
+    (t.aliases && t.aliases.includes(targetId)) ||
+    (t.id && t.id.toLowerCase().includes(targetId.toLowerCase()))
+  );
+  const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${targetId}.json`;
+
+  fetch(encodeURI(targetFile) + `?_t=${Date.now()}`, { cache: 'no-cache' })
+    .then(res => {
+      if (!res.ok) throw new Error("Fichier introuvable sur le serveur");
+      return res.json();
+    })
+    .then(freshData => {
+      if (!freshData || !freshData.itinerary) return;
+      
+      const currentHash = currentTrip ? JSON.stringify({
+        title: currentTrip.title,
+        itinerary: currentTrip.itinerary,
+        hotels: currentTrip.hotels,
+        flightsList: currentTrip.flightsList,
+        freeTimeSuggestions: currentTrip.freeTimeSuggestions,
+        practicalTipsList: currentTrip.practicalTipsList
+      }) : '';
+
+      const freshHash = JSON.stringify({
+        title: freshData.title,
+        itinerary: freshData.itinerary,
+        hotels: freshData.hotels,
+        flightsList: freshData.flightsList,
+        freeTimeSuggestions: freshData.freeTimeSuggestions,
+        practicalTipsList: freshData.practicalTipsList
+      });
+
+      if (currentHash !== freshHash) {
+        console.log("Nouvelle version du voyage détectée sur le serveur, mise à jour transparente...");
+        currentTrip = freshData;
+        if (window.GirardotStorage) {
+          window.GirardotStorage.set(`girardot_trip_data_${freshData.id}`, freshData);
+        }
+        try {
+          localStorage.setItem(`girardot_trip_data_${freshData.id}`, JSON.stringify(freshData));
+        } catch(e) {}
+        refreshAppAfterTripChange();
+        showDiscreetSyncToast("Carnet actualisé avec les dernières informations de l'agence.");
+      }
+    })
+    .catch(() => {
+      // Hors-ligne ou distant inaccessible : conservation normale du carnet actuel
+    });
+}
 
 // Helper: Open GPS route (Google Maps / Apple Maps / Waze)
 function getGpsUrl(lat, lng, queryName = '') {
@@ -939,30 +1038,80 @@ function quickAddPhotoForEntry(entryTitle) {
   fileInput.click();
 }
 
-function saveSouvenir(item) {
-  const key = `girardot_souvenirs_${currentTrip.id}`;
-  const list = JSON.parse(localStorage.getItem(key) || '[]');
-  list.unshift(item);
+let inMemorySouvenirs = null;
+
+function getSouvenirsKey() {
+  return `girardot_souvenirs_${currentTrip ? currentTrip.id : 'default'}`;
+}
+
+function getSouvenirsList() {
+  if (inMemorySouvenirs !== null) return inMemorySouvenirs;
+  const key = getSouvenirsKey();
   try {
-    localStorage.setItem(key, JSON.stringify(list));
+    const raw = localStorage.getItem(key);
+    inMemorySouvenirs = raw ? JSON.parse(raw) : [];
   } catch (e) {
-    alert("L'espace de stockage local de votre navigateur est plein. Supprimez d'anciennes photos pour en ajouter de nouvelles.");
+    inMemorySouvenirs = [];
   }
+
+  // Chargement asynchrone haute capacité depuis IndexedDB
+  if (window.GirardotStorage) {
+    window.GirardotStorage.get(key).then(idbSouv => {
+      if (idbSouv && Array.isArray(idbSouv)) {
+        if (!inMemorySouvenirs || idbSouv.length !== inMemorySouvenirs.length) {
+          inMemorySouvenirs = idbSouv;
+          renderSouvenirs();
+        }
+      }
+    }).catch(() => {});
+  }
+
+  return inMemorySouvenirs;
+}
+
+function saveSouvenir(item) {
+  const key = getSouvenirsKey();
+  const list = getSouvenirsList();
+  list.unshift(item);
+  inMemorySouvenirs = list;
+
+  // 1. Sauvegarde IndexedDB sans limitation de taille de photos
+  if (window.GirardotStorage) {
+    window.GirardotStorage.set(key, list).catch(err => console.warn('Erreur sauvegarde IndexedDB souvenir:', err));
+  }
+
+  // 2. Mémorisation localStorage si possible
+  try {
+    const serialized = JSON.stringify(list);
+    if (serialized.length < 400000) {
+      localStorage.setItem(key, serialized);
+    } else {
+      localStorage.removeItem(key);
+    }
+  } catch (e) {}
+
   renderSouvenirs();
 }
 
 function deleteSouvenir(souvId) {
-  const key = `girardot_souvenirs_${currentTrip.id}`;
-  let list = JSON.parse(localStorage.getItem(key) || '[]');
-  list = list.filter(s => s.id !== souvId);
-  localStorage.setItem(key, JSON.stringify(list));
+  const key = getSouvenirsKey();
+  let list = getSouvenirsList().filter(s => s.id !== souvId);
+  inMemorySouvenirs = list;
+
+  if (window.GirardotStorage) {
+    window.GirardotStorage.set(key, list);
+  }
+  try {
+    localStorage.setItem(key, JSON.stringify(list));
+  } catch (e) {}
+
   renderSouvenirs();
 }
 
 function renderSouvenirs() {
   const grid = document.getElementById('souvenirs-list');
-  const key = `girardot_souvenirs_${currentTrip.id}`;
-  let list = JSON.parse(localStorage.getItem(key) || '[]');
+  if (!grid) return;
+  let list = getSouvenirsList();
 
   // Uniquement pour l'Afrique du Sud si aucun souvenir n'a été pris
   if (list.length === 0 && currentTrip.id === 'afrique-du-sud-2026') {
@@ -3819,21 +3968,61 @@ function switchMainTab(targetId) {
 // -----------------------------------------------------------------------------
 let activeDocFilter = 'all';
 let currentPendingScan = null; // Données en cours de validation dans le modal d'ajout
+let inMemoryPersonalDocs = null;
 
 function getClientPersonalDocsKey() {
   return `girardot_personal_docs_${currentTrip ? currentTrip.id : 'default'}`;
 }
 
 function getClientPersonalDocs() {
-  try {
-    return JSON.parse(localStorage.getItem(getClientPersonalDocsKey()) || '[]');
-  } catch(e) {
-    return [];
+  if (inMemoryPersonalDocs !== null) {
+    return inMemoryPersonalDocs;
   }
+  const key = getClientPersonalDocsKey();
+  try {
+    const raw = localStorage.getItem(key);
+    inMemoryPersonalDocs = raw ? JSON.parse(raw) : [];
+  } catch(e) {
+    inMemoryPersonalDocs = [];
+  }
+
+  // Chargement asynchrone haute capacité depuis IndexedDB (Passeports, Visas, PDFs)
+  if (window.GirardotStorage) {
+    window.GirardotStorage.get(key).then(idbDocs => {
+      if (idbDocs && Array.isArray(idbDocs) && idbDocs.length > 0) {
+        if (!inMemoryPersonalDocs || idbDocs.length !== inMemoryPersonalDocs.length) {
+          inMemoryPersonalDocs = idbDocs;
+          if (typeof renderClientDocuments === 'function') {
+            renderClientDocuments();
+          }
+        }
+      }
+    }).catch(() => {});
+  }
+
+  return inMemoryPersonalDocs;
 }
 
 function saveClientPersonalDocs(list) {
-  localStorage.setItem(getClientPersonalDocsKey(), JSON.stringify(list));
+  inMemoryPersonalDocs = list;
+  const key = getClientPersonalDocsKey();
+
+  // 1. Sauvegarde dans IndexedDB (capacité jusqu'à plusieurs Go sans limitation)
+  if (window.GirardotStorage) {
+    window.GirardotStorage.set(key, list).catch(err => console.warn('Erreur stockage IndexedDB docs:', err));
+  }
+
+  // 2. Mémorisation dans localStorage si la taille le permet sans déclencher d'exception quota
+  try {
+    const serialized = JSON.stringify(list);
+    if (serialized.length < 400000) {
+      localStorage.setItem(key, serialized);
+    } else {
+      localStorage.removeItem(key);
+    }
+  } catch(e) {
+    // Quota localStorage dépassé : absorbé sans erreur par IndexedDB
+  }
 }
 
 // Détection automatique intelligente du type de document

@@ -189,6 +189,18 @@ function loadTripById(tripId) {
     }
   }
 
+  // Si pas dans localStorage (ex: voyage volumineux avec gros PDFs), charger depuis GirardotStorage (IndexedDB)
+  if (window.GirardotStorage) {
+    window.GirardotStorage.get(`girardot_trip_data_${tripId}`).then(idbTrip => {
+      if (idbTrip && idbTrip.title) {
+        tripData = idbTrip;
+        normalizeAdminTripDocuments(tripData);
+        populateForm();
+        updateShareLink();
+      }
+    }).catch(() => {});
+  }
+
   // 2. Si c'est l'ancien voyage actif par défaut
   if (tripId === 'afrique-du-sud-2026') {
     const legacyStored = localStorage.getItem('girardot_active_carnet');
@@ -300,18 +312,32 @@ function saveTripToCatalogAndStorage(trip) {
   currentTripId = cleanSlug;
 
   if (oldId && oldId !== cleanSlug && oldId !== '__blank__') {
+    if (window.GirardotStorage) window.GirardotStorage.remove(`girardot_trip_data_${oldId}`);
     localStorage.removeItem(`girardot_trip_data_${oldId}`);
     let list = JSON.parse(localStorage.getItem('girardot_trips_catalog') || '[]');
     list = list.filter(c => c.id !== oldId);
     localStorage.setItem('girardot_trips_catalog', JSON.stringify(list));
   }
 
-  // Stocker les données complètes
-  localStorage.setItem(`girardot_trip_data_${trip.id}`, JSON.stringify(trip));
-  
-  // Si c'est le voyage actif
-  localStorage.setItem('girardot_active_carnet', JSON.stringify(trip));
-  localStorage.setItem('girardot_active_trip_id', trip.id);
+  // 1. Stocker dans GirardotStorage (IndexedDB - Capacité illimitée pour plans, roomings et gros JSON)
+  if (window.GirardotStorage) {
+    window.GirardotStorage.set(`girardot_trip_data_${trip.id}`, trip);
+    window.GirardotStorage.set('girardot_active_carnet', trip);
+  }
+
+  // 2. Mémoriser aussi dans localStorage si la taille le permet (sans blocage si quota atteint)
+  try {
+    const serialized = JSON.stringify(trip);
+    if (serialized.length < 400000) {
+      localStorage.setItem(`girardot_trip_data_${trip.id}`, serialized);
+      localStorage.setItem('girardot_active_carnet', serialized);
+    } else {
+      localStorage.removeItem(`girardot_trip_data_${trip.id}`);
+    }
+    localStorage.setItem('girardot_active_trip_id', trip.id);
+  } catch (quotaErr) {
+    console.warn("Quota localStorage atteint, sauvegarde sécurisée dans IndexedDB:", quotaErr);
+  }
 
   // Mettre à jour l'index
   let customList = JSON.parse(localStorage.getItem('girardot_trips_catalog') || '[]');

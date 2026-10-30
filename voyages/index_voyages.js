@@ -11,14 +11,13 @@ window.AVAILABLE_TRIPS = [
 
   {
     id: "cocktail-mexicain",
-    alias: "cocktail-mexicain",
-    aliases: ["cocktail-mexicain"],
+    alias: "mexique",
+    aliases: ["cocktail-mexicain", "mexique", "voyage-1792069990645"],
     title: "Cocktail Mexicain",
     subtitle: "De Mexico au Yucatan en passant par les Chiapas",
     dates: "11 au 24 novembre 2026",
     file: "voyages/cocktail-mexicain.json"
   },
-
   {
     id: "afrique-du-sud-2026",
     alias: "afrique-du-sud",
@@ -47,22 +46,13 @@ window.AVAILABLE_TRIPS = [
     file: "voyages/voyage-1791552514414 Chicago Elan.json"
   },
   {
-    id: "voyage-1791900707100",
+    id: "san-francisco-perso",
     alias: "san-francisco",
-    aliases: ["san-francisco"],
-    title: "Carnet San Francisco",
+    aliases: ["san-francisco", "voyage-1791900707100"],
+    title: "San Francisco - Perso",
     subtitle: "Voyage Famille",
     dates: "13/02 au 21/02/2027",
-    file: "voyages/voyage-1791900707100 San Francisco Perso.json"
-  },
-  {
-    id: "voyage-1792069990645",
-    alias: "mexique",
-    aliases: ["mexique", "cocktail-mexicain"],
-    title: "Cocktail Mexicain",
-    subtitle: "De Mexico au Yucatan en passant par les Chiapas",
-    dates: "11 au 24 novembre 2026",
-    file: "voyages/voyage-1792069990645 Mexique.json"
+    file: "voyages/san-francisco-perso.json"
   },
   {
     id: "croisiere-costa-smeralda-2026",
