@@ -833,3 +833,28 @@ Double chantier stratégique : fiabilisation absolue du connecteur de publicatio
      - Recolement automatique des coupures de titres sur plusieurs lignes (*« Machu »* + *« Picchu »*).
   5. **Mise à jour PWA & Cache** :
      - Version du cache Service Worker incrémentée à `carnet-girardot-v20` dans [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).
+
+#### Demande n°114 — *04/11/2026 16:50:00*
+> **Demande Utilisateur :**  
+> *« Dans plusieurs import, remonte Dunes de Sam dans les villes étapes, ce qui est faux. Les dunes de Sam font partie du voyage Inde. Corrige le problème. »*
+
+* **Diagnostic & Cause racine :**
+  - Dans `DESTINATION_CITY_COORDINATES` ([admin.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js)), l'entrée `"sam"` pointait vers les Dunes de Sam (`city: "Dunes de Sam", country: "Inde"`).
+  - Lors de l'analyse des textes de descriptif de journée ou des hôtels, les fonctions de recherche utilisaient des inclusions de sous-chaînes partielles (`normSearch.includes(k)` ou `n.includes(k)`).
+  - En conséquence, tout mot ou date contenant le jour **« samedi »** (ou « sam. ») matchait la clé 3 lettres `"sam"`, attribuant à tort la ville étape « Dunes de Sam » (avec coordonnées GPS en Inde) à des circuits au Pérou, Canada, Mexique, etc.
+  - De plus, en cas d'absence de ville reconnue dans le titre de journée, la recherche de secours (fallback) balayait le descriptif sans restreindre les villes candidates au pays de destination principal du circuit.
+
+* **Actions Réalisées :**
+  1. **Suppression de la clé piège `"sam"`** :
+     - Remplacement dans `DESTINATION_CITY_COORDINATES` par les clés explicites `"dunes de sam"` et `"desert de sam"` (Inde).
+  2. **Recherche par mots entiers (Whole-word Regex Matching)** :
+     - Remplacement de tout `n.includes(k)` dans `matchCoordInSegment`, `buildHotelObject` et `parsePartnerItinerary` par une expression régulière stricte avec délimiteurs de mots : `new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:[^a-z0-9]|$)', 'i')`.
+     - Élimine tout risque de faux positif sur des sous-mots français courants.
+  3. **Scoping géographique strict par pays de destination (`primaryDestinationCountry`)** :
+     - Détection automatique et pondérée du pays de destination principal dans `processExtractedTextToTrip` à partir du titre, sous-titre et étapes clés.
+     - Filtrage strict dans `matchCoordInSegment` et dans la recherche de villes pour les hôtels : une ville étrangère d'un autre pays ne peut plus jamais être retenue en repli pour un circuit étranger d'un pays distinct (ex : une ville en Inde ne peut jamais être attribuée à un circuit au Pérou, Canada ou Mexique).
+  4. **Validation multi-circuits** :
+     - Tests d'import automatisés validés à 100% sur *Pérou* (0 Sam, 12/12 villes péruviennes), *Canada Gaspésie* (0 Sam, 12/12 villes québécoises), *Canada États-Unis* (0 Sam), *Cocktail Mexicain* (0 Sam).
+     - Test de non-régression validé sur circuit synthétique en Inde : « Dunes de Sam » est parfaitement résolu lorsque le circuit concerne l'Inde et mentionne expressément les dunes.
+  5. **Mise à jour PWA & Cache** :
+     - Version du cache Service Worker incrémentée à `carnet-girardot-v21` dans [sw.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).

@@ -5584,7 +5584,8 @@ const DESTINATION_CITY_COORDINATES = {
   "mandawa": { lat: 28.0551, lng: 75.1485, city: "Mandawa", country: "Inde" },
   "bikaner": { lat: 28.0229, lng: 73.3119, city: "Bikaner", country: "Inde" },
   "jaisalmer": { lat: 26.9157, lng: 70.9083, city: "Jaisalmer", country: "Inde" },
-  "sam": { lat: 26.8322, lng: 70.5050, city: "Dunes de Sam", country: "Inde" },
+  "dunes de sam": { lat: 26.8322, lng: 70.5050, city: "Dunes de Sam", country: "Inde" },
+  "desert de sam": { lat: 26.8322, lng: 70.5050, city: "Dunes de Sam", country: "Inde" },
   "jodhpur": { lat: 26.2389, lng: 73.0243, city: "Jodhpur", country: "Inde" },
   "luni": { lat: 26.1022, lng: 73.0189, city: "Luni", country: "Inde" },
   "jaipur": { lat: 26.9124, lng: 75.7873, city: "Jaipur", country: "Inde" },
@@ -5787,20 +5788,24 @@ function isFrenchOriginOrTransitSegment(seg, isDomesticFranceTrip) {
 }
 
 // Cherche les coordonnées d'un segment ou texte dans DESTINATION_CITY_COORDINATES
-function matchCoordInSegment(segText, sortedKeys, isDomesticFranceTrip) {
+function matchCoordInSegment(segText, sortedKeys, isDomesticFranceTrip, allowedCountry = null) {
   const n = normStr(segText);
   if (!n) return null;
   // 1. Correspondance exacte d'abord
   for (const k of sortedKeys) {
     const c = DESTINATION_CITY_COORDINATES[k];
     if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
+    if (allowedCountry && c.country && c.country !== "France" && c.country !== allowedCountry) continue;
     if (n === k) return c;
   }
-  // 2. Correspondance partielle par longueur décroissante
+  // 2. Correspondance par mot entier (frontières strictes pour éviter de matcher des sous-chaînes comme 'sam' dans 'samedi')
   for (const k of sortedKeys) {
     const c = DESTINATION_CITY_COORDINATES[k];
     if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
-    if (n.includes(k)) return c;
+    if (allowedCountry && c.country && c.country !== "France" && c.country !== allowedCountry) continue;
+    const escaped = k.replace(/[.*+?\^${}()|[\]\\]/g, '\\$&');
+    const wordRegex = new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:[^a-z0-9]|$)', 'i');
+    if (wordRegex.test(n)) return c;
   }
   return null;
 }
@@ -5808,7 +5813,7 @@ function matchCoordInSegment(segText, sortedKeys, isDomesticFranceTrip) {
 // Règles 2 & 3 : Résolution de la ville étape et GPS de chaque journée
 // - Étape 1 et dernière étape : jamais la ville en France (destination pour J1, point de départ du retour pour le dernier jour)
 // - Chaque journée : soit la ville de destination, soit la ville intermédiaire, JAMAIS la ville de départ (1er segment)
-function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip) {
+function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip, primaryCountry = null) {
   const sortedKeys = Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length);
 
   // Déterminer le point de départ du vol Retour (pour la dernière étape)
@@ -5816,7 +5821,7 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
   if (flightsList && Array.isArray(flightsList)) {
     const inbound = flightsList.find(f => f.type === 'Retour');
     if (inbound && inbound.departureAirport) {
-      returnDepartureCoord = matchCoordInSegment(inbound.departureAirport, sortedKeys, isDomesticFranceTrip);
+      returnDepartureCoord = matchCoordInSegment(inbound.departureAirport, sortedKeys, isDomesticFranceTrip, primaryCountry);
     }
   }
 
@@ -5831,7 +5836,7 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
     let rawSegments = d.title.split(/\s+[-–—/•>→]+\s+/).map(s => s.trim()).filter(Boolean);
     if (rawSegments.length === 1 && /\s*[-–—]\s*/.test(d.title)) {
       // Vérifier si le titre entier est un nom composé connu avant de couper sur '-' sans espace
-      const wholeMatch = matchCoordInSegment(d.title, sortedKeys, isDomesticFranceTrip);
+      const wholeMatch = matchCoordInSegment(d.title, sortedKeys, isDomesticFranceTrip, primaryCountry);
       if (!wholeMatch) {
         rawSegments = d.title.split(/\s*[-–—/•>→]+\s*/).map(s => s.trim()).filter(Boolean);
       }
@@ -5850,7 +5855,7 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
       if (validLastDaySegs.length > 0) {
         // S'il y a une ville hors France (ex: Jour 8 • Reykjavik - Paris, ou Jour 5 • Lourdes - Votre région en voyage France)
         for (let i = validLastDaySegs.length - 1; i >= 0; i--) {
-          const m = matchCoordInSegment(validLastDaySegs[i], sortedKeys, isDomesticFranceTrip);
+          const m = matchCoordInSegment(validLastDaySegs[i], sortedKeys, isDomesticFranceTrip, primaryCountry);
           if (m) { chosenCoord = m; break; }
         }
         if (!chosenCoord) fallbackCityName = validLastDaySegs[validLastDaySegs.length - 1];
@@ -5865,7 +5870,7 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
       if (validFirstDaySegs.length > 0) {
         // Prendre la destination finale du Jour 1
         for (let i = validFirstDaySegs.length - 1; i >= 0; i--) {
-          const m = matchCoordInSegment(validFirstDaySegs[i], sortedKeys, isDomesticFranceTrip);
+          const m = matchCoordInSegment(validFirstDaySegs[i], sortedKeys, isDomesticFranceTrip, primaryCountry);
           if (m) { chosenCoord = m; break; }
         }
         if (!chosenCoord) fallbackCityName = validFirstDaySegs[validFirstDaySegs.length - 1];
@@ -5886,7 +5891,7 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
         if (hasFrenchReturnToday) {
           // Ex: "Valladolid - Tulum - Cancun - Paris" -> privilégier la première étape visitée (Tulum) avant l'aéroport
           for (let i = 0; i < candidateSegments.length; i++) {
-            const m = matchCoordInSegment(candidateSegments[i], sortedKeys, isDomesticFranceTrip);
+            const m = matchCoordInSegment(candidateSegments[i], sortedKeys, isDomesticFranceTrip, primaryCountry);
             if (m) { chosenCoord = m; break; }
           }
         } else {
@@ -5894,8 +5899,8 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
           // Si 3 segments et que le 2e est un grand site archéologique majeur (ex: Teotihuacán) ou si l'on prend la destination finale
           const lastCand = candidateSegments[candidateSegments.length - 1];
           const firstCand = candidateSegments[0];
-          const mLast = matchCoordInSegment(lastCand, sortedKeys, isDomesticFranceTrip);
-          const mFirst = matchCoordInSegment(firstCand, sortedKeys, isDomesticFranceTrip);
+          const mLast = matchCoordInSegment(lastCand, sortedKeys, isDomesticFranceTrip, primaryCountry);
+          const mFirst = matchCoordInSegment(firstCand, sortedKeys, isDomesticFranceTrip, primaryCountry);
 
           if (candidateSegments.length >= 2 && normStr(firstCand) === 'teotihuacan' && mFirst) {
             chosenCoord = mFirst;
@@ -5905,7 +5910,7 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
             chosenCoord = mFirst;
           } else {
             for (let i = candidateSegments.length - 1; i >= 0; i--) {
-              const m = matchCoordInSegment(candidateSegments[i], sortedKeys, isDomesticFranceTrip);
+              const m = matchCoordInSegment(candidateSegments[i], sortedKeys, isDomesticFranceTrip, primaryCountry);
               if (m) { chosenCoord = m; break; }
             }
           }
@@ -5915,14 +5920,14 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
         }
       } else if (segments.length === 1) {
         // Journée avec un seul nom dans le titre (ex: "Mexico", "San Cristobal de las Casas", "Cercle d'Or", "Région de Vik")
-        chosenCoord = matchCoordInSegment(segments[0], sortedKeys, isDomesticFranceTrip);
+        chosenCoord = matchCoordInSegment(segments[0], sortedKeys, isDomesticFranceTrip, primaryCountry);
         if (!chosenCoord) fallbackCityName = segments[0];
       }
     }
 
     // Fallback dans la description si le titre ne contenait aucun lieu reconnu
     if (!chosenCoord && d.description) {
-      chosenCoord = matchCoordInSegment(d.description, sortedKeys, isDomesticFranceTrip);
+      chosenCoord = matchCoordInSegment(d.description, sortedKeys, isDomesticFranceTrip, primaryCountry);
     }
 
     if (chosenCoord) {
@@ -7001,15 +7006,27 @@ function processExtractedTextToTrip(text, sourceName) {
     delete d.rawLinesOfDay;
   });
 
-  // Déterminer si le voyage se déroule en France métropolitaine (ex: Pyrénées) ou à l'étranger
+  // Déterminer si le voyage se déroule en France métropolitaine (ex: Pyrénées) ou à l'étranger, et identifier le pays de destination principal
   const sortedCoordsKeys = Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length);
   const fullItineraryTitlesText = normStr(detectedTitle + " " + detectedSubtitle + " " + itinerary.map(d => d.title).join(" "));
   let hasForeignDestination = false;
+  let primaryDestinationCountry = null;
+  const countryCounts = {};
   for (const k of sortedCoordsKeys) {
     const c = DESTINATION_CITY_COORDINATES[k];
-    if (c.country && c.country !== "France" && fullItineraryTitlesText.includes(k)) {
-      hasForeignDestination = true;
-      break;
+    if (c.country && c.country !== "France") {
+      const escaped = k.replace(/[.*+?\^${}()|[\]\\]/g, '\\$&');
+      const wordRegex = new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:[^a-z0-9]|$)', 'i');
+      if (wordRegex.test(fullItineraryTitlesText)) {
+        hasForeignDestination = true;
+        countryCounts[c.country] = (countryCounts[c.country] || 0) + 1;
+      }
+    }
+  }
+  if (hasForeignDestination) {
+    const sortedCountries = Object.entries(countryCounts).sort((a, b) => b[1] - a[1]);
+    if (sortedCountries.length > 0) {
+      primaryDestinationCountry = sortedCountries[0][0];
     }
   }
   const isDomesticFranceTrip = !hasForeignDestination && flightsList.length === 0;
@@ -7019,7 +7036,7 @@ function processExtractedTextToTrip(text, sourceName) {
     d.timeline = extractVisitsFromDay(d.description, d.title);
     d.description = d.description.replace(/\r?\n/g, " ").replace(/\s{2,}/g, " ").trim();
   });
-  resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip);
+  resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip, primaryDestinationCountry);
 
   // =========================================================================
   // 4. DÉTECTION DE L'ENSEMBLE DES HÔTELS DU CIRCUIT (ONGLET HÉBERGEMENT)
@@ -7093,8 +7110,11 @@ function processExtractedTextToTrip(text, sourceName) {
       for (const k of sortedCoordsKeys) {
         const c = DESTINATION_CITY_COORDINATES[k];
         if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
+        if (primaryDestinationCountry && c.country && c.country !== "France" && c.country !== primaryDestinationCountry) continue;
         if (k === 'paris' && (normAddr.includes('mexico') || normAddr.includes('cdmx'))) continue;
-        if (normSearch.includes(k)) {
+        const escaped = k.replace(/[.*+?\^${}()|[\]\\]/g, '\\$&');
+        const wordRegex = new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:[^a-z0-9]|$)', 'i');
+        if (wordRegex.test(normSearch)) {
           matchedCoord = c;
           break;
         }
@@ -8754,8 +8774,10 @@ function parsePartnerItinerary(fullText) {
     let lng = null;
     const normSearch = normStr(cleanTitle + " " + description);
     for (const k of localSortedCoordsKeys) {
-      if (normSearch.includes(k)) {
-        const c = DESTINATION_CITY_COORDINATES[k];
+      const c = DESTINATION_CITY_COORDINATES[k];
+      const escaped = k.replace(/[.*+?\^${}()|[\]\\]/g, '\\$&');
+      const wordRegex = new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:[^a-z0-9]|$)', 'i');
+      if (wordRegex.test(normSearch)) {
         detectedCity = c.city;
         lat = c.lat;
         lng = c.lng;
