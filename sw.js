@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnet-girardot-v15';
+const CACHE_NAME = 'carnet-girardot-v20';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',

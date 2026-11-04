@@ -2430,7 +2430,13 @@ function renderAdminConcierge() {
   if (!container) return;
 
   if (!tripData.conciergerie) {
-    tripData.conciergerie = JSON.parse(JSON.stringify(window.defaultTravelData.conciergerie));
+    const base = (window.defaultTravelData && window.defaultTravelData.conciergerie)
+      ? JSON.parse(JSON.stringify(window.defaultTravelData.conciergerie))
+      : { welcomeMessage: "Bienvenue sur votre carnet de voyage Girardot !", themes: [] };
+    if (base.themes) {
+      base.themes.forEach(t => { t.places = []; t.enabled = true; });
+    }
+    tripData.conciergerie = base;
   }
 
   container.innerHTML = '';
@@ -3944,14 +3950,21 @@ function renderAdminContacts() {
         </div>
       </div>
 
-      <div class="form-row">
+      <div class="form-row" style="margin-bottom:8px;">
         <div class="form-group">
           <label>Numéro de téléphone :</label>
           <input type="text" class="form-control" placeholder="Ex: +27 21 000 0000" value="${c.phone || ''}" onchange="updateContactField(${idx}, 'phone', this.value)">
         </div>
         <div class="form-group">
-          <label>Adresse physique (éventuelle) :</label>
+          <label>Adresse physique ou informations complémentaires :</label>
           <input type="text" class="form-control" placeholder="Ex: 12 Strand Street, Le Cap" value="${c.address || ''}" onchange="updateContactField(${idx}, 'address', this.value)">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group" style="grid-column: 1 / -1;">
+          <label>Lien internet officiel (URL optionnelle — ex: Fil d'Ariane, Ambassade) :</label>
+          <input type="url" class="form-control" placeholder="Ex: https://fildariane.diplomatie.gouv.fr" value="${c.link || ''}" onchange="updateContactField(${idx}, 'link', this.value)">
         </div>
       </div>
     `;
@@ -4322,6 +4335,31 @@ function openPdfImportModal() {
   const modal = document.getElementById('pdf-import-modal');
   if (modal) modal.style.display = 'flex';
   resetPdfModalState();
+  const dropZone = document.getElementById('pdf-drop-zone');
+  if (dropZone && !dropZone.dataset.dragBound) {
+    dropZone.dataset.dragBound = '1';
+    dropZone.addEventListener('dragover', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.style.borderColor = '#dc2626';
+      dropZone.style.background = '#fef2f2';
+    });
+    dropZone.addEventListener('dragleave', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.style.borderColor = '#cbd5e1';
+      dropZone.style.background = 'white';
+    });
+    dropZone.addEventListener('drop', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.style.borderColor = '#cbd5e1';
+      dropZone.style.background = 'white';
+      if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+        handlePdfFileSelected({ target: { files: e.dataTransfer.files } });
+      }
+    });
+  }
 }
 
 function closePdfImportModal() {
@@ -4405,7 +4443,7 @@ function extractTextFromPdfArray(typedarray, originalFileName) {
       let currentLineText = "";
 
       for (const item of items) {
-        const str = item.str;
+        const str = (item.str || "").replace(/\u0000/g, '').replace(/\u00A0/g, ' ');
         if (!str) continue;
         const itemY = item.transform[5];
 
@@ -5389,63 +5427,318 @@ function extractDestinationPracticalInfoFromText(text) {
 }
 
 const DESTINATION_CITY_COORDINATES = {
-  "san cristobal de las casas": { lat: 16.7370, lng: -92.6376, city: "San Cristóbal de las Casas" },
-  "san cristobal": { lat: 16.7370, lng: -92.6376, city: "San Cristóbal de las Casas" },
-  "oaxaca de juarez": { lat: 17.0732, lng: -96.7266, city: "Oaxaca de Juárez" },
-  "oaxaca": { lat: 17.0732, lng: -96.7266, city: "Oaxaca" },
-  "puebla": { lat: 19.0414, lng: -98.2063, city: "Puebla" },
-  "ixtepec": { lat: 16.5593, lng: -95.0975, city: "Ixtepec" },
-  "palenque": { lat: 17.5095, lng: -91.9825, city: "Palenque" },
-  "campeche": { lat: 19.8301, lng: -90.5349, city: "Campeche" },
-  "merida": { lat: 20.9674, lng: -89.5926, city: "Mérida" },
-  "valladolid": { lat: 20.6896, lng: -88.2024, city: "Valladolid" },
-  "cancun": { lat: 21.1619, lng: -86.8515, city: "Cancún" },
-  "tulum": { lat: 20.2114, lng: -87.4654, city: "Tulum" },
-  "celestun": { lat: 20.8600, lng: -90.3980, city: "Celestún" },
-  "chichen itza": { lat: 20.6843, lng: -88.5678, city: "Chichén Itzá" },
-  "teotihuacan": { lat: 19.6925, lng: -98.8437, city: "Teotihuacán" },
-  "mexico cdmx": { lat: 19.4326, lng: -99.1332, city: "Mexico (CDMX)" },
-  "cdmx": { lat: 19.4326, lng: -99.1332, city: "Mexico (CDMX)" },
-  "mexico": { lat: 19.4326, lng: -99.1332, city: "Mexico (CDMX)" },
-  "chicago": { lat: 41.8781, lng: -87.6298, city: "Chicago" },
-  "san francisco": { lat: 37.7749, lng: -122.4194, city: "San Francisco" },
-  "paris": { lat: 48.8566, lng: 2.3522, city: "Paris" },
-  "marseille": { lat: 43.2965, lng: 5.3698, city: "Marseille" },
-  "barcelone": { lat: 41.3851, lng: 2.1734, city: "Barcelone" },
-  "tanger": { lat: 35.7878, lng: -5.8118, city: "Tanger" },
-  "casablanca": { lat: 33.6062, lng: -7.6186, city: "Casablanca" },
-  "cadix": { lat: 36.5271, lng: -6.2886, city: "Cadix" },
-  "gibraltar": { lat: 36.1408, lng: -5.3536, city: "Gibraltar" },
-  "malaga": { lat: 36.7213, lng: -4.4214, city: "Malaga" },
-  "seville": { lat: 37.3891, lng: -5.9845, city: "Séville" },
-  "savone": { lat: 44.3079, lng: 8.4811, city: "Savone" },
-  "palerme": { lat: 38.1157, lng: 13.3615, city: "Palerme" },
-  "cagliari": { lat: 39.2238, lng: 9.1217, city: "Cagliari" },
-  "civitavecchia": { lat: 42.0924, lng: 11.7954, city: "Civitavecchia / Rome" },
-  "genes": { lat: 44.4056, lng: 8.9463, city: "Gênes" },
-  "naples": { lat: 40.8518, lng: 14.2681, city: "Naples" },
-  "le cap": { lat: -33.9249, lng: 18.4241, city: "Le Cap" },
-  "pretoria": { lat: -25.7479, lng: 28.2293, city: "Pretoria" },
-  "johannesburg": { lat: -26.2041, lng: 28.0473, city: "Johannesburg" },
-  "new delhi": { lat: 28.6139, lng: 77.2090, city: "New Delhi" },
-  "delhi": { lat: 28.6139, lng: 77.2090, city: "Delhi" },
-  "mandawa": { lat: 28.0551, lng: 75.1485, city: "Mandawa" },
-  "bikaner": { lat: 28.0229, lng: 73.3119, city: "Bikaner" },
-  "jaisalmer": { lat: 26.9157, lng: 70.9083, city: "Jaisalmer" },
-  "sam": { lat: 26.8322, lng: 70.5050, city: "Dunes de Sam" },
-  "jodhpur": { lat: 26.2389, lng: 73.0243, city: "Jodhpur" },
-  "luni": { lat: 26.1022, lng: 73.0189, city: "Luni" },
-  "jaipur": { lat: 26.9124, lng: 75.7873, city: "Jaipur" },
-  "abhaneri": { lat: 27.0094, lng: 76.6025, city: "Abhaneri" },
-  "agra": { lat: 27.1767, lng: 78.0081, city: "Agra (Taj Mahal)" },
-  "jhansi": { lat: 25.4484, lng: 78.5685, city: "Jhansi" },
-  "orchha": { lat: 25.3516, lng: 78.6433, city: "Orchha" },
-  "orccha": { lat: 25.3516, lng: 78.6433, city: "Orchha" },
-  "khajuraho": { lat: 24.8318, lng: 79.9199, city: "Khajuraho" },
-  "varanasi": { lat: 25.3176, lng: 82.9739, city: "Varanasi (Bénarès)" },
-  "benares": { lat: 25.3176, lng: 82.9739, city: "Varanasi (Bénarès)" },
-  "sarnath": { lat: 25.3716, lng: 83.0252, city: "Sarnath" },
-  "geneve": { lat: 46.2044, lng: 6.1432, city: "Genève" }
+  // Pérou
+  "lima": { lat: -12.0464, lng: -77.0428, city: "Lima", country: "Pérou" },
+  "arequipa": { lat: -16.4090, lng: -71.5375, city: "Arequipa", country: "Pérou" },
+  "canyon de colca": { lat: -15.6094, lng: -71.9017, city: "Canyon de Colca", country: "Pérou" },
+  "colca": { lat: -15.6094, lng: -71.9017, city: "Canyon de Colca", country: "Pérou" },
+  "croix du condor": { lat: -15.6133, lng: -71.8986, city: "Croix du Condor", country: "Pérou" },
+  "puno": { lat: -15.8402, lng: -70.0219, city: "Puno", country: "Pérou" },
+  "lac titicaca": { lat: -15.8402, lng: -69.8500, city: "Lac Titicaca", country: "Pérou" },
+  "iles uros": { lat: -15.8208, lng: -69.9719, city: "Îles Uros", country: "Pérou" },
+  "amantani": { lat: -15.6644, lng: -69.7092, city: "Île d'Amantani", country: "Pérou" },
+  "cusco": { lat: -13.5319, lng: -71.9675, city: "Cusco", country: "Pérou" },
+  "cuzco": { lat: -13.5319, lng: -71.9675, city: "Cusco", country: "Pérou" },
+  "vallee sacree": { lat: -13.3333, lng: -72.0833, city: "Vallée Sacrée", country: "Pérou" },
+  "chinchero": { lat: -13.3922, lng: -72.0489, city: "Chinchero", country: "Pérou" },
+  "maras": { lat: -13.3333, lng: -72.1583, city: "Salines de Maras", country: "Pérou" },
+  "salines de maras": { lat: -13.3333, lng: -72.1583, city: "Salines de Maras", country: "Pérou" },
+  "ollantaytambo": { lat: -13.2583, lng: -72.2639, city: "Ollantaytambo", country: "Pérou" },
+  "aguas calientes": { lat: -13.1547, lng: -72.5256, city: "Aguas Calientes", country: "Pérou" },
+  "machu picchu": { lat: -13.1631, lng: -72.5450, city: "Machu Picchu", country: "Pérou" },
+  "machu": { lat: -13.1631, lng: -72.5450, city: "Machu Picchu", country: "Pérou" },
+  "la raya": { lat: -14.4833, lng: -71.0000, city: "La Raya", country: "Pérou" },
+  "juliaca": { lat: -15.4989, lng: -70.1333, city: "Juliaca", country: "Pérou" },
+
+
+  // Mexique
+  "san cristobal de las casas": { lat: 16.7370, lng: -92.6376, city: "San Cristóbal de las Casas", country: "Mexique" },
+  "san cristobal": { lat: 16.7370, lng: -92.6376, city: "San Cristóbal de las Casas", country: "Mexique" },
+  "gorges de sumidero": { lat: 16.8286, lng: -93.0933, city: "Gorges de Sumidero", country: "Mexique" },
+  "sumidero": { lat: 16.8286, lng: -93.0933, city: "Gorges de Sumidero", country: "Mexique" },
+  "oaxaca de juarez": { lat: 17.0732, lng: -96.7266, city: "Oaxaca", country: "Mexique" },
+  "oaxaca": { lat: 17.0732, lng: -96.7266, city: "Oaxaca", country: "Mexique" },
+  "monte alban": { lat: 17.0439, lng: -96.7678, city: "Monte Albán", country: "Mexique" },
+  "mitla": { lat: 16.9267, lng: -96.3597, city: "Mitla", country: "Mexique" },
+  "tehuantepec": { lat: 16.3264, lng: -95.2389, city: "Tehuantepec", country: "Mexique" },
+  "ixtepec": { lat: 16.5593, lng: -95.0975, city: "Ixtepec", country: "Mexique" },
+  "puebla": { lat: 19.0414, lng: -98.2063, city: "Puebla", country: "Mexique" },
+  "palenque": { lat: 17.5095, lng: -91.9825, city: "Palenque", country: "Mexique" },
+  "campeche": { lat: 19.8301, lng: -90.5349, city: "Campeche", country: "Mexique" },
+  "uxmal": { lat: 20.3594, lng: -89.7714, city: "Uxmal", country: "Mexique" },
+  "merida": { lat: 20.9674, lng: -89.5926, city: "Mérida", country: "Mexique" },
+  "izamal": { lat: 20.9317, lng: -89.0178, city: "Izamal", country: "Mexique" },
+  "valladolid": { lat: 20.6896, lng: -88.2024, city: "Valladolid", country: "Mexique" },
+  "cancun": { lat: 21.1619, lng: -86.8515, city: "Cancun", country: "Mexique" },
+  "tulum": { lat: 20.2114, lng: -87.4654, city: "Tulum", country: "Mexique" },
+  "celestun": { lat: 20.8600, lng: -90.3980, city: "Celestún", country: "Mexique" },
+  "chichen itza": { lat: 20.6843, lng: -88.5678, city: "Chichén Itzá", country: "Mexique" },
+  "teotihuacan": { lat: 19.6925, lng: -98.8437, city: "Teotihuacán", country: "Mexique" },
+  "mexico cdmx": { lat: 19.4326, lng: -99.1332, city: "Mexico", country: "Mexique" },
+  "cdmx": { lat: 19.4326, lng: -99.1332, city: "Mexico", country: "Mexique" },
+  "mexico": { lat: 19.4326, lng: -99.1332, city: "Mexico", country: "Mexique" },
+
+  // Canada
+  "saint-jean-port-joli": { lat: 47.2133, lng: -70.2686, city: "Saint-Jean-Port-Joli", country: "Canada" },
+  "riviere-du-loup": { lat: 47.8360, lng: -69.5350, city: "Rivière-du-Loup", country: "Canada" },
+  "trois-rivieres": { lat: 46.3432, lng: -72.5432, city: "Trois-Rivières", country: "Canada" },
+  "saint-simeon": { lat: 47.8406, lng: -69.8786, city: "Saint-Siméon", country: "Canada" },
+  "ile d'orleans": { lat: 46.9167, lng: -70.9667, city: "Île d'Orléans", country: "Canada" },
+  "baie-des-chaleurs": { lat: 48.0833, lng: -65.5000, city: "Baie-des-Chaleurs", country: "Canada" },
+  "val-jalbert": { lat: 48.4317, lng: -72.1672, city: "Val-Jalbert", country: "Canada" },
+  "lac saint-jean": { lat: 48.5833, lng: -72.0167, city: "Lac Saint-Jean", country: "Canada" },
+  "chicoutimi": { lat: 48.4284, lng: -71.0685, city: "Chicoutimi", country: "Canada" },
+  "saguenay": { lat: 48.4284, lng: -71.0685, city: "Saguenay", country: "Canada" },
+  "tadoussac": { lat: 48.1444, lng: -69.7183, city: "Tadoussac", country: "Canada" },
+  "matane": { lat: 48.8437, lng: -67.5298, city: "Matane", country: "Canada" },
+  "forillon": { lat: 48.9000, lng: -64.3500, city: "Parc Forillon", country: "Canada" },
+  "gaspe": { lat: 48.8316, lng: -64.4819, city: "Gaspé", country: "Canada" },
+  "perce": { lat: 48.5244, lng: -64.2127, city: "Percé", country: "Canada" },
+  "campbellton": { lat: 48.0050, lng: -66.6731, city: "Campbellton", country: "Canada" },
+  "matapedia": { lat: 47.9739, lng: -66.9458, city: "Vallée de la Matapédia", country: "Canada" },
+  "rimouski": { lat: 48.4489, lng: -68.5240, city: "Rimouski", country: "Canada" },
+  "sainte-foy": { lat: 46.7745, lng: -71.2925, city: "Québec", country: "Canada" },
+  "quebec": { lat: 46.8139, lng: -71.2080, city: "Québec", country: "Canada" },
+  "longueuil": { lat: 45.5312, lng: -73.5181, city: "Montréal (Longueuil)", country: "Canada" },
+  "montreal": { lat: 45.5017, lng: -73.5673, city: "Montréal", country: "Canada" },
+  "ottawa": { lat: 45.4215, lng: -75.6972, city: "Ottawa", country: "Canada" },
+  "gananoque": { lat: 44.3292, lng: -76.1614, city: "Gananoque (Mille Îles)", country: "Canada" },
+  "mille iles": { lat: 44.3414, lng: -76.0528, city: "Mille Îles", country: "Canada" },
+  "kingston": { lat: 44.2312, lng: -76.4860, city: "Kingston", country: "Canada" },
+  "mississauga": { lat: 43.5890, lng: -79.6441, city: "Toronto (Mississauga)", country: "Canada" },
+  "toronto": { lat: 43.6532, lng: -79.3832, city: "Toronto", country: "Canada" },
+  "niagara-on-the-lake": { lat: 43.2557, lng: -79.0716, city: "Niagara-on-the-Lake", country: "Canada" },
+  "chutes du niagara": { lat: 43.0896, lng: -79.0849, city: "Chutes du Niagara", country: "Canada" },
+  "niagara falls": { lat: 43.0896, lng: -79.0849, city: "Chutes du Niagara", country: "Canada" },
+  "niagara": { lat: 43.0896, lng: -79.0849, city: "Chutes du Niagara", country: "Canada" },
+
+  // États-Unis
+  "pays amish": { lat: 40.0379, lng: -76.3055, city: "Pays Amish (Lancaster)", country: "États-Unis" },
+  "lancaster": { lat: 40.0379, lng: -76.3055, city: "Lancaster", country: "États-Unis" },
+  "harrisburg": { lat: 40.2732, lng: -76.8867, city: "Harrisburg", country: "États-Unis" },
+  "carlisle": { lat: 40.2015, lng: -77.1889, city: "Carlisle", country: "États-Unis" },
+  "fairfax": { lat: 38.8462, lng: -77.3064, city: "Washington (Fairfax)", country: "États-Unis" },
+  "washington": { lat: 38.9072, lng: -77.0369, city: "Washington", country: "États-Unis" },
+  "philadelphie": { lat: 39.9526, lng: -75.1652, city: "Philadelphie", country: "États-Unis" },
+  "fair lawn": { lat: 40.9404, lng: -74.1318, city: "New York (Fair Lawn)", country: "États-Unis" },
+  "manhattan": { lat: 40.7580, lng: -73.9855, city: "New York (Manhattan)", country: "États-Unis" },
+  "new york": { lat: 40.7128, lng: -74.0060, city: "New York", country: "États-Unis" },
+  "chicago": { lat: 41.8781, lng: -87.6298, city: "Chicago", country: "États-Unis" },
+  "san francisco": { lat: 37.7749, lng: -122.4194, city: "San Francisco", country: "États-Unis" },
+
+  // Islande
+  "peninsule de reykjanes": { lat: 63.8804, lng: -22.4495, city: "Péninsule de Reykjanes", country: "Islande" },
+  "reykjanes": { lat: 63.8804, lng: -22.4495, city: "Péninsule de Reykjanes", country: "Islande" },
+  "blue lagoon": { lat: 63.8804, lng: -22.4495, city: "Blue Lagoon", country: "Islande" },
+  "lagon bleu": { lat: 63.8804, lng: -22.4495, city: "Lagon Bleu", country: "Islande" },
+  "cercle d'or": { lat: 64.2559, lng: -21.1295, city: "Cercle d'Or", country: "Islande" },
+  "thingvellir": { lat: 64.2559, lng: -21.1295, city: "Thingvellir", country: "Islande" },
+  "gullfoss": { lat: 64.3271, lng: -20.1199, city: "Gullfoss", country: "Islande" },
+  "geysir": { lat: 64.3104, lng: -20.3024, city: "Geysir", country: "Islande" },
+  "hvolsvollur": { lat: 63.7523, lng: -20.2248, city: "Hvolsvöllur", country: "Islande" },
+  "dyrholaey": { lat: 63.4027, lng: -19.1277, city: "Dyrhólaey (Vík)", country: "Islande" },
+  "region de vik": { lat: 63.4186, lng: -19.0060, city: "Vík", country: "Islande" },
+  "vik": { lat: 63.4186, lng: -19.0060, city: "Vík", country: "Islande" },
+  "skaftafell": { lat: 64.0156, lng: -16.9669, city: "Skaftafell", country: "Islande" },
+  "jokulsarlon": { lat: 64.0784, lng: -16.2306, city: "Jökulsárlón", country: "Islande" },
+  "hveragerdi": { lat: 64.0004, lng: -21.1860, city: "Hveragerði", country: "Islande" },
+  "reykjavik": { lat: 64.1466, lng: -21.9426, city: "Reykjavik", country: "Islande" },
+  "keflavik": { lat: 63.9850, lng: -22.6056, city: "Keflavik", country: "Islande" },
+
+  // Afrique du Sud & Eswatini
+  "cap de bonne esperance": { lat: -34.3568, lng: 18.4974, city: "Cap de Bonne-Espérance", country: "Afrique du Sud" },
+  "blyde river canyon": { lat: -24.5608, lng: 30.8069, city: "Blyde River Canyon", country: "Afrique du Sud" },
+  "region du blyde": { lat: -24.5608, lng: 30.8069, city: "Blyde River Canyon", country: "Afrique du Sud" },
+  "parc kruger": { lat: -24.9947, lng: 31.5969, city: "Parc Kruger", country: "Afrique du Sud" },
+  "kruger": { lat: -24.9947, lng: 31.5969, city: "Parc Kruger", country: "Afrique du Sud" },
+  "hazyview": { lat: -25.0447, lng: 31.1258, city: "Hazyview (Parc Kruger)", country: "Afrique du Sud" },
+  "sabie": { lat: -25.0958, lng: 30.7797, city: "Sabie", country: "Afrique du Sud" },
+  "eswatini": { lat: -26.4167, lng: 31.1667, city: "Eswatini (Swaziland)", country: "Afrique du Sud" },
+  "swaziland": { lat: -26.4167, lng: 31.1667, city: "Eswatini (Swaziland)", country: "Afrique du Sud" },
+  "ezulwini": { lat: -26.4167, lng: 31.1667, city: "Ezulwini (Eswatini)", country: "Afrique du Sud" },
+  "region de hluhluwe": { lat: -28.0189, lng: 32.2678, city: "Hluhluwe", country: "Afrique du Sud" },
+  "hluhluwe": { lat: -28.0189, lng: 32.2678, city: "Hluhluwe", country: "Afrique du Sud" },
+  "sainte-lucie": { lat: -28.3772, lng: 32.4125, city: "Sainte-Lucie", country: "Afrique du Sud" },
+  "durban": { lat: -29.8587, lng: 31.0218, city: "Durban", country: "Afrique du Sud" },
+  "robben island": { lat: -33.8067, lng: 18.3662, city: "Robben Island (Le Cap)", country: "Afrique du Sud" },
+  "hout bay": { lat: -34.0436, lng: 18.3486, city: "Hout Bay", country: "Afrique du Sud" },
+  "stellenbosch": { lat: -33.9321, lng: 18.8602, city: "Stellenbosch", country: "Afrique du Sud" },
+  "cape town": { lat: -33.9249, lng: 18.4241, city: "Le Cap", country: "Afrique du Sud" },
+  "le cap": { lat: -33.9249, lng: 18.4241, city: "Le Cap", country: "Afrique du Sud" },
+  "soweto": { lat: -26.2678, lng: 27.8585, city: "Soweto", country: "Afrique du Sud" },
+  "pretoria": { lat: -25.7479, lng: 28.2293, city: "Pretoria", country: "Afrique du Sud" },
+  "johannesburg": { lat: -26.2041, lng: 28.0473, city: "Johannesburg", country: "Afrique du Sud" },
+
+  // Pyrénées & France touristique
+  "cirque de gavarnie": { lat: 42.6956, lng: -0.0086, city: "Cirque de Gavarnie", country: "France" },
+  "gavarnie": { lat: 42.7322, lng: -0.0094, city: "Gavarnie", country: "France" },
+  "argeles-gazost": { lat: 43.0033, lng: -0.0989, city: "Argelès-Gazost", country: "France" },
+  "col du tourmalet": { lat: 42.9083, lng: 0.1453, city: "Col du Tourmalet", country: "France" },
+  "pic du midi": { lat: 42.9369, lng: 0.1411, city: "Pic du Midi", country: "France" },
+  "lourdes": { lat: 43.0915, lng: -0.0457, city: "Lourdes", country: "France" },
+  "pau": { lat: 43.2951, lng: -0.3708, city: "Pau", country: "France" },
+
+  // Inde
+  "new delhi": { lat: 28.6139, lng: 77.2090, city: "New Delhi", country: "Inde" },
+  "delhi": { lat: 28.6139, lng: 77.2090, city: "Delhi", country: "Inde" },
+  "mandawa": { lat: 28.0551, lng: 75.1485, city: "Mandawa", country: "Inde" },
+  "bikaner": { lat: 28.0229, lng: 73.3119, city: "Bikaner", country: "Inde" },
+  "jaisalmer": { lat: 26.9157, lng: 70.9083, city: "Jaisalmer", country: "Inde" },
+  "sam": { lat: 26.8322, lng: 70.5050, city: "Dunes de Sam", country: "Inde" },
+  "jodhpur": { lat: 26.2389, lng: 73.0243, city: "Jodhpur", country: "Inde" },
+  "luni": { lat: 26.1022, lng: 73.0189, city: "Luni", country: "Inde" },
+  "jaipur": { lat: 26.9124, lng: 75.7873, city: "Jaipur", country: "Inde" },
+  "abhaneri": { lat: 27.0094, lng: 76.6025, city: "Abhaneri", country: "Inde" },
+  "agra": { lat: 27.1767, lng: 78.0081, city: "Agra (Taj Mahal)", country: "Inde" },
+  "jhansi": { lat: 25.4484, lng: 78.5685, city: "Jhansi", country: "Inde" },
+  "orchha": { lat: 25.3516, lng: 78.6433, city: "Orchha", country: "Inde" },
+  "orccha": { lat: 25.3516, lng: 78.6433, city: "Orchha", country: "Inde" },
+  "khajuraho": { lat: 24.8318, lng: 79.9199, city: "Khajuraho", country: "Inde" },
+  "varanasi": { lat: 25.3176, lng: 82.9739, city: "Varanasi (Bénarès)", country: "Inde" },
+  "benares": { lat: 25.3176, lng: 82.9739, city: "Varanasi (Bénarès)", country: "Inde" },
+  "sarnath": { lat: 25.3716, lng: 83.0252, city: "Sarnath", country: "Inde" },
+
+  // Europe / Méditerranée / Transit
+  "barcelone": { lat: 41.3851, lng: 2.1734, city: "Barcelone", country: "Espagne" },
+  "cadix": { lat: 36.5271, lng: -6.2886, city: "Cadix", country: "Espagne" },
+  "malaga": { lat: 36.7213, lng: -4.4214, city: "Malaga", country: "Espagne" },
+  "seville": { lat: 37.3891, lng: -5.9845, city: "Séville", country: "Espagne" },
+  "gibraltar": { lat: 36.1408, lng: -5.3536, city: "Gibraltar", country: "Royaume-Uni" },
+  "tanger": { lat: 35.7878, lng: -5.8118, city: "Tanger", country: "Maroc" },
+  "casablanca": { lat: 33.6062, lng: -7.6186, city: "Casablanca", country: "Maroc" },
+  "savone": { lat: 44.3079, lng: 8.4811, city: "Savone", country: "Italie" },
+  "palerme": { lat: 38.1157, lng: 13.3615, city: "Palerme", country: "Italie" },
+  "cagliari": { lat: 39.2238, lng: 9.1217, city: "Cagliari", country: "Italie" },
+  "civitavecchia": { lat: 42.0924, lng: 11.7954, city: "Civitavecchia / Rome", country: "Italie" },
+  "genes": { lat: 44.4056, lng: 8.9463, city: "Gênes", country: "Italie" },
+  "naples": { lat: 40.8518, lng: 14.2681, city: "Naples", country: "Italie" },
+  "geneve": { lat: 46.2044, lng: 6.1432, city: "Genève", country: "Suisse" },
+  "marseille": { lat: 43.2965, lng: 5.3698, city: "Marseille", country: "France", isFrenchTransit: true },
+  "lyon": { lat: 45.7640, lng: 4.8357, city: "Lyon", country: "France", isFrenchTransit: true },
+  "paris": { lat: 48.8566, lng: 2.3522, city: "Paris", country: "France", isFrenchTransit: true }
+};
+
+// Coordonnées officielles des Ambassades de France par pays de destination
+const FRENCH_EMBASSIES_BY_COUNTRY = {
+  "Pérou": {
+    category: "Ambassade de France au Pérou",
+    name: "Avenida Arequipa 3415, San Isidro, Lima 27",
+    phone: "+51 1 215 8400",
+    address: "Urgences consulaires : +51 999 965 831 • Site : https://pe.ambafrance.org",
+    link: "https://pe.ambafrance.org",
+    isEmergency: true
+  },
+
+  "Mexique": {
+    category: "Ambassade de France au Mexique",
+    name: "Campos Elíseos 339, Polanco, 11560 Ciudad de México",
+    phone: "+52 55 9171 9700",
+    address: "Urgences consulaires : +52 55 5406 8764 • Site : https://mx.ambafrance.org",
+    link: "https://mx.ambafrance.org",
+    isEmergency: true
+  },
+  "Canada": {
+    category: "Ambassade de France au Canada",
+    name: "42 Sussex Drive, Ottawa, ON K1M 2C9 (Consulats à Montréal et Québec)",
+    phone: "+1 613 789 1795",
+    address: "Consulat général à Montréal : +1 514 878 4385 • Site : https://ca.ambafrance.org",
+    link: "https://ca.ambafrance.org",
+    isEmergency: true
+  },
+  "États-Unis": {
+    category: "Ambassade de France aux États-Unis",
+    name: "4101 Reservoir Road NW, Washington, DC 20007 (Consulat à New York : 934 Fifth Ave)",
+    phone: "+1 202 944 6000",
+    address: "Consulat général à New York : +1 212 606 3600 • Site : https://franceintheus.org",
+    link: "https://franceintheus.org",
+    isEmergency: true
+  },
+  "Islande": {
+    category: "Ambassade de France en Islande",
+    name: "Túngata 22, 101 Reykjavík",
+    phone: "+354 575 9600",
+    address: "Site officiel : https://is.ambafrance.org",
+    link: "https://is.ambafrance.org",
+    isEmergency: true
+  },
+  "Afrique du Sud": {
+    category: "Ambassade de France en Afrique du Sud",
+    name: "250 Melk Street, Nieuw Muckleneuk, Pretoria 0181 (Consulat au Cap : 78 Queen Victoria St)",
+    phone: "+27 12 425 1600",
+    address: "Consulat général au Cap : +27 21 423 1575 • Site : https://za.ambafrance.org",
+    link: "https://za.ambafrance.org",
+    isEmergency: true
+  },
+  "Inde": {
+    category: "Ambassade de France en Inde",
+    name: "2/50-E Shantipath, Chanakyapuri, New Delhi 110021",
+    phone: "+91 11 4319 6100",
+    address: "Site officiel : https://in.ambafrance.org",
+    link: "https://in.ambafrance.org",
+    isEmergency: true
+  },
+  "Maroc": {
+    category: "Ambassade de France au Maroc",
+    name: "1 rue Ibn Hajar, Agdal, Rabat",
+    phone: "+212 537 68 97 00",
+    address: "Site officiel : https://ma.ambafrance.org",
+    link: "https://ma.ambafrance.org",
+    isEmergency: true
+  },
+  "Espagne": {
+    category: "Ambassade de France en Espagne",
+    name: "Calle de Salustiano Olózaga 9, 28001 Madrid",
+    phone: "+34 91 423 89 00",
+    address: "Site officiel : https://es.ambafrance.org",
+    link: "https://es.ambafrance.org",
+    isEmergency: true
+  },
+  "Italie": {
+    category: "Ambassade de France en Italie",
+    name: "Piazza Farnese 67, 00186 Roma",
+    phone: "+39 06 686 011",
+    address: "Site officiel : https://it.ambafrance.org",
+    link: "https://it.ambafrance.org",
+    isEmergency: true
+  }
+};
+
+// Photos Wikimedia Commons vérifiées pour la couverture (en rapport avec le sous-titre) et les étapes
+const CURATED_COVER_IMAGES = {
+  "mexique": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chichen_Itza_3.jpg/960px-Chichen_Itza_3.jpg",
+  "yucatan": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chichen_Itza_3.jpg/960px-Chichen_Itza_3.jpg",
+  "gaspesie": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d6/Rocher_Perc%C3%A9_-_Gasp%C3%A9sie.jpg/960px-Rocher_Perc%C3%A9_-_Gasp%C3%A9sie.jpg",
+  "quebec a new york": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Ch%C3%A2teau_Frontenac_after_a_snowstorm.jpg/960px-Ch%C3%A2teau_Frontenac_after_a_snowstorm.jpg",
+  "canada": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Ch%C3%A2teau_Frontenac_after_a_snowstorm.jpg/960px-Ch%C3%A2teau_Frontenac_after_a_snowstorm.jpg",
+  "islande": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Kirkjufell_and_Aurora_Borealis.jpg/960px-Kirkjufell_and_Aurora_Borealis.jpg",
+  "lumieres du nord": "https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Kirkjufell_and_Aurora_Borealis.jpg/960px-Kirkjufell_and_Aurora_Borealis.jpg",
+  "afrique du sud": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lion_%28Panthera_leo%29_male_6y.jpg/960px-Lion_%28Panthera_leo%29_male_6y.jpg",
+  "kruger": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/a2/Lion_%28Panthera_leo%29_male_6y.jpg/960px-Lion_%28Panthera_leo%29_male_6y.jpg",
+  "pyrenees": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Lourdes_sanctuary.jpg/960px-Lourdes_sanctuary.jpg",
+  "lourdes": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Lourdes_sanctuary.jpg/960px-Lourdes_sanctuary.jpg",
+  "inde": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/960px-Taj_Mahal_%28Edited%29.jpeg"
+};
+
+const CURATED_STEP_IMAGES = {
+  "mexico": "https://upload.wikimedia.org/wikipedia/commons/thumb/6/6b/Mexico_City_Cathedral_and_Zocalo.jpg/960px-Mexico_City_Cathedral_and_Zocalo.jpg",
+  "xochimilco": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Trajinera_en_Xochimilco.jpg/960px-Trajinera_en_Xochimilco.jpg",
+  "teotihuacan": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3b/Teotihuac%C3%A1n_-_Panorama_von_der_Mondpyramide.jpg/960px-Teotihuac%C3%A1n_-_Panorama_von_der_Mondpyramide.jpg",
+  "puebla": "https://upload.wikimedia.org/wikipedia/commons/thumb/7/75/Catedral_de_Puebla_y_Volc%C3%A1n_Popocat%C3%A9petl.jpg/960px-Catedral_de_Puebla_y_Volc%C3%A1n_Popocat%C3%A9petl.jpg",
+  "oaxaca": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Templo_de_Santo_Domingo_de_Guzm%C3%A1n_Oaxaca.jpg/960px-Templo_de_Santo_Domingo_de_Guzm%C3%A1n_Oaxaca.jpg",
+  "monte alban": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1e/Monte_Alban_Panorama.jpg/960px-Monte_Alban_Panorama.jpg",
+  "sumidero": "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Ca%C3%B1on_del_Sumidero_Chiapas.jpg/960px-Ca%C3%B1on_del_Sumidero_Chiapas.jpg",
+  "san cristobal": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/San_Cristobal_de_las_Casas_Cathedral.jpg/960px-San_Cristobal_de_las_Casas_Cathedral.jpg",
+  "agua azul": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Cascadas_de_Agua_Azul_Chiapas.jpg/960px-Cascadas_de_Agua_Azul_Chiapas.jpg",
+  "palenque": "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Palenque_Overview.jpg/960px-Palenque_Overview.jpg",
+  "campeche": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Campeche_Cathedral_at_night.jpg/960px-Campeche_Cathedral_at_night.jpg",
+  "uxmal": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Uxmal_Pyramid_of_the_Magician.jpg/960px-Uxmal_Pyramid_of_the_Magician.jpg",
+  "merida": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Uxmal_Pyramid_of_the_Magician.jpg/960px-Uxmal_Pyramid_of_the_Magician.jpg",
+  "celestun": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Convento_de_San_Antonio_de_Padua_Izamal.jpg/960px-Convento_de_San_Antonio_de_Padua_Izamal.jpg",
+  "izamal": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d3/Convento_de_San_Antonio_de_Padua_Izamal.jpg/960px-Convento_de_San_Antonio_de_Padua_Izamal.jpg",
+  "chichen itza": "https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Chichen_Itza_3.jpg/960px-Chichen_Itza_3.jpg",
+  "valladolid": "https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Cenote_Ik_Kil_Yucatan.jpg/960px-Cenote_Ik_Kil_Yucatan.jpg",
+  "tulum": "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Tulum_Maya_Ruins_2019.jpg/960px-Tulum_Maya_Ruins_2019.jpg",
+  "cancun": "https://upload.wikimedia.org/wikipedia/commons/thumb/9/92/Cancun_Strand_Luftbild_%2820264019692%29.jpg/960px-Cancun_Strand_Luftbild_%2820264019692%29.jpg"
 };
 
 function separateDayTitleAndText(rawText) {
@@ -5475,162 +5768,1136 @@ function separateDayTitleAndText(rawText) {
   return { title: cleaned.slice(0, 50).trim(), extraDesc: cleaned.slice(50).trim() };
 }
 
+// Normalisation sans accents en minuscule
+function normStr(str) {
+  return (str || "").normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+
+// Vérifie si un segment de titre correspond à une ville de départ/transit en France
+function isFrenchOriginOrTransitSegment(seg, isDomesticFranceTrip) {
+  const n = normStr(seg);
+  if (!n) return true;
+  if (n.includes('votre region') || n.includes('aeroport de') || n.includes('roissy') || n.includes('orly') || n === 'vol retour' || n === 'retour') return true;
+  if (!isDomesticFranceTrip) {
+    if (n === 'paris' || n === 'lyon' || n === 'marseille' || n === 'france' || n === 'nantes' || n === 'bordeaux' || n === 'toulouse' || n === 'nice' || n === 'mulhouse' || n === 'geneve') {
+      return true;
+    }
+  }
+  return false;
+}
+
+// Cherche les coordonnées d'un segment ou texte dans DESTINATION_CITY_COORDINATES
+function matchCoordInSegment(segText, sortedKeys, isDomesticFranceTrip) {
+  const n = normStr(segText);
+  if (!n) return null;
+  // 1. Correspondance exacte d'abord
+  for (const k of sortedKeys) {
+    const c = DESTINATION_CITY_COORDINATES[k];
+    if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
+    if (n === k) return c;
+  }
+  // 2. Correspondance partielle par longueur décroissante
+  for (const k of sortedKeys) {
+    const c = DESTINATION_CITY_COORDINATES[k];
+    if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
+    if (n.includes(k)) return c;
+  }
+  return null;
+}
+
+// Règles 2 & 3 : Résolution de la ville étape et GPS de chaque journée
+// - Étape 1 et dernière étape : jamais la ville en France (destination pour J1, point de départ du retour pour le dernier jour)
+// - Chaque journée : soit la ville de destination, soit la ville intermédiaire, JAMAIS la ville de départ (1er segment)
+function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip) {
+  const sortedKeys = Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length);
+
+  // Déterminer le point de départ du vol Retour (pour la dernière étape)
+  let returnDepartureCoord = null;
+  if (flightsList && Array.isArray(flightsList)) {
+    const inbound = flightsList.find(f => f.type === 'Retour');
+    if (inbound && inbound.departureAirport) {
+      returnDepartureCoord = matchCoordInSegment(inbound.departureAirport, sortedKeys, isDomesticFranceTrip);
+    }
+  }
+
+  let lastKnownForeignCoord = null;
+
+  itinerary.forEach((d, idx) => {
+    const isFirstDay = (idx === 0);
+    const isLastDay = (idx === itinerary.length - 1);
+
+    // Découper le titre du jour en segments d'étapes (attention aux traits d'union internes ex: Trois-Rivières, Saint-Jean-Port-Joli, Argelès-Gazost)
+    // Dans les carnets Girardot, les étapes sont séparées par " - " (avec espaces) ou " / " ou " • "
+    let rawSegments = d.title.split(/\s+[-–—/•>→]+\s+/).map(s => s.trim()).filter(Boolean);
+    if (rawSegments.length === 1 && /\s*[-–—]\s*/.test(d.title)) {
+      // Vérifier si le titre entier est un nom composé connu avant de couper sur '-' sans espace
+      const wholeMatch = matchCoordInSegment(d.title, sortedKeys, isDomesticFranceTrip);
+      if (!wholeMatch) {
+        rawSegments = d.title.split(/\s*[-–—/•>→]+\s*/).map(s => s.trim()).filter(Boolean);
+      }
+    }
+
+    // Filtrer les mentions non-géographiques type "Safari en 4x4"
+    const geoSegments = rawSegments.filter(s => !/^(?:safari(?:\s+en\s+4x4)?|croisi[eè]re|excursion|journ[ée]e\s+libre)$/i.test(s.trim()));
+    const segments = geoSegments.length > 0 ? geoSegments : rawSegments;
+
+    let chosenCoord = null;
+    let fallbackCityName = "";
+
+    if (isLastDay) {
+      // Dernier jour (ex: "Paris - Votre région" ou "Montréal" ou "Lourdes - Votre région")
+      const validLastDaySegs = segments.filter(s => !isFrenchOriginOrTransitSegment(s, isDomesticFranceTrip));
+      if (validLastDaySegs.length > 0) {
+        // S'il y a une ville hors France (ex: Jour 8 • Reykjavik - Paris, ou Jour 5 • Lourdes - Votre région en voyage France)
+        for (let i = validLastDaySegs.length - 1; i >= 0; i--) {
+          const m = matchCoordInSegment(validLastDaySegs[i], sortedKeys, isDomesticFranceTrip);
+          if (m) { chosenCoord = m; break; }
+        }
+        if (!chosenCoord) fallbackCityName = validLastDaySegs[validLastDaySegs.length - 1];
+      } else {
+        // Tous les segments du dernier jour sont en France (ex: "Paris - Votre région" ou "Lyon - Votre région")
+        // -> Utiliser le point de départ du vol Retour (ex: Cancun) ou la dernière ville étrangère connue
+        chosenCoord = returnDepartureCoord || lastKnownForeignCoord;
+      }
+    } else if (isFirstDay) {
+      // Jour 1 (ex: "Votre région - Paris - Mexico" ou "Votre région - Paris - Montréal - Trois-Rivières")
+      const validFirstDaySegs = segments.filter(s => !isFrenchOriginOrTransitSegment(s, isDomesticFranceTrip));
+      if (validFirstDaySegs.length > 0) {
+        // Prendre la destination finale du Jour 1
+        for (let i = validFirstDaySegs.length - 1; i >= 0; i--) {
+          const m = matchCoordInSegment(validFirstDaySegs[i], sortedKeys, isDomesticFranceTrip);
+          if (m) { chosenCoord = m; break; }
+        }
+        if (!chosenCoord) fallbackCityName = validFirstDaySegs[validFirstDaySegs.length - 1];
+      }
+    } else {
+      // Jours intermédiaires du circuit (Règle 3 : JAMAIS la ville de départ segments[0] s'il y a plusieurs villes)
+      if (segments.length >= 2) {
+        // Exclure impérativement segments[0] (ville de départ du matin) ainsi que les villes de transit en France (ex: Paris au J13)
+        let candidateSegments = segments.slice(1).filter(s => !isFrenchOriginOrTransitSegment(s, isDomesticFranceTrip));
+        if (candidateSegments.length === 0) {
+          // Cas où segments.slice(1) ne contient que "Paris" (ex: "Le Cap - Lyon" au J12) -> utiliser la ville de départ/étape sur place
+          candidateSegments = segments.filter(s => !isFrenchOriginOrTransitSegment(s, isDomesticFranceTrip));
+        }
+
+        // Chercher d'abord la destination finale du jour ou la ville intermédiaire reconnue
+        // Si le dernier segment est reconnu (ville de destination du soir) et qu'il n'y a pas de retour à Paris ce jour-là, on privilégie la destination (ou l'intermédiaire majeure)
+        const hasFrenchReturnToday = segments.some(s => isFrenchOriginOrTransitSegment(s, isDomesticFranceTrip));
+        if (hasFrenchReturnToday) {
+          // Ex: "Valladolid - Tulum - Cancun - Paris" -> privilégier la première étape visitée (Tulum) avant l'aéroport
+          for (let i = 0; i < candidateSegments.length; i++) {
+            const m = matchCoordInSegment(candidateSegments[i], sortedKeys, isDomesticFranceTrip);
+            if (m) { chosenCoord = m; break; }
+          }
+        } else {
+          // Ex: "Puebla - Oaxaca" -> Oaxaca ; "San Cristobal - Palenque" -> Palenque ; "Campeche - Uxmal - Merida" -> Mérida ; "Mexico - Teotihuacan - Puebla" -> Teotihuacán ou Puebla
+          // Si 3 segments et que le 2e est un grand site archéologique majeur (ex: Teotihuacán) ou si l'on prend la destination finale
+          const lastCand = candidateSegments[candidateSegments.length - 1];
+          const firstCand = candidateSegments[0];
+          const mLast = matchCoordInSegment(lastCand, sortedKeys, isDomesticFranceTrip);
+          const mFirst = matchCoordInSegment(firstCand, sortedKeys, isDomesticFranceTrip);
+
+          if (candidateSegments.length >= 2 && normStr(firstCand) === 'teotihuacan' && mFirst) {
+            chosenCoord = mFirst;
+          } else if (mLast) {
+            chosenCoord = mLast;
+          } else if (mFirst) {
+            chosenCoord = mFirst;
+          } else {
+            for (let i = candidateSegments.length - 1; i >= 0; i--) {
+              const m = matchCoordInSegment(candidateSegments[i], sortedKeys, isDomesticFranceTrip);
+              if (m) { chosenCoord = m; break; }
+            }
+          }
+        }
+        if (!chosenCoord && candidateSegments.length > 0) {
+          fallbackCityName = candidateSegments[candidateSegments.length - 1];
+        }
+      } else if (segments.length === 1) {
+        // Journée avec un seul nom dans le titre (ex: "Mexico", "San Cristobal de las Casas", "Cercle d'Or", "Région de Vik")
+        chosenCoord = matchCoordInSegment(segments[0], sortedKeys, isDomesticFranceTrip);
+        if (!chosenCoord) fallbackCityName = segments[0];
+      }
+    }
+
+    // Fallback dans la description si le titre ne contenait aucun lieu reconnu
+    if (!chosenCoord && d.description) {
+      chosenCoord = matchCoordInSegment(d.description, sortedKeys, isDomesticFranceTrip);
+    }
+
+    if (chosenCoord) {
+      d.city = chosenCoord.city;
+      d.lat = chosenCoord.lat;
+      d.lng = chosenCoord.lng;
+      if (!chosenCoord.isFrenchTransit) {
+        lastKnownForeignCoord = chosenCoord;
+      }
+    } else {
+      d.city = fallbackCityName || extractProbableCity(d.title) || "";
+      d.lat = null;
+      d.lng = null;
+    }
+
+    // Photo de l'étape (day.image) en rapport avec les visites ou la ville du jour
+    if (!d.image) {
+      const searchPool = normStr(d.city + " " + d.title + " " + (d.description || ""));
+      // Priorité à la ville de l'étape
+      const cityKey = normStr(d.city);
+      if (CURATED_STEP_IMAGES[cityKey]) {
+        d.image = CURATED_STEP_IMAGES[cityKey];
+      } else {
+        for (const [imgKey, imgUrl] of Object.entries(CURATED_STEP_IMAGES)) {
+          if (searchPool.includes(imgKey)) {
+            d.image = imgUrl;
+            break;
+          }
+        }
+      }
+    }
+  });
+}
+
+// Règle 4 : Extraction d'un titre court (strictement un nom ou groupe nominal, JAMAIS une phrase ni un début de phrase)
+// Règle 4 : Extraction d'un titre court (strictement un nom ou groupe nominal, JAMAIS une phrase ni un début de phrase)
+function extractShortVisitTitle(sentence) {
+  sentence = repairBrokenPdfWords(sentence);
+  let s = (sentence || "").trim().replace(/^[•\-\*·\s]+/, '').replace(/[.!?…]+$/, '').trim();
+  if (!s) return "Étape";
+
+  // Normalisation des césures et espaces résiduels
+  s = s.replace(/-\s+/g, '-').replace(/\s{2,}/g, ' ');
+  s = s.replace(/\bTrois\s*Rivières\b/gi, 'Trois-Rivières');
+  s = s.replace(/\bAccuei\s+l\b/gi, 'Accueil');
+
+  // Retirer l'horaire ou la plage horaire complète en début de texte (ex: "17h00 - 18h30 : ", "16h36 - 18h10 : ", "10h32- 12h10 : ", "5h30 : ")
+  s = s.replace(/^(?:(?:de|vers|à|a)\s*)?(?:[01]?\d|2[0-3])[hH:][0-5]\d(?:\s*(?:[-–—]|à|a)\s*(?:[01]?\d|2[0-3])[hH:][0-5]\d)?\s*[:–-]?\s*/i, '').trim();
+
+  // Nettoyer les préfixes d'altitude ou distance résiduels : "(alt. 2 335 m)", "(364 km / 7h - alt. 3 800 m)"
+  s = s.replace(/^\(?\s*(?:route\s+)?(?:\d+\s*km|\d+h\d*|\balt\.?\s*[\d\s]+m?|\s*[\/+–-])+\s*(?:m|m\.|m\))?\s*\)?\s*[-–:]?\s*/i, '').trim();
+  s = s.replace(/^\(?alt\.?\s*[\d\s]+m?\)?\s*/i, '').trim();
+
+  // 1. Détection prioritaire des vols avec numéro de vol (ex: "vol intérieur LA2326 pour Arequipa")
+  const volAvecNumMatch = s.match(/^vol\s+(?:int[ée]rieur\s+)?([A-Z0-9]{2,8})(?:\s+(?:pour|vers)\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?))?(?:,|\.|\(|$)/i);
+  if (volAvecNumMatch) {
+    const fn = volAvecNumMatch[1].toUpperCase();
+    let dest = volAvecNumMatch[2] ? volAvecNumMatch[2].trim() : "";
+    dest = dest.replace(/\s+(?:en\s+|via\b|par\b|avec\b|dans\b).*$/i, '').trim();
+    return dest ? `Vol intérieur ${fn} pour ${dest}` : `Vol intérieur ${fn}`;
+  }
+
+  // Trains avec nom ou numéro (ex: "train panoramique Inca Rail n°45 pour Aguas Calientes")
+  const trainMatch = s.match(/(?:embarquement\s+[àa]\s+bord\s+du\s+|r\s*etour\s+en\s+)?train\s+(?:panoramique\s+)?([A-Za-zÀ-ÿ\s]+?)(?:\s+n[°o]\s*(\d+))?(?:\s+(?:pour|vers)\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?))?(?:,|\.|\(|$)/i);
+  if (trainMatch && /inca\s*rail/i.test(s)) {
+    const num = trainMatch[2] ? ` n°${trainMatch[2]}` : "";
+    let dest = trainMatch[3] ? trainMatch[3].trim() : "";
+    dest = dest.replace(/\s+(?:en\s+[a-zà-ÿ]+ant|en\s+|via\b|par\b|avec\b|dans\b).*$/i, '').trim();
+    const cleanDest = dest ? ` pour ${dest}` : "";
+    return `Train Inca Rail${num}${cleanDest}`;
+  }
+
+  // 2. Repas, Logement, Acheminements standardisés
+  if (/^(?:d[îi]ner|repas)\s+et\s+nuit\s+[àa]\s+bord/i.test(s)) return "Dîner et nuit à bord";
+  if (/^d[îi]ner\s+logement$/i.test(s) || /^d[îi]ner\s+et\s+logement$/i.test(s)) return "Dîner logement";
+  if (/^logement$/i.test(s) || /^nuit\s+[àa]\s+l'h[ôo]tel$/i.test(s)) return "Logement";
+  if (/^installation\s+(?:[àa]\s+l['’]h[ôo]tel|pour\s+\d+\s+nuits?)/i.test(s)) return "Installation à l'hôtel";
+  if (/^retour\s+dans\s+votre\s+r[ée]gion/i.test(s) || /retour\s+en\s+soir[ée]e\s+dans\s+votre\s+r[ée]gion/i.test(s)) return "Retour dans votre région";
+  if (/^d[îi]ner\s+(?:avec\s+)?spectacle\s+des+danses\s+andines/i.test(s)) return "Dîner spectacle de danses andines";
+  if (/^d[îi]ner\s+avec\s+spectacle\s+de\s+danses\s+folkloriques/i.test(s)) return "Spectacle de danses folkloriques";
+  if (/^d[îi]ner\s+d[ée]gustation\s+d['’]alpaga/i.test(s)) return "Dîner dégustation d'alpaga";
+  if (/^d[îi]ner\s+avec\s+spectacle/i.test(s) || /^d[îi]ner\s+spectacle/i.test(s)) return "Dîner spectacle";
+  if (/^d[îi]ner\s+boma/i.test(s)) return "Dîner boma traditionnel";
+  if (/^d[îi]ner\s+libre/i.test(s)) return "Dîner libre";
+  if (/^d[îi]ner\b/i.test(s) || /pour\s+d[îi]ner\b/i.test(s)) return "Dîner";
+  if (/^souper\b/i.test(s)) return "Souper";
+  if (/^petit[- ]d[ée]jeuner/i.test(s)) return "Petit-déjeuner";
+  if (/^d[ée]jeuner\s+libre/i.test(s)) return "Déjeuner libre";
+  if (/^d[ée]jeuner\s+traditionnel\s+des\s+andes/i.test(s)) return "Déjeuner traditionnel Pachamanca";
+  if (/^d[ée]jeuner\s+d[ée]gustation/i.test(s)) return "Déjeuner dégustation";
+  if (/^d[ée]jeuner\b/i.test(s) || /au\s+cours\s+de\s+votre\s+d[ée]jeuner/i.test(s) || /pour\s+d[ée]jeuner\b/i.test(s) || /^soir[ée]e\s+pi[ñn]ata/i.test(s)) return "Déjeuner";
+  if (/^(?:deuxi[èe]me\s+)?d[ée]gustation\b/i.test(s)) return "Dégustation";
+  if (/^journ[ée]e\s+libre/i.test(s)) return "Journée libre";
+  if (/^matin[ée]e\s+libre/i.test(s)) return "Matinée libre";
+  if (/^apr[èe]s-midi\s+libre/i.test(s)) return "Après-midi libre";
+  if (/^temps\s+libre/i.test(s)) return "Temps libre";
+  if (/r[ée]acheminement/i.test(s)) return "Réacheminement";
+  if (/acheminement/i.test(s)) return "Acheminement";
+
+    if (/rendez-vous.*navette|d[ée]part\s+pour\s+la\s+navette/i.test(s)) return "Navette vers le site";
+  if (/lever\s+du\s+soleil/i.test(s)) return "Lever du soleil";
+  // 3. Sites majeurs & monuments (Nominalisation prioritaire)
+  if (/volcan\s+sabancaya/i.test(s)) return "Volcan Sabancaya";
+  if (/volcan\s+misti/i.test(s)) return "Volcan Misti";
+  if (/croix\s+du\s+condor/i.test(s)) return "Croix du Condor";
+  if (/canyon\s+de\s+colca/i.test(s)) return "Canyon de Colca";
+  if (/sanctuaire\s+(?:du\s+)?machu\s+picchu|machu\s+picchu/i.test(s)) return "Machu Picchu";
+  if (/salines\s+de\s+maras/i.test(s)) return "Salines de Maras";
+  if (/vall[ée]e\s+sacr[ée]e/i.test(s)) return "Vallée Sacrée";
+  if (/ollantaytambo/i.test(s)) return "Ollantaytambo";
+  if (/chinchero/i.test(s)) return "Chinchero";
+  if (/r[ée]serve\s+d['’]aguada\s+blanca/i.test(s)) return "Réserve d'Aguada Blanca";
+  if (/couvent\s+de\s+santa\s+catalina/i.test(s)) return "Couvent de Santa Catalina";
+  if (/march[ée]\s+(?:color[ée]\s+de\s+)?san\s+camilo/i.test(s)) return "Marché San Camilo";
+  if (/march[ée]\s+(?:color[ée]\s+de\s+)?san\s+pedro/i.test(s)) return "Marché San Pedro";
+  if (/lagunillas/i.test(s)) return "Lagunillas";
+  if (/la\s+raya/i.test(s)) return "Col de La Raya";
+  if (/[îi]les\s+uros/i.test(s)) return "Îles Uros";
+  if (/[îi]le\s+d['’]amantani/i.test(s)) return "Île d'Amantani";
+  if (/lac\s+titicaca/i.test(s)) return "Lac Titicaca";
+  if (/parc\s+amour/i.test(s)) return "Parc de l'Amour";
+  if (/barranco/i.test(s)) return "Quartier de Barranco";
+  if (/plaza\s+mayor/i.test(s) || /lima\s+colonial/i.test(s)) return "Centre historique de Lima";
+  if (/plaza\s+san\s+martin/i.test(s)) return "Plaza San Martin";
+  if (/plaza\s+de\s+armas/i.test(s)) return "Plaza de Armas";
+
+  if (/statue\s+de\s+la\s+libert[ée]/i.test(s)) return "Statue de la Liberté";
+  if (/travers[ée]e\s+en\s+ferry\s+verss+qu[ée]bec/i.test(s)) return "Ferry vers Québec";
+  if (/observation\s+des\s+baleines/i.test(s)) return "Observation des baleines";
+  if (/embarquement\s+sur\s+le\s+traversier|traversier\s+entre/i.test(s)) return "Traversier";
+  if (/bataille\s+de\s+la\s+ristigouche/i.test(s)) return "Site Historique de la Ristigouche";
+  if (/route\s+panoramique\s+de\s+la\s+matap[ée]dia/i.test(s)) return "Route panoramique de la Matapédia";
+  if (/route\s+c[ôo]ti[èe]re\s+en\s+gasp[ée]sie/i.test(s)) return "Route côtière de Gaspésie";
+  if (/jardins?\s+botaniques?\s+de\s+m[ée]tis/i.test(s)) return "Jardin botanique de Métis";
+  if (/sirop\s+d['’][ée]rable|tr[ée]sor\s+gastronomique\s+qu[ée]b[ée]cois/i.test(s)) return "Sirop d’érable";
+  if (/chutes?\s+montmorency/i.test(s)) return "Chutes Montmorency";
+  if (/chutes?\b.*mondialement\s+c[ée]l[èe]bres/i.test(s)) return "Chutes du Niagara";
+  if (/parc\s+(?:national\s+)?(?:de\s+la\s+|d['’]en\s+)?jacques[- ]*cartier/i.test(s)) return "Parc Jacques Cartier";
+  if (/[îi]le\s+de\s+bonaventure/i.test(s)) return "Île de Bonaventure";
+  if (/[îi]le\s+d['’]orl[ée]ans/i.test(s)) return "Île d’Orléans";
+  if (/mille[- ][îi]les/i.test(s)) return "Croisière des Mille-Îles";
+  if (/hornblower/i.test(s)) return "Croisière Hornblower";
+  if (/one\s+world\s+observatory/i.test(s)) return "One World Observatory";
+  if (/cimeti[èe]re\s+d['’]arlington/i.test(s)) return "Cimetière d'Arlington";
+  if (/m[ée]tropole\s+de\s+montr[ée]al/i.test(s)) return "Montréal";
+  if (/philadelphie\s+en\s+pennsylvanie/i.test(s)) return "Philadelphie";
+  if (/r[ée]gion\s+de\s+harrisburg/i.test(s)) return "Harrisburg";
+
+  // 4. Aéroports, Envols, Arrivées
+  const volDestMatch = s.match(/^vol\s+[A-Z0-9\s]+\s+[àa]\s+destination\s+(?:du\s+|de\s+la\s+|de\s+l['’]|de\s+)?([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?)(?:\s+Roissy|\s+CDG|,|\.|$)/i);
+  if (volDestMatch) return `Envol pour ${volDestMatch[1].trim()}`;
+
+  const envolMatch = s.match(/envol\s+(?:[àa]\s+destination\s+du|[àa]\s+destination\s+de|pour|vers)\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?)(?:\s+via\b|,|\.|$)/i);
+  if (envolMatch && (/^formalit[ée]s/i.test(s) || /^transfert\s+[àa]\s+l'a[ée]roport/i.test(s) || /^envol/i.test(s))) {
+    return `Envol pour ${envolMatch[1].trim()}`;
+  }
+  const transfertAeroMatch = s.match(/transfert\s+[àa]\s+l['’]a[ée]roport(?:\s+de\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?))?(?:,|\.|$)/i);
+  if (transfertAeroMatch && !/envol/i.test(s)) {
+    return transfertAeroMatch[1] ? `Transfert à l'aéroport de ${transfertAeroMatch[1].trim()}` : "Transfert à l'aéroport";
+  }
+  const arriveeMatch = s.match(/^arriv[ée]e\s+(?:pr[ée]vue\s+)?[àa]\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?)(?:\s+pour\s+d[ée]jeuner|\s+pour\s+d[îi]ner|,|\.|$)/i);
+  if (arriveeMatch) {
+    if (/d[ée]jeuner/i.test(s)) return "Déjeuner";
+    if (/d[îi]ner/i.test(s)) return "Dîner";
+    return arriveeMatch[1].trim();
+  }
+
+  // Trajets "Route vers <Ville>", "Départ vers/pour <Ville>"
+  const routeVersMatch = s.match(/^(?:route|continuation|poursuite)\s+(?:vers|pour|en\s+direction\s+de)\s+([A-ZÀ-Ýa-zà-ÿ\s'-]+?)(?:\s+(?:en\s+[a-zà-ÿ]+ant|via\b|par\b|avec\b|dans\b)|,|\.|$)/i);
+  if (routeVersMatch && !/r[ée]gion/i.test(routeVersMatch[1])) {
+    const cleanDest = routeVersMatch[1].replace(/^(?:la|le|les|l['’])\s+/i, '').trim();
+    if (cleanDest.length > 0) return `Route vers ${cleanDest.charAt(0).toUpperCase() + cleanDest.slice(1)}`;
+  }
+  const departVersMatch = s.match(/^d[ée]part\s+(?:vers|pour|en\s+direction\s+de)\s+([A-ZÀ-Ýa-zà-ÿ\s'-]+?)(?:\s+(?:en\s+[a-zà-ÿ]+ant|via\b|par\b|avec\b|dans\b)|,|\.|$)/i);
+  if (departVersMatch) {
+    const cleanDest = departVersMatch[1].replace(/^(?:la|le|les|l['’])\s+/i, '').trim();
+    if (cleanDest.length > 0) return cleanDest.charAt(0).toUpperCase() + cleanDest.slice(1);
+  }
+
+  // 5. Cas spécifiques récurrents dans les programmes Girardot
+  if (/^accueil\s+(?:[àa]\s+l['’]a[ée]roport\s+)?par\s+votre\s+guide/i.test(s)) return "Accueil par votre guide";
+  if (/mus[ée]e\s+national\s+d['’]anthropologie/i.test(s)) return "Musée d'Anthropologie";
+  if (/jardins\s+flottants\s+de\s+xochimilco/i.test(s)) return "Xochimilco";
+  if (/balade\s+sur\s+la\s+place\s+principale,\s+le\s+zocalo/i.test(s)) return "Centre historique";
+  if (/isthme\s+de\s+tehuantepec/i.test(s)) return "Tehuantepec";
+  if (/gorges\s+del\s+sumidero/i.test(s)) return "Gorges Del Sumidero";
+  if (/promenade\s+en\s+barque\s+[àa]\s+moteur\s+dans\s+la\s+lagune/i.test(s)) return "Promenade en barque à moteur";
+  if (/ceti[èe]re\s+maya\s+tel\s+que\s+celui\s+de\s+pomuch|cimeti[èe]re\s+maya\s+tel\s+que\s+celui\s+de\s+pomuch/i.test(s)) return "Cimetière maya de Pomuch";
+  if (/d[ée]couverte\s+d['’]un\s+cenote/i.test(s)) return "Cénote";
+  if (/ville\s+coloniale\s+de\s+valladolid/i.test(s)) return "Valladolid";
+  if (/plaines\s+verdoyantes\s+du\s+chiapas\s+et\s+route\s+vers\s+palenque/i.test(s)) return "Palenque";
+  if (/visite\s+de\s+la\s+ville\s+fond[ée]e\s+en/i.test(s)) return "Visite de la ville";
+  if (/visite\s+du\s+site\s+arch[ée]ologique\s+de\s+palenque/i.test(s)) return "Site archéologique de Palenque";
+
+  // 6. Si la phrase commence par "À <Lieu>, <action>" -> extraire le lieu ou l'objet
+  const atPlaceMatch = s.match(/^[ÀA]\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]{1,35}),\s+(.*)$/);
+  if (atPlaceMatch) {
+    s = atPlaceMatch[2].trim();
+  }
+
+  // 7. Suppression des préfixes verbeux d'action
+  const actionPrefixes = [
+    /^dans\s+l['’]apr[èe]s-midi,\s*/i,
+    /^en\s+fin\s+de\s+journ[ée]e,\s*/i,
+    /^au\s+retour,\s*/i,
+    /^puis,\s*/i,
+    /^ensuite,\s*/i,
+    /^d[ée]part\s+au\s+lever\s+du\s+jour\s+pour\s+(?:le\s+|la\s+|l['’]|les\s+)?/i,
+    /^d[ée]part\s+en\s+direction\s+(?:du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^d[ée]part\s+(?:vers|pour)\s+(?:la\s+petite\s+ville\s+de\s+|le\s+petit\s+royaume\s+d['’]|le\s+c[ée]l[èe]bre\s+|le\s+site\s+de\s+|le\s+|la\s+|l['’]|les\s+)?/i,
+    /^route\s+panoramique\s+(?:vers|pour|de)\s+(?:le\s+|la\s+|l['’]|les\s+)?/i,
+    /^route\s+en\s+direction\s+(?:du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^route\s+(?:vers|pour)\s+(?:le\s+|la\s+|l['’]|les\s+)?/i,
+    /^continuation\s+en\s+direction\s+(?:du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^continuation\s+(?:vers|pour|par)\s+(?:la\s+ville\s+de\s+|la\s+r[ée]gion\s+de\s+|le\s+|la\s+|l['’]|les\s+)?/i,
+    /^poursuite\s+(?:vers|pour)\s+(?:le\s+|la\s+|l['’]|les\s+)?/i,
+    /^direction\s+(?:le\s+|la\s+|l['’]|les\s+)?/i,
+    /^entr[ée]e\s+(?:au|en|dans\s+le|dans\s+la)\s+/i,
+    /^retour\s+(?:en\s+fin\s+de\s+journ[ée]e\s+)?(?:dans\s+la\s+r[ée]gion\s+de\s+|vers|à|a|au|aux)\s+(?:les+|la\s+|l['’])?/i,
+    /^passage\s+par\s+(?:la\s+petite\s+ville\s+de\s+|le\s+|la\s+|l['’]|les\s+)?/i,
+    /^travers[ée]e\s+(?:en\s+ferry\s+vers\s+|du\s+|de\s+la\s+|de\s+l['’]|des\s+)/i,
+    /^visite\s+guid[ée]e\s+(?:du\s+site\s+arch[ée]ologique\s+de\s+|du\s+site\s+de\s+|de\s+la\s+ville\s+de\s+|du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^visite\s+et\s+d[ée]gustation\s+[àa]\s+(?:la\s+|l['’]|le\s+)?/i,
+    /^visite\s+(?:du\s+prestigieux\s+site\s+de\s+|du\s+site\s+arch[ée]ologique\s+de\s+|du\s+site\s+de\s+|du\s+village\s+indien\s+de\s+|du\s+village\s+de\s+|de\s+la\s+ville\s+du\s+|de\s+la\s+ville\s+de\s+|d['’]une\s+|d['’]un\s+|du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^d[ée]couverte\s+guid[ée]e\s+(?:du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^d[ée]couverte\s+(?:du\s+site\s+arch[ée]ologique\s+de\s+|du\s+site\s+de\s+|du\s+village\s+de\s+|d['’]une\s+|d['’]un\s+|du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^exploration\s+(?:du\s+site\s+des\s+|du\s+site\s+de\s+|du\s+|de\s+la\s+|de\s+l['’]|des\s+|de\s+|d['’])/i,
+    /^immersion\s+dans\s+(?:le\s+splendide\s+|le\s+|la\s+|les\s+)/i,
+    /^arr[êe]t\s+(?:photo\s+)?(?:sur\s+la\s+|sur\s+le\s+|sur\s+les\s+|devant\s+l['’]|devant\s+le\s+|devant\s+la\s+|dans\s+un\s+|dans\s+une\s+|aux\s+magnifiques\s+|aux\s+|au\s+|[àa]\s+la\s+|[àa]\s+l['’]|[àa]\s+)/i,
+    /^rencontre\s+(?:de\s+familles\s+[àa]\s+|avec\s+les\s+|avec\s+)/i,
+    /^promenade\s+(?:en\s+barque\s+[àa]\s+moteur\s+dans\s+les\s+|dans\s+la\s+ville\s+coloniale\s+de\s+|dans\s+les\s+|dans\s+le\s+|sur\s+la\s+)/i,
+    /^balade\s+(?:en\s+cal[èe]che\s+dans\s+le\s+|sur\s+la\s+|sur\s+le\s+|dans\s+le\s+|dans\s+la\s+)/i,
+    /^embarquement\s+pour\s+(?:une\s+|un\s+)/i,
+    /^temps\s+libre\s+(?:[àa]\s+|dans\s+le\s+|sur\s+le\s+)/i
+  ];
+
+  for (const pref of actionPrefixes) {
+    if (pref.test(s)) {
+      s = s.replace(pref, '').trim();
+      break;
+    }
+  }
+
+  // 8. Tronquer systématiquement à tout gérondif "en admirant...", "en passant...", etc.
+  s = s.replace(/\s+en\s+[a-zà-ÿ]+ant\b.*$/i, '').trim();
+
+  // 9. Tronquer dès le premier séparateur descriptif ou clause relative
+  const cutPatterns = [
+    /\s*[,:;()]\s*/,
+    /\s+et\s+(?:visite|d[ée]couverte|promenade|baignade|balade|retour|installation|transfert|notamment|son|sa|ses|de\s+sa|de\s+son|de\s+ses|dans\s+le|dans\s+la|les\s+coutumes)(?=\s|$|[.,;:])/i,
+    /\s+(?:o[ùu]|qui|que|dont|situ[ée]e?s?|fond[ée]e?s?|class[ée]e?s?|consid[ée]r[ée]e?s?|r[ée]put[ée]e?s?|c[ée]l[èe]bres?|surnomm[ée]e?s?|nich[ée]e?s?|entour[ée]e?s?|bord[ée]e?s?|pour\s+d[ée]couvrir|pour\s+admirer|afin\s+d['’]admirer|avec\s+son|avec\s+sa|avec\s+ses|au\s+patrimoine|tr[èe]s\s+pittoresque|le\s+plus\s+connu|[àa]\s+la\s+d[ée]couverte|[àa]\s+la\s+faune|dans\s+la\s+r[ée]serve)(?=\s|$|[.,;:])/i
+  ];
+
+  for (const pat of cutPatterns) {
+    const m = s.match(pat);
+    if (m && m.index >= 3) {
+      s = s.slice(0, m.index).trim();
+    }
+  }
+
+  s = s.replace(/["«»]/g, '').replace(/\s+(?:et|ou|de|du|des|à|a|au|aux|en|par|dans|sur|le|la|les|l['’]|entre)$/i, '').trim();
+  s = s.replace(/^(?:la|le|les|l['’])\s+/i, '');
+
+  if (s.length > 40) {
+    const cut = s.slice(0, 38);
+    const lastSpace = cut.lastIndexOf(' ');
+    s = (lastSpace > 12 ? cut.slice(0, lastSpace) : cut).trim();
+  }
+
+  if (s.length > 0) {
+    s = s.charAt(0).toUpperCase() + s.slice(1);
+  }
+
+  return s || "Étape";
+}
+
+// Détermine si une phrase ouvre une NOUVELLE étape/visite de la journée ou si elle complète la description de l'étape précédente
+function isNewVisitStepSentence(sentence) {
+  const s = (sentence || "").trim();
+  if (!s) return false;
+
+  // Lignes de distance/durée/altitude : JAMAIS une étape
+  if (/^\(?\s*(?:route\s+)?(?:\d+\s*km|\d+h\d*|\balt\.?\s*[\d\s]+m?|\s*[\/+–-])+\s*(?:m|m\.|m\))?\s*$/i.test(s) || /^\(?alt\.?\s*[\d\s]+m?\)?$/i.test(s)) {
+    return false;
+  }
+
+  // Instructions logistiques, bagages, billets : rattacher à la visite suivante
+  if (/^d[ée]p[ôo]t\s+du\s+(?:petit\s+|grand\s+|principal\s+)?bagage/i.test(s) || /^d[ée]part\s+avec\s+votre\s+sac\s+[àa]\s+dos/i.test(s)) {
+    return 'ATTACH_NEXT';
+  }
+  if (/^(?:Billets\s+remis|La\s+valise|Le\s+bagage|Pr[ée]voir\s+un|NOTE\s*:|Attention\s*:|Entr[ée]e\s+[àa]\s+r[ée]gler|Transfert\s+[àa]\s+la\s+gare\s+ferroviaire)/i.test(s)) {
+    return false;
+  }
+
+  // Arrivée consécutive à une étape de route vers la même ville
+  if (/^Arriv[ée]e\s+[àa]\s+/i.test(s)) {
+    return false;
+  }
+
+  // Descriptions, détails architecturaux, dimensions : JAMAIS une étape
+  if (/^(?:Observation\s+et\s+explication|Entr[ée]e\s+dans\s+les\s+maisons|Sa\s+superficie|Cette\s+[îi]le|Ce\s+site|Qui\s+vit|Machu\s+Picchu\s+d[ée]voile|Visite\s+guid[ée]e\s+du\s+majestueux|Observation\s+des\s+balcons)/i.test(s)) {
+    return false;
+  }
+
+  // Logement isolé : se greffe au dîner ou à l'étape précédente
+  if (/^logement\.?$/i.test(s)) {
+    return false;
+  }
+
+  // Si commence par une lettre MINUSCULE (sans flag /i !) : suite de phrase
+  if (/^[a-zà-ÿ]/.test(s) || /^en\s+[a-zà-ÿ]+ant\b/i.test(s)) {
+    return false;
+  }
+
+  // Introduction d'acheminement
+  if (/^(?:Jour\s+consacr[ée]\s+(?:[àa]\s+l['’]acheminement|au\s+r[ée]acheminement)|Formalit[ée]s\s+d['’]embarquement)\.?$/i.test(s)) {
+    return 'ATTACH_NEXT';
+  }
+
+  // Phrases descriptives / explicatives qui doivent être fusionnées dans le sous-titre de l'étape précédente
+  const continuationStarters = /^(?:En\s+prime|D[ée]couvrez|Les\s+falaises|C['’]est\s+un|Fin\s+d['’]apr[èe]s-midi\s+libre|Possibilit[ée]\s+de|Grand\s+site\s+Maya|Empreinte\s+d['’][ée]l[ée]ments|Seul\s+site\s+Maya|Plus\s+de\s+\d|Laissons\s+les|On\s+peut\s+voir|Ils\s+se\s+distinguent|Le\s+parc\s+rassemble|La\s+passion\s+avec|Vous\s+pourrez|Vous\s+d[ée]couvrirez|Ces\s+objets|Chaque\s+mod[èe]le|Observer\s+les|V[ée]ritable\s+lieu|Ce\s+site|Magasins,\s+bars|Fond[ée]e\s+en|Il\s+est\s+|Elle\s+est\s+|Ils\s+sont\s+|Il\s+comporte|La\s+ville\s+est\s+situ[ée]e|Ces\s+groupes\s+ethniques|La\s+place\s+des\s+Trois\s+Cultures|Cette\s+[ée]glise|La\s+basilique\s+moderne|Les\s+Indiens\s+de\s+|Dans\s+une\s+atmosph[èe]re|D[ée]gustation\s+du\s+«|Le\s+site\s+de\s+Palenque\s+est|Un\s+aqueduc\s+souterrain|La\s+pyramide\s+des\s+Inscriptions|Les\s+d[ée]funts\s+de\s+|Puis\s+quelques\s+ann[ée]es|Les\s+os\s+sont|Chichen\s+Itza\s+fut|Parmi\s+les\s+[ée]difices|D[ée]monstration\s+de\s+la\s+pr[ée]paration|Le\s+Paseo\s+Montejo|Un\s+havre\s+de\s+nature|(?:D[ée]couverte\s+de\s+)?ce\s+sanctuaire\s+naturel|Avec\s+ses\s+maisons\s+traditionnelles|Balade\s+sur\s+le\s+pont|Seule\s+cit[ée]\s+nord-am[ée]ricaine|D[ée]couve?\s*rte\s+de\s+la\s+ville|Cette\s+chute\s+de\s+\d+|Exploration\s+du\s+parc\s+[àa]\s+pied|[ÀA]\s*la\s+fronti[èe]re\s+entre|Tour\s+de\s+ville\b|Visite\s+de\s+Rideau\s+Hall|Une\s+multitude\s+d['’][îi]les|Toronto\s+b[ée]n[ée]ficie|Ce\s+court\s+trajet|Leur\s+dimension\s+en\s+devient|Situ[ée]e\s+dans\s+le\s+District|[ÀA]\s*voir\s*:|Visite\s+guid[ée]e\s*\.?\s*$|Les\s+imposants\s+b[âa]timents|Le\s+["«]?Berceau\s+de\s+l['’]ind[ée]pendance|Tour\s+panoramique\b|New\s+York\s+et\s+Long\s+Island)/i;
+  if (continuationStarters.test(s)) {
+    return false;
+  }
+
+  // Vrais marqueurs de nouvelle étape :
+  // Horaire / vol / train
+  if (/(?:[01]?\d|2[0-3])[hH:][0-5]\d/i.test(s) && /(?:vol|train|d[ée]part|rendez-vous|embarquement)/i.test(s)) return true;
+  // Repas
+  if (/^(?:D[ée]jeuner|D[îi]ner|Souper)\b/i.test(s)) return true;
+  // Déplacement majeur
+  if (/^(?:Route\s+(?:vers|pour|en)|Travers[ée]e\s+|Envol\s+|Transfert\s+[àa]\s+l['’]a[ée]roport|D[ée]part\s+(?:pour|vers))/i.test(s)) return true;
+  // Visite majeure
+  if (/^(?:Visite\s+|D[ée]couverte\s+|Arr[êe]t\s+[àa]\s+|Embarquement\s+|Mont[ée]e\s+|Depuis\s+la\s+|Navigation\s+vers)/i.test(s)) return true;
+  // Temps libre
+  if (/^(?:Apr[èe]s-midi\s+libre|Temps\s+libre|Journ[ée]e\s+libre|Matin[ée]e\s+libre)/i.test(s)) return true;
+
+  return false;
+}
+
+function repairBrokenPdfWords(line) {
+  return (line || "")
+    .replace(/\u0000/g, '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\b([rR])\s+(etour)\b/gi, '$1$2')
+    .replace(/\b([mM])\s+(arch[ée])\b/gi, '$1$2')
+    .replace(/\b([lL])\s+(ogement)\b/gi, '$1$2')
+  return (line || "")
+    .replace(/\u0000/g, '')
+    .replace(/\u00A0/g, ' ')
+    .replace(/\b([dD])\s+(écouverte)/g, '$1$2')
+    .replace(/\b([vV])\s+(isite)/g, '$1$2')
+    .replace(/\b([cC])\s+(athédrale)/g, '$1$2')
+    .replace(/\b([bB])\s+(asilique)/g, '$1$2')
+    .replace(/\b([qQ]u)\s+([ée]bec)/gi, '$1$2')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+}
+
+// Sépare les lignes narratives d'une journée et l'encadré hôtel éventuel en bas de page (ex: programme final-GI710x8.pdf)
+function splitDayLinesAndHotelCard(rawLinesOfDay) {
+  const cleaned = rawLinesOfDay
+    .map(l => repairBrokenPdfWords(l))
+    .filter(l => {
+      if (!l) return false;
+      if (/^---\s*PAGE\s*\d+\s*---$/i.test(l)) return false;
+      if (/^p\s*a\s*g\s*e\s*\d[\d\s]*$/i.test(l)) return false;
+      if (/^page\s+\d+$/i.test(l)) return false;
+      if (/^photos?\s+de\s+chambres?\s+non\s+contractuelles?$/i.test(l)) return false;
+      if (/^\*\*fin\s+des\s+services\*\*$/i.test(l)) return false;
+      if (/25\s+Boulevard\s+des\s+Martyrs\s+Nantais|ZEN\s+ASIE\s+SAS\s+TOTRAVEL|SIRET\s+\d+|GARANTIE\s+APST/i.test(l)) return false;
+      return true;
+    });
+
+  let extractedHotel = null;
+  let narrativeLines = [...cleaned];
+
+  if (cleaned.length >= 3) {
+    const lastLine = cleaned[cleaned.length - 1];
+    const secondLastLine = cleaned[cleaned.length - 2] || "";
+    const isUrl = l => /^(?:https?:\/\/|www\.)\S+$/i.test(l);
+    const isPhone = l => /^(?:\(?00\s*\d+|\+\d+|\d{2,4}[\s.-]\d{2,4})[\d\s().\/-]{5,}$/.test(l);
+
+    if (isUrl(lastLine) || isPhone(lastLine) || isPhone(secondLastLine)) {
+      let hotelStartIdx = -1;
+      const minIdx = Math.max(0, cleaned.length - 7);
+      for (let k = cleaned.length - 2; k >= minIdx; k--) {
+        const cand = cleaned[k];
+        if (
+          /^[A-ZÀ-Ý0-9\s'&.-]{3,50}$/.test(cand) &&
+          !/[.!?]$/.test(cand) &&
+          !isPhone(cand) &&
+          !isUrl(cand) &&
+          !/^\d{4,6}\s+/.test(cand)
+        ) {
+          hotelStartIdx = k;
+          break;
+        }
+      }
+      if (hotelStartIdx !== -1) {
+        const hBlock = cleaned.slice(hotelStartIdx);
+        narrativeLines = cleaned.slice(0, hotelStartIdx);
+        let hName = hBlock[0];
+        if (!/^h[ôo]tel\b/i.test(hName) && !/\bhotel\b/i.test(hName)) {
+          hName = "HOTEL " + hName;
+        }
+        let hPhone = "";
+        let hUrl = "";
+        let hAddr = [];
+        for (let m = 1; m < hBlock.length; m++) {
+          const hl = hBlock[m];
+          if (isUrl(hl)) hUrl = hl;
+          else if (isPhone(hl)) hPhone = hl.replace(/^\(?00\s*/, '+').replace(/^(\+\d+)\)\s*/, '$1 ');
+          else hAddr.push(hl.replace(/,+$/, '').trim());
+        }
+        extractedHotel = {
+          name: hName,
+          address: hAddr.join(", "),
+          phone: hPhone,
+          website: hUrl
+        };
+      }
+    }
+  }
+
+  const paragraphs = [];
+  let currentPara = "";
+  for (const line of narrativeLines) {
+    if (!currentPara) {
+      currentPara = line;
+    } else if (/[.!?…]$/.test(currentPara) && /^[A-ZÀ-Ý0-9]/.test(line)) {
+      paragraphs.push(currentPara.trim());
+      currentPara = line;
+    } else {
+      if (/[a-zà-ÿ][-\uFFFD]$/i.test(currentPara) && /^[a-zà-ÿ]/i.test(line)) {
+        currentPara = currentPara.slice(0, -1) + line;
+      } else {
+        currentPara += " " + line;
+      }
+    }
+  }
+  if (currentPara.trim()) paragraphs.push(currentPara.trim());
+
+  const mergedParas = [];
+  for (let i = 0; i < paragraphs.length; i++) {
+    const p = paragraphs[i];
+    if (/^soir[ée]e\s+pi[ñn]ata\.?$/i.test(p) && i + 1 < paragraphs.length) {
+      mergedParas.push(p + " " + paragraphs[i + 1]);
+      i++;
+    } else {
+      mergedParas.push(p);
+    }
+  }
+
+  return { paragraphs: mergedParas, extractedHotel };
+}
+
 function extractVisitsFromDay(description, dayTitle) {
   const visits = [];
-  if (!description) {
+  if (!description || !description.trim()) {
     return [{
       time: "",
-      title: dayTitle || "Étape du jour",
-      subtitle: "Déroulé de la journée.",
+      title: extractShortVisitTitle(dayTitle || "Étape du jour"),
+      subtitle: "",
       icon: "route"
     }];
   }
 
-  const rawItems = description
-    .split(/(?:\r?\n|(?<=[.!?])\s+)/)
-    .map(s => s.replace(/^[•\-\*·\s]+/, '').trim())
-    .filter(s => s.length > 8);
+  // Nettoyer les en-têtes d'altitude/distance entre parenthèses au tout début de la description (ex: "(alt. 2 335 m)", "(364 km / 7h - alt. 3 800 m)", "(train 1h40 + route 74 km...)")
+  let cleanDesc = description
+    .replace(/^\s*\([^)]*(?:km|alt\.|\balt\b|\btrain\b|\broute\b)[^)]*\)\s*/i, '')
+    .replace(/^Picchu\s*\([^)]*\)\s*/i, '')
+    .replace(/^\(?alt\.?\s*[\d\s]+m?\)?\s*/i, '')
+    .trim();
 
-  const filterOutIntro = rawItems.filter(s => {
-    const l = (s || "").normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  // Éviter de couper sur les abréviations fréquentes (alt., n°, p., etc.)
+  cleanDesc = cleanDesc
+    .replace(/\b(alt)\.\s*(\d)/gi, '$1 $2')
+    .replace(/\b(n)[°o]\.\s*(\d)/gi, '$1° $2')
+    .replace(/\b(p)\.\s*(ex)/gi, '$1 $2');
+
+  const rawSentences = cleanDesc
+    .split(/(?:\r?\n|(?<=[.!?])\s+)/)
+    .map(s => repairBrokenPdfWords(s).replace(/^[•\-\*·\s]+/, '').trim())
+    .filter(s => s.length >= 3);
+
+  const filteredSentences = rawSentences.filter(s => {
+    const l = normStr(s);
+    if (/^petit[-\s]dejeuner\.?$/.test(l)) return false;
+    if (/^installation\s+(?:a\s+l['’]?hotel\s+)?pour\s+\d+\s+nuits?\.?$/.test(l)) return false;
+    if (/^\**fin\s+des\s+services\**\.?$/.test(l)) return false;
+    // Filtrer les résidus d'en-têtes de distance/durée/altitude sans toucher aux vols/trains
+    if (/^\(?\s*(?:\d+\s*km|alt\.?\s*\d+|\(alt\.)/i.test(l) && !/(?:vol|train|embarquement)/i.test(l)) return false;
+    if (/^\(?\d+h\d*\s*[-–\/+]\s*alt/i.test(l)) return false;
     return !l.startsWith('pays fabuleux') &&
            !l.startsWith('trois mille ans') &&
-           !l.startsWith('le voyage n’etant pas une science exacte') &&
            !l.startsWith('le voyage n\'etant pas une science exacte') &&
+           !l.startsWith('le voyage n’etant pas une science exacte') &&
+           !l.startsWith('en pareilles circonstances') &&
+           !l.startsWith('nous vous souhaitons un beau voyage') &&
            !l.startsWith('nous attirons votre attention') &&
            !l.startsWith('sous reserve de modification');
   });
 
-  const candidates = filterOutIntro.length > 0 ? filterOutIntro : rawItems;
+  const sentences = filteredSentences.length > 0 ? filteredSentences : rawSentences;
 
-  candidates.slice(0, 5).forEach(item => {
+  // Regrouper les phrases (préfixes d'acheminement / logistique avec la suivante, phrases descriptives avec la précédente)
+  const groupedItems = [];
+  let pendingPrefix = "";
+
+  for (let i = 0; i < sentences.length; i++) {
+    const sent = sentences[i];
+    const status = isNewVisitStepSentence(sent);
+
+    if (status === 'ATTACH_NEXT') {
+      pendingPrefix = pendingPrefix ? (pendingPrefix + " " + sent) : sent;
+      continue;
+    }
+
+    if (status === false && groupedItems.length > 0 && !pendingPrefix) {
+      groupedItems[groupedItems.length - 1].fullText += " " + sent;
+    } else {
+      const combinedText = pendingPrefix ? `${pendingPrefix} ${sent}` : sent;
+      groupedItems.push({
+        leadSentence: sent,
+        fullText: combinedText
+      });
+      pendingPrefix = "";
+    }
+  }
+
+  if (pendingPrefix) {
+    if (groupedItems.length > 0) {
+      groupedItems[groupedItems.length - 1].fullText += " " + pendingPrefix;
+    } else {
+      groupedItems.push({ leadSentence: pendingPrefix, fullText: pendingPrefix });
+    }
+  }
+
+  groupedItems.forEach(group => {
+    const item = group.fullText.trim();
+    const lead = group.leadSentence.trim();
+
     let detectedTime = "";
-    const timeMatch = item.match(/\b([01]?\d|2[0-3])[hH:]([0-5]\d)\b/) || item.match(/\b([01]?\d|2[0-3])\s*[hH]\b/);
+    // Extraire l'heure de départ
+    const timeMatch = lead.match(/\b([01]?\d|2[0-3])[hH:]([0-5]\d)\b/) || lead.match(/\b([01]?\d|2[0-3])\s*[hH]\b/);
     if (timeMatch) {
       const h = timeMatch[1].padStart(2, '0');
       const m = timeMatch[2] ? timeMatch[2] : "00";
       detectedTime = `${h}:${m}`;
     }
 
-    let cleanTitle = item.replace(/^(?:[àa]\s*)?(?:[01]?\d|2[0-3])[hH:][0-5]\d\s*[:–-]?\s*/i, '').trim();
-    if (cleanTitle.length > 60) {
-      const commaIdx = cleanTitle.indexOf(',');
-      if (commaIdx > 15 && commaIdx < 60) {
-        cleanTitle = cleanTitle.slice(0, commaIdx).trim();
-      } else {
-        cleanTitle = cleanTitle.slice(0, 58).replace(/[.,;:!?\s]+$/, '') + '...';
-      }
-    }
+    const shortTitle = extractShortVisitTitle(lead);
+    const cleanFullNoDot = item.replace(/[.!?]+$/, '').trim();
+    const subtitle = (normStr(shortTitle) === normStr(cleanFullNoDot)) ? "" : item;
 
     visits.push({
       time: detectedTime,
-      title: cleanTitle,
-      subtitle: item,
+      title: shortTitle,
+      subtitle: subtitle,
       icon: (typeof detectIconForText === 'function') ? detectIconForText(item) : 'location-dot'
     });
   });
 
-  return visits.length > 0 ? visits : [{
+  // Déduplication des étapes consécutives ayant le même titre (ex: double "Parc Jacques Cartier")
+  const dedupedVisits = [];
+  for (const v of visits) {
+    if (dedupedVisits.length > 0 && normStr(dedupedVisits[dedupedVisits.length - 1].title) === normStr(v.title)) {
+      if (v.subtitle) {
+        dedupedVisits[dedupedVisits.length - 1].subtitle += (dedupedVisits[dedupedVisits.length - 1].subtitle ? " " : "") + v.subtitle;
+      }
+    } else {
+      dedupedVisits.push(v);
+    }
+  }
+
+  return dedupedVisits.length > 0 ? dedupedVisits : [{
     time: "",
-    title: dayTitle,
+    title: extractShortVisitTitle(dayTitle),
     subtitle: description,
     icon: "route"
   }];
 }
 
+const FRENCH_MONTHS_MAP = {
+  "janvier": "01", "fevrier": "02", "mars": "03", "avril": "04",
+  "mai": "05", "juin": "06", "juillet": "07", "aout": "08",
+  "septembre": "09", "octobre": "10", "novembre": "11", "decembre": "12"
+};
+
+function parseFrenchDateInfo(dayNumStr, monthNameStr, yearStr) {
+  const d = String(dayNumStr || "").trim().padStart(2, '0');
+  const mKey = normStr(monthNameStr);
+  const m = FRENCH_MONTHS_MAP[mKey] || "01";
+  const y = String(yearStr || "").trim();
+  return {
+    iso: `${y}-${m}-${d}`,
+    dayInt: parseInt(dayNumStr, 10),
+    monthRaw: (monthNameStr || "").trim().toLowerCase(),
+    year: y
+  };
+}
+
+// Résolution automatique en arrière-plan d'une photo Wikimedia Commons si absente du dictionnaire vérifié
+async function fetchFirstWikimediaImage(query) {
+  if (!query || typeof fetch !== 'function') return "";
+  try {
+    const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&generator=search&gsrsearch=${encodeURIComponent(query)}&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url&iiurlwidth=960`;
+    const res = await fetch(url);
+    const data = await res.json();
+    if (!data || !data.query || !data.query.pages) return "";
+    const pages = Object.values(data.query.pages);
+    for (const p of pages) {
+      const t = (p.title || "").toLowerCase();
+      if ((t.endsWith('.jpg') || t.endsWith('.jpeg') || t.endsWith('.png') || t.endsWith('.webp')) && !t.includes('icon') && !t.includes('flag') && !t.includes('map') && !t.includes('logo')) {
+        const info = p.imageinfo && p.imageinfo[0];
+        if (info && (info.thumburl || info.url)) {
+          return info.thumburl || info.url;
+        }
+      }
+    }
+  } catch (e) {}
+  return "";
+}
+
+async function autoPopulateMissingPhotosFromWikimedia(tripObj) {
+  if (!tripObj || typeof window === 'undefined') return;
+  if (!tripObj.coverImage) {
+    const q = (tripObj.subtitle || tripObj.title || "").replace(/[^\w\sà-ÿÀ-Ý'-]/g, ' ').trim();
+    const found = await fetchFirstWikimediaImage(q || tripObj.title);
+    if (found) {
+      tripObj.coverImage = found;
+      const inp = document.getElementById('adm-cover');
+      if (inp && tripData === tripObj) {
+        inp.value = found;
+        if (typeof updateCoverPreview === 'function') updateCoverPreview(found);
+      }
+    }
+  }
+  if (tripObj.itinerary && Array.isArray(tripObj.itinerary)) {
+    for (let i = 0; i < tripObj.itinerary.length; i++) {
+      const d = tripObj.itinerary[i];
+      if (!d.image && d.city) {
+        const found = await fetchFirstWikimediaImage(`${d.city} landmark`);
+        if (found) d.image = found;
+      }
+    }
+  }
+}
+
+// Prétraitement du flux de lignes PDF : recolle les chiffres/titres de jours coupés et les lettres majuscules isolées
+function preprocessExtractedPdfLines(lines) {
+  let cleaned = (lines || [])
+    .map(l => (l || "").replace(/\u0000/g, '').replace(/\u00A0/g, ' ').trim())
+    .filter(l => l.length > 0 && !/^---\s*PAGE\s*\d*\s*---$/i.test(l) && !/^p\s*a\s*g\s*e\s*\d[\d\s]*$/i.test(l));
+
+  let res = [];
+  for (let i = 0; i < cleaned.length; i++) {
+    let line = cleaned[i];
+
+    // 1. Détection Jour split: 'Jour 1' + '1 • ...' ou '1 •'
+    if (/^(?:Jour|J)\s*1$/i.test(line) && i + 1 < cleaned.length) {
+      const nextL = cleaned[i + 1];
+      const m = nextL.match(/^(\d)\s*([•:\-–—."].*)$/);
+      if (m) {
+        line = 'Jour 1' + m[1] + ' ' + m[2];
+        i++;
+      }
+    }
+
+    // 2. Lettre majuscule isolée sur sa ligne (ex: 'T' suivi de 'rois-Rivières' ou 'V' suivi de 'isite')
+    if (/^[A-ZÀ-Ý]$/.test(line) && i + 1 < cleaned.length && /^[a-zà-ÿ]/.test(cleaned[i + 1])) {
+      line = line + cleaned[i + 1];
+      i++;
+    }
+
+    // 3. Ligne se terminant par une majuscule isolée collée à une ponctuation/espace (ex: 'Jour 1 • V' suivi de 'otre région' ou 'Carlisle - W' suivi de 'ashington')
+    const endCapMatch = line.match(/^(.*(?:[•:\-–—\s]))([A-ZÀ-Ý])$/);
+    if (endCapMatch && i + 1 < cleaned.length && /^[a-zà-ÿ]/.test(cleaned[i + 1])) {
+      const prefix = endCapMatch[1];
+      const cap = endCapMatch[2];
+      line = prefix + cap + cleaned[i + 1];
+      i++;
+    }
+
+    res.push(line);
+  }
+
+  // Deuxième passe: rattachement des en-têtes de jours incomplets et mots coupés en bout d'en-tête
+  let finalLines = [];
+  for (let i = 0; i < res.length; i++) {
+    let line = res[i];
+
+    // Ex: 'Jour 2 •' suivi de 'Trois-Rivières - Chicoutimi'
+    if (/^(?:Jour|J)\s*\d{1,2}\s*[•:\-–—]\s*$/i.test(line) && i + 1 < res.length) {
+      line = line.trim() + ' ' + res[i + 1].trim();
+      i++;
+    }
+    // Ex: 'Jour 5 • Gananoque -' suivi de 'Toronto'
+    else if (/^(?:Jour|J)\s*\d{1,2}\s*[•:\-–—]\s*.*[-–—]\s*$/i.test(line) && i + 1 < res.length && !/^(?:Jour|J)\b/i.test(res[i + 1])) {
+      line = line.trim() + ' ' + res[i + 1].trim();
+      i++;
+    }
+
+    // Ex: 'Jour 10 • New' suivi de 'York' (si 'York' ou 'Y' était sur la ligne suivante)
+    if (/^(?:Jour|J)\s*\d{1,2}\s*[•:\-–—]\s*.*(?:\bNew|\bSan|\bLos|\bSainte?)\s*$/i.test(line) && i + 1 < res.length) {
+      line = line.trim() + ' ' + res[i + 1].trim();
+      i++;
+    }
+
+    finalLines.push(line);
+  }
+
+  return finalLines;
+}
+
 function processExtractedTextToTrip(text, sourceName) {
+  try {
   const statusEl = document.getElementById('pdf-import-status');
   const previewBox = document.getElementById('pdf-preview-container');
-  const previewSummary = document.getElementById('pdf-preview-summary');
   const btnDownload = document.getElementById('btn-download-parsed-json');
   const btnApply = document.getElementById('btn-apply-parsed-trip');
 
-  // Choix explicite du profil avant import
   const profileSelect = document.getElementById('pdf-import-profile-select');
   const chosenProfile = profileSelect ? profileSelect.value : 'guided';
 
-  const rawLines = text.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  const initialLines = text.split(/\r?\n/)
+    .map(l => repairBrokenPdfWords(l))
+    .filter(l => l.length > 0 && !/^---\s*PAGE\s*\d+\s*---$/i.test(l) && !/^p\s*a\s*g\s*e\s*\d[\d\s]*$/i.test(l));
+  const rawLines = preprocessExtractedPdfLines(initialLines);
 
-  // 1. Détection du Titre et Dates globales
+  // =========================================================================
+  // 1. DÉTECTION DU TITRE, SOUS-TITRE, DATES ET TEXTE DE PRÉSENTATION (INTRO)
+  // =========================================================================
   let detectedTitle = "";
-  let detectedSubtitle = "Circuit exclusif Voyages Girardot";
+  let detectedSubtitle = "";
   let detectedDates = "";
   let detectedStartDate = "";
   let detectedEndDate = "";
+  let detectedIntro = "";
 
-  // Analyse multi-lignes pour les dates globales de voyage
+  // 1a. Dates globales sur l'en-tête (supporte "-" ou "du ... au ...")
   const headerBlock = rawLines.slice(0, 12).join(" ");
-  const datesMatch = headerBlock.match(/((?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4})\s*[-–—]\s*((?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4})/i);
-  if (datesMatch) {
-    detectedDates = `${datesMatch[1]} au ${datesMatch[2]}`;
-  }
-
-  // Recherche de motif de carnet "Votre carnet de voyage X"
-  for (let i = 0; i < Math.min(rawLines.length, 15); i++) {
-    const l = rawLines[i];
-    const carnetMatch = l.match(/Votre carnet de voyage\s+(.*)/i);
-    if (carnetMatch) {
-      detectedTitle = carnetMatch[1].trim();
-    }
-    const subMatch = l.match(/De\s+([A-Za-zÀ-Ý\s-]+)\s+au\s+([A-Za-zÀ-Ý\s-]+(?:\s+en passant par\s+[A-Za-zÀ-Ý\s-]+)?)/i);
-    if (subMatch) {
-      detectedSubtitle = subMatch[0].trim();
-    } else if (l.includes('|') && (l.toLowerCase().includes('croisière') || l.toLowerCase().includes('bord du') || l.toLowerCase().includes('espagne') || l.toLowerCase().includes('italie') || l.toLowerCase().includes('sicile'))) {
-      detectedSubtitle = l.trim();
+  const fullDatesRegex = /(?:du\s+)?(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*(\d{1,2})\s+([a-zà-ÿ]+)\s+(\d{4})\s*(?:[-–—]|\bau\b)\s*(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*(\d{1,2})\s+([a-zà-ÿ]+)\s+(\d{4})/i;
+  const dm = headerBlock.match(fullDatesRegex);
+  if (dm) {
+    const d1 = parseFrenchDateInfo(dm[1], dm[2], dm[3]);
+    const d2 = parseFrenchDateInfo(dm[4], dm[5], dm[6]);
+    detectedStartDate = d1.iso;
+    detectedEndDate = d2.iso;
+    if (d1.monthRaw === d2.monthRaw && d1.year === d2.year) {
+      detectedDates = `${d1.dayInt} au ${d2.dayInt} ${d2.monthRaw} ${d2.year}`;
+    } else if (d1.year === d2.year) {
+      detectedDates = `${d1.dayInt} ${d1.monthRaw} au ${d2.dayInt} ${d2.monthRaw} ${d2.year}`;
+    } else {
+      detectedDates = `${d1.dayInt} ${d1.monthRaw} ${d1.year} au ${d2.dayInt} ${d2.monthRaw} ${d2.year}`;
     }
   }
 
-  // Nettoyage du titre si la date est accolée
-  if (detectedTitle) {
-    detectedTitle = detectedTitle.replace(/(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b.*$/i, '').trim();
-    detectedTitle = detectedTitle.replace(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}.*$/i, '').trim();
+  // 1b. Structure Page 1 Girardot : après "En date du DD/MM/YYYY à HH:MM:SS"
+  //     Ligne +1 = Titre exact du carnet
+  //     Ligne(s) suivante(s) courtes = Sous-titre exact
+  //     Paragraphe(s) avant "Convocation aérienne" / "Aller :" / "Jour 1" = Texte de présentation (intro)
+  const enDateIdx = rawLines.findIndex((l, idx) => idx < 12 && /^En date du\s+\d{2}\/\d{2}\/\d{4}/i.test(l));
+  const endOfIntroIdx = rawLines.findIndex((l, idx) =>
+    idx > 0 && /^(?:Convocation\s+a[ée]rienne|(?:Vol\s+)?Aller\s*:|Bagages\s+A[ée]riens|(?:Jour|J)\s*1\b|1er\s+jour\b)/i.test(l)
+  );
+
+  if (enDateIdx !== -1) {
+    const limitIdx = endOfIntroIdx !== -1 ? endOfIntroIdx : Math.min(rawLines.length, enDateIdx + 15);
+    const page1Block = rawLines.slice(enDateIdx + 1, limitIdx);
+
+    if (page1Block.length > 0) {
+      detectedTitle = page1Block[0].trim();
+
+      let subtitleLines = [];
+      let introStartPos = 1;
+      for (let k = 1; k < page1Block.length; k++) {
+        const lineK = page1Block[k];
+        // Une ligne de sous-titre est relativement courte (< 95 car.) et ne se termine pas par un point final de phrase (ou commence par De ... / Du ...)
+        const looksLikeSubtitle = (
+          subtitleLines.length === 0 &&
+          lineK.length <= 95 &&
+          (!/[.!]$/.test(lineK) || /^(?:De\s+|Du\s+)/i.test(lineK))
+        );
+        if (looksLikeSubtitle) {
+          subtitleLines.push(lineK);
+          introStartPos = k + 1;
+        } else {
+          break;
+        }
+      }
+      detectedSubtitle = subtitleLines.join(" ").trim();
+      detectedIntro = page1Block.slice(introStartPos).join(" ").replace(/\s{2,}/g, ' ').trim();
+    }
+  } else {
+    // Fallback si "En date du" n'est pas présent : chercher "Votre carnet de voyage <Titre>" ou l'en-tête Page 1 d'un programme réceptif (ex: "COCKTAIL MEXICAIN")
+    for (let i = 0; i < Math.min(rawLines.length, 15); i++) {
+      const l = rawLines[i];
+      const carnetMatch = l.match(/Votre carnet de voyage\s+(.*)/i);
+      if (carnetMatch && !detectedTitle) {
+        detectedTitle = carnetMatch[1]
+          .replace(/(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)\b.*$/i, '')
+          .replace(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}.*$/i, '')
+          .trim();
+      }
+      if (!detectedSubtitle) {
+        if (/^(?:De\s+|Du\s+)[A-Za-zÀ-Ý\s'-]+(?:au|aux|[àa])\s+[A-Za-zÀ-Ý\s'-]+/i.test(l) && l.length <= 95) {
+          detectedSubtitle = l.trim();
+        } else if (l.includes('|') && /croisi[èe]re|bord du|espagne|italie|sicile/i.test(l)) {
+          detectedSubtitle = l.trim();
+        }
+      }
+    }
+
+    // Si toujours aucun titre mais que la 1re ligne avant la date et avant "JOUR 1" est un titre de programme (ex: "COCKTAIL MEXICAIN")
+    if (!detectedTitle && endOfIntroIdx > 0) {
+      const candidateLine = rawLines[0];
+      if (candidateLine && candidateLine.length >= 4 && candidateLine.length <= 70 && !/^du\s+/i.test(candidateLine)) {
+        detectedTitle = candidateLine === candidateLine.toUpperCase()
+          ? candidateLine.toLowerCase().replace(/(?:^|\s|-)\S/g, c => c.toUpperCase())
+          : candidateLine;
+      }
+      const introLines = rawLines.slice(1, endOfIntroIdx).filter(l => !fullDatesRegex.test(l) && !/^\d+\s+jours?\s*\/\s*\d+\s+nuits?/i.test(l));
+      if (!detectedIntro && introLines.length > 0) {
+        detectedIntro = introLines.join(" ").replace(/\s{2,}/g, ' ').trim();
+      }
+    }
   }
 
   if (!detectedTitle && sourceName && !sourceName.toLowerCase().includes("programme importé")) {
     detectedTitle = sourceName.replace(/\.pdf$/i, "").replace(/[_-]/g, " ").trim();
   }
-  if (!detectedTitle && rawLines.length > 0) {
-    detectedTitle = rawLines[0].slice(0, 60);
+
+  // 1c. Photo de couverture en rapport avec le sous-titre / la destination
+  let detectedCoverImage = "";
+  const coverSearchPool = normStr((detectedSubtitle || "") + " " + (detectedTitle || ""));
+  for (const [k, url] of Object.entries(CURATED_COVER_IMAGES)) {
+    if (coverSearchPool.includes(k)) {
+      detectedCoverImage = url;
+      break;
+    }
   }
 
-  // 2. Détection précise des étapes "Jour X"
+  // =========================================================================
+  // 2. DÉTECTION DU PLAN DE VOL (Aller / Retour — sans rien inventer)
+  // =========================================================================
+  const flightsList = [];
+
+  function parseFlightSection(typeLabel, headerStr, blockStr, fallbackDate) {
+    const dateMatch = headerStr.match(/\d{1,2}\/\d{1,2}\/\d{4}/)
+                   || blockStr.match(/Date\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i)
+                   || headerStr.match(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i);
+    const flightDate = dateMatch ? dateMatch[0].trim() : (headerStr.trim() || fallbackDate || "");
+
+    const depAero = ((blockStr.match(/(?:D[ée]collage de l[’']a[ée]roport de|D[ée]part de|A[ée]roport de d[ée]part)\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const arrAero = ((blockStr.match(/(?:A l[’']a[ée]roport de|Arriv[ée]e [àa]|A[ée]roport d['’]arriv[ée]e)\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const flightNumRaw = ((blockStr.match(/(?:N°\s*(?:de\s*)?vol|Vol)\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const flightNum = flightNumRaw.replace(/^([A-Z]{2})(\d{2,4})$/, '$1 $2');
+
+    // Premier "Décollage prévu à :" = heure de départ du 1er tronçon
+    const depTime = ((blockStr.match(/(?:D[ée]collage pr[ée]vu [àa]|D[ée]part pr[ée]vu [àa])\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const arrTime = ((blockStr.match(/(?:Arriv[ée]e pr[ée]vue [àa]|Arriv[ée]e)\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const comp = ((blockStr.match(/Compagnie\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+
+    // Escale éventuelle (ex: "Escale à : Dubaï à 23h55" + 2e décollage "Décollage prévu à : 04h05 le 13/10/2026 – vol n° EK761")
+    let viaStr = "";
+    const escaleMatch = blockStr.match(/Escale\s+[àa]\s*:\s*([^\r\n]+)/i);
+    if (escaleMatch) {
+      viaStr = `Escale à ${escaleMatch[1].trim()}`;
+      const allDepMatches = [...blockStr.matchAll(/D[ée]collage pr[ée]vu [àa]\s*:\s*([^\r\n]+)/gi)];
+      if (allDepMatches.length > 1) {
+        viaStr += ` (redécollage à ${allDepMatches[1][1].trim()})`;
+      }
+    }
+
+    // Notes : Heure de présentation + Lieu + Observations
+    const meetingTime = ((blockStr.match(/(?:Heure de pr[ée]sentation|Convocation)\s*(?:[àa]\s*l[’']a[ée]roport)?\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const meetingPlace = ((blockStr.match(/Lieu\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+    const obs = ((blockStr.match(/Observations\s*:\s*([^\r\n]*)/i) || [])[1] || "").trim();
+
+    let notesParts = [];
+    if (meetingTime) {
+      let convStr = `Convocation à ${meetingTime}`;
+      if (meetingPlace) {
+        const cleanPlace = meetingPlace.replace(/\s+du\s+vol$/i, '').trim();
+        convStr += ` au ${cleanPlace.charAt(0).toLowerCase() + cleanPlace.slice(1)}`;
+      }
+      notesParts.push(convStr);
+    }
+    if (obs) {
+      notesParts.push(obs);
+    }
+
+    if (flightNum || depAero || arrAero) {
+      flightsList.push({
+        type: typeLabel,
+        airline: comp,
+        flightNumber: flightNum,
+        departureAirport: depAero,
+        departureTime: depTime,
+        arrivalAirport: arrAero,
+        arrivalTime: arrTime,
+        date: flightDate,
+        via: viaStr,
+        notes: notesParts.join(" • ")
+      });
+    }
+  }
+
+  const outboundMatch = text.match(/(?:Vol\s+)?Aller\s*[:–-]\s*([^\r\n]*)\r?\n([\s\S]*?)(?=(?:Vol\s+)?Retour\s*[:–-]|Nous attirons|Bagages|Jour 1\b|$)/i);
+  if (outboundMatch) {
+    parseFlightSection("Aller", outboundMatch[1], outboundMatch[2], detectedStartDate);
+  }
+
+  const inboundMatch = text.match(/(?:Vol\s+)?Retour\s*[:–-]\s*([^\r\n]*)\r?\n([\s\S]*?)(?=Nous attirons|Bagages|Jour 1\b|Coordonn[ée]es|Vos h[ôo]tels|$)/i);
+  if (inboundMatch) {
+    parseFlightSection("Retour", inboundMatch[1], inboundMatch[2], detectedEndDate);
+  }
+
+  // Fallback si aucun bloc "Aller :" / "Retour :" explicite n'est présent, mais que les vols sont intégrés dans le texte des journées (ex: "11H45 : Vol AF 178 à destination de Mexico.")
+  if (flightsList.length === 0) {
+    const inlineFlightRegex = /(\d{1,2}[hH:]\d{2})\s*:\s*Vol\s+([A-Z]{2}\s*\d{2,4})\s+[àa]\s+destination\s+de\s+([^.\r\n]+)/gi;
+    const inlineMatches = [...text.matchAll(inlineFlightRegex)];
+    inlineMatches.forEach((m, idx) => {
+      const depTime = m[1].toLowerCase().replace(':', 'h');
+      const fNum = m[2].replace(/\s+/g, ' ').trim();
+      const arrPlace = m[3].trim();
+      const beforeSlice = text.slice(Math.max(0, m.index - 250), m.index);
+      const depAeroMatch = beforeSlice.match(/a[ée]roport\s+de\s+([A-ZÀ-Ý][A-Za-zÀ-ÿ\s'-]+?)(?:\s+pour|\s+et|[.,\r\n]|$)/i);
+      const depPlace = idx === 0 ? "Paris" : (depAeroMatch ? depAeroMatch[1].trim() : "");
+      const afterSlice = text.slice(m.index, m.index + 350);
+      const arrMatch = afterSlice.match(/(\d{1,2}[hH:]\d{2})\s*:\s*Arriv[ée]e\s+pr[ée]vue\s+[àa]\s+([^.\r\n]+)/i);
+      const arrTime = arrMatch ? arrMatch[1].toLowerCase().replace(':', 'h') : "";
+      const airlineCode = fNum.slice(0, 2).toUpperCase();
+      const airlineName = airlineCode === 'AF' ? 'Air France' : (airlineCode === 'LH' ? 'Lufthansa' : '');
+      flightsList.push({
+        type: idx === 0 ? "Aller" : "Retour",
+        airline: airlineName,
+        flightNumber: fNum,
+        departureAirport: depPlace,
+        departureTime: depTime,
+        arrivalAirport: arrPlace,
+        arrivalTime: arrTime,
+        date: idx === 0 ? detectedStartDate : detectedEndDate,
+        via: "",
+        notes: ""
+      });
+    });
+  }
+
+  const landFlightsCopy = JSON.parse(JSON.stringify(flightsList));
+
+  // =========================================================================
+  // 3. DÉTECTION DU PROGRAMME JOUR PAR JOUR (ITINERARY)
+  // =========================================================================
   const itinerary = [];
   let currentDay = null;
-  const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—."'«»]\s*(.*))?$/i;
-  const altDayRegex = /^(?:1er|\d{1,2}(?:er|[eè]me)?)\s+jour\b(?:\s*[•:\-–—."'«»]\s*(.*))?$/i;
+  const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—."'«»]\s*(.*)|\s+(.+))?$/i;
+  const altDayRegex = /^(?:1er|\d{1,2}(?:er|[eè]me)?)\s+jour\b(?:\s*[•:\-–—."'«»]\s*(.*)|\s+(.+))?$/i;
 
-  // Mots qui marquent la FIN définitive du déroulé des étapes (SEULEMENT APRÈS AVOIR COMMENCÉ À TROUVER DES JOURS)
   const endOfItineraryKeywords = [
-    "coordonnées de vos hôtels", "coordonnees de vos hotels", "vos hôtels", "vos hotels",
+    "coordonnées de vos hôtels", "coordonnees de vos hotels",
+    "coordonnées de votre hôtel", "coordonnees de votre hotel",
+    "vos hôtels", "vos hotels", "votre hôtel", "votre hotel",
     "le voyage n’étant pas une science exacte", "le voyage n'etant pas une science exacte",
-    "votre accompagnatrice", "votre guide", "vos contacts",
+    "votre accompagnatrice", "votre accompagnateur", "votre guide", "vos contacts", "votre contact sur place",
     "formalités indispensables", "formalites indispensables", "bon à savoir", "bon a savoir",
     "assurance multirisque"
   ];
-
-  const knownPortCoordinates = {
-    "marseille": { city: "Marseille", lat: 43.2965, lng: 5.3698 },
-    "barcelone": { city: "Barcelone", lat: 41.3851, lng: 2.1734 },
-    "tanger": { city: "Tanger (Maroc)", lat: 35.7878, lng: -5.8118 },
-    "casablanca": { city: "Casablanca (Maroc)", lat: 33.6062, lng: -7.6186 },
-    "cadix": { city: "Cadix (Espagne)", lat: 36.5271, lng: -6.2886 },
-    "cadiz": { city: "Cadix (Espagne)", lat: 36.5271, lng: -6.2886 },
-    "gibraltar": { city: "Gibraltar (Royaume-Uni)", lat: 36.1408, lng: -5.3536 },
-    "malaga": { city: "Malaga (Espagne)", lat: 36.7213, lng: -4.4214 },
-    "seville": { city: "Séville (Espagne)", lat: 37.3891, lng: -5.9845 },
-    "savone": { city: "Savone (Italie)", lat: 44.3079, lng: 8.4811 },
-    "palerme": { city: "Palerme (Italie)", lat: 38.1157, lng: 13.3615 },
-    "cagliari": { city: "Cagliari (Italie)", lat: 39.2238, lng: 9.1217 },
-    "civitavecchia": { city: "Civitavecchia / Rome (Italie)", lat: 42.0924, lng: 11.7954 },
-    "genes": { city: "Gênes (Italie)", lat: 44.4056, lng: 8.9463 },
-    "naples": { city: "Naples (Italie)", lat: 40.8518, lng: 14.2681 }
-  };
 
   for (let i = 0; i < rawLines.length; i++) {
     const line = rawLines[i];
     const lowerLine = line.toLowerCase();
 
-    // Arrêt uniquement si nous avons déjà trouvé au moins un jour ET que nous atteignons la section finale
     if (currentDay !== null || itinerary.length > 0) {
       if (endOfItineraryKeywords.some(kw => lowerLine.startsWith(kw))) {
         break;
@@ -5641,14 +6908,19 @@ function processExtractedTextToTrip(text, sourceName) {
     let dayNum = 0;
     let dayTitle = "";
 
+    // Éviter le faux positif "Jour consacré à l'acheminement..."
+    if (matchDay && !matchDay[2] && matchDay[3] && /^consacr[ée]/i.test(matchDay[3].trim())) {
+      matchDay = null;
+    }
+
     if (matchDay) {
       dayNum = parseInt(matchDay[1], 10);
-      dayTitle = (matchDay[2] || "").trim();
+      dayTitle = (matchDay[2] || matchDay[3] || "").trim();
     } else {
       const matchAlt = line.match(altDayRegex);
       if (matchAlt) {
         dayNum = parseInt(matchAlt[0].match(/\d+/)?.[0] || "1", 10);
-        dayTitle = (matchAlt[1] || "").trim();
+        dayTitle = (matchAlt[1] || matchAlt[2] || "").trim();
         matchDay = matchAlt;
       }
     }
@@ -5662,40 +6934,49 @@ function processExtractedTextToTrip(text, sourceName) {
         dayTitle = rawLines[i + 1];
         i++;
       }
+      if (/-?\s*Machu$/i.test(dayTitle) && i + 1 < rawLines.length && /^Picchu\b/i.test(rawLines[i + 1])) {
+        dayTitle += " " + "Picchu";
+        rawLines[i + 1] = rawLines[i + 1].replace(/^Picchu\s*/i, '').trim();
+      }
 
-      const separated = (typeof separateDayTitleAndText === 'function') 
-        ? separateDayTitleAndText(dayTitle) 
+
+      // Extraire une date éventuelle en fin de titre (ex: "JOUR 1 Paris / Mexico Mercredi 11 Novembre 2026")
+      let extractedDayDateStr = `Jour ${dayNum}`;
+      const trailDateMatch = dayTitle.match(/\s+((?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+(?:janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[ûu]t|septembre|octobre|novembre|d[ée]cembre)\s+\d{4})$/i);
+      if (trailDateMatch) {
+        extractedDayDateStr = trailDateMatch[1].trim();
+        dayTitle = dayTitle.slice(0, trailDateMatch.index).trim();
+      }
+      dayTitle = dayTitle
+        .replace(/\s*\([A-Z]{2,4}\)\s*/g, ' ')
+        .replace(/\s*\/\s*/g, ' - ')
+        .replace(/\s{2,}/g, ' ')
+        .trim();
+
+      const separated = (typeof separateDayTitleAndText === 'function')
+        ? separateDayTitleAndText(dayTitle)
         : { title: dayTitle, extraDesc: "" };
 
       currentDay = {
         day: dayNum,
         title: separated.title || `Étape Jour ${dayNum}`,
         city: "",
-        lat: 0,
-        lng: 0,
-        highlight: "", // Thématique / Point fort : reste vide et sera rempli à la main par l'administrateur
+        lat: null,
+        lng: null,
+        highlight: "",
         description: separated.extraDesc || "",
+        rawLinesOfDay: separated.extraDesc ? [separated.extraDesc] : [],
+        extractedHotel: null,
+        image: "",
         weather: "",
-        dateStr: `Jour ${dayNum}`,
+        dateStr: extractedDayDateStr,
         timeline: []
       };
     } else if (currentDay) {
-      if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
-        const visitTitle = line.replace(/^[•\-\*]\s*/, '').trim();
-        if (visitTitle.length > 2) {
-          let itemTime = "";
-          const tm = visitTitle.match(/\b([01]?\d|2[0-3])[hH:]([0-5]\d)\b/) || visitTitle.match(/\b([01]?\d|2[0-3])\s*[hH]\b/);
-          if (tm) {
-            itemTime = `${tm[1].padStart(2, '0')}:${tm[2] ? tm[2] : '00'}`;
-          }
-          currentDay.timeline.push({
-            time: itemTime, // Pas d'horaires inventés si non spécifiés dans le document
-            title: visitTitle,
-            subtitle: "Visite ou temps fort au programme.",
-            icon: detectIconForText(visitTitle)
-          });
-        }
-        currentDay.description += (currentDay.description ? " " : "") + visitTitle;
+      currentDay.rawLinesOfDay.push(line);
+      // Reconstituer proprement les mots coupés en fin de ligne par une césure PDF (ex: "après-\nmidi" ou "Bo-\nKaap")
+      if (currentDay.description && /[a-zà-ÿ][-\uFFFD]$/i.test(currentDay.description) && /^[a-zà-ÿ]/i.test(line)) {
+        currentDay.description = currentDay.description.replace(/\uFFFD$/, '-') + line;
       } else {
         currentDay.description += (currentDay.description ? " " : "") + line;
       }
@@ -5706,194 +6987,221 @@ function processExtractedTextToTrip(text, sourceName) {
     itinerary.push(currentDay);
   }
 
-  // Clés de coordonnées triées par spécificité (les noms les plus longs d'abord)
-  const sortedCoordsKeys = (typeof DESTINATION_CITY_COORDINATES !== 'undefined') 
-    ? Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length)
-    : [];
-
+  // Nettoyer les éventuels encadrés hôtels situés en bas de page de chaque journée (ex: programme final-GI710x8.pdf)
   itinerary.forEach(d => {
-    // Si aucune visite extraite par puces, extraire les étapes depuis les phrases du descriptif (SANS inventer d'horaires)
-    if (!d.timeline || d.timeline.length === 0) {
-      if (typeof extractVisitsFromDay === 'function') {
-        d.timeline = extractVisitsFromDay(d.description, d.title);
-      } else {
-        d.timeline = [{
-          time: "",
-          title: d.title,
-          subtitle: d.description || "Déroulé de la journée.",
-          icon: "route"
-        }];
+    if (d.rawLinesOfDay && d.rawLinesOfDay.length > 0) {
+      const { paragraphs, extractedHotel } = splitDayLinesAndHotelCard(d.rawLinesOfDay);
+      if (extractedHotel) {
+        d.extractedHotel = extractedHotel;
+      }
+      if (paragraphs.length > 0) {
+        d.description = paragraphs.join("\n");
+      }
+    }
+    delete d.rawLinesOfDay;
+  });
+
+  // Déterminer si le voyage se déroule en France métropolitaine (ex: Pyrénées) ou à l'étranger
+  const sortedCoordsKeys = Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length);
+  const fullItineraryTitlesText = normStr(detectedTitle + " " + detectedSubtitle + " " + itinerary.map(d => d.title).join(" "));
+  let hasForeignDestination = false;
+  for (const k of sortedCoordsKeys) {
+    const c = DESTINATION_CITY_COORDINATES[k];
+    if (c.country && c.country !== "France" && fullItineraryTitlesText.includes(k)) {
+      hasForeignDestination = true;
+      break;
+    }
+  }
+  const isDomesticFranceTrip = !hasForeignDestination && flightsList.length === 0;
+
+  // Extraire les visites à titres courts (Règle 4) et résoudre les villes étapes & GPS (Règles 2 & 3)
+  itinerary.forEach(d => {
+    d.timeline = extractVisitsFromDay(d.description, d.title);
+    d.description = d.description.replace(/\r?\n/g, " ").replace(/\s{2,}/g, " ").trim();
+  });
+  resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip);
+
+  // =========================================================================
+  // 4. DÉTECTION DE L'ENSEMBLE DES HÔTELS DU CIRCUIT (ONGLET HÉBERGEMENT)
+  // =========================================================================
+  const hotels = [];
+  const hotelSectionRegex = /(?:Coordonn[ée]es de (?:vos|votre) h[ôo]tels?|(?:^|\n)\s*Vos h[ôo]tels?)\s*(?:sous r[ée]serve[^\n]*)?\n*([\s\S]*?)(?=(?:Votre accompagnat|Votre guide|Votre contact|Vos contacts|Formalit[ée]s|Bon [àa] savoir|Inclus|Assurance|$))/i;
+  const hotelSectionMatch = text.match(hotelSectionRegex);
+  const hotelSectionRaw = hotelSectionMatch ? hotelSectionMatch[1] : "";
+
+  function buildHotelObject(datesStay, rawBlockLines) {
+    const bLines = rawBlockLines
+      .map(l => l.trim())
+      .filter(l => l.length > 0 && !/^sous r[ée]serve/i.test(l) && !/^coordonn[ée]es/i.test(l));
+
+    if (bLines.length === 0) return null;
+
+    // Ignorer "Nuit à bord" (ex: vol de nuit en Afrique du Sud)
+    if (/^nuit\s+[àa]\s+bord$/i.test(bLines[0])) return null;
+
+    let hotelName = bLines[0];
+    let startAddrIdx = 1;
+
+    // Si le nom de l'hôtel est sur 2 lignes (ex: "The Originals City" + "Hôtel Astoria Vatican")
+    if (bLines.length >= 3 && (/^h[ôo]tel\b/i.test(bLines[1]) || /^(?:the\s+originals|best\s+western|relais|logis)\b/i.test(bLines[0]))) {
+      if (!/^\d+\s+/.test(bLines[1]) && !/^t[ée]l\.?\s*:/i.test(bLines[1])) {
+        hotelName = `${bLines[0]} - ${bLines[1]}`;
+        startAddrIdx = 2;
       }
     }
 
-    // Résolution précise de la Ville et des coordonnées GPS de l'étape
-    const normSearch = (d.title + " " + d.description).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+    let addressParts = [];
+    let phone = "";
+
+    for (let j = startAddrIdx; j < bLines.length; j++) {
+      const l = bLines[j];
+      if (/^t[ée]l\.?\s*:/i.test(l)) {
+        phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+      } else {
+        addressParts.push(l);
+      }
+    }
+
+    const fullAddress = addressParts.join(", ");
+    const lastAddrLine = addressParts[addressParts.length - 1] || "";
+    let detectedCity = lastAddrLine
+      .replace(/^\d{3,6}\s+/, '')
+      .replace(/,\s*\d{3,6}\s*-\s*[A-Za-zÀ-ÿ\s]+$/, '')
+      .replace(/\s+[A-Z]\d[A-Z]\s*\d[A-Z]\d.*$/i, '')
+      .replace(/,\s*[A-Z]{2}\s+\d{5}.*$/, '')
+      .replace(/,\s*[A-Z]{2,4}$/, '')
+      .trim();
+
+    let lat = null;
+    let lng = null;
+
+    const normAddr = normStr(fullAddress);
+    const normDetectedCity = normStr(detectedCity);
+    const normSearch = normStr(hotelName + " " + fullAddress + " " + detectedCity);
+
+    let matchedCoord = null;
     for (const k of sortedCoordsKeys) {
-      if (normSearch.includes(k)) {
-        const c = DESTINATION_CITY_COORDINATES[k];
-        d.city = c.city;
-        d.lat = c.lat;
-        d.lng = c.lng;
+      const c = DESTINATION_CITY_COORDINATES[k];
+      if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
+      if (normDetectedCity && (normDetectedCity === k || normDetectedCity.includes(k))) {
+        matchedCoord = c;
         break;
       }
     }
 
-    // Vérification des ports connus pour croisières
-    if (!d.lat && !d.lng) {
-      for (const [portKey, portData] of Object.entries(knownPortCoordinates)) {
-        if (normSearch.includes(portKey)) {
-          d.city = portData.city;
-          d.lat = portData.lat;
-          d.lng = portData.lng;
+    if (!matchedCoord) {
+      for (const k of sortedCoordsKeys) {
+        const c = DESTINATION_CITY_COORDINATES[k];
+        if (!isDomesticFranceTrip && c.isFrenchTransit) continue;
+        if (k === 'paris' && (normAddr.includes('mexico') || normAddr.includes('cdmx'))) continue;
+        if (normSearch.includes(k)) {
+          matchedCoord = c;
           break;
         }
       }
     }
 
-    if (!d.city) d.city = extractProbableCity(d.title);
-  });
+    if (matchedCoord) {
+      lat = matchedCoord.lat;
+      lng = matchedCoord.lng;
+      detectedCity = matchedCoord.city;
+    }
 
-  // 3. Détection des Hôtels avec Dates, Adresses complètes et coordonnées GPS
-  const hotels = [];
-  const hotelSectionRegex = /(?:Coordonn[ée]es de (?:vos|votre) h[ôo]tels?|(?:^|\n)\s*Vos h[ôo]tels?)\s*(?:sous r[ée]serve[^\n]*)?\n*([\s\S]*?)(?=(?:Votre accompagnat|Votre guide|Votre contact|Vos contacts|Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i;
-  const hotelSectionMatch = text.match(hotelSectionRegex);
-  const hotelTextToAnalyze = hotelSectionMatch ? hotelSectionMatch[1] : text;
+    return {
+      name: hotelName,
+      dates: datesStay || "",
+      city: detectedCity || "",
+      address: fullAddress,
+      phone: phone,
+      lat: lat,
+      lng: lng,
+      notes: ""
+    };
+  }
 
-  const hotelBlockRegex = /du\s+(\d{1,2}(?:\s+[a-zà-ÿ]+)?\s+au\s+\d{1,2}\s+[a-zà-ÿ]+)([\s\S]*?)(?=(?:du\s+\d{1,2}\s+au|$))/gi;
-  let hbMatch;
+  if (hotelSectionRaw) {
+    const hLines = hotelSectionRaw.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0 && !/^---\s*PAGE\s*\d+\s*---$/i.test(l));
+    // Reconnaissance ligne par ligne des entêtes de dates (supporte "Du 16 au 17 mars et du 20 au 21 mars")
+    const dateLineRegex = /^du\s+\d{1,2}(?:\s+[a-zà-ÿ]+)?\s+au\s+\d{1,2}\s+[a-zà-ÿ]+(?:\s+et\s+du\s+\d{1,2}(?:\s+[a-zà-ÿ]+)?\s+au\s+\d{1,2}\s+[a-zà-ÿ]+)?$/i;
 
-  while ((hbMatch = hotelBlockRegex.exec(hotelTextToAnalyze)) !== null) {
-    const datesStay = "Du " + hbMatch[1].trim();
-    const blockContent = hbMatch[2].trim();
-    const bLines = blockContent.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0 && !/^sous réserve/i.test(l));
+    let currentStayDates = "";
+    let currentBlockLines = [];
+    let foundDateHeaders = false;
 
-    if (bLines.length > 0) {
-      const hotelName = bLines[0];
-      let addressParts = [];
-      let phone = "";
-
-      for (let j = 1; j < bLines.length; j++) {
-        const l = bLines[j];
-        if (/^t[ée]l\.?\s*:/i.test(l)) {
-          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
-        } else {
-          addressParts.push(l);
+    for (const hl of hLines) {
+      if (dateLineRegex.test(hl)) {
+        if (foundDateHeaders && currentBlockLines.length > 0) {
+          const hObj = buildHotelObject(currentStayDates, currentBlockLines);
+          if (hObj) hotels.push(hObj);
         }
+        currentStayDates = hl.charAt(0).toUpperCase() + hl.slice(1);
+        currentBlockLines = [];
+        foundDateHeaders = true;
+      } else if (foundDateHeaders) {
+        currentBlockLines.push(hl);
+      } else {
+        currentBlockLines.push(hl);
       }
+    }
 
-      const fullAddress = addressParts.join(", ") || hotelName;
-      const lastAddrLine = addressParts[addressParts.length - 1] || "";
-      let detectedCity = lastAddrLine.replace(/^\d{4,5}\s+/, '').replace(/,\s*[A-Z]{2,4}$/, '').trim();
-      let lat = 0;
-      let lng = 0;
-
-      const normAddr = fullAddress.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const normDetectedCity = (detectedCity || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const normSearch = (hotelName + " " + fullAddress + " " + detectedCity).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-      // 1. Tester d'abord la ville détectée dans la dernière ligne d'adresse
-      let matchedCoord = null;
-      for (const k of sortedCoordsKeys) {
-        if (normDetectedCity && (normDetectedCity.includes(k) || k.includes(normDetectedCity))) {
-          matchedCoord = DESTINATION_CITY_COORDINATES[k];
-          break;
-        }
-      }
-
-      // 2. Sinon chercher dans l'adresse complète (en évitant le piège du nom de rue ex: "Paris No. 9" à Mexico)
-      if (!matchedCoord) {
-        for (const k of sortedCoordsKeys) {
-          if (k === 'paris' && (normAddr.includes('mexico') || normAddr.includes('cdmx'))) continue;
-          if (normSearch.includes(k)) {
-            matchedCoord = DESTINATION_CITY_COORDINATES[k];
-            break;
-          }
-        }
-      }
-
-      if (matchedCoord) {
-        lat = matchedCoord.lat;
-        lng = matchedCoord.lng;
-        detectedCity = matchedCoord.city;
-      }
-
-      hotels.push({
-        name: hotelName,
-        dates: datesStay,
-        city: detectedCity || "Étape du circuit",
-        address: fullAddress,
-        phone: phone,
-        lat: lat,
-        lng: lng,
-        notes: "Hôtel sélectionné par Voyages Girardot"
-      });
+    if (currentBlockLines.length > 0) {
+      const hObj = buildHotelObject(currentStayDates || detectedDates, currentBlockLines);
+      if (hObj) hotels.push(hObj);
     }
   }
 
-  // Fallback si aucun bloc avec date "Du ... au ..." n'a été trouvé mais qu'un hôtel est présent dans la section
-  if (hotels.length === 0 && hotelSectionMatch && hotelSectionMatch[1].trim()) {
-    const rawLines = hotelSectionMatch[1].split(/\r?\n/)
-      .map(l => l.trim())
-      .filter(l => l.length > 0 && !/^sous r[ée]serve/i.test(l) && !/^coordonn[ée]es/i.test(l));
-
-    if (rawLines.length > 0) {
-      const hotelName = rawLines[0];
-      let addressParts = [];
-      let phone = "";
-      for (let j = 1; j < rawLines.length; j++) {
-        const l = rawLines[j];
-        if (/^t[ée]l\.?\s*:/i.test(l)) {
-          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+  // Fallback si aucun bloc "Coordonnées de vos hôtels" n'existe mais que des hôtels ont été extraits en bas de page de chaque jour (ex: programme final-GI710x8.pdf)
+  if (hotels.length === 0) {
+    const stayGroups = [];
+    itinerary.forEach(d => {
+      if (d.extractedHotel && d.extractedHotel.name) {
+        const prev = stayGroups[stayGroups.length - 1];
+        if (prev && normStr(prev.hotel.name) === normStr(d.extractedHotel.name)) {
+          prev.endDay = d.day;
         } else {
-          addressParts.push(l);
+          stayGroups.push({
+            startDay: d.day,
+            endDay: d.day,
+            dayCity: d.city || "",
+            hotel: d.extractedHotel
+          });
         }
       }
-      const fullAddress = addressParts.join(", ") || hotelName;
-      const lastAddrLine = addressParts[addressParts.length - 1] || "";
-      let detectedCity = lastAddrLine.replace(/^\d{4,6}\s+/, '').replace(/-\d{4,6}$/, '').replace(/,\s*[A-Z]{2,4}$/, '').trim();
-      let lat = 0;
-      let lng = 0;
+      delete d.extractedHotel;
+    });
 
-      const normAddr = fullAddress.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const normDetectedCity = (detectedCity || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-      const normSearch = (hotelName + " " + fullAddress + " " + detectedCity).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-
-      let matchedCoord = null;
-      for (const k of sortedCoordsKeys) {
-        if (normDetectedCity && (normDetectedCity.includes(k) || k.includes(normDetectedCity))) {
-          matchedCoord = DESTINATION_CITY_COORDINATES[k];
-          break;
+    const revMonths = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+    stayGroups.forEach(g => {
+      let stayDatesStr = `Jour ${g.startDay} au Jour ${g.endDay + 1}`;
+      if (detectedStartDate && /^\d{4}-\d{2}-\d{2}$/.test(detectedStartDate)) {
+        const base = new Date(detectedStartDate + "T12:00:00");
+        if (!isNaN(base.getTime())) {
+          const dStart = new Date(base.getTime() + (g.startDay - 1) * 86400000);
+          const dEnd = new Date(base.getTime() + g.endDay * 86400000);
+          const m1 = revMonths[dStart.getMonth()];
+          const m2 = revMonths[dEnd.getMonth()];
+          stayDatesStr = m1 === m2
+            ? `Du ${dStart.getDate()} au ${dEnd.getDate()} ${m2}`
+            : `Du ${dStart.getDate()} ${m1} au ${dEnd.getDate()} ${m2}`;
         }
       }
-      if (!matchedCoord) {
-        for (const k of sortedCoordsKeys) {
-          if (k === 'paris' && (normAddr.includes('mexico') || normAddr.includes('cdmx'))) continue;
-          if (normSearch.includes(k)) {
-            matchedCoord = DESTINATION_CITY_COORDINATES[k];
-            break;
-          }
-        }
+      const blockLines = [g.hotel.name];
+      if (g.hotel.address) blockLines.push(g.hotel.address);
+      if (g.hotel.phone) blockLines.push(`Tél. : ${g.hotel.phone}`);
+      const hObj = buildHotelObject(stayDatesStr, blockLines);
+      if (hObj) {
+        if (!hObj.city && g.dayCity) hObj.city = g.dayCity;
+        if (g.hotel.website) hObj.notes = g.hotel.website;
+        hotels.push(hObj);
       }
-      if (matchedCoord) {
-        lat = matchedCoord.lat;
-        lng = matchedCoord.lng;
-        detectedCity = matchedCoord.city;
-      }
-
-      hotels.push({
-        name: hotelName,
-        dates: detectedDates || "Pendant le séjour",
-        city: detectedCity || "Étape du circuit",
-        address: fullAddress,
-        phone: phone,
-        lat: lat,
-        lng: lng,
-        notes: "Hôtel sélectionné par Voyages Girardot"
-      });
-    }
+    });
+  } else {
+    itinerary.forEach(d => { delete d.extractedHotel; });
   }
 
-  // 4. Détermination Intelligente du Profil & Croisière vs Circuit Terrestre
+  // =========================================================================
+  // 5. DÉTERMINATION DU PROFIL (CROISIÈRE VS CIRCUIT TERRESTRE)
+  // =========================================================================
   let isCruise = false;
   let conciergeMode = 'guided';
 
@@ -5915,7 +7223,6 @@ function processExtractedTextToTrip(text, sourceName) {
     isCruise = false;
     conciergeMode = chosenProfile;
   } else {
-    // Mode 'auto' : détection contextuelle rigoureuse
     const titleHasCruise = /croisi[eè]re/i.test(detectedTitle || "") || /croisi[eè]re/i.test(detectedSubtitle || "");
     const explicitShipPattern = /(?:à bord du|a bord du)\s+(?:Costa|MSC|CroisiEurope|Ponant|Hurtigruten|MS\s+|Le\s+Boréal|L'Austral|Le\s+Soléal|Le\s+Lyrial|Le\s+Commandant|Polarfront|Ocean\s+Nova)/i;
     const shipSpecsPattern = /(?:Votre bateau[\s\S]{0,120}?(?:Dimensions|Capacité|Ponts|Tonnage|Tirant d'eau))/i;
@@ -5930,88 +7237,165 @@ function processExtractedTextToTrip(text, sourceName) {
     }
   }
 
-  // Fallback hébergement croisière si aucun hôtel terrestre
   if (isCruise && hotels.length === 0) {
     hotels.push({
       name: `${detectedShip || "Costa Diadema"} (Cabine de bord)`,
-      dates: detectedDates || "Pendant toute la croisière",
+      dates: detectedDates || "",
       city: "À bord du navire (Croisière)",
-      address: `Paquebot ${detectedShip || "Costa Diadema"} - Compagnie Costa Croisières`,
+      address: `Paquebot ${detectedShip || "Costa Diadema"}`,
       phone: "Réception 24h/24 à bord",
       lat: 43.2965,
       lng: 5.3698,
-      notes: "Cabine tout confort selon catégorie réservée (Service de bord 24h/24)"
+      notes: ""
     });
   }
 
-  // 5. Contacts (Accompagnatrice, Guide local, Réceptif & Assistance)
+  // =========================================================================
+  // 6. DÉTECTION DES CONTACTS (Accompagnatrice, Guide, Correspondant, Assistance, Ambassade, Fil d'Ariane)
+  // =========================================================================
   const contactsList = [];
-  const accompMatch = text.match(/Votre accompagnatrice(?:\s*(?:Voyages\s+)?Girardot)?[\s\r\n]+([A-ZÀ-Ý][a-zà-ÿ]+)/i);
+
+  // 6a. Accompagnatrice / Accompagnateur (si présent dans le PDF)
   let accompName = "";
-  if (accompMatch) {
-    accompName = accompMatch[1].trim();
-  }
-  if (!accompName && isCruise) {
-    const m = text.match(/(?:accompagnatrice|accompagnateur)\s+(?:Voyages Girardot\s+)?([A-ZÀ-Ý][a-zà-ÿ]+)/i);
-    if (m) accompName = m[1].trim();
+  let accompPhone = "";
+  const accompIdx = rawLines.findIndex(l => /^Votre\s+accompagnat(?:rice|eur)(?:\s+(?:Voyages\s+)?Girardot)?$/i.test(l));
+  if (accompIdx !== -1 && accompIdx + 1 < rawLines.length) {
+    const nextL = rawLines[accompIdx + 1];
+    if (!/^(?:Votre\s+guide|Vos\s+contacts|Votre\s+contact|Formalit|Bon\s+[àa]\s+savoir)/i.test(nextL)) {
+      accompName = nextL.trim();
+      if (accompIdx + 2 < rawLines.length && /^(?:Portable|T[ée]l\.?|Mobile)\s*:/i.test(rawLines[accompIdx + 2])) {
+        accompPhone = rawLines[accompIdx + 2].replace(/^(?:Portable|T[ée]l\.?|Mobile)\s*:\s*/i, '').trim();
+      }
+    }
   }
 
   if (accompName) {
     contactsList.push({
       category: "Accompagnatrice Voyages Girardot",
       name: accompName,
-      phone: "",
-      address: isCruise ? `À bord du ${detectedShip || "navire"} (Permanence quotidienne Voyages Girardot)` : "Avec le groupe sur le circuit",
+      phone: accompPhone,
+      address: isCruise ? `À bord du ${detectedShip || "navire"}` : "Avec le groupe sur le circuit",
       isEmergency: false
     });
   }
 
-  // Guide local terrestre
-  const guideMatch = text.match(/Votre guide(?:\s+local)?[\s\r\n]+([A-ZÀ-Ýa-zà-ÿ\s-]+)(?:\n+T[ée]l\.?\s*:\s*([+\d\s().-]+))?/i);
-  if (guideMatch && !isCruise) {
-    const candidateName = guideMatch[1].trim().split('\n')[0].trim();
-    if (candidateName && !/^(?:Votre contact|Formalit|Bon [àa] savoir)/i.test(candidateName)) {
+  // 6b. Guide local (si présent dans le PDF)
+  const guideIdx = rawLines.findIndex(l => /^Votre\s+guide(?:\s+local)?$/i.test(l));
+  if (guideIdx !== -1 && guideIdx + 1 < rawLines.length && !isCruise) {
+    const nextL = rawLines[guideIdx + 1];
+    if (!/^(?:Vos\s+contacts|Votre\s+contact|Formalit|Bon\s+[àa]\s+savoir)/i.test(nextL)) {
+      const guideName = nextL.trim();
+      let guidePhone = "";
+      if (guideIdx + 2 < rawLines.length && /^(?:Portable|T[ée]l\.?|Mobile)\s*:/i.test(rawLines[guideIdx + 2])) {
+        guidePhone = rawLines[guideIdx + 2].replace(/^(?:Portable|T[ée]l\.?|Mobile)\s*:\s*/i, '').trim();
+      }
       contactsList.push({
         category: "Guide Local",
-        name: candidateName,
-        phone: guideMatch[2] ? guideMatch[2].trim() : "",
+        name: guideName,
+        phone: guidePhone,
         address: "Guide local francophone",
         isEmergency: false
       });
     }
   }
 
-  // Réceptif terrestre / Contact sur place
-  const receptifMatch = text.match(/(?:Votre contact sur place|Correspondant local|R[ée]ceptif local|En France|Au Mexique|À l[’']étranger|A l[’']etranger|Vos contacts)\s*[:–-]?[\s\r\n]+([\s\S]*?)(?=(?:Formalit[ée]s|Bon [àa] savoir|Assurance|$))/i);
-  if (receptifMatch && !isCruise) {
-    const rawContactBlock = receptifMatch[1].slice(0, 450);
-    const cLines = rawContactBlock.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
+  // 6c. Correspondant local / Réceptif (selon information du PDF)
+  const contactsBlockMatch = text.match(/(?:^|\n)\s*(?:Vos contacts|Votre contact sur place|Correspondant local|R[ée]ceptif local)\s*\r?\n([\s\S]*?)(?=(?:\n\s*(?:Formalit[ée]s indispensables|Bon [àa] savoir|Inclus|Assurance multirisque)|$))/i);
+  if (contactsBlockMatch && !isCruise) {
+    const cLines = contactsBlockMatch[1]
+      .split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l.length > 0 && !/^---\s*PAGE\s*\d+\s*---$/i.test(l));
+
     if (cLines.length > 0) {
-      let contactName = cLines[0].replace(/^[:–-]\s*/, '').trim();
-      let addressParts = [];
-      let phone = "";
-      for (let j = 1; j < cLines.length; j++) {
-        const l = cLines[j];
-        if (/^t[ée]l\.?\s*:/i.test(l)) {
-          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
-        } else {
-          addressParts.push(l);
+      // Vérifier s'il y a une séparation "En France – ..." et "Au <Pays> – ..."
+      const localHeaderIdx = cLines.findIndex((l, idx) => idx > 0 && /^(?:Au\s+|Aux\s+|En\s+(?!France)|[ÀA]\s+l['’][ée]tranger|Contact\s+sur\s+place\s*:)/i.test(l));
+
+      if (localHeaderIdx !== -1) {
+        const franceLines = cLines.slice(0, localHeaderIdx);
+        const localLines = cLines.slice(localHeaderIdx);
+
+        const localName = localLines[0].trim();
+        let mainPhone = "";
+        let secondaryPhones = [];
+
+        for (let j = 1; j < localLines.length; j++) {
+          const l = localLines[j];
+          if (/^(?:T[ée]l\.?|NUMERO D['’]URGENCE|Portable)\s*:/i.test(l)) {
+            const rawPh = l.replace(/^(?:T[ée]l\.?|NUMERO D['’]URGENCE|Portable)\s*:\s*/i, '').trim();
+            const cleanNum = rawPh.replace(/\s*\([^)]*\)/g, '').replace(/\+\s+(\d)/g, '+$1').trim();
+            if (/urgence/i.test(rawPh) || /urgence/i.test(l)) {
+              if (mainPhone) secondaryPhones.push(`Bureau : ${mainPhone}`);
+              mainPhone = cleanNum;
+            } else if (!mainPhone) {
+              mainPhone = cleanNum;
+            } else {
+              secondaryPhones.push(cleanNum);
+            }
+          } else {
+            secondaryPhones.push(l);
+          }
         }
+
+        // Résumer le contact en France ou Bureau local dans l'adresse complémentaire
+        let franceSummary = "";
+        if (franceLines.length > 0) {
+          const frTitle = franceLines[0].replace(/^En France\s*[–-]\s*/i, 'En France : ').trim();
+          const frTelLine = franceLines.find(fl => /^T[ée]l\.?\s*:/i.test(fl));
+          const frTel = frTelLine ? frTelLine.replace(/^T[ée]l\.?\s*:\s*/i, '').replace(/\+\s+(\d)/g, '+$1').trim() : "";
+          franceSummary = frTel ? `${frTitle} (${frTel})` : frTitle;
+        }
+
+        const addrParts = [...secondaryPhones];
+        if (franceSummary) addrParts.push(franceSummary);
+
+        contactsList.push({
+          category: "Correspondant Réceptif & Urgence",
+          name: localName,
+          phone: mainPhone,
+          address: addrParts.join(" • "),
+          isEmergency: true
+        });
+      } else {
+        // Bloc unique (ex: GO TOURISM en Afrique du Sud)
+        const contactName = cLines[0].replace(/^[:–-]\s*/, '').trim();
+        let addressParts = [];
+        let officePhone = "";
+        let emergencyPhone = "";
+
+        for (let j = 1; j < cLines.length; j++) {
+          const l = cLines[j];
+          if (/^NUMERO D['’]URGENCE\s*:/i.test(l)) {
+            emergencyPhone = l.replace(/^NUMERO D['’]URGENCE\s*:\s*/i, '').trim();
+          } else if (/^T[ée]l\.?\s*:/i.test(l)) {
+            const p = l.replace(/^T[ée]l\.?\s*:\s*/i, '').replace(/\+\s+(\d)/g, '+$1').trim();
+            if (/urgence/i.test(p)) {
+              emergencyPhone = p.replace(/\s*\([^)]*\)/g, '').trim();
+            } else {
+              officePhone = p.replace(/\s*\([^)]*\)/g, '').trim();
+            }
+          } else {
+            addressParts.push(l);
+          }
+        }
+
+        const primaryPhone = emergencyPhone || officePhone;
+        if (emergencyPhone && officePhone) {
+          addressParts.push(`Tél. bureau : ${officePhone}`);
+        }
+
+        contactsList.push({
+          category: "Correspondant Réceptif & Urgence",
+          name: contactName,
+          phone: primaryPhone,
+          address: addressParts.join(", "),
+          isEmergency: true
+        });
       }
-      if (!phone) {
-        const phones = rawContactBlock.match(/(?:\+?\d{1,3}[\s.-]?)?\(?\d{2,4}\)?[\s.-]?\d{2,4}[\s.-]?\d{2,4}(?:[\s.-]?\d{2,4})?/g) || [];
-        phone = phones[0] || "";
-      }
-      contactsList.push({
-        category: "Correspondant Réceptif & Urgence",
-        name: contactName,
-        phone: phone,
-        address: addressParts.join(", ") || "Assistance locale 24h/24",
-        isEmergency: true
-      });
     }
   }
 
+  // 6d. Contact assistance Girardot
   contactsList.push({
     category: "Assistance Girardot 24h/7j",
     name: "Permanence Urgences Girardot",
@@ -6020,116 +7404,115 @@ function processExtractedTextToTrip(text, sourceName) {
     isEmergency: true
   });
 
+  // 6e. Coordonnées de l'Ambassade de France dans le(s) pays de destination + Fil d'Ariane
+  if (!isDomesticFranceTrip && !isCruise) {
+    const detectedCountries = [];
+    const countryCheckText = normStr(detectedTitle + " " + detectedSubtitle + " " + itinerary.map(d => d.city + " " + d.title).join(" "));
+
+        if (countryCheckText.includes("perou") || countryCheckText.includes("lima") || countryCheckText.includes("cuzco") || countryCheckText.includes("cusco") || countryCheckText.includes("arequipa") || countryCheckText.includes("machu picchu")) {
+      detectedCountries.push("Pérou");
+    }
+    if (countryCheckText.includes("mexique") || countryCheckText.includes("yucatan") || countryCheckText.includes("mexico") || countryCheckText.includes("cancun")) {
+      detectedCountries.push("Mexique");
+    }
+    if (countryCheckText.includes("canada") || countryCheckText.includes("gaspesie") || countryCheckText.includes("montreal") || countryCheckText.includes("quebec") || countryCheckText.includes("toronto")) {
+      detectedCountries.push("Canada");
+    }
+    if (countryCheckText.includes("etats-unis") || countryCheckText.includes("usa") || countryCheckText.includes("new york") || countryCheckText.includes("washington") || countryCheckText.includes("philadelphie")) {
+      detectedCountries.push("États-Unis");
+    }
+    if (countryCheckText.includes("islande") || countryCheckText.includes("reykjavik") || countryCheckText.includes("vik")) {
+      detectedCountries.push("Islande");
+    }
+    if (countryCheckText.includes("afrique du sud") || countryCheckText.includes("kruger") || countryCheckText.includes("johannesburg") || countryCheckText.includes("le cap")) {
+      detectedCountries.push("Afrique du Sud");
+    }
+    if (countryCheckText.includes("inde") || countryCheckText.includes("delhi") || countryCheckText.includes("jaipur") || countryCheckText.includes("agra")) {
+      detectedCountries.push("Inde");
+    }
+    if (countryCheckText.includes("maroc") || countryCheckText.includes("casablanca") || countryCheckText.includes("marrakech") || countryCheckText.includes("tanger")) {
+      detectedCountries.push("Maroc");
+    }
+    if (countryCheckText.includes("espagne") || countryCheckText.includes("barcelone") || countryCheckText.includes("madrid") || countryCheckText.includes("seville")) {
+      detectedCountries.push("Espagne");
+    }
+    if (countryCheckText.includes("italie") || countryCheckText.includes("rome") || countryCheckText.includes("naples") || countryCheckText.includes("palerme")) {
+      detectedCountries.push("Italie");
+    }
+
+    if (detectedCountries.length > 0) {
+      detectedCountries.forEach(cName => {
+        const emb = FRENCH_EMBASSIES_BY_COUNTRY[cName];
+        if (emb) {
+          contactsList.push(JSON.parse(JSON.stringify(emb)));
+        }
+      });
+    } else {
+      // Ne rien inventer si le pays n'est pas dans la base : laisser les cases vides
+      contactsList.push({
+        category: "Ambassade de France dans le pays de destination",
+        name: "",
+        phone: "",
+        address: "",
+        link: "",
+        isEmergency: true
+      });
+    }
+
+    // 6f. Coordonnées et lien internet du "Fil d'Ariane" pour les ressortissants français
+    contactsList.push({
+      category: "Fil d'Ariane — Ressortissants Français",
+      name: "Portail officiel France Diplomatie (Inscription gratuite)",
+      phone: "",
+      address: "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      link: "https://fildariane.diplomatie.gouv.fr",
+      isEmergency: false
+    });
+  }
+
   const landContactsCopy = JSON.parse(JSON.stringify(contactsList));
 
-  // 6. Détection des Vols (Aller / Retour)
-  const flightsList = [];
-  const outboundMatch = text.match(/(?:Vol\s+)?Aller\s*[:–-]?\s*([0-9a-zA-Zà-ÿ\s/.-]*?)(?:\r?\n)([\s\S]*?)(?=(?:Vol\s+)?Retour|Nous attirons|Bagages|Jour 1|$)/i);
-  if (outboundMatch) {
-    const outHeader = outboundMatch[1].trim();
-    const outBlock = outboundMatch[2];
-    const outDateMatch = outHeader.match(/\d{1,2}\/\d{1,2}\/\d{4}/) || outBlock.match(/Date\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i) || outHeader.match(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i);
-    const outDate = outDateMatch ? outDateMatch[0] : (outHeader || detectedStartDate || "Jour 1");
+  // =========================================================================
+  // 7. FORMALITÉS PRINCIPALES (ALERT)
+  // =========================================================================
+  const formalitesMatch = text.match(/Formalit[ée]s indispensables\s*[:–-]?\s*\n+([\s\S]*?)(?=(?:\n\s*(?:Bon [àa] savoir|Inclus|Assurance multirisque|\d{2}\/\d{2}\/\d{4})|$))/i);
+  let formalitiesText = formalitesMatch ? formalitesMatch[1].trim() : "";
+  formalitiesText = formalitiesText
+    .replace(/---\s*PAGE\s*\d+\s*---/gi, '')
+    .replace(/\r?\n+/g, ' ')
+    .replace(/\s{2,}/g, ' ')
+    .trim();
 
-    const depAero = (outBlock.match(/(?:D[ée]collage de l[’']a[ée]roport de|D[ée]part de|A[ée]roport de d[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
-    const arrAero = (outBlock.match(/(?:A l[’']a[ée]roport de|Arriv[ée]e [àa]|A[ée]roport d'arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
-    const flightNum = (outBlock.match(/(?:N°\s*(?:de\s*)?vol|Vol)\s*:\s*(.*)/i) || [])[1] || "";
-    const depTime = (outBlock.match(/(?:D[ée]collage pr[ée]vu [àa]|D[ée]part pr[ée]vu [àa]|D[ée]collage|D[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
-    const arrTime = (outBlock.match(/(?:Arriv[ée]e pr[ée]vue [àa]|Arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
-    const comp = (outBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
-    const meeting = (outBlock.match(/(?:Heure de pr[ée]sentation|Convocation)\s*(?:[àa]\s*l[’']a[ée]roport)?\s*:\s*(.*)/i) || [])[1] || "";
-
-    if (flightNum || (depAero && arrAero)) {
-      flightsList.push({
-        type: "Aller",
-        airline: comp.trim(),
-        flightNumber: flightNum.trim(),
-        departureAirport: depAero.trim(),
-        departureTime: depTime.trim(),
-        arrivalAirport: arrAero.trim(),
-        arrivalTime: arrTime.trim(),
-        date: outDate.trim(),
-        via: "",
-        notes: meeting ? `Convocation à ${meeting.trim()}` : ""
-      });
+  let formalitiesLink = "";
+  if (formalitiesText) {
+    const urlInForm = formalitiesText.match(/https?:\/\/[^\s)]+/i) || formalitiesText.match(/\b(?:[a-z0-9-]+\.)+(?:gov|gouv|gc|org|com|ca|us|in|za)(?:\/[^\s.,)]*)?/i);
+    if (urlInForm) {
+      let rawUrl = urlInForm[0].replace(/[.,;]+$/, '');
+      if (!/^https?:\/\//i.test(rawUrl)) rawUrl = 'https://' + rawUrl;
+      formalitiesLink = rawUrl;
     }
   }
 
-  const inboundMatch = text.match(/(?:Vol\s+)?Retour\s*[:–-]?\s*([0-9a-zA-Zà-ÿ\s/.-]*?)(?:\r?\n)([\s\S]*?)(?=Nous attirons|Bagages|Jour 1|Coordonnées|Vos hôtels|$)/i);
-  if (inboundMatch) {
-    const inHeader = inboundMatch[1].trim();
-    const inBlock = inboundMatch[2];
-    const inDateMatch = inHeader.match(/\d{1,2}\/\d{1,2}\/\d{4}/) || inBlock.match(/Date\s*:\s*(\d{1,2}\/\d{1,2}\/\d{4})/i) || inHeader.match(/\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i);
-    const inDate = inDateMatch ? inDateMatch[0] : (inHeader || detectedEndDate || "Dernier jour");
-
-    const depAero = (inBlock.match(/(?:D[ée]collage de l[’']a[ée]roport de|D[ée]part de|A[ée]roport de d[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
-    const arrAero = (inBlock.match(/(?:A l[’']a[ée]roport de|Arriv[ée]e [àa]|A[ée]roport d'arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
-    const flightNum = (inBlock.match(/(?:N°\s*(?:de\s*)?vol|Vol)\s*:\s*(.*)/i) || [])[1] || "";
-    const depTime = (inBlock.match(/(?:D[ée]collage pr[ée]vu [àa]|D[ée]part pr[ée]vu [àa]|D[ée]collage|D[ée]part)\s*:\s*(.*)/i) || [])[1] || "";
-    const arrTime = (inBlock.match(/(?:Arriv[ée]e pr[ée]vue [àa]|Arriv[ée]e)\s*:\s*(.*)/i) || [])[1] || "";
-    const comp = (inBlock.match(/Compagnie\s*:\s*(.*)/i) || [])[1] || "Air France";
-
-    if (flightNum || (depAero && arrAero)) {
-      flightsList.push({
-        type: "Retour",
-        airline: comp.trim(),
-        flightNumber: flightNum.trim(),
-        departureAirport: depAero.trim(),
-        departureTime: depTime.trim(),
-        arrivalAirport: arrAero.trim(),
-        arrivalTime: arrTime.trim(),
-        date: inDate.trim(),
-        via: "",
-        notes: ""
-      });
-    }
-  }
-
-  // Backup scan automatique des numéros de vols réels (ex: AF 178, AF 651) si le format différé n'a pas répondu
-  if (flightsList.length === 0) {
-    const flightRegex = /\b(AF|IB|LH|UX|BA|EK|QR|SN|KL|AT)\s*(\d{2,4})\b/g;
-    let fm;
-    const foundNumbers = [];
-    while ((fm = flightRegex.exec(text)) !== null) {
-      const fullNum = `${fm[1]} ${fm[2]}`;
-      if (!foundNumbers.includes(fullNum)) {
-        foundNumbers.push(fullNum);
-        flightsList.push({
-          type: foundNumbers.length === 1 ? "Aller" : "Retour",
-          airline: fm[1] === 'AF' ? "Air France" : (fm[1] === 'IB' ? "Iberia" : (fm[1] === 'LH' ? "Lufthansa" : "Compagnie aérienne")),
-          flightNumber: fullNum,
-          departureAirport: foundNumbers.length === 1 ? "Paris Charles de Gaulle" : "Aéroport international de destination",
-          departureTime: "",
-          arrivalAirport: foundNumbers.length === 1 ? (detectedTitle || "Destination") : "Paris Charles de Gaulle",
-          arrivalTime: "",
-          date: detectedDates || "",
-          via: "",
-          notes: ""
-        });
-      }
-    }
-  }
-
-  const landFlightsCopy = JSON.parse(JSON.stringify(flightsList));
-
-  // 7. Objet Voyage Final
+  // =========================================================================
+  // 8. OBJET VOYAGE FINAL (SANS RIEN INVENTER)
+  // =========================================================================
   const newTripId = 'voyage-' + Date.now();
   currentParsedTrip = {
     id: newTripId,
-    title: detectedTitle || "Circuit Découverte",
-    subtitle: detectedSubtitle || "Circuit exclusif Voyages Girardot",
-    dates: detectedDates || "Dates selon programme",
-    startDate: new Date().toISOString().split('T')[0],
-    endDate: new Date(Date.now() + (itinerary.length || 14) * 86400000).toISOString().split('T')[0],
-    coverImage: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80",
-    intro: text.slice(0, 320) + "...",
+    title: detectedTitle || "",
+    subtitle: detectedSubtitle || "",
+    dates: detectedDates || "",
+    startDate: detectedStartDate || "",
+    endDate: detectedEndDate || "",
+    coverImage: detectedCoverImage || "",
+    intro: detectedIntro || "",
     alert: {
       title: "Formalités indispensables",
-      text: "Passeport ou pièce d'identité en cours de validité. Vérifiez vos dates de validité.",
-      link: ""
+      text: formalitiesText || "",
+      link: formalitiesLink || ""
     },
     flightsList: flightsList,
-    flights: flightsList,
+    flights: null,
     itinerary: itinerary,
     hotels: hotels,
     hotelsList: hotels,
@@ -6137,18 +7520,12 @@ function processExtractedTextToTrip(text, sourceName) {
     freeTimeSuggestions: [],
     contactsList: contactsList,
     practicalTipsList: [],
-    practicalInfo: {
-      money: "Euros ou devise locale selon le pays. Cartes bancaires internationales acceptées. Prévoir des espèces pour les petits commerces.",
-      electricity: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon la destination.",
-      clothing: "Tenue confortable de saison et chaussures adaptées pour les visites à pied.",
-      tips: "Pourboires indicatifs : selon les usages locaux et laissés à votre discrétion.",
-      wifi: "Wi-Fi disponible dans la plupart des hébergements."
-    },
+    practicalInfo: {},
     driverDossier: {
-      busModel: "Autocar Grand Tourisme",
+      busModel: "",
       busCapacity: 50,
       busPlanUrl: "",
-      busNotes: "Placement libre ou selon consignes de l'accompagnatrice.",
+      busNotes: "",
       roomingList: [],
       roomingFileUrl: "",
       passengersList: []
@@ -6161,7 +7538,6 @@ function processExtractedTextToTrip(text, sourceName) {
     conciergeMode: conciergeMode
   };
 
-  // Traitement Croisière vs Circuit Terrestre
   if (isCruise) {
     currentParsedTrip.isCruise = true;
     const cruiseInfo = (typeof detectCruiseLineAndShip === 'function')
@@ -6176,72 +7552,32 @@ function processExtractedTextToTrip(text, sourceName) {
 
     if (typeof getCruisePracticalInfo === 'function') currentParsedTrip.practicalInfo = getCruisePracticalInfo(currentParsedTrip.shipName, text);
     if (typeof getCruisePracticalTips === 'function') currentParsedTrip.practicalTipsList = getCruisePracticalTips(currentParsedTrip.shipName, text);
-    if (typeof getCruiseContacts === 'function') currentParsedTrip.contactsList = getCruiseContacts(currentParsedTrip.shipName, accompName || "Mireille");
+    if (typeof getCruiseContacts === 'function') currentParsedTrip.contactsList = getCruiseContacts(currentParsedTrip.shipName, accompName || "");
 
-    // Supprimer les vols fictifs pour croisière maritime si non explicites
-    const realCruiseFlights = flightsList.filter(f => f.flightNumber || (f.departureAirport && f.arrivalAirport && f.departureAirport !== 'Paris' && f.arrivalAirport !== detectedTitle));
+    const realCruiseFlights = flightsList.filter(f => f.flightNumber || (f.departureAirport && f.arrivalAirport));
     currentParsedTrip.flightsList = realCruiseFlights;
-
   } else {
-    // CIRCUIT TERRESTRE
     currentParsedTrip.isCruise = false;
     currentParsedTrip.shipName = "";
     currentParsedTrip.decks = [];
 
-    // Extraction des vraies informations pratiques de destination du PDF
     const destPractical = extractDestinationPracticalInfoFromText(text);
     if (destPractical.tipsList && destPractical.tipsList.length > 0) {
       currentParsedTrip.practicalTipsList = destPractical.tipsList;
       currentParsedTrip.practicalInfo = Object.assign(currentParsedTrip.practicalInfo, destPractical.practicalInfo);
-    } else {
-      currentParsedTrip.practicalTipsList = [
-        { title: "Monnaie & Devises", icon: "coins", content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux." },
-        { title: "Électricité & Prises", icon: "plug", content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité." },
-        { title: "Vêtements conseillés", icon: "shirt", content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car." },
-        { title: "Pourboires indicatifs", icon: "hand-holding-dollar", content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar." },
-        { title: "Connexion Wi-Fi", icon: "wifi", content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit." }
-      ];
     }
 
-    // Formalités passeport et sanitaires (Visa, Air Suvidha, etc.)
-    const formalitesMatch = text.match(/Formalit[ée]s indispensables\s*[:–-]?\s*\n*([\s\S]*?)(?=(?:03\/07|\d{2}\/\d{2}\/\d{4}|Bon [àa] savoir|Inclus|$))/i);
-    let formalitiesText = formalitesMatch ? formalitesMatch[1].trim().replace(/\r?\n+/g, ' ') : '';
-    formalitiesText = formalitiesText.replace(/---\s*PAGE\s*\d+\s*---/gi, '').trim();
-    if (!formalitiesText) {
-      const passMatch = text.match(/Passeport\s+valide[^\n.]+/i);
-      if (passMatch) formalitiesText = passMatch[0].trim();
-    }
-
-    const airSuvidhaMatch = text.match(/(?:Air Suvidha|d[ée]claration de sant[ée])[\s\S]*?airsuvidha\.civilaviation\.gov\.in[\s\S]*?(?=(?:Bon [àa] savoir|Inclus|$))/i);
-    if (airSuvidhaMatch) {
-      currentParsedTrip.alert = {
-        title: "Formalités indispensables (Visa & Déclaration Air Suvidha)",
-        text: (formalitiesText ? formalitiesText + " — " : "") + "Déclaration de santé 'Air Suvidha' obligatoire à remplir en ligne sur airsuvidha.civilaviation.gov.in dans les 24h avant l'arrivée en Inde.",
-        link: "https://airsuvidha.civilaviation.gov.in"
-      };
-
-      if (currentParsedTrip.practicalTipsList) {
-        currentParsedTrip.practicalTipsList.unshift({
-          title: "Déclaration de santé Air Suvidha (Obligatoire)",
-          icon: "file-shield",
-          content: "Obligatoire pour l'Inde. Le formulaire officiel doit être impérativement complété en ligne sur airsuvidha.civilaviation.gov.in dans les 24h avant l'atterrissage (le portail bloque si rempli plus tôt). Présenter le document avec QR Code généré à l'embarquement."
-        });
-      }
-    } else if (formalitiesText) {
-      currentParsedTrip.alert = {
-        title: "Formalités indispensables",
-        text: formalitiesText,
-        link: ""
-      };
-    }
-
-    // Conciergerie par défaut standard
-    currentParsedTrip.conciergerie = (window.defaultTravelData && window.defaultTravelData.conciergerie)
+    const baseConciergerie = (window.defaultTravelData && window.defaultTravelData.conciergerie)
       ? JSON.parse(JSON.stringify(window.defaultTravelData.conciergerie))
       : { welcomeMessage: "Bienvenue sur votre carnet de voyage Girardot !", themes: [] };
+    if (baseConciergerie.themes) {
+      baseConciergerie.themes.forEach(t => { t.places = []; t.enabled = true; });
+    }
+    currentParsedTrip.conciergerie = baseConciergerie;
+    currentParsedTrip.freeTimeSuggestions = [];
   }
 
-  // Synchronisation rétrocompatible des objets flights et contacts
+  // Synchronisation rétrocompatible de l'objet flights
   if (currentParsedTrip.flightsList && currentParsedTrip.flightsList.length > 0) {
     const outF = currentParsedTrip.flightsList.find(f => f.type === 'Aller') || currentParsedTrip.flightsList[0];
     const inF = currentParsedTrip.flightsList.find(f => f.type === 'Retour') || currentParsedTrip.flightsList[currentParsedTrip.flightsList.length - 1];
@@ -6285,7 +7621,7 @@ function processExtractedTextToTrip(text, sourceName) {
       guide: {
         name: accompName || "",
         role: "Accompagnateur Girardot",
-        phone: ""
+        phone: accompPhone || ""
       },
       agence: {
         name: "Voyages Girardot",
@@ -6295,12 +7631,17 @@ function processExtractedTextToTrip(text, sourceName) {
     };
   }
 
-  // Affichage du résultat dans le modal via le helper dédié
+  // Recherche automatique Wikimedia en arrière-plan si certaines photos ne sont pas dans le dictionnaire
+  autoPopulateMissingPhotosFromWikimedia(currentParsedTrip);
+
   if (previewBox) previewBox.style.display = 'block';
   renderParsedTripSummaryInModal();
 
   if (btnDownload) btnDownload.style.display = 'inline-block';
   if (btnApply) btnApply.style.display = 'inline-block';
+  } catch (err) {
+    console.error("CRITICAL ERROR IN processExtractedTextToTrip:", err);
+  }
 }
 
 function extractProbableCity(text) {
@@ -7092,19 +8433,13 @@ function onParsedProfilePreviewChange(newMode) {
     currentParsedTrip.shipName = "";
     currentParsedTrip.decks = [];
 
-    // Restaurer les infos pratiques de la destination terrestre
+    // Restaurer les infos pratiques de la destination terrestre (sans inventer)
     const destPractical = extractDestinationPracticalInfoFromText(rawText);
     if (destPractical.tipsList && destPractical.tipsList.length > 0) {
       currentParsedTrip.practicalTipsList = destPractical.tipsList;
       currentParsedTrip.practicalInfo = Object.assign(currentParsedTrip.practicalInfo || {}, destPractical.practicalInfo);
     } else {
-      currentParsedTrip.practicalTipsList = [
-        { title: "Monnaie & Devises", icon: "coins", content: "Euros ou devise locale selon votre destination. Cartes bancaires internationales acceptées. Prévoyez des espèces pour les petits commerces et marchés locaux." },
-        { title: "Électricité & Prises", icon: "plug", content: "Voltage 220-230 volts. Vérifiez si un adaptateur de prise est nécessaire selon les normes du pays visité." },
-        { title: "Vêtements conseillés", icon: "shirt", content: "Vêtements confortables de saison, chaussures de marche adaptées aux visites et une petite laine pour les soirées ou la climatisation du car." },
-        { title: "Pourboires indicatifs", icon: "hand-holding-dollar", content: "Les pourboires restent à votre entière appréciation pour les guides locaux et conducteurs d'autocar." },
-        { title: "Connexion Wi-Fi", icon: "wifi", content: "Accès Wi-Fi disponible gratuitement dans la plupart des hébergements du circuit." }
-      ];
+      currentParsedTrip.practicalTipsList = [];
     }
 
     if (currentParsedTrip._landContactsList && currentParsedTrip._landContactsList.length > 0) {
@@ -7154,13 +8489,13 @@ function renderParsedTripSummaryInModal() {
         <strong>Destination :</strong> <span style="font-size:0.95rem; font-weight:800; color:#0f172a;">${currentParsedTrip.title}</span>
         ${modeBadge}
       </div>
-      <div style="margin-bottom:6px;"><strong>Sous-titre / Itinéraire :</strong> ${currentParsedTrip.subtitle || 'Voyages Girardot'}</div>
-      <div style="margin-bottom:6px;"><strong>Dates :</strong> ${currentParsedTrip.dates || 'À définir'} • <strong>${currentParsedTrip.itinerary.length} jours au programme</strong></div>
+      <div style="margin-bottom:6px;"><strong>Sous-titre / Itinéraire :</strong> ${currentParsedTrip.subtitle || '<em>(Non spécifié)</em>'}</div>
+      <div style="margin-bottom:6px;"><strong>Dates :</strong> ${currentParsedTrip.dates || '<em>(Non spécifiées)</em>'} • <strong>${currentParsedTrip.itinerary.length} jours au programme</strong></div>
       <div style="margin-bottom:6px;"><strong>Vols reconnus :</strong> ${flights.length > 0 ? flights.map(f => `${f.type}: ${f.airline} ${f.flightNumber} (${f.departureAirport} ➔ ${f.arrivalAirport})`).join(' | ') : '<em>Aucun vol (trajet autocar ou croisière)</em>'}</div>
       <div style="margin-bottom:6px;"><strong>Hébergements (${hotels.length}) :</strong> ${hotels.map(h => `<span style="display:inline-block; background:#e0f2fe; color:#0369a1; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${h.name} (${h.dates})</span>`).join('')}</div>
-      <div style="margin-bottom:6px;"><strong>Contacts identifiés :</strong> ${contacts.map(c => `${c.category}: ${c.name} ${c.phone ? `(${c.phone})` : ''}`).join(' | ')}</div>
+      <div style="margin-bottom:6px;"><strong>Contacts identifiés (${contacts.length}) :</strong> ${contacts.map(c => `${c.category}: ${c.name} ${c.phone ? `(${c.phone})` : ''}`).join(' | ')}</div>
       <div style="margin-bottom:6px;"><strong>Infos pratiques extraites (${practicals.length}) :</strong> ${practicals.map(p => `<span style="display:inline-block; background:#fef3c7; color:#92400e; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">${p.title}</span>`).join('')}</div>
-      <div><strong>Étapes :</strong> ${currentParsedTrip.itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.highlight || d.title.slice(0, 20)}</span>`).join('')}</div>
+      <div><strong>Villes étapes (Carte) :</strong> ${currentParsedTrip.itinerary.map(d => `<span style="display:inline-block; background:#e2e8f0; border-radius:4px; padding:2px 6px; margin:2px; font-size:0.75rem;">J${d.day}: ${d.city || d.title.slice(0, 20)}</span>`).join('')}</div>
     `;
   }
 }
@@ -7189,6 +8524,33 @@ function openPartnerEnrichModal() {
   resetPartnerEnrichModalState();
   const modal = document.getElementById('partner-enrich-modal');
   if (modal) modal.style.display = 'flex';
+
+  const dropZone = document.getElementById('partner-pdf-drop-zone');
+  if (dropZone && !dropZone.dataset.dragBound) {
+    dropZone.dataset.dragBound = "true";
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.style.borderColor = '#2563eb';
+      dropZone.style.background = '#dbeafe';
+    });
+    dropZone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.style.borderColor = '#93c5fd';
+      dropZone.style.background = '#eff6ff';
+    });
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      dropZone.style.borderColor = '#93c5fd';
+      dropZone.style.background = '#eff6ff';
+      const files = e.dataTransfer && e.dataTransfer.files;
+      if (files && files.length > 0) {
+        handlePartnerPdfFileSelected({ target: { files: files } });
+      }
+    });
+  }
 }
 
 function closePartnerEnrichModal() {
@@ -7221,7 +8583,7 @@ function handlePartnerPdfFileSelected(event) {
     statusEl.style.borderColor = '#93c5fd';
     statusEl.style.background = '#eff6ff';
     statusEl.style.color = '#1d4ed8';
-    statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lecture et analyse du PDF partenaire "${file.name}" en cours...`;
+    statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Lecture et analyse du PDF "${file.name}" en cours...`;
   }
 
   const reader = new FileReader();
@@ -7264,7 +8626,7 @@ function extractTextFromPartnerPdfArray(typedarray, originalFileName) {
       let currentLineText = "";
 
       for (const item of items) {
-        const str = item.str;
+        const str = (item.str || "").replace(/\u0000/g, '').replace(/\u00A0/g, ' ');
         if (!str) continue;
         const itemY = item.transform[5];
 
@@ -7282,6 +8644,9 @@ function extractTextFromPartnerPdfArray(typedarray, originalFileName) {
       if (currentLineText.trim()) pageLines.push(currentLineText.trim());
       fullText += pageLines.join("\n") + "\n\n";
     }
+
+    const rawInput = document.getElementById('partner-raw-text-input');
+    if (rawInput) rawInput.value = fullText;
 
     processPartnerPdfText(fullText, originalFileName);
   }).catch(function(err) {
@@ -7304,78 +8669,91 @@ function parsePastedPartnerText() {
 }
 
 function parsePartnerItinerary(fullText) {
-  const progIdx = fullText.search(/(?:^|\n)\s*LE\s+PROGRAMME\b/i);
-  const textToScan = progIdx !== -1 ? fullText.slice(progIdx) : fullText;
+  const cleanedFullText = (fullText || "").replace(/\u0000/g, '').replace(/\u00A0/g, ' ');
+  const progIdx = cleanedFullText.search(/(?:^|\n)\s*LE\s+PROGRAMME\b/i);
+  const textToScan = progIdx !== -1 ? cleanedFullText.slice(progIdx) : cleanedFullText;
 
   const endIdx = textToScan.search(/(?:HOTELS\s+NORMES|HOTELS\s+SELECTIONNES|DEVIS\s+N|TARIFS\s+EN\s+EUROS|NOS\s+PRIX\s+COMPRENNENT)/i);
   const cleanProgText = endIdx !== -1 ? textToScan.slice(0, endIdx) : textToScan;
 
-  const dayHeaderRegex = /(?:^|\n)\s*(?:JOUR|J)\s*(\d{1,2})\s*[:–-]\s*([^\n\r]+)/gi;
+  // Supporte à la fois "JOUR 1 : ..." et "JOUR 1 Paris / Mexico Mercredi 11 Novembre 2026"
+  const dayHeaderRegex = /(?:^|\n)\s*(?:JOUR|Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—]\s*|\s+)([^\n\r]+)/g;
   const days = [];
   let match;
   const indices = [];
 
   while ((match = dayHeaderRegex.exec(cleanProgText)) !== null) {
+    const rest = (match[2] || "").trim();
+    if (/^consacr[ée]/i.test(rest)) continue;
     indices.push({
       dayNum: parseInt(match[1], 10),
-      rawHeader: match[2].trim(),
+      rawHeader: rest,
       startIndex: match.index,
       headerLength: match[0].length
     });
   }
+
+  const localSortedCoordsKeys = Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length);
 
   for (let i = 0; i < indices.length; i++) {
     const cur = indices[i];
     const nextStart = (i + 1 < indices.length) ? indices[i + 1].startIndex : cleanProgText.length;
     const bodyRaw = cleanProgText.slice(cur.startIndex + cur.headerLength, nextStart).trim();
 
-    const cleanLines = bodyRaw.split(/\r?\n/)
-      .map(l => l.trim())
-      .filter(l => {
-        if (!l) return false;
-        if (/^---\s*PAGE\s*\d+\s*---/i.test(l)) return false;
-        if (/25\s+Boulevard\s+des\s+Martyrs\s+Nantais/i.test(l)) return false;
-        if (/ZEN\s+ASIE\s+SAS\s+TOTRAVEL/i.test(l)) return false;
-        if (/SIRET\s+\d+|GARANTIE\s+APST/i.test(l)) return false;
-        return true;
-      });
+    let rawTitle = repairBrokenPdfWords(cur.rawHeader);
+    let dateStr = '';
 
-    let rawTitle = cur.rawHeader;
-    let remainingLines = [...cleanLines];
+    // Extraire la date éventuelle située à la fin de l'en-tête du jour (ex: "JOUR 1 Paris / Mexico Mercredi 11 Novembre 2026")
+    const trailDateMatch = rawTitle.match(/\s+((?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+(?:janvier|f[ée]vrier|mars|avril|mai|juin|juillet|ao[ûu]t|septembre|octobre|novembre|d[ée]cembre)\s+\d{4})$/i);
+    if (trailDateMatch) {
+      dateStr = trailDateMatch[1].trim();
+      rawTitle = rawTitle.slice(0, trailDateMatch.index).trim();
+    }
 
-    if (remainingLines.length > 0) {
-      const firstLine = remainingLines[0];
-      const isDate = /^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i.test(firstLine);
+    const rawBodyLines = bodyRaw.split(/\r?\n/).map(l => repairBrokenPdfWords(l)).filter(Boolean);
+    if (rawBodyLines.length > 0) {
+      const firstLine = rawBodyLines[0];
+      const isDate = /^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}$/i.test(firstLine);
       const isContinuation = /^([A-Z0-9\s()\/–-]+(?:KM|H|\)))/i.test(firstLine) || /^[)]/.test(firstLine);
       if (!isDate && isContinuation) {
         rawTitle += ' ' + firstLine;
-        remainingLines.shift();
+        rawBodyLines.shift();
       }
     }
 
-    let dateStr = '';
-    if (remainingLines.length > 0) {
-      const isDate = /^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}/i.test(remainingLines[0]);
+    if (!dateStr && rawBodyLines.length > 0) {
+      const isDate = /^(?:lundi|mardi|mercredi|jeudi|vendredi|samedi|dimanche)?\s*\d{1,2}\s+[a-zà-ÿ]+\s+\d{4}$/i.test(rawBodyLines[0]);
       if (isDate) {
-        dateStr = remainingLines[0];
-        remainingLines.shift();
+        dateStr = rawBodyLines[0];
+        rawBodyLines.shift();
       }
     }
+
+    const { paragraphs, extractedHotel } = splitDayLinesAndHotelCard(rawBodyLines);
 
     let cleanTitle = rawTitle
+      .replace(/\s*\([A-Z]{2,4}\)\s*/g, ' ')
       .replace(/[\u2708\uFE0F\uD83D\uDEEB✈️]+/g, ' - ')
       .replace(/\s*\/\s*/g, ' - ')
       .replace(/\s*-\s*-\s*/g, ' - ')
       .replace(/\s{2,}/g, ' ')
       .trim();
 
-    const description = remainingLines.join('\n\n');
+    const chunks = paragraphs.filter(p => {
+      if (/^petit[-\s]d[ée]jeuner\.?$/i.test(p)) return false;
+      if (/^d[îi]ner(?:\s+libre)?\.?$/i.test(p)) return false;
+      if (/^installation\s+(?:[àa]\s+l['’]h[ôo]tel\s+)?pour\s+\d+\s+nuits?\.?$/i.test(p)) return false;
+      if (/^repas\s+et\s+nuit\s+[àa]\s+bord\.?$/i.test(p)) return false;
+      return true;
+    });
+
+    const description = chunks.join(" ");
 
     let detectedCity = "";
     let lat = null;
     let lng = null;
-    const normSearch = (cleanTitle + " " + description).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
-    for (const k of sortedCoordsKeys) {
+    const normSearch = normStr(cleanTitle + " " + description);
+    for (const k of localSortedCoordsKeys) {
       if (normSearch.includes(k)) {
         const c = DESTINATION_CITY_COORDINATES[k];
         detectedCity = c.city;
@@ -7392,12 +8770,272 @@ function parsePartnerItinerary(fullText) {
       city: detectedCity,
       lat: lat,
       lng: lng,
+      paragraphs: paragraphs,
+      chunks: chunks,
       description: description,
-      timeline: extractVisitsFromDay(description, cleanTitle)
+      extractedHotel: extractedHotel,
+      timeline: extractVisitsFromDay(paragraphs.join("\n"), cleanTitle)
     });
   }
 
   return days;
+}
+
+const STOPWORDS_ENRICH = new Set([
+  "visite", "decouverte", "exploration", "arret", "route", "vers", "depart", "pour",
+  "continuation", "poursuite", "promenade", "balade", "dans", "avec", "plus", "tres",
+  "ville", "site", "archeologique", "centre", "historique", "mexique", "mexicain",
+  "mexicains", "region", "etat", "pays", "monde", "jour", "matin", "apres", "midi",
+  "soir", "soiree", "nuit", "hotel", "logement", "diner", "dejeuner", "petit",
+  "transfert", "aeroport", "envol", "retour", "arrivee", "accueil", "guide",
+  "francophone", "installation", "barque", "moteur", "bateau", "pied", "place",
+  "principale", "eglise", "cathedrale", "belle", "beaux", "grand", "grande", "grands",
+  "petite", "petit", "ancien", "ancienne", "fameux", "fameuse", "celebre", "typique",
+  "local", "locale", "locaux", "indien", "indienne", "indiens", "maya", "mayas",
+  "nombreux", "nombreuses", "maison", "maisons", "colore", "coloree", "colorees",
+  "patrimoine", "bien", "valeur", "seule", "seul", "sans", "doute", "entree",
+  "descente", "plaines", "verdoyantes", "famille", "familles", "rencontre",
+  "village", "villages", "flaner", "libre", "possibilite", "baignade", "cours",
+  "votre", "leurs", "leur", "cette", "cet", "ces", "comme", "sont", "tout", "tous",
+  "toutes", "entre", "sous", "sur", "aux", "par", "une", "des", "les",
+  "arbre", "arbres", "geant", "devant", "fond", "fondee", "ruines", "cite",
+  "capitale", "charme", "colonial", "coloniale", "spectacle", "danses", "folkloriques"
+]);
+
+function extractVisitTokensForEnrich(text) {
+  const n = normStr(text).replace(/[^a-z0-9\s]/g, ' ');
+  return [...new Set(n.split(/\s+/).filter(w => w.length >= 4 && !STOPWORDS_ENRICH.has(w)))];
+}
+
+function hasWordTokenForEnrich(normText, tok) {
+  const re = new RegExp(`(?:^|\\s|[^a-z0-9])${tok}s?(?:$|\\s|[^a-z0-9])`, 'i');
+  return re.test(normText);
+}
+
+function mergeVisitSubtitleWithPartnerChunks(origSubtitle, matchedChunks) {
+  if (!matchedChunks || matchedChunks.length === 0) return origSubtitle;
+  const partnerTextCombined = matchedChunks.join(" ").trim();
+  if (!origSubtitle || !origSubtitle.trim()) return partnerTextCombined;
+
+  const pSentences = partnerTextCombined
+    .split(/(?<=[.!?…])\s+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const origNorm = normStr(origSubtitle);
+  const origSentences = origSubtitle
+    .split(/(?<=[.!?…])\s+/)
+    .map(s => s.trim())
+    .filter(Boolean);
+
+  const addedSentences = [];
+  for (let i = 0; i < pSentences.length; i++) {
+    const ps = pSentences[i];
+    const psNorm = normStr(ps);
+    if (origNorm.includes(psNorm)) continue;
+
+    // Éviter d'ajouter une phrase finale de liaison routière ("Route vers Merida...") à l'intérieur d'une visite de site
+    if (i > 0 && /^(?:route|continuation|poursuite|d[ée]part)\s+vers\s+/i.test(ps)) {
+      continue;
+    }
+
+    if (i === 0 && origSentences.length > 0) {
+      const pTokens = extractVisitTokensForEnrich(ps);
+      const oTokens = extractVisitTokensForEnrich(origSentences[0]);
+      const overlap = pTokens.filter(t => oTokens.includes(t));
+      if (overlap.length > 0 && ps.length <= origSentences[0].length + 25) {
+        continue;
+      }
+      if (/^(?:visite|d[ée]couverte|continuation|poursuite|arr[êe]t|route|d[ée]part|promenade|balade)\b/i.test(ps) && ps.split(/\s+/).length <= 10) {
+        continue;
+      }
+    }
+
+    addedSentences.push(ps);
+  }
+
+  if (addedSentences.length === 0) return origSubtitle;
+  const base = origSubtitle.trim().replace(/(?<![.!?…])$/, '.');
+  return (base + " " + addedSentences.join(" ")).replace(/\s{2,}/g, ' ').trim();
+}
+
+// Enrichit les sous-titres des visites existantes SANS JAMAIS modifier l'ordre des journées ni l'ordre/les titres des visites
+function enrichAllDaysPreservingOrder(itinerary, partnerDays) {
+  const usedGlobalKeys = new Set();
+  let totalEnrichedDays = 0;
+  let totalEnrichedVisits = 0;
+  const perDayStats = {};
+
+  (itinerary || []).forEach(dayObj => {
+    const timeline = dayObj.timeline || [];
+    perDayStats[dayObj.day] = { enrichedVisitsCount: 0, enrichedTitles: [] };
+    if (timeline.length === 0) return;
+
+    const samePartnerDay = partnerDays.find(p => p.day === dayObj.day);
+    const prevPartnerDay = partnerDays.find(p => p.day === dayObj.day - 1);
+    const nextPartnerDay = partnerDays.find(p => p.day === dayObj.day + 1);
+    let dayEnrichedVisits = 0;
+
+    timeline.forEach(visit => {
+      const tNorm = normStr(visit.title);
+      const subNorm = normStr(visit.subtitle || "");
+
+      // 1. Ne pas altérer les étapes purement logistiques (logement, vols, transferts aéroport, retour région)
+      if (/^(?:logement|diner\s+logement|diner\s+et\s+nuit\s+a\s+bord|retour\s+dans\s+votre\s+region|retour\s+a\s+|arrivee\s+a\s+paris|envol\s+pour|transfert\s+a\s+l['’]?aeroport|transfert\s+a\s+l['’]?hotel)$/i.test(tNorm)) {
+        return;
+      }
+      if (/^route\s+vers\s+/i.test(tNorm) && !subNorm) {
+        return;
+      }
+
+      const isRoadTransitStep = (
+        /^(?:poursuite|continuation|route|d[ée]part|descente)\b/i.test(subNorm) &&
+        !/\b(?:visite|exploration|arr[êe]t|promenade|balade|r[ée]serve)\b/i.test(subNorm)
+      );
+
+      // 2. Étape Repas ("Déjeuner")
+      if (tNorm === 'dejeuner') {
+        if (samePartnerDay && samePartnerDay.chunks) {
+          const mealIdx = samePartnerDay.chunks.findIndex((c, idx) => !usedGlobalKeys.has(`${samePartnerDay.day}:${idx}`) && /^d[ée]jeuner\b/i.test(c));
+          if (mealIdx !== -1) {
+            usedGlobalKeys.add(`${samePartnerDay.day}:${mealIdx}`);
+            const mealChunk = samePartnerDay.chunks[mealIdx];
+            if (!visit.subtitle || mealChunk.length > visit.subtitle.length) {
+              if (!subNorm.includes('pinata')) {
+                visit.subtitle = mealChunk;
+                dayEnrichedVisits++;
+                perDayStats[dayObj.day].enrichedTitles.push(visit.title);
+              }
+            }
+          }
+        }
+        if (subNorm.includes('pinata')) {
+          for (const pd of partnerDays) {
+            const pIdx = (pd.chunks || []).findIndex(c => normStr(c).includes('pinata'));
+            if (pIdx !== -1 && !usedGlobalKeys.has(`${pd.day}:${pIdx}`)) {
+              usedGlobalKeys.add(`${pd.day}:${pIdx}`);
+              const merged = mergeVisitSubtitleWithPartnerChunks(visit.subtitle, [pd.chunks[pIdx]]);
+              if (merged !== visit.subtitle) {
+                visit.subtitle = merged;
+                dayEnrichedVisits++;
+                perDayStats[dayObj.day].enrichedTitles.push(visit.title);
+              }
+              break;
+            }
+          }
+        }
+        return;
+      }
+
+      // 3. Étapes de visites culturelles / sites / trajets
+      const titleTokens = extractVisitTokensForEnrich(visit.title);
+      const allTokens = extractVisitTokensForEnrich(visit.title + " " + (visit.subtitle || ""));
+      const rawWords = normStr(visit.title + " " + (visit.subtitle || "")).replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter(w => w.length >= 4);
+
+      if (samePartnerDay && samePartnerDay.chunks) {
+        const matchedChunks = [];
+        samePartnerDay.chunks.forEach((chunk, idx) => {
+          const key = `${samePartnerDay.day}:${idx}`;
+          if (usedGlobalKeys.has(key)) return;
+          if (/^(?:d[ée]jeuner|d[îi]ner)\b/i.test(chunk) && !tNorm.includes('spectacle') && !tNorm.includes('diner')) return;
+
+          const cNorm = normStr(chunk);
+          const isChunkRoadTransit = /^(?:route|d[ée]part\s+(?:[àa]\s+destination|en\s+direction|vers)|continuation\s+vers|poursuite\s+vers)\b/i.test(cNorm) && !/\b(?:visite|d[ée]couverte\s+du\s+site)\b/i.test(cNorm);
+
+          if (isRoadTransitStep && !isChunkRoadTransit) return;
+
+          let score = 0;
+          for (const tok of titleTokens) {
+            if (hasWordTokenForEnrich(cNorm, tok)) score += 5;
+          }
+          for (const tok of allTokens) {
+            if (!titleTokens.includes(tok) && hasWordTokenForEnrich(cNorm, tok)) score += 2;
+          }
+          if (score === 0 && !isRoadTransitStep) {
+            for (const rw of rawWords) {
+              if (['marche', 'zocalo', 'cathedrale', 'santo', 'domingo', 'barque', 'lagune', 'cenote', 'flamants', 'flamands', 'jarana', 'folklorique'].includes(rw) && hasWordTokenForEnrich(cNorm, rw)) {
+                score += 3;
+              }
+            }
+          }
+
+          if (score >= 3) {
+            matchedChunks.push({ idx, key, chunk, score });
+          }
+        });
+
+        if (matchedChunks.length > 0) {
+          matchedChunks.sort((a, b) => b.score - a.score || a.idx - b.idx);
+          const topScore = matchedChunks[0].score;
+          const selected = matchedChunks
+            .filter(m => m.score >= Math.max(3, topScore - 3))
+            .sort((a, b) => a.idx - b.idx);
+          selected.forEach(m => usedGlobalKeys.add(m.key));
+          const newSub = mergeVisitSubtitleWithPartnerChunks(visit.subtitle, selected.map(m => m.chunk));
+          if (newSub !== visit.subtitle) {
+            visit.subtitle = newSub;
+            dayEnrichedVisits++;
+            perDayStats[dayObj.day].enrichedTitles.push(visit.title);
+          }
+          return;
+        }
+      }
+
+      // Étape B : Recherche dans le jour partenaire N-1 ou N+1 uniquement pour les vraies visites (jamais pour les liaisons routières)
+      if (!isRoadTransitStep) {
+        const adjacentTokens = titleTokens.length > 0 ? titleTokens : allTokens.filter(t => ['campeche', 'malecon', 'merida', 'montejo', 'valladolid', 'bernardino', 'chichen', 'itza'].includes(t));
+        if (adjacentTokens.length > 0) {
+          const adjacentDays = [prevPartnerDay, nextPartnerDay].filter(Boolean);
+          let bestAdj = null;
+          let bestAdjScore = 0;
+          for (const adjDay of adjacentDays) {
+            (adjDay.chunks || []).forEach((chunk, idx) => {
+              const key = `${adjDay.day}:${idx}`;
+              if (usedGlobalKeys.has(key)) return;
+              if (/^(?:d[ée]jeuner|d[îi]ner)\b/i.test(chunk) && !tNorm.includes('spectacle')) return;
+              const cNorm = normStr(chunk);
+              let score = 0;
+              for (const tok of adjacentTokens) {
+                if (hasWordTokenForEnrich(cNorm, tok)) score += 5;
+              }
+              for (const tok of allTokens) {
+                if (!adjacentTokens.includes(tok) && hasWordTokenForEnrich(cNorm, tok)) score += 2;
+              }
+              if (score >= 5 && score > bestAdjScore) {
+                bestAdjScore = score;
+                bestAdj = { key, chunk };
+              }
+            });
+          }
+          if (bestAdj) {
+            usedGlobalKeys.add(bestAdj.key);
+            const newSub = mergeVisitSubtitleWithPartnerChunks(visit.subtitle, [bestAdj.chunk]);
+            if (newSub !== visit.subtitle) {
+              visit.subtitle = newSub;
+              dayEnrichedVisits++;
+              perDayStats[dayObj.day].enrichedTitles.push(visit.title);
+            }
+          }
+        }
+      }
+    });
+
+    // Reconstruire la description globale du jour dans l'ordre exact des visites existantes
+    const descParts = timeline
+      .map(v => (v.subtitle && v.subtitle.trim()) ? v.subtitle.trim() : (v.title.endsWith('.') ? v.title : v.title + '.'))
+      .filter(Boolean);
+    if (descParts.length > 0) {
+      dayObj.description = descParts.join(" ");
+    }
+
+    perDayStats[dayObj.day].enrichedVisitsCount = dayEnrichedVisits;
+    if (dayEnrichedVisits > 0) {
+      totalEnrichedDays++;
+      totalEnrichedVisits += dayEnrichedVisits;
+    }
+  });
+
+  return { totalEnrichedDays, totalEnrichedVisits, perDayStats };
 }
 
 function processPartnerPdfText(fullText, sourceName) {
@@ -7415,50 +9053,62 @@ function processPartnerPdfText(fullText, sourceName) {
       statusEl.style.borderColor = '#fca5a5';
       statusEl.style.background = '#fef2f2';
       statusEl.style.color = '#b91c1c';
-      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Aucune étape (ex: "JOUR 01 : ...") n'a été détectée dans ce document. Vérifiez le format du fichier PDF ou collez directement son texte.`;
+      statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Aucune étape (ex: "JOUR 1 ...") n'a été détectée dans ce document. Vérifiez le format du fichier PDF ou collez directement son texte.`;
     }
     return;
   }
 
   currentPartnerParsedDays = partnerDays;
 
+  // Simuler l'enrichissement sur une copie profonde pour l'aperçu avant application
+  const simulatedItinerary = JSON.parse(JSON.stringify(tripData.itinerary || []));
+  const simResult = enrichAllDaysPreservingOrder(simulatedItinerary, partnerDays);
+
   if (statusEl) {
     statusEl.style.display = 'block';
     statusEl.style.borderColor = '#86efac';
     statusEl.style.background = '#f0fdf4';
     statusEl.style.color = '#15803d';
-    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <strong>${partnerDays.length} étape(s) détectée(s)</strong> dans le document partenaire. Vérifiez l'aperçu ci-dessous et appliquez la mise à jour.`;
+    statusEl.innerHTML = `<i class="fa-solid fa-circle-check"></i> <strong>${partnerDays.length} journée(s) lue(s)</strong> dans "${sourceName}" • <strong>${simResult.totalEnrichedVisits} visite(s) enrichie(s) sur ${simResult.totalEnrichedDays} journée(s)</strong> (ordre des journées et des visites 100% conservé).`;
   }
 
-  if (countEl) countEl.textContent = partnerDays.length;
+  if (countEl) countEl.textContent = `${simResult.totalEnrichedVisits} visite(s) enrichie(s) sur ${simResult.totalEnrichedDays} jour(s)`;
 
   if (listEl) {
-    const existingDays = tripData.itinerary || [];
-    listEl.innerHTML = partnerDays.map(p => {
-      const cur = existingDays.find(d => d.day === p.day);
-      const curTitle = cur ? cur.title : '<em>(Nouveau jour à créer)</em>';
-      const curDescLen = cur && cur.description ? cur.description.length : 0;
-      const newDescLen = p.description ? p.description.length : 0;
-      const visitsCount = p.timeline ? p.timeline.length : 0;
+    const origDays = tripData.itinerary || [];
+    listEl.innerHTML = simulatedItinerary.map((simDay, idx) => {
+      const origDay = origDays[idx] || simDay;
+      const stat = simResult.perDayStats[simDay.day] || { enrichedVisitsCount: 0, enrichedTitles: [] };
+      const origLen = origDay.description ? origDay.description.length : 0;
+      const newLen = simDay.description ? simDay.description.length : 0;
 
       return `
         <div style="border-bottom:1px solid #f1f5f9; padding:10px; font-size:0.8rem;">
           <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px; flex-wrap:wrap; gap:6px;">
             <div style="font-weight:800; color:#1e293b;">
-              <span style="display:inline-block; background:#2563eb; color:white; border-radius:4px; padding:1px 6px; font-size:0.72rem; margin-right:6px;">Jour ${p.day}</span>
-              ${p.title}
+              <span style="display:inline-block; background:#2563eb; color:white; border-radius:4px; padding:1px 6px; font-size:0.72rem; margin-right:6px;">Jour ${simDay.day}</span>
+              ${simDay.title}
+              ${simDay.city ? `<span style="color:#64748b; font-weight:600; font-size:0.75rem;">(${simDay.city})</span>` : ''}
             </div>
-            <div style="font-size:0.75rem; color:#64748b;">
-              ${p.dateStr ? `<i class="fa-regular fa-calendar"></i> ${p.dateStr} • ` : ''}
-              <strong>${visitsCount} visite(s)</strong>
+            <div style="font-size:0.75rem; color:${stat.enrichedVisitsCount > 0 ? '#15803d' : '#64748b'}; font-weight:700;">
+              ${stat.enrichedVisitsCount > 0 ? `<i class="fa-solid fa-wand-magic-sparkles"></i> +${stat.enrichedVisitsCount} visite(s) détaillée(s)` : 'Aucun détail supplémentaire'}
             </div>
           </div>
-          <div style="font-size:0.75rem; color:#475569; margin-bottom:4px;">
-            <span style="color:#64748b;">Trajet actuel :</span> ${curTitle}
+          <div style="display:flex; flex-direction:column; gap:4px; margin-top:6px;">
+            ${(simDay.timeline || []).map((v, vIdx) => {
+              const origV = (origDay.timeline && origDay.timeline[vIdx]) ? origDay.timeline[vIdx] : v;
+              const isEnriched = v.subtitle !== origV.subtitle;
+              return `
+                <div style="font-size:0.74rem; padding:5px 8px; border-radius:6px; background:${isEnriched ? '#f0fdf4' : '#f8fafc'}; border-left:3px solid ${isEnriched ? '#16a34a' : '#cbd5e1'};">
+                  <strong style="color:#0f172a;">${vIdx + 1}. ${v.title}</strong>
+                  ${isEnriched ? `<span style="background:#dcfce7; color:#15803d; font-size:0.68rem; font-weight:700; padding:1px 5px; border-radius:4px; margin-left:6px;">Enrichi</span>` : ''}
+                  ${v.subtitle ? `<div style="color:#334155; margin-top:2px;">${v.subtitle}</div>` : ''}
+                </div>
+              `;
+            }).join('')}
           </div>
-          <div style="font-size:0.75rem; color:#0f172a; background:#f8fafc; border-left:3px solid #2563eb; padding:6px 10px; border-radius:0 6px 6px 0; max-height:60px; overflow:hidden; text-overflow:ellipsis;">
-            ${p.description.slice(0, 180)}...
-            <span style="color:#2563eb; font-weight:700;">(${newDescLen} car. vs ${curDescLen} car.)</span>
+          <div style="font-size:0.7rem; color:#64748b; margin-top:4px; text-align:right;">
+            Texte global : ${origLen} car. ➔ <strong>${newLen} car.</strong>
           </div>
         </div>
       `;
@@ -7471,58 +9121,14 @@ function processPartnerPdfText(fullText, sourceName) {
 
 function applyPartnerEnrichmentToCurrentTrip() {
   if (!currentPartnerParsedDays || currentPartnerParsedDays.length === 0) return;
-  if (!tripData) return;
+  if (!tripData || !tripData.itinerary) return;
 
-  const updateDesc = document.getElementById('chk-partner-desc') ? document.getElementById('chk-partner-desc').checked : true;
-  const updateTitle = document.getElementById('chk-partner-title') ? document.getElementById('chk-partner-title').checked : true;
-  const updateVisits = document.getElementById('chk-partner-visits') ? document.getElementById('chk-partner-visits').checked : true;
-  const keepHighlights = document.getElementById('chk-partner-keep-highlights') ? document.getElementById('chk-partner-keep-highlights').checked : true;
+  const result = enrichAllDaysPreservingOrder(tripData.itinerary, currentPartnerParsedDays);
 
-  if (!tripData.itinerary) tripData.itinerary = [];
-
-  let updatedCount = 0;
-  let addedCount = 0;
-
-  currentPartnerParsedDays.forEach(p => {
-    let dayObj = tripData.itinerary.find(d => d.day === p.day);
-    if (dayObj) {
-      if (updateTitle && p.title) dayObj.title = p.title;
-      if (updateDesc && p.description) dayObj.description = p.description;
-      if (updateVisits && p.timeline && p.timeline.length > 0) dayObj.timeline = p.timeline;
-      if (p.dateStr && !dayObj.dateStr) dayObj.dateStr = p.dateStr;
-      if (p.city && (!dayObj.city || dayObj.city.length <= 3)) {
-        dayObj.city = p.city;
-        if (p.lat && !dayObj.lat) {
-          dayObj.lat = p.lat;
-          dayObj.lng = p.lng;
-        }
-      }
-      if (!keepHighlights) dayObj.highlight = "";
-      updatedCount++;
-    } else {
-      tripData.itinerary.push({
-        day: p.day,
-        title: p.title,
-        city: p.city || "",
-        dateStr: p.dateStr || `Jour ${p.day}`,
-        highlight: "",
-        weather: "",
-        description: p.description,
-        lat: p.lat,
-        lng: p.lng,
-        timeline: p.timeline || []
-      });
-      addedCount++;
-    }
-  });
-
-  // Trier les jours par numéro croissant
-  tripData.itinerary.sort((a, b) => a.day - b.day);
-
-  // Sauvegarder dans IndexedDB & localStorage sans toucher aux hôtels, vols et contacts
+  // Sauvegarder dans IndexedDB & localStorage sans toucher à l'ordre des jours, ni à l'ordre des visites, ni aux hôtels, vols et contacts
   saveTripToCatalogAndStorage(tripData);
   renderAdminDays();
   closePartnerEnrichModal();
 
-  alert(`✓ Enrichissement réussi du voyage "${tripData.title}" !\n\n• ${updatedCount} journée(s) enrichie(s)\n${addedCount > 0 ? `• ${addedCount} nouvelle(s) étape(s) ajoutée(s)\n` : ''}• Vos hôtels, vols et contacts Girardot ont été rigoureusement conservés.`);
+  alert(`✓ Enrichissement réussi du voyage "${tripData.title}" !\n\n• ${result.totalEnrichedVisits} visite(s) enrichie(s) sur ${result.totalEnrichedDays} journée(s)\n• L'ordre des journées et l'ordre des visites ont été strictement conservés.\n• Vos hôtels, vols et contacts sont intacts.`);
 }

@@ -667,13 +667,15 @@ function renderTodayFocus() {
   document.getElementById('next-sub').innerText = nextEvent.badge || nextEvent.sub || "Programme Girardot";
   
   const qrBtn = document.getElementById('btn-show-qr');
-  qrBtn.onclick = () => {
-    if (nextEvent.docId && findDocById(nextEvent.docId)) {
-      viewClientDocDetails(nextEvent.docId, true);
-    } else {
-      openQrModal(nextEvent.title, nextEvent.qrCodeText || `GIRARDOT-JOUR-${currentDay.day}`);
-    }
-  };
+  if (qrBtn) {
+    qrBtn.onclick = () => {
+      if (nextEvent.docId && findDocById(nextEvent.docId)) {
+        viewClientDocDetails(nextEvent.docId, true);
+      } else {
+        openQrModal(nextEvent.title, nextEvent.qrCodeText || `GIRARDOT-JOUR-${currentDay.day}`);
+      }
+    };
+  }
 
   // Timeline Stream (Liste avec points, lignes pointillées et photos)
   const timelineStream = document.getElementById('timeline-stream');
@@ -3425,20 +3427,31 @@ function renderContactsAndAlert() {
       const isUrgent = c.isEmergency;
       const card = document.createElement('div');
       card.style = `background:${isUrgent ? '#fef2f2' : 'white'}; border:1px solid ${isUrgent ? '#fee2e2' : 'var(--border-light)'}; border-left:4px solid ${isUrgent ? '#dc2626' : 'var(--primary-color)'}; border-radius:16px; padding:16px; margin-bottom:14px;`;
-      
+
+      const extractedUrlMatch = !c.link && c.address ? c.address.match(/https?:\/\/[^\s)]+/i) : null;
+      const webLink = c.link || (extractedUrlMatch ? extractedUrlMatch[0] : "");
+      const formattedAddress = c.address
+        ? c.address.replace(/(https?:\/\/[^\s)]+)/gi, '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0284c7; text-decoration:underline; font-weight:600;">$1</a>')
+        : '';
+
       card.innerHTML = `
         <h4 style="font-size:0.96rem; font-weight:800; color:${isUrgent ? '#dc2626' : 'var(--primary-dark)'}; margin-bottom:4px;">
           <i class="fa-solid ${isUrgent ? 'fa-triangle-exclamation' : 'fa-address-card'}"></i> ${c.category}
         </h4>
-        <div style="font-weight:700; font-size:0.9rem; color:var(--text-main);">${c.name}</div>
-        ${c.address ? `<div style="font-size:0.82rem; color:#475569; margin:3px 0 6px;">${c.address}</div>` : ''}
-        ${c.phone ? `
-          <div style="margin-top:6px;">
+        ${c.name ? `<div style="font-weight:700; font-size:0.9rem; color:var(--text-main);">${c.name}</div>` : ''}
+        ${formattedAddress ? `<div style="font-size:0.82rem; color:#475569; margin:3px 0 6px;">${formattedAddress}</div>` : ''}
+        <div style="margin-top:8px; display:flex; gap:8px; flex-wrap:wrap;">
+          ${c.phone ? `
             <a href="tel:${c.phone.replace(/[^0-9+]/g, '')}" class="btn-entry-gps" style="background:${isUrgent ? '#dc2626' : 'var(--primary-color)'}; color:white;">
               <i class="fa-solid fa-phone"></i> ${c.phone}
             </a>
-          </div>
-        ` : ''}
+          ` : ''}
+          ${webLink ? `
+            <a href="${webLink}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="background:#0284c7; color:white;">
+              <i class="fa-solid fa-globe"></i> Accéder au site officiel
+            </a>
+          ` : ''}
+        </div>
       `;
       contactsBox.appendChild(card);
     });
@@ -3799,11 +3812,19 @@ function renderMapMarkers(filterCategory = 'all') {
     });
 
     // Si le voyage n'a pas de freeTimeSuggestions manuelles mais possède des visites libres dans la conciergerie, les inclure sur la carte
+    // UNIQUEMENT si ces visites ne sont pas des reliquats d'Afrique du Sud
     if (validSuggs.length === 0 && currentTrip.conciergerie && currentTrip.conciergerie.themes) {
       const visitesTheme = currentTrip.conciergerie.themes.find(t => t.id === 'visites' && t.enabled !== false);
       if (visitesTheme && visitesTheme.places) {
         visitesTheme.places.forEach(p => {
           if (p.lat && p.lng) {
+            if (!isSouthAfricaTrip) {
+              const pText = ((p.name || "") + " " + (p.location || "") + " " + (p.description || "")).toLowerCase();
+              if (pText.includes('table mountain') || pText.includes('kirstenbosch') || pText.includes('le cap') || pText.includes('kruger') || pText.includes('fynbos') || pText.includes('pot luck club') || pText.includes('afrique')) {
+                return;
+              }
+              if (p.lat < 0) return;
+            }
             validSuggs.push({
               name: p.name,
               category: p.category || "Coup de cœur",

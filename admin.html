@@ -220,8 +220,8 @@
           <button type="button" onclick="openPdfImportModal()" class="btn-secondary" style="font-size:0.78rem; padding:6px 14px; background:#fef2f2; color:#dc2626; border-color:#fca5a5; font-weight:800;" title="Convertir automatiquement un programme de voyage PDF en circuit JSON">
             <i class="fa-solid fa-file-pdf"></i> Importer un programme PDF
           </button>
-          <button type="button" onclick="openPartnerEnrichModal()" class="btn-secondary" style="font-size:0.78rem; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:800;" title="Enrichir uniquement les étapes du carnet actif avec un PDF réceptif/partenaire (conserve les hôtels, vols et contacts)">
-            <i class="fa-solid fa-wand-magic-sparkles"></i> Enrichir le programme (PDF Partenaire)
+          <button type="button" onclick="openPartnerEnrichModal()" class="btn-secondary" style="font-size:0.78rem; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:800;" title="Ajouter des détails aux visites du carnet actif via un PDF complémentaire sans modifier l'ordre des journées ni l'ordre des visites">
+            <i class="fa-solid fa-file-pdf"></i> PDF pour enrichir le texte du programme
           </button>
           <button type="button" onclick="document.getElementById('import-json-file').click()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#f8fafc;" title="Importer un fichier .json complété">
             <i class="fa-solid fa-upload"></i> Importer un fichier (.json)
@@ -389,8 +389,8 @@
             <p style="font-size:0.8rem; color:#64748b; margin:2px 0 0;">Gérez chaque journée et détaillez les visites et horaires précis.</p>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <button type="button" onclick="openPartnerEnrichModal()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" title="Enrichir uniquement les étapes du programme à partir du PDF d'un partenaire sans modifier vos hôtels, vols et contacts">
-              <i class="fa-solid fa-wand-magic-sparkles"></i> Enrichir via un PDF partenaire
+            <button type="button" onclick="openPartnerEnrichModal()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" title="Ajouter des détails aux visites du programme via un PDF complémentaire sans jamais modifier l'ordre des journées ni l'ordre des visites">
+              <i class="fa-solid fa-file-pdf"></i> PDF pour enrichir le texte du programme
             </button>
             <button type="button" onclick="addNewDay()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
               <i class="fa-solid fa-plus"></i> Ajouter un jour
@@ -841,11 +841,11 @@
       <div style="padding:16px 20px; background:#1e3a8a; color:white; display:flex; justify-content:space-between; align-items:center;">
         <div style="display:flex; align-items:center; gap:10px;">
           <div style="background:#3b82f6; width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:white;">
-            <i class="fa-solid fa-wand-magic-sparkles"></i>
+            <i class="fa-solid fa-file-pdf"></i>
           </div>
           <div>
-            <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:white;">Enrichir le programme via un PDF partenaire</h3>
-            <p style="margin:0; font-size:0.75rem; color:#bfdbfe;">Met à jour les descriptifs, visites et trajets sans toucher à vos hôtels, vols ni contacts Girardot</p>
+            <h3 style="margin:0; font-size:1.05rem; font-weight:800; color:white;">PDF pour enrichir le texte du programme</h3>
+            <p style="margin:0; font-size:0.75rem; color:#bfdbfe;">Ajoute des détails aux visites sans jamais modifier l'ordre des journées ni l'ordre des visites</p>
           </div>
         </div>
         <button type="button" onclick="closePartnerEnrichModal()" style="background:none; border:none; color:#bfdbfe; font-size:1.3rem; cursor:pointer;">&times;</button>
@@ -865,18 +865,18 @@
         <!-- Zone de dépôt / sélection fichier PDF partenaire -->
         <div id="partner-pdf-drop-zone" style="border:2px dashed #93c5fd; border-radius:14px; padding:24px 20px; text-align:center; background:white; cursor:pointer; margin-bottom:16px; transition:border-color 0.2s;" onclick="document.getElementById('partner-pdf-file-input').click()">
           <i class="fa-solid fa-file-pdf" style="font-size:2.4rem; color:#2563eb; margin-bottom:10px;"></i>
-          <h4 style="font-size:0.95rem; font-weight:800; color:#1e293b; margin:0 0 4px;">Glissez le PDF du partenaire ici ou cliquez pour choisir</h4>
-          <p style="font-size:0.78rem; color:#64748b; margin:0;">Exemple : Fiche technique réceptif, brochure Zen Asie, programme détaillé de l'agence locale.</p>
+          <h4 style="font-size:0.95rem; font-weight:800; color:#1e293b; margin:0 0 4px;">Glissez le PDF complémentaire ici ou cliquez pour choisir</h4>
+          <p style="font-size:0.78rem; color:#64748b; margin:0;">Exemple : Programme détaillé (ex: programme final-GI710x8.pdf), fiche technique réceptif ou brochure.</p>
           <input type="file" id="partner-pdf-file-input" accept=".pdf,application/pdf" style="display:none;" onchange="handlePartnerPdfFileSelected(event)">
         </div>
 
         <!-- Zone alternative : coller le texte -->
         <details style="margin-bottom:16px; background:white; border:1px solid #e2e8f0; border-radius:10px; padding:8px 12px;">
           <summary style="font-size:0.8rem; font-weight:700; color:#475569; cursor:pointer;">
-            <i class="fa-solid fa-paste"></i> Ou coller directement le texte du PDF partenaire
+            <i class="fa-solid fa-paste"></i> Ou coller directement le texte du PDF complémentaire
           </summary>
           <div style="margin-top:10px;">
-            <textarea id="partner-raw-text-input" class="form-control" rows="4" placeholder="Collez le texte du programme partenaire (JOUR 01, JOUR 02...)" style="font-size:0.8rem; font-family:inherit;"></textarea>
+            <textarea id="partner-raw-text-input" class="form-control" rows="4" placeholder="Collez le texte du programme complémentaire (JOUR 1, JOUR 2...)" style="font-size:0.8rem; font-family:inherit;"></textarea>
             <div style="display:flex; justify-content:flex-end; margin-top:8px;">
               <button type="button" onclick="parsePastedPartnerText()" class="btn-secondary" style="font-size:0.78rem; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;">
                 <i class="fa-solid fa-wand-magic-sparkles"></i> Analyser ce texte
@@ -893,44 +893,21 @@
           <!-- Garanties de sécurité -->
           <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:8px; margin-bottom:16px;">
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:8px 10px; font-size:0.75rem; color:#166534; font-weight:700; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-shield-halved"></i> Hôtels Girardot préservés
+              <i class="fa-solid fa-lock"></i> Ordre des journées conservé
             </div>
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:8px 10px; font-size:0.75rem; color:#166534; font-weight:700; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-shield-halved"></i> Vols & Contacts préservés
+              <i class="fa-solid fa-lock"></i> Ordre des visites conservé
             </div>
             <div style="background:#f0fdf4; border:1px solid #bbf7d0; border-radius:8px; padding:8px 10px; font-size:0.75rem; color:#166534; font-weight:700; display:flex; align-items:center; gap:6px;">
-              <i class="fa-solid fa-shield-halved"></i> Formalités préservées
-            </div>
-          </div>
-
-          <!-- Options de mise à jour -->
-          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:10px; padding:12px 14px; margin-bottom:14px;">
-            <div style="font-size:0.8rem; font-weight:800; color:#1e293b; margin-bottom:8px;">Éléments du programme à enrichir :</div>
-            <div style="display:flex; flex-direction:column; gap:6px; font-size:0.8rem; color:#334155;">
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="checkbox" id="chk-partner-desc" checked>
-                <span><strong>Descriptifs narratifs</strong> : Remplacer les résumés courts par les textes riches du partenaire (monuments, histoire, détails)</span>
-              </label>
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="checkbox" id="chk-partner-title" checked>
-                <span><strong>Titres de trajets</strong> : Mettre à jour avec les parcours & distances (ex: <em>Delhi - Mandawa (255 km - 5h)</em>)</span>
-              </label>
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="checkbox" id="chk-partner-visits" checked>
-                <span><strong>Découpage des visites</strong> : Générer automatiquement les visites / sous-étapes détectées dans le texte</span>
-              </label>
-              <label style="display:flex; align-items:center; gap:8px; cursor:pointer;">
-                <input type="checkbox" id="chk-partner-keep-highlights" checked>
-                <span><strong>Points forts / Thématiques</strong> : Conserver les thématiques déjà renseignées dans votre carnet</span>
-              </label>
+              <i class="fa-solid fa-shield-halved"></i> Hôtels, Vols & Contacts intacts
             </div>
           </div>
 
           <!-- Liste comparative Jour par Jour -->
           <h4 style="font-size:0.85rem; font-weight:800; color:#1e293b; margin:0 0 10px; display:flex; align-items:center; gap:6px;">
-            <i class="fa-solid fa-list-check" style="color:#2563eb;"></i> Comparatif des étapes détectées (<span id="partner-days-count">0</span> jours) :
+            <i class="fa-solid fa-list-check" style="color:#2563eb;"></i> Aperçu des visites enrichies (<span id="partner-days-count">0</span> jours analysés) :
           </h4>
-          <div id="partner-comparison-list" style="max-height:280px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; background:white; padding:8px;"></div>
+          <div id="partner-comparison-list" style="max-height:320px; overflow-y:auto; border:1px solid #e2e8f0; border-radius:8px; background:white; padding:8px;"></div>
         </div>
       </div>
 
