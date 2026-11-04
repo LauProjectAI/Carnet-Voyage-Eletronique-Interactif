@@ -973,6 +973,29 @@
       "phone": "03 85 42 82 50",
       "address": "Chalon-sur-Saône, France",
       "isEmergency": true
+    },
+    {
+      "category": "Assurance",
+      "name": "Assurever",
+      "phone": "+33 1 55 98 88 17",
+      "address": "Contrat n°6428592",
+      "isEmergency": false
+    },
+    {
+      "category": "Ambassade de France",
+      "name": "Ambassade de France au Mexique",
+      "phone": "+52 55 9171 9700",
+      "address": "Calle Campos Elíseos 339 Miguel Hidalgo, Mexico City",
+      "isEmergency": false,
+      "link": "https://mx.ambafrance.org"
+    },
+    {
+      "category": "Fil d'Ariane",
+      "name": "",
+      "phone": "",
+      "address": "",
+      "isEmergency": false,
+      "link": "https://fildariane.diplomatie.gouv.fr"
     }
   ],
   "driverDossier": {
