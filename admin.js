@@ -2160,9 +2160,63 @@ function renderAdminHotels() {
           <input type="number" step="any" id="hotel-lng-${index}" class="form-control" value="${hotel.lng || ''}" placeholder="Ex: 28.2045" oninput="updateHotelField(${index}, 'lng', parseFloat(this.value))" onchange="updateHotelField(${index}, 'lng', parseFloat(this.value))">
         </div>
       </div>
+
+      <!-- Encart Hôtel de Séjour (Présentation détaillée) -->
+      <div style="margin-top:14px; padding:12px 14px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px;">
+        <label style="display:flex; align-items:center; gap:8px; font-weight:800; color:#0369a1; cursor:pointer; font-size:0.88rem;">
+          <input type="checkbox" ${hotel.isStayHotel ? 'checked' : ''} onchange="toggleStayHotel(${index}, this.checked)">
+          <i class="fa-solid fa-umbrella-beach"></i> Hôtel de séjour (activer la fiche détaillée de présentation)
+        </label>
+        <div id="hotel-pres-box-${index}" style="margin-top:10px; display:${hotel.isStayHotel ? 'block' : 'none'};">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-sun"></i> Cadre & Ambiance (présentation générale) :</label>
+            <textarea class="form-control" rows="2" style="font-size:0.82rem;" placeholder="Cadre, situation bord de mer, ambiance familiale..." onchange="updateHotelPresentationField(${index}, 'intro', this.value)">${(hotel.presentation && hotel.presentation.intro) || ''}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-bed"></i> Les Chambres :</label>
+            <textarea class="form-control" rows="2" style="font-size:0.82rem;" placeholder="Équipements, climatisation, balcon/terrasse..." onchange="updateHotelPresentationField(${index}, 'chambres', this.value)">${(hotel.presentation && hotel.presentation.chambres) || ''}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-utensils"></i> Restauration :</label>
+            <textarea class="form-control" rows="2" style="font-size:0.82rem;" placeholder="Restaurant principal, buffets, spécialités..." onchange="updateHotelPresentationField(${index}, 'restauration', this.value)">${(hotel.presentation && hotel.presentation.restauration) || ''}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-champagne-glasses"></i> Formule Repas / Tout Inclus :</label>
+            <textarea class="form-control" rows="2" style="font-size:0.82rem;" placeholder="Accès aux bars, boissons incluses, snacks..." onchange="updateHotelPresentationField(${index}, 'formule', this.value)">${(hotel.presentation && hotel.presentation.formule) || ''}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-person-swimming"></i> Services, Sports & Loisirs :</label>
+            <textarea class="form-control" rows="2" style="font-size:0.82rem;" placeholder="Piscine, plage, tennis, spa, vélos..." onchange="updateHotelPresentationField(${index}, 'services', this.value)">${(hotel.presentation && hotel.presentation.services) || ''}</textarea>
+          </div>
+          <div class="form-group" style="margin-bottom:4px;">
+            <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-bell-concierge"></i> À votre disposition :</label>
+            <textarea class="form-control" rows="2" style="font-size:0.82rem;" placeholder="Wi-Fi, serviettes, transats, plage privée..." onchange="updateHotelPresentationField(${index}, 'disposition', this.value)">${(hotel.presentation && hotel.presentation.disposition) || ''}</textarea>
+          </div>
+        </div>
+      </div>
     `;
     container.appendChild(box);
   });
+}
+
+function toggleStayHotel(index, isChecked) {
+  if (!tripData.hotels[index]) return;
+  tripData.hotels[index].isStayHotel = isChecked;
+  if (isChecked && !tripData.hotels[index].presentation) {
+    tripData.hotels[index].presentation = { intro: "", chambres: "", restauration: "", formule: "", services: "", disposition: "" };
+  }
+  const box = document.getElementById(`hotel-pres-box-${index}`);
+  if (box) box.style.display = isChecked ? 'block' : 'none';
+  hasUnsavedChanges = true;
+  updateChangeBadge();
+}
+
+function updateHotelPresentationField(index, field, value) {
+  if (!tripData.hotels[index]) return;
+  if (!tripData.hotels[index].presentation) tripData.hotels[index].presentation = {};
+  tripData.hotels[index].presentation[field] = value;
+  hasUnsavedChanges = true;
+  updateChangeBadge();
 }
 
 function autoGeocodeHotel(index) {
@@ -5613,14 +5667,44 @@ const DESTINATION_CITY_COORDINATES = {
   "civitavecchia": { lat: 42.0924, lng: 11.7954, city: "Civitavecchia / Rome", country: "Italie" },
   "genes": { lat: 44.4056, lng: 8.9463, city: "Gênes", country: "Italie" },
   "naples": { lat: 40.8518, lng: 14.2681, city: "Naples", country: "Italie" },
+
+  // Pouilles & Italie du Sud (Séjours & Circuits)
+  "porto cesareo": { lat: 40.2612, lng: 17.8986, city: "Porto Cesareo", country: "Italie" },
+  "brindisi": { lat: 40.6327, lng: 17.9418, city: "Brindisi", country: "Italie" },
+  "bari": { lat: 41.1171, lng: 16.8719, city: "Bari", country: "Italie" },
+  "lecce": { lat: 40.3548, lng: 18.1724, city: "Lecce", country: "Italie" },
+  "alberobello": { lat: 40.7838, lng: 17.2412, city: "Alberobello", country: "Italie" },
+  "ostuni": { lat: 40.7290, lng: 17.5772, city: "Ostuni", country: "Italie" },
+  "monopoli": { lat: 40.9535, lng: 17.3032, city: "Monopoli", country: "Italie" },
+  "polignano a mare": { lat: 40.9964, lng: 17.2185, city: "Polignano a Mare", country: "Italie" },
+  "taranto": { lat: 40.4644, lng: 17.2470, city: "Tarente", country: "Italie" },
+  "tarente": { lat: 40.4644, lng: 17.2470, city: "Tarente", country: "Italie" },
+  "otranto": { lat: 40.1479, lng: 18.4907, city: "Otrante", country: "Italie" },
+  "otrante": { lat: 40.1479, lng: 18.4907, city: "Otrante", country: "Italie" },
+  "gallipoli": { lat: 40.0558, lng: 17.9926, city: "Gallipoli", country: "Italie" },
+  "matera": { lat: 40.6664, lng: 16.6043, city: "Matera", country: "Italie" },
+  "pouilles": { lat: 40.8500, lng: 16.8500, city: "Pouilles", country: "Italie" },
+  "trani": { lat: 41.2727, lng: 16.4172, city: "Trani", country: "Italie" },
+  "vieste": { lat: 41.8825, lng: 16.1750, city: "Vieste", country: "Italie" },
+  "castel del monte": { lat: 41.0847, lng: 16.2708, city: "Castel del Monte", country: "Italie" },
   "geneve": { lat: 46.2044, lng: 6.1432, city: "Genève", country: "Suisse" },
   "marseille": { lat: 43.2965, lng: 5.3698, city: "Marseille", country: "France", isFrenchTransit: true },
   "lyon": { lat: 45.7640, lng: 4.8357, city: "Lyon", country: "France", isFrenchTransit: true },
-  "paris": { lat: 48.8566, lng: 2.3522, city: "Paris", country: "France", isFrenchTransit: true }
+  "paris": { lat: 48.8566, lng: 2.3522, city: "Paris", country: "France", isFrenchTransit: true },
+  "dole jura": { lat: 47.0425, lng: 5.4286, city: "Dole Jura", country: "France", isFrenchTransit: true },
+  "dole": { lat: 47.0425, lng: 5.4286, city: "Dole Jura", country: "France", isFrenchTransit: true }
 };
 
 // Coordonnées officielles des Ambassades de France par pays de destination
 const FRENCH_EMBASSIES_BY_COUNTRY = {
+  "Italie": {
+    category: "Ambassade de France en Italie",
+    name: "Palais Farnèse, Piazza Farnese 67, 00186 Rome",
+    phone: "+39 06 68 60 11",
+    address: "Urgences consulaires : +39 335 607 7298 • Consulats à Milan et Naples • Site : https://it.ambafrance.org",
+    link: "https://it.ambafrance.org",
+    isEmergency: true
+  },
   "Pérou": {
     category: "Ambassade de France au Pérou",
     name: "Avenida Arequipa 3415, San Isidro, Lima 27",
@@ -5928,6 +6012,14 @@ function resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranc
     // Fallback dans la description si le titre ne contenait aucun lieu reconnu
     if (!chosenCoord && d.description) {
       chosenCoord = matchCoordInSegment(d.description, sortedKeys, isDomesticFranceTrip, primaryCountry);
+    }
+
+    // Fallback Hôtel de séjour pour les journées libres / séjour sans étape de transit
+    if (!chosenCoord && typeof tripData !== 'undefined' && tripData && tripData.hotels && tripData.hotels.length > 0) {
+      const stayH = tripData.hotels.find(h => h.city && h.lat && h.lng && (h.isStayHotel || tripData.hotels.length === 1));
+      if (stayH) {
+        chosenCoord = { city: stayH.city, lat: stayH.lat, lng: stayH.lng };
+      }
     }
 
     if (chosenCoord) {
@@ -6888,6 +6980,7 @@ function processExtractedTextToTrip(text, sourceName) {
   let currentDay = null;
   const dayHeaderRegex = /^(?:Jour|J)\s*(\d{1,2})\b(?:\s*[•:\-–—."'«»]\s*(.*)|\s+(.+))?$/i;
   const altDayRegex = /^(?:1er|\d{1,2}(?:er|[eè]me)?)\s+jour\b(?:\s*[•:\-–—."'«»]\s*(.*)|\s+(.+))?$/i;
+  const rangeDayRegex = /^(?:Jours?|J)\s*(\d{1,2})\s*(?:[àa]|au|-|–|—|\bet\b)\s*(\d{1,2})\b(?:\s*[•:\-–—."'«»]\s*(.*)|\s+(.+))?$/i;
 
   const endOfItineraryKeywords = [
     "coordonnées de vos hôtels", "coordonnees de vos hotels",
@@ -6909,24 +7002,37 @@ function processExtractedTextToTrip(text, sourceName) {
       }
     }
 
-    let matchDay = line.match(dayHeaderRegex);
+    const matchRange = line.match(rangeDayRegex);
+    let matchDay = !matchRange ? line.match(dayHeaderRegex) : null;
     let dayNum = 0;
     let dayTitle = "";
+    let isRangeBlock = false;
+    let rangeStart = 0;
+    let rangeEnd = 0;
 
-    // Éviter le faux positif "Jour consacré à l'acheminement..."
-    if (matchDay && !matchDay[2] && matchDay[3] && /^consacr[ée]/i.test(matchDay[3].trim())) {
-      matchDay = null;
-    }
-
-    if (matchDay) {
-      dayNum = parseInt(matchDay[1], 10);
-      dayTitle = (matchDay[2] || matchDay[3] || "").trim();
+    if (matchRange) {
+      isRangeBlock = true;
+      rangeStart = parseInt(matchRange[1], 10);
+      rangeEnd = parseInt(matchRange[2], 10);
+      dayNum = rangeStart;
+      dayTitle = (matchRange[3] || matchRange[4] || "Séjour").trim();
+      matchDay = matchRange;
     } else {
-      const matchAlt = line.match(altDayRegex);
-      if (matchAlt) {
-        dayNum = parseInt(matchAlt[0].match(/\d+/)?.[0] || "1", 10);
-        dayTitle = (matchAlt[1] || matchAlt[2] || "").trim();
-        matchDay = matchAlt;
+      // Éviter le faux positif "Jour consacré à l'acheminement..."
+      if (matchDay && !matchDay[2] && matchDay[3] && /^consacr[ée]/i.test(matchDay[3].trim())) {
+        matchDay = null;
+      }
+
+      if (matchDay) {
+        dayNum = parseInt(matchDay[1], 10);
+        dayTitle = (matchDay[2] || matchDay[3] || "").trim();
+      } else {
+        const matchAlt = line.match(altDayRegex);
+        if (matchAlt) {
+          dayNum = parseInt(matchAlt[0].match(/\d+/)?.[0] || "1", 10);
+          dayTitle = (matchAlt[1] || matchAlt[2] || "").trim();
+          matchDay = matchAlt;
+        }
       }
     }
 
@@ -6963,6 +7069,9 @@ function processExtractedTextToTrip(text, sourceName) {
         : { title: dayTitle, extraDesc: "" };
 
       currentDay = {
+        isRange: isRangeBlock,
+        startDay: rangeStart,
+        endDay: rangeEnd,
         day: dayNum,
         title: separated.title || `Étape Jour ${dayNum}`,
         city: "",
@@ -7006,6 +7115,80 @@ function processExtractedTextToTrip(text, sourceName) {
     delete d.rawLinesOfDay;
   });
 
+  // RÈGLE UNIVERSELLE : Déployer les blocs multi-jours (ex: Jours 2 à 7 • Séjour) en journées individuelles
+  // et garantir la totalité absolue des jours du voyage (comblement de tout jour vide ou manquant).
+  // "Quelques soient le voyage, tu dois toujours proposer la totalité des jours du voyage, même si tu n'as rien d'inclus dans les journées.
+  // Indique tous les jours, et indique 'journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme'. La conciergerie prendra la suite."
+  const expandedItinerary = [];
+  itinerary.forEach(d => {
+    if (d.isRange && d.startDay && d.endDay && d.endDay >= d.startDay) {
+      const baseDesc = d.description || "";
+      for (let dayIdx = d.startDay; dayIdx <= d.endDay; dayIdx++) {
+        expandedItinerary.push({
+          day: dayIdx,
+          title: d.title ? (d.title.toLowerCase().startsWith('jour') ? d.title : `Jour ${dayIdx} • ${d.title}`) : `Jour ${dayIdx} • Séjour`,
+          city: d.city || "",
+          lat: d.lat || null,
+          lng: d.lng || null,
+          highlight: "",
+          description: "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme." + (baseDesc ? " " + baseDesc : ""),
+          extractedHotel: d.extractedHotel || null,
+          image: d.image || "",
+          weather: "",
+          dateStr: `Jour ${dayIdx}`,
+          timeline: [{
+            time: "",
+            title: "Journée libre",
+            subtitle: "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme"
+          }]
+        });
+      }
+    } else {
+      expandedItinerary.push(d);
+    }
+  });
+
+  // Calcul du nombre total de jours réels du voyage
+  let maxDayFound = expandedItinerary.reduce((max, d) => Math.max(max, d.day || 0), 0);
+  if (detectedDates) {
+    const datesDiffMatch = detectedDates.match(/(\d{1,2})\s+(?:au|[-–—])\s+(\d{1,2})\s+([a-zà-ÿ]+)\s+(\d{4})/i);
+    if (datesDiffMatch) {
+      const d1 = parseInt(datesDiffMatch[1], 10);
+      const d2 = parseInt(datesDiffMatch[2], 10);
+      if (d2 > d1 && (d2 - d1 + 1) > maxDayFound && (d2 - d1 + 1) <= 35) {
+        maxDayFound = d2 - d1 + 1;
+      }
+    }
+  }
+
+  // Combler les éventuels jours manquants entre 1 et maxDayFound
+  for (let dayIdx = 1; dayIdx <= maxDayFound; dayIdx++) {
+    if (!expandedItinerary.find(d => d.day === dayIdx)) {
+      expandedItinerary.push({
+        day: dayIdx,
+        title: `Jour ${dayIdx} • Journée libre`,
+        city: "",
+        lat: null,
+        lng: null,
+        highlight: "",
+        description: "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme.",
+        extractedHotel: null,
+        image: "",
+        weather: "",
+        dateStr: `Jour ${dayIdx}`,
+        timeline: [{
+          time: "",
+          title: "Journée libre",
+          subtitle: "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme"
+        }]
+      });
+    }
+  }
+
+  expandedItinerary.sort((a, b) => a.day - b.day);
+  itinerary.length = 0;
+  itinerary.push(...expandedItinerary);
+
   // Déterminer si le voyage se déroule en France métropolitaine (ex: Pyrénées) ou à l'étranger, et identifier le pays de destination principal
   const sortedCoordsKeys = Object.keys(DESTINATION_CITY_COORDINATES).sort((a, b) => b.length - a.length);
   const fullItineraryTitlesText = normStr(detectedTitle + " " + detectedSubtitle + " " + itinerary.map(d => d.title).join(" "));
@@ -7033,8 +7216,17 @@ function processExtractedTextToTrip(text, sourceName) {
 
   // Extraire les visites à titres courts (Règle 4) et résoudre les villes étapes & GPS (Règles 2 & 3)
   itinerary.forEach(d => {
-    d.timeline = extractVisitsFromDay(d.description, d.title);
-    d.description = d.description.replace(/\r?\n/g, " ").replace(/\s{2,}/g, " ").trim();
+    if (!d.timeline || d.timeline.length === 0) {
+      d.timeline = extractVisitsFromDay(d.description, d.title);
+    }
+    if (!d.timeline || d.timeline.length === 0) {
+      d.timeline = [{
+        time: "",
+        title: "Journée libre",
+        subtitle: "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme"
+      }];
+    }
+    d.description = (d.description || "").replace(/\r?\n/g, " ").replace(/\s{2,}/g, " ").trim();
   });
   resolveItineraryCitiesAndCoords(itinerary, flightsList, isDomesticFranceTrip, primaryDestinationCountry);
 
@@ -7067,15 +7259,55 @@ function processExtractedTextToTrip(text, sourceName) {
       }
     }
 
+    // Détection des rubriques de présentation détaillée d'un hôtel de séjour (resort / club / séjour balnéaire)
+    const sectionPatterns = [
+      { key: 'chambres', regex: /^les\s+chambres\b/i },
+      { key: 'restauration', regex: /^restauration\b/i },
+      { key: 'formule', regex: /^(?:la\s+)?formule\s+(?:tout\s+(?:compris|inclus)|pension|demi-pension)\b/i },
+      { key: 'services', regex: /^services?\s*(?:et|&)\s*loisirs\b/i },
+      { key: 'disposition', regex: /^[àa]\s*votre\s*disposition\b/i },
+      { key: 'animation', regex: /^animation\b/i },
+      { key: 'situation', regex: /^situation\b/i },
+      { key: 'plage', regex: /^plage\b/i }
+    ];
+
     let addressParts = [];
     let phone = "";
+    let currentSectionKey = null;
+    const presentation = {
+      intro: "",
+      chambres: "",
+      restauration: "",
+      formule: "",
+      services: "",
+      disposition: ""
+    };
 
     for (let j = startAddrIdx; j < bLines.length; j++) {
-      const l = bLines[j];
-      if (/^t[ée]l\.?\s*:/i.test(l)) {
-        phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+      let l = bLines[j];
+
+      // Vérifier si cette ligne inaugure une rubrique descriptive de l'hôtel
+      const matchedSec = sectionPatterns.find(p => p.regex.test(l));
+      if (matchedSec) {
+        currentSectionKey = matchedSec.key;
+        let content = l.replace(matchedSec.regex, '').replace(/^[:\s-]+/, '').trim();
+        if (content) {
+          presentation[currentSectionKey] = (presentation[currentSectionKey] ? presentation[currentSectionKey] + " " : "") + content;
+        }
+        continue;
+      }
+
+      if (currentSectionKey) {
+        l = l.replace(/^[:\s-]+/, '').trim();
+        if (l) {
+          presentation[currentSectionKey] = (presentation[currentSectionKey] ? presentation[currentSectionKey] + " " : "") + l;
+        }
       } else {
-        addressParts.push(l);
+        if (/^t[ée]l\.?\s*:/i.test(l)) {
+          phone = l.replace(/^t[ée]l\.?\s*:\s*/i, '').trim();
+        } else {
+          addressParts.push(l);
+        }
       }
     }
 
@@ -7127,6 +7359,8 @@ function processExtractedTextToTrip(text, sourceName) {
       detectedCity = matchedCoord.city;
     }
 
+    const hasPresentation = Object.values(presentation).some(v => v.length > 0);
+
     return {
       name: hotelName,
       dates: datesStay || "",
@@ -7135,7 +7369,9 @@ function processExtractedTextToTrip(text, sourceName) {
       phone: phone,
       lat: lat,
       lng: lng,
-      notes: ""
+      notes: "",
+      isStayHotel: hasPresentation,
+      presentation: hasPresentation ? presentation : null
     };
   }
 
@@ -7217,6 +7453,21 @@ function processExtractedTextToTrip(text, sourceName) {
     });
   } else {
     itinerary.forEach(d => { delete d.extractedHotel; });
+  }
+
+  // Remplir la présentation d'introduction de l'hôtel de séjour si trouvée dans le descriptif de séjour
+  if (hotels && hotels.length > 0) {
+    hotels.forEach(h => {
+      if (h.presentation && !h.presentation.intro) {
+        const stayDay = itinerary.find(d => d.description && /(?:équipe d'animation|accueille dans cet hôtel|offre tout le confort|situé à seulement)/i.test(d.description));
+        if (stayDay) {
+          const introMatch = stayDay.description.match(/(?:Votre équipe[^\r\n.]*|Cet hôtel[^\r\n.]*)[\s\S]*?(?:ambiance familiale|vacances aux couleurs d'azur|[.!])/i);
+          if (introMatch) {
+            h.presentation.intro = introMatch[0].replace(/^Séjour en[^\r\n.]*\.\s*/i, '').trim();
+          }
+        }
+      }
+    });
   }
 
   // =========================================================================

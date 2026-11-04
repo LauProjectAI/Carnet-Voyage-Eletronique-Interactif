@@ -732,6 +732,12 @@ function renderTodayFocus() {
             </button>
           ` : ''}
 
+          ${/libre/i.test(entry.title) ? `
+            <button class="btn-entry-gps" style="background:linear-gradient(135deg, #0284c7, #0369a1); color:white; border:none; cursor:pointer;" onclick="switchMainTab('tab-conciergerie')">
+              <i class="fa-solid fa-bell-concierge"></i> Conciergerie & Idées
+            </button>
+          ` : ''}
+
           <button class="btn-entry-note" onclick="quickAddPhotoForEntry('${entry.title}')">
             <i class="fa-solid fa-camera"></i> Souvenir
           </button>
@@ -3389,14 +3395,96 @@ function renderHotelsAndFlights() {
     `;
     currentTrip.hotels.forEach(h => {
       const el = document.createElement('div');
-      el.style = "background:white; border-radius:16px; border:1px solid var(--border-light); padding:14px; margin-bottom:10px;";
       const gpsUrl = (h.lat && h.lng) ? getGpsUrl(h.lat, h.lng, h.name) : '#';
-      el.innerHTML = `
-        <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800;">${h.dates || h.date || h.day || ""}</div>
-        <div style="font-size:0.95rem; font-weight:800; color:var(--text-main);">${h.name}</div>
-        <div style="font-size:0.8rem; color:#64748b; margin:2px 0 6px;">${h.address}</div>
-        <a href="${gpsUrl}" target="_blank" class="btn-entry-gps"><i class="fa-solid fa-location-arrow"></i> GPS Hébergement</a>
-      `;
+      const isStay = h.isStayHotel || (h.presentation && Object.values(h.presentation).some(v => v));
+      const cleanPhone = (h.phone || '').replace(/[^0-9+]/g, '');
+
+      if (isStay && h.presentation) {
+        const p = h.presentation;
+        el.className = 'stay-hotel-card';
+        el.style = "background:white; border-radius:18px; border:1px solid #bae6fd; padding:18px; margin-bottom:16px; box-shadow:0 4px 16px rgba(2,132,199,0.08);";
+        el.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; flex-wrap:wrap; gap:8px;">
+            <div>
+              <span style="display:inline-flex; align-items:center; gap:6px; font-size:0.75rem; font-weight:800; text-transform:uppercase; letter-spacing:0.5px; background:linear-gradient(135deg, #0284c7, #0369a1); color:white; padding:4px 12px; border-radius:20px; box-shadow:0 2px 6px rgba(2,132,199,0.25);">
+                <i class="fa-solid fa-umbrella-beach"></i> Votre Hôtel de Séjour
+              </span>
+              <h4 style="font-size:1.15rem; font-weight:800; color:var(--primary-dark); margin:8px 0 4px;">${h.name}</h4>
+              <div style="font-size:0.82rem; color:#475569; display:flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-location-dot" style="color:var(--accent-gold);"></i> ${h.address}
+              </div>
+            </div>
+            ${(h.dates || h.date) ? `
+              <div style="background:#f0f9ff; border:1px solid #bae6fd; border-radius:8px; padding:4px 10px; font-size:0.78rem; font-weight:700; color:#0369a1;">
+                <i class="fa-solid fa-calendar-days" style="margin-right:4px;"></i> ${h.dates || h.date}
+              </div>
+            ` : ''}
+          </div>
+
+          <div style="display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap;">
+            <a href="${gpsUrl}" target="_blank" class="btn-entry-gps" style="background:var(--primary-color); color:white; padding:6px 14px; font-size:0.8rem; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+              <i class="fa-solid fa-location-arrow"></i> Itinéraire GPS
+            </a>
+            ${cleanPhone ? `
+              <a href="tel:${cleanPhone}" class="btn-entry-gps" style="background:#0284c7; color:white; padding:6px 14px; font-size:0.8rem; border-radius:8px; text-decoration:none; display:inline-flex; align-items:center; gap:6px;">
+                <i class="fa-solid fa-phone"></i> ${h.phone}
+              </a>
+            ` : ''}
+          </div>
+
+          ${p.intro ? `
+            <div style="background:#f8fafc; border-radius:12px; padding:12px 14px; margin-bottom:12px; font-size:0.84rem; color:#334155; line-height:1.5; border-left:4px solid var(--accent-gold);">
+              <div style="font-weight:700; color:var(--primary-dark); font-size:0.86rem; margin-bottom:3px;"><i class="fa-solid fa-sun" style="color:var(--accent-gold); margin-right:5px;"></i> Cadre & Ambiance</div>
+              ${p.intro}
+            </div>
+          ` : ''}
+
+          <div style="display:grid; grid-template-columns:1fr; gap:10px;">
+            ${p.chambres ? `
+              <div style="background:#f8fafc; border-radius:12px; padding:12px 14px; border-left:4px solid #0284c7;">
+                <div style="font-weight:700; color:#0369a1; font-size:0.85rem; margin-bottom:3px;"><i class="fa-solid fa-bed" style="margin-right:5px;"></i> Les Chambres</div>
+                <div style="font-size:0.82rem; color:#334155; line-height:1.45;">${p.chambres}</div>
+              </div>
+            ` : ''}
+
+            ${p.restauration ? `
+              <div style="background:#fdf2f8; border-radius:12px; padding:12px 14px; border-left:4px solid #db2777;">
+                <div style="font-weight:700; color:#9d174d; font-size:0.85rem; margin-bottom:3px;"><i class="fa-solid fa-utensils" style="margin-right:5px;"></i> Restauration</div>
+                <div style="font-size:0.82rem; color:#334155; line-height:1.45;">${p.restauration}</div>
+              </div>
+            ` : ''}
+
+            ${p.formule ? `
+              <div style="background:#fffbeb; border-radius:12px; padding:12px 14px; border-left:4px solid #d97706;">
+                <div style="font-weight:700; color:#92400e; font-size:0.85rem; margin-bottom:3px;"><i class="fa-solid fa-champagne-glasses" style="margin-right:5px;"></i> Formule Tout Compris & Boissons</div>
+                <div style="font-size:0.82rem; color:#334155; line-height:1.45;">${p.formule}</div>
+              </div>
+            ` : ''}
+
+            ${p.services ? `
+              <div style="background:#f0fdf4; border-radius:12px; padding:12px 14px; border-left:4px solid #16a34a;">
+                <div style="font-weight:700; color:#166534; font-size:0.85rem; margin-bottom:3px;"><i class="fa-solid fa-person-swimming" style="margin-right:5px;"></i> Services, Sports & Loisirs</div>
+                <div style="font-size:0.82rem; color:#334155; line-height:1.45;">${p.services}</div>
+              </div>
+            ` : ''}
+
+            ${p.disposition ? `
+              <div style="background:#f5f3ff; border-radius:12px; padding:12px 14px; border-left:4px solid #7c3aed;">
+                <div style="font-weight:700; color:#5b21b6; font-size:0.85rem; margin-bottom:3px;"><i class="fa-solid fa-bell-concierge" style="margin-right:5px;"></i> À votre disposition</div>
+                <div style="font-size:0.82rem; color:#334155; line-height:1.45;">${p.disposition}</div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      } else {
+        el.style = "background:white; border-radius:16px; border:1px solid var(--border-light); padding:14px; margin-bottom:10px;";
+        el.innerHTML = `
+          <div style="font-size:0.75rem; color:var(--accent-gold); font-weight:800;">${h.dates || h.date || h.day || ""}</div>
+          <div style="font-size:0.95rem; font-weight:800; color:var(--text-main);">${h.name}</div>
+          <div style="font-size:0.8rem; color:#64748b; margin:2px 0 6px;">${h.address}</div>
+          <a href="${gpsUrl}" target="_blank" class="btn-entry-gps"><i class="fa-solid fa-location-arrow"></i> GPS Hébergement</a>
+        `;
+      }
       hotelsContainer.appendChild(el);
     });
   }

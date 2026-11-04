@@ -858,3 +858,45 @@ Double chantier stratégique : fiabilisation absolue du connecteur de publicatio
      - Test de non-régression validé sur circuit synthétique en Inde : « Dunes de Sam » est parfaitement résolu lorsque le circuit concerne l'Inde et mentionne expressément les dunes.
   5. **Mise à jour PWA & Cache** :
      - Version du cache Service Worker incrémentée à `carnet-girardot-v21` dans [sw.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).
+
+#### Demande n°115 — *04/11/2026 17:35:00*
+> **Demande Utilisateur :**  
+> *« Quelques soient le voyage, tu dois toujours proposer la totalité des jours du voyage, même si tu n'as rien d'inclus dans les journées. En partant de l'exemple "Séjour dans les Pouilles", carnet en pièce jointe, le programme ne propose aucune visite des jours 2 au jours 7. Indique tous les jours, et indique "journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme". La conciergerie prendra la suite. Prévoir, dans la partie hébergement, un encart pour présenter l'hôtel quand il s'agit d'un hôtel de séjour. »*
+
+* **Analyse & Diagnostics :**
+  1. **Disparition des jours sans visites (ex: Jours 2 à 7)** :
+     - Les carnets de type *Séjour* (ex: *Séjour dans les Pouilles - Envol Dole Jura*) regroupent fréquemment les journées de détente sous une mention collective (*« Jours 2 à 7 • Séjour »*).
+     - Le parseur n'interprétait que des numéros de jours unitaires, ignorant le bloc ou laissant un vide béant de 6 jours entre le Jour 1 et le Jour 8.
+  2. **Pollution de l'adresse de l'hôtel par les rubriques de présentation** :
+     - Dans les brochures de séjour, les pages hébergement décrivent en détail le resort (*Les chambres :*, *Restauration :*, *La formule tout compris*, *Services et Loisirs :*, *À votre disposition :*).
+     - Ces descriptifs étaient concaténés à tort dans la chaîne de l'adresse de l'hôtel, rendant l'adresse illisible et empêchant la détection de la ville et des coordonnées GPS réelles.
+
+* **Actions Réalisées :**
+  1. **Règle d'or universelle : Totalité absolue des jours du voyage garantie (100% sans exception)** :
+     - Détection des plages de journées multi-jours via regex `rangeDayRegex` (`Jours? X à Y • Titre`).
+     - Déploiement automatique en journées individuelles (du jour X au jour Y) avec préservation du descriptif de séjour.
+     - Algorithme de comblement universel (*Gap Filling*) : calcul du nombre total de jours du voyage (d'après le retour de vol, les dates du séjour ou les en-têtes) et création systématique de toute journée manquante.
+     - Pour chaque journée libre sans visite imposée :
+       - Titre de visite : **« Journée libre »**
+       - Sous-titre : **« Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme »**
+       - Bouton d'action directe dans l'application : **« Conciergerie & Idées »** permettant au voyageur de basculer instantanément sur l'onglet Conciergerie.
+  2. **Encart de présentation de l'Hôtel de Séjour (Hébergement)** :
+     - Séparation stricte dans `buildHotelObject` ([admin.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js)) entre l'adresse physique réelle et les rubriques de présentation.
+     - Extraction structurée dans `hotel.presentation` :
+       - **Cadre & Ambiance** (intro générale du resort)
+       - **Les Chambres**
+       - **Restauration**
+       - **Formule Repas / Tout Inclus**
+       - **Services, Sports & Loisirs** (piscines, spa, vélos, tennis...)
+       - **À votre disposition** (plage privée, transats, Wi-Fi...)
+     - Rendu visuel d'exception dans [app.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/app.js) (`renderHotelsAndFlights`) : création d'une carte dédiée avec badge doré/bleu *« Votre Hôtel de Séjour »*, boutons GPS et d'appel direct, et mise en valeur par cartes colorées pour chaque espace de l'hôtel.
+     - Contrôle et édition complète dans [admin.html](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.html) et [admin.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js) (`renderAdminHotels`) avec case à cocher *« Hôtel de séjour (activer la fiche détaillée de présentation) »* et zones de texte éditables.
+  3. **Référentiel Pouilles & Italie** :
+     - Ajout des coordonnées géographiques des Pouilles dans `DESTINATION_CITY_COORDINATES` (*Porto Cesareo, Brindisi, Bari, Lecce, Alberobello, Ostuni, Monopoli, Polignano a Mare, Tarente, Otrante, Gallipoli, Matera, etc.*).
+     - Ajout de l'aéroport de transit français *Dole Jura* (`isFrenchTransit: true`).
+     - Ajout de l'Ambassade de France en Italie (Rome - Palais Farnèse, urgences consulaires et site web) dans `FRENCH_EMBASSIES_BY_COUNTRY`.
+  4. **Validation sur circuit séjour Pouilles & non-régression multi-circuits** :
+     - *Séjour dans les Pouilles* : exactement 8 jours créés (J1 Brindisi, J2 à J7 Séjour à Porto Cesareo avec journées libres, J8 Brindisi), hôtel Tops Club Baiamalva Resort 4**** NL géolocalisé avec encart complet de présentation.
+     - Non-régression validée sur *Pérou* (12 jours), *Canada Gaspésie* (12 jours), *USA Canada* (12 jours) et *Mexique* (14 jours).
+  5. **Mise à jour PWA & Cache** :
+     - Version du cache Service Worker incrémentée à `carnet-girardot-v22` dans [sw.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).
