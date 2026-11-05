@@ -5606,7 +5606,7 @@ function extractDestinationPracticalInfoFromText(text) {
           cleanTitle = "Douanes & Franchises";
         } else if (/formalit[ée]/i.test(rawTitle)) {
           icon = "file-shield";
-          cleanTitle = "Formalités";
+          cleanTitle = "Formalités (Conseils généraux)";
         } else if (/s[ûu]ret[ée]/i.test(rawTitle)) {
           icon = "shield-halved";
           cleanTitle = "Sûreté aéroportuaire";
@@ -5621,6 +5621,25 @@ function extractDestinationPracticalInfoFromText(text) {
     }
   }
 
+  // 4. bis FORMALITÉS INDISPENSABLES DU CARNET (Passeport, Visas, Déclarations, Liens officiels)
+  const formalitesFullMatch = text.match(/(?:^|\n)\s*(?:Formalit[ée]s\s+(?:indispensables|d['’]entr[ée]e|administratives|sanitaires)?|Mise [àa] jour des formalit[ée]s)\s*[:–-]?\s*\n+([\s\S]*?)(?=(?:^|\n)\s*(?:Bon [àa] savoir|Inclus|Assurance multirisque|Quelques conseils|Nos partenaires|Tarifs|Conditions|$))/i);
+  if (formalitesFullMatch) {
+    let fText = formalitesFullMatch[1].trim()
+      .replace(/---\s*PAGE\s*\d+\s*---/gi, '')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+    fText = fText.replace(/\bEntre\s+120\s+et\s+4\s+jours\s+avant\s+l'arrivée[\s\S]*?demande\s+de\s+Visa\s*:\s*/i, "Entre 120 et 4 jours avant l'arrivée vous devez donc faire votre demande de Visa : ");
+    if (fText.length > 5) {
+      tipsList.unshift({
+        title: "Formalités indispensables (Passeport & Visas)",
+        icon: "passport",
+        content: fText
+      });
+      practicalInfo.formalities = fText;
+    }
+  }
+
   // 5. SECTIONS CLASSIQUES DE DESTINATION (Monnaie, Électricité, etc.)
   const sections = [
     { title: "Monnaie & Devises", icon: "coins", field: "money", patterns: [/(?:^|\n)\s*Monnaie(?:\s*nationale|\s*locale)?\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i, /(?:^|\n)\s*Devises?\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] },
@@ -5630,8 +5649,7 @@ function extractDestinationPracticalInfoFromText(text) {
     { title: "Vêtements & Valise", icon: "suitcase-rolling", field: "clothing", patterns: [/(?:^|\n)\s*Valise\s*\n+([^\n]+(?:\n[^\n]+){0,5})/i, /(?:^|\n)\s*V[êe]tements?(?:\s*conseill[ée]s)?\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
     { title: "Pourboires", icon: "hand-holding-dollar", field: "tips", patterns: [/(?:^|\n)\s*Pourboires?\s*\n+(?:Suggestions pour les pourboires\s*:\s*)?([^\n]+(?:\n[^\n]+){0,4})/i] },
     { title: "Santé & Alimentation", icon: "shield-heart", field: "health", patterns: [/(?:^|\n)\s*Sant[ée]\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i, /(?:^|\n)\s*Cuisine\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
-    { title: "Téléphone & Réseau", icon: "phone", field: "phone", patterns: [/(?:^|\n)\s*T[ée]l[ée]phone\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] },
-    { title: "Formalités d'entrée", icon: "passport", field: "formalities", patterns: [/(?:^|\n)\s*Formalit[ée]s(?:\s*indispensables)?\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] }
+    { title: "Téléphone & Réseau", icon: "phone", field: "phone", patterns: [/(?:^|\n)\s*T[ée]l[ée]phone\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] }
   ];
 
   sections.forEach(sec => {
@@ -7924,21 +7942,29 @@ function processExtractedTextToTrip(text, sourceName) {
   // =========================================================================
   // 7. FORMALITÉS PRINCIPALES (ALERT)
   // =========================================================================
-  const formalitesMatch = text.match(/Formalit[ée]s indispensables\s*[:–-]?\s*\n+([\s\S]*?)(?=(?:\n\s*(?:Bon [àa] savoir|Inclus|Assurance multirisque|\d{2}\/\d{2}\/\d{4})|$))/i);
+  const formalitesMatch = text.match(/(?:^|\n)\s*(?:Formalit[ée]s\s+(?:indispensables|d['’]entr[ée]e|administratives|sanitaires)?|Mise [àa] jour des formalit[ée]s)\s*[:–-]?\s*\n+([\s\S]*?)(?=(?:^|\n)\s*(?:Bon [àa] savoir|Inclus|Assurance multirisque|Quelques conseils|Nos partenaires|Tarifs|Conditions|$))/i);
   let formalitiesText = formalitesMatch ? formalitesMatch[1].trim() : "";
-  formalitiesText = formalitiesText
-    .replace(/---\s*PAGE\s*\d+\s*---/gi, '')
-    .replace(/\r?\n+/g, ' ')
-    .replace(/\s{2,}/g, ' ')
-    .trim();
+  if (formalitiesText) {
+    formalitiesText = formalitiesText
+      .replace(/---\s*PAGE\s*\d+\s*---/gi, '')
+      .replace(/[ \t]+\n/g, '\n')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+
+    // Rapprochement des lignes verticalisées lors de l'extraction PDF (ex: mots isolés sur plusieurs lignes)
+    formalitiesText = formalitiesText.replace(/\bEntre\s+120\s+et\s+4\s+jours\s+avant\s+l'arrivée[\s\S]*?demande\s+de\s+Visa\s*:\s*/i, "Entre 120 et 4 jours avant l'arrivée vous devez donc faire votre demande de Visa : ");
+  }
 
   let formalitiesLink = "";
   if (formalitiesText) {
-    const urlInForm = formalitiesText.match(/https?:\/\/[^\s)]+/i) || formalitiesText.match(/\b(?:[a-z0-9-]+\.)+(?:gov|gouv|gc|org|com|ca|us|in|za)(?:\/[^\s.,)]*)?/i);
-    if (urlInForm) {
-      let rawUrl = urlInForm[0].replace(/[.,;]+$/, '');
-      if (!/^https?:\/\//i.test(rawUrl)) rawUrl = 'https://' + rawUrl;
-      formalitiesLink = rawUrl;
+    const urlMatches = [...formalitiesText.matchAll(/https?:\/\/[^\s"'<>]+/gi)].map(m => m[0].replace(/[.,;)]+$/, ''));
+    if (urlMatches.length > 0) {
+      formalitiesLink = urlMatches[0];
+    } else {
+      const govMatch = formalitiesText.match(/\b(?:[a-z0-9-]+\.)+(?:gov|gouv|gc|org|com|ca|us|in|za)(?:\/[^\s.,)]*)?/i);
+      if (govMatch) {
+        formalitiesLink = 'https://' + govMatch[0].replace(/[.,;]+$/, '');
+      }
     }
   }
 

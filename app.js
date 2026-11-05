@@ -3547,14 +3547,34 @@ function renderHotelsAndFlights() {
 
 function renderContactsAndAlert() {
   const alertBox = document.getElementById('alert-banner-box');
-  if (currentTrip.alert && currentTrip.alert.title) {
-    alertBox.innerHTML = `
-      <div style="background:#fffbeb; border:1px solid #fef3c7; border-left:4px solid #d97706; border-radius:14px; padding:14px; margin-bottom:16px;">
-        <h4 style="font-size:0.9rem; font-weight:800; color:#92400e; margin-bottom:3px;"><i class="fa-solid fa-triangle-exclamation"></i> ${currentTrip.alert.title}</h4>
-        <p style="font-size:0.82rem; color:#78350f; line-height:1.4;">${currentTrip.alert.text}</p>
-        ${currentTrip.alert.link ? `<a href="${currentTrip.alert.link}" target="_blank" style="font-size:0.78rem; font-weight:bold; color:#b45309; text-decoration:underline; display:inline-block; margin-top:4px;">Remplir la formalité en ligne</a>` : ''}
-      </div>
-    `;
+  if (alertBox) {
+    if (currentTrip.alert && currentTrip.alert.title && currentTrip.alert.text && currentTrip.alert.text.trim()) {
+      const formattedAlertText = currentTrip.alert.text.replace(
+        /(https?:\/\/[^\s<)]+)/gi,
+        '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0284c7; text-decoration:underline; font-weight:700;">$1</a>'
+      );
+
+      alertBox.innerHTML = `
+        <div style="background:#fffbeb; border:1px solid #fef3c7; border-left:4px solid #d97706; border-radius:14px; padding:16px; margin-bottom:16px; box-shadow:0 2px 8px rgba(217,119,6,0.08);">
+          <div style="display:flex; align-items:center; gap:8px; margin-bottom:8px;">
+            <div style="background:#fef3c7; color:#d97706; width:30px; height:30px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0;">
+              <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h4 style="font-size:0.95rem; font-weight:800; color:#92400e; margin:0;">${currentTrip.alert.title}</h4>
+          </div>
+          <div style="font-size:0.84rem; color:#78350f; line-height:1.55; white-space:pre-line; word-break:break-word;">${formattedAlertText}</div>
+          ${currentTrip.alert.link ? `
+            <div style="margin-top:10px; padding-top:8px; border-top:1px dashed #fde68a;">
+              <a href="${currentTrip.alert.link}" target="_blank" rel="noopener noreferrer" style="font-size:0.8rem; font-weight:800; color:#b45309; text-decoration:none; display:inline-flex; align-items:center; gap:6px; background:#fef3c7; padding:6px 12px; border-radius:8px; border:1px solid #fde68a;">
+                <i class="fa-solid fa-arrow-up-right-from-square"></i> Accéder au formulaire officiel en ligne
+              </a>
+            </div>
+          ` : ''}
+        </div>
+      `;
+    } else {
+      alertBox.innerHTML = '';
+    }
   }
 
   const contactsBox = document.getElementById('contacts-container');
@@ -3671,6 +3691,10 @@ function renderContactsAndAlert() {
       <div style="display:flex; flex-direction:column; gap:12px;">
         ${currentTrip.practicalTipsList.map((tip) => {
           const icon = tip.icon || 'circle-info';
+          const formattedContent = (tip.content || '').replace(
+            /(https?:\/\/[^\s<)]+)/gi,
+            '<a href="$1" target="_blank" rel="noopener noreferrer" style="color:#0284c7; text-decoration:underline; font-weight:700;">$1</a>'
+          );
           return `
             <div style="background:white; border:1px solid var(--border-light); border-radius:14px; padding:14px 16px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
               <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
@@ -3679,7 +3703,7 @@ function renderContactsAndAlert() {
                 </div>
                 <strong style="font-size:0.95rem; color:var(--primary-dark); font-weight:800;">${tip.title}</strong>
               </div>
-              <p style="font-size:0.85rem; color:#475569; margin:0; line-height:1.55; white-space:pre-line; word-break:break-word;">${tip.content}</p>
+              <p style="font-size:0.85rem; color:#475569; margin:0; line-height:1.55; white-space:pre-line; word-break:break-word;">${formattedContent}</p>
             </div>
           `;
         }).join('')}
