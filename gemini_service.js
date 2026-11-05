@@ -465,6 +465,380 @@ Réponds STRICTEMENT sous format JSON valide avec la clé racine "suggestions": 
   }
 
   // ---------------------------------------------------------------------------
+  // 5. NETTOYAGE INTELLIGENT DU PROGRAMME ET DES ÉTAPES PAR GEMINI IA
+  // ---------------------------------------------------------------------------
+  async function cleanParsedTripWithGemini() {
+    const tripToClean = (typeof currentParsedTrip !== 'undefined' && currentParsedTrip) ? currentParsedTrip : null;
+    if (!tripToClean || !tripToClean.itinerary || tripToClean.itinerary.length === 0) {
+      alert("Aucun programme n'est actuellement analysé dans la modale d'import.");
+      return;
+    }
+
+    const apiKey = getStoredGeminiKey();
+    if (!apiKey) {
+      openGeminiConfigModal();
+      const feedback = document.getElementById('gemini-test-feedback');
+      if (feedback) {
+        feedback.style.display = 'block';
+        feedback.style.background = '#fef3c7';
+        feedback.style.color = '#92400e';
+        feedback.style.borderColor = '#fde68a';
+        feedback.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Renseignez votre clé API Gemini pour activer le nettoyage intelligent du programme.`;
+      }
+      return;
+    }
+
+    const statusEl = document.getElementById('pdf-import-status');
+    const btnClean = document.getElementById('btn-clean-with-gemini');
+    const btnBannerClean = document.getElementById('btn-banner-clean-gemini');
+    const originalBtnHtml = btnClean ? btnClean.innerHTML : '';
+    const originalBannerHtml = btnBannerClean ? btnBannerClean.innerHTML : '';
+
+    if (btnClean) {
+      btnClean.disabled = true;
+      btnClean.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Nettoyage IA en cours...`;
+    }
+    if (btnBannerClean) {
+      btnBannerClean.disabled = true;
+      btnBannerClean.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Nettoyage IA en cours...`;
+    }
+
+    if (statusEl) {
+      statusEl.style.display = 'block';
+      statusEl.style.borderColor = '#c084fc';
+      statusEl.style.background = '#faf5ff';
+      statusEl.style.color = '#7e22ce';
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Nettoyage IA Gemini en cours :</strong> Restructuration des étapes, élimination des fausses visites, normalisation des titres et détection des hôtels...`;
+    }
+
+    try {
+      const model = getStoredGeminiModel();
+
+      // Préparer un résumé structuré du voyage actuel pour Gemini
+      const itinerarySample = tripToClean.itinerary.map(d => ({
+        day: d.day,
+        title: d.title,
+        city: d.city,
+        description: (d.description || "").substring(0, 1500)
+      }));
+
+      // Extraire un extrait du texte brut d'origine si disponible
+      const rawTextSample = (tripToClean._rawImportedText || "").slice(0, 25000);
+
+      const promptText = `Tu es l'expert éditorial et logistique des programmes de voyages touristiques de l'agence "Voyages Girardot".
+Voici un programme de voyage extrait d'un document ou carnet :
+TITRE : ${tripToClean.title}
+SOUS-TITRE : ${tripToClean.subtitle || ""}
+DATES : ${tripToClean.dates || ""}
+
+JOURNÉES EXTRAITES INITIALES :
+${JSON.stringify(itinerarySample, null, 2)}
+
+EXTRAIT DU DOCUMENT SOURCE :
+${rawTextSample}
+
+TA MISSION :
+Nettoyer, corriger et restructurer fidèlement le voyage en respectant STRICTEMENT les règles éditoriales Girardot :
+1. TITRES D'ÉTAPES / VISITES STRICTEMENT NOMINAUX ET COURTS :
+   - Un titre de visite NE DOIT JAMAIS ÊTRE UNE PHRASE, ni commencer par un verbe conjugué (JAMAIS de "Visite de...", "En route pour...", "Découverte de...", "Route vers...", "Ce sanctuaire...").
+   - Utilise le NOM PROPRE NOBLE du lieu, du monument, du transport ou du temps fort :
+     Exemples corrects : "Fort d'Amber", "Palais des Vents", "Temple de Karni Mata", "Dunes de Sam", "Taj Mahal", "Mosquée Jama Masjid", "Puits de Chand Baoli", "Vol intérieur", "Train Shatabdi Express", "Journée libre", "Spectacle de danses".
+   - Élimine les fausses étapes créées par des phrases descriptives, poétiques ou d'ambiance.
+   - Intègre les explications et détails dans le champ 'subtitle'.
+2. COMPLÉTUDE DES JOURS :
+   - Proposer obligatoirement la TOTALITÉ des jours du voyage (du Jour 1 au dernier jour, sans aucun jour manquant).
+   - Si une journée n'a pas de visite guidée (séjour ou journée libre), mettre en titre "Journée libre" et en subtitle "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme".
+3. VILLES ÉTAPES :
+   - Assigner pour chaque jour la ville étape principale ('city') où se déroulent les visites et la nuitée.
+4. HÔTELS DU CIRCUIT :
+   - Extraire tous les hôtels réels du voyage (depuis le tableau des hôtels, les coordonnées ou le déroulé). Pour chaque hôtel : 'name' (avec catégorie si mentionnée, ex: "Deventure Sarovar Portico 4*"), 'city', 'dates' (ou jours associés, ex: "Du 2 au 3 décembre" ou "Jours 2 et 14").
+
+RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOUR :
+{
+  "title": "Titre propre du voyage",
+  "subtitle": "Sous-titre ou descriptif court",
+  "days": [
+    {
+      "day": 1,
+      "title": "Titre propre du jour (ex: Paris - Delhi)",
+      "city": "Ville étape",
+      "timeline": [
+        {
+          "title": "Nom court étape",
+          "subtitle": "Description synthétique de l'étape",
+          "time": ""
+        }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "name": "Nom de l'hôtel",
+      "city": "Ville",
+      "dates": "Période ou jours"
+    }
+  ]
+}`;
+
+      const payload = {
+        contents: [{
+          parts: [{ text: promptText }]
+        }],
+        generationConfig: {
+          temperature: 0.1,
+          responseMimeType: "application/json"
+        }
+      };
+
+      const { data } = await callGeminiApiWithFallback(apiKey, model, payload);
+      const jsonStr = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!jsonStr) throw new Error("Aucune réponse textuelle reçue de Gemini.");
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch(e) {
+        const match = jsonStr.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+        else throw new Error("Format JSON invalide dans la réponse de Gemini.");
+      }
+
+      if (parsed.title) tripToClean.title = parsed.title;
+      if (parsed.subtitle) tripToClean.subtitle = parsed.subtitle;
+
+      // Mise à jour de l'itinéraire
+      if (parsed.days && Array.isArray(parsed.days) && parsed.days.length > 0) {
+        parsed.days.forEach(aiDay => {
+          let existingDay = tripToClean.itinerary.find(d => d.day === aiDay.day);
+          if (!existingDay) {
+            existingDay = {
+              day: aiDay.day,
+              title: aiDay.title,
+              city: aiDay.city || "",
+              lat: null,
+              lng: null,
+              highlight: "",
+              description: "",
+              dateStr: `Jour ${aiDay.day}`,
+              timeline: []
+            };
+            tripToClean.itinerary.push(existingDay);
+          }
+
+          if (aiDay.title) existingDay.title = aiDay.title;
+          if (aiDay.city) existingDay.city = aiDay.city;
+          if (aiDay.timeline && Array.isArray(aiDay.timeline) && aiDay.timeline.length > 0) {
+            existingDay.timeline = aiDay.timeline.map(t => ({
+              title: t.title || "Visite",
+              subtitle: t.subtitle || "",
+              time: t.time || ""
+            }));
+          }
+
+          // Résolution GPS automatique pour la ville de la journée
+          if (typeof DESTINATION_CITY_COORDINATES !== 'undefined' && existingDay.city) {
+            const normC = (typeof normStr === 'function') ? normStr(existingDay.city) : existingDay.city.toLowerCase();
+            const foundKey = Object.keys(DESTINATION_CITY_COORDINATES).find(k => normC === k || normC.includes(k) || k.includes(normC));
+            if (foundKey) {
+              existingDay.lat = DESTINATION_CITY_COORDINATES[foundKey].lat;
+              existingDay.lng = DESTINATION_CITY_COORDINATES[foundKey].lng;
+            }
+          }
+        });
+        tripToClean.itinerary.sort((a, b) => a.day - b.day);
+      }
+
+      // Mise à jour des hôtels si détectés par Gemini
+      if (parsed.hotels && Array.isArray(parsed.hotels) && parsed.hotels.length > 0) {
+        const newHotels = parsed.hotels.map(h => {
+          let lat = null, lng = null;
+          if (typeof DESTINATION_CITY_COORDINATES !== 'undefined' && h.city) {
+            const normC = (typeof normStr === 'function') ? normStr(h.city) : h.city.toLowerCase();
+            const foundKey = Object.keys(DESTINATION_CITY_COORDINATES).find(k => normC === k || normC.includes(k) || k.includes(normC));
+            if (foundKey) {
+              lat = DESTINATION_CITY_COORDINATES[foundKey].lat;
+              lng = DESTINATION_CITY_COORDINATES[foundKey].lng;
+            }
+          }
+          return {
+            name: h.name,
+            city: h.city || "",
+            dates: h.dates || "",
+            address: h.address || (h.city ? `Hôtel à ${h.city}` : ""),
+            phone: h.phone || "",
+            lat: lat,
+            lng: lng,
+            notes: "",
+            isStayHotel: false,
+            presentation: null
+          };
+        });
+
+        if (newHotels.length >= tripToClean.hotels.length || tripToClean.hotels.length <= 1) {
+          tripToClean.hotels = newHotels;
+          tripToClean.hotelsList = newHotels;
+        }
+      }
+
+      if (typeof renderParsedTripSummaryInModal === 'function') {
+        renderParsedTripSummaryInModal();
+      }
+
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.style.borderColor = '#86efac';
+        statusEl.style.background = '#f0fdf4';
+        statusEl.style.color = '#15803d';
+        statusEl.innerHTML = `<i class="fa-solid fa-sparkles" style="color:#9333ea;"></i> <strong>Nettoyage IA réussi !</strong> Le programme a été restructuré avec succès : titres nominaux courts, fausses visites éliminées, ${tripToClean.itinerary.length} journée(s) et ${tripToClean.hotels.length} hôtel(s) identifié(s).`;
+      }
+
+    } catch(err) {
+      console.error("Erreur nettoyage Gemini:", err);
+      if (statusEl) {
+        statusEl.style.display = 'block';
+        statusEl.style.borderColor = '#fca5a5';
+        statusEl.style.background = '#fef2f2';
+        statusEl.style.color = '#b91c1c';
+        statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Erreur lors du nettoyage IA : ${err.message}. L'import standard reste intact.`;
+      }
+    } finally {
+      if (btnClean) {
+        btnClean.disabled = false;
+        btnClean.innerHTML = originalBtnHtml || `<i class="fa-solid fa-wand-magic-sparkles"></i> Nettoyage IA du programme`;
+      }
+      if (btnBannerClean) {
+        btnBannerClean.disabled = false;
+        btnBannerClean.innerHTML = originalBannerHtml || `<i class="fa-solid fa-sparkles"></i> Nettoyer avec l'IA`;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // 6. NETTOYAGE IA DES ÉTAPES DU CARNET ACTIF (ONGLET PROGRAMME)
+  // ---------------------------------------------------------------------------
+  async function cleanActiveCarnetWithGemini() {
+    if (typeof tripData === 'undefined' || !tripData || !tripData.itinerary || tripData.itinerary.length === 0) {
+      alert("Aucun voyage actif avec des étapes n'est chargé.");
+      return;
+    }
+
+    if (!confirm(`Voulez-vous lancer le nettoyage IA des étapes pour le voyage "${tripData.title}" ?\n\nL'IA Gemini va :\n• Remplacer les débuts de phrases par des noms propres courts de visites\n• Éliminer les étapes descriptives parasites\n• Respecter strictement l'ordre de vos ${tripData.itinerary.length} journées`)) {
+      return;
+    }
+
+    const apiKey = getStoredGeminiKey();
+    if (!apiKey) {
+      openGeminiConfigModal();
+      return;
+    }
+
+    const model = getStoredGeminiModel();
+    const btn = document.getElementById('btn-admin-clean-days-ia');
+    const originalHtml = btn ? btn.innerHTML : '';
+    if (btn) {
+      btn.disabled = true;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Nettoyage IA...`;
+    }
+
+    try {
+      const itinerarySample = tripData.itinerary.map(d => ({
+        day: d.day,
+        title: d.title,
+        city: d.city,
+        timeline: (d.timeline || []).map(t => ({ title: t.title, subtitle: t.subtitle, time: t.time })),
+        description: (d.description || "").substring(0, 1500)
+      }));
+
+      const promptText = `Tu es l'expert éditorial de "Voyages Girardot".
+Nettoie et normalise les étapes et visites de ce voyage :
+TITRE : ${tripData.title}
+SOUS-TITRE : ${tripData.subtitle || ""}
+PAYS : ${tripData.primaryDestinationCountry || ""}
+
+JOURNÉES :
+${JSON.stringify(itinerarySample, null, 2)}
+
+RÈGLES STRICTES :
+1. Titres de visites STRICTEMENT NOMINAUX ET COURTS (Jamais de phrase, pas de "Visite de...", pas de verbes conjugués).
+2. Éliminer les fausses étapes parasites et fondre leurs explications dans 'subtitle'.
+3. Conserver strictement l'ordre des jours et des visites.
+
+RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT :
+{
+  "days": [
+    {
+      "day": 1,
+      "title": "Titre propre du jour",
+      "city": "Ville étape",
+      "timeline": [
+        {
+          "title": "Nom court étape",
+          "subtitle": "Description synthétique",
+          "time": ""
+        }
+      ]
+    }
+  ]
+}`;
+
+      const payload = {
+        contents: [{ parts: [{ text: promptText }] }],
+        generationConfig: { temperature: 0.1, responseMimeType: "application/json" }
+      };
+
+      const { data } = await callGeminiApiWithFallback(apiKey, model, payload);
+      const jsonStr = data.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!jsonStr) throw new Error("Aucune réponse textuelle reçue de Gemini.");
+
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonStr);
+      } catch(e) {
+        const match = jsonStr.match(/\{[\s\S]*\}/);
+        if (match) parsed = JSON.parse(match[0]);
+        else throw new Error("Format JSON invalide.");
+      }
+
+      let countCleaned = 0;
+      if (parsed.days && Array.isArray(parsed.days)) {
+        parsed.days.forEach(aiDay => {
+          const d = tripData.itinerary.find(day => day.day === aiDay.day);
+          if (d) {
+            if (aiDay.title) d.title = aiDay.title;
+            if (aiDay.city) d.city = aiDay.city;
+            if (aiDay.timeline && Array.isArray(aiDay.timeline) && aiDay.timeline.length > 0) {
+              d.timeline = aiDay.timeline.map(t => ({
+                title: t.title || "Visite",
+                subtitle: t.subtitle || "",
+                time: t.time || ""
+              }));
+              countCleaned++;
+            }
+          }
+        });
+      }
+
+      if (typeof saveTripToCatalogAndStorage === 'function') {
+        saveTripToCatalogAndStorage(tripData);
+      }
+      if (typeof renderAdminDays === 'function') {
+        renderAdminDays();
+      }
+
+      alert(`✓ Nettoyage IA réussi ! Les étapes de ${countCleaned} journée(s) ont été nettoyées et normalisées.`);
+
+    } catch(err) {
+      console.error("Erreur nettoyage IA actif:", err);
+      alert("Erreur lors du nettoyage IA : " + err.message);
+    } finally {
+      if (btn) {
+        btn.disabled = false;
+        btn.innerHTML = originalHtml || `<i class="fa-solid fa-wand-magic-sparkles"></i> Nettoyage IA des étapes`;
+      }
+    }
+  }
+
+  // ---------------------------------------------------------------------------
   // EXPOSITION GLOBALE
   // ---------------------------------------------------------------------------
   global.getStoredGeminiKey = getStoredGeminiKey;
@@ -479,5 +853,8 @@ Réponds STRICTEMENT sous format JSON valide avec la clé racine "suggestions": 
   global.showGeminiResultsModal = showGeminiResultsModal;
   global.closeGeminiResultsModal = closeGeminiResultsModal;
   global.applyGeminiSuggestionsToCarnet = applyGeminiSuggestionsToCarnet;
+  global.cleanParsedTripWithGemini = cleanParsedTripWithGemini;
+  global.cleanActiveCarnetWithGemini = cleanActiveCarnetWithGemini;
+  global.callGeminiApiWithFallback = callGeminiApiWithFallback;
 
 })(typeof window !== 'undefined' ? window : global);

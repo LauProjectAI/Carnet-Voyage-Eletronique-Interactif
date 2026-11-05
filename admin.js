@@ -4427,6 +4427,8 @@ function resetPdfModalState() {
   const preview = document.getElementById('pdf-preview-container');
   const btnDownload = document.getElementById('btn-download-parsed-json');
   const btnApply = document.getElementById('btn-apply-parsed-trip');
+  const btnClean = document.getElementById('btn-clean-with-gemini');
+  const bannerClean = document.getElementById('gemini-clean-banner');
   const rawInput = document.getElementById('pdf-raw-text-input');
   const fileInput = document.getElementById('pdf-file-input');
 
@@ -4434,6 +4436,8 @@ function resetPdfModalState() {
   if (preview) preview.style.display = 'none';
   if (btnDownload) btnDownload.style.display = 'none';
   if (btnApply) btnApply.style.display = 'none';
+  if (btnClean) btnClean.style.display = 'none';
+  if (bannerClean) bannerClean.style.display = 'none';
   if (rawInput) rawInput.value = '';
   if (fileInput) fileInput.value = '';
 }
@@ -7909,6 +7913,10 @@ function processExtractedTextToTrip(text, sourceName) {
   renderParsedTripSummaryInModal();
 
   if (btnDownload) btnDownload.style.display = 'inline-block';
+  const btnClean = document.getElementById('btn-clean-with-gemini');
+  if (btnClean) btnClean.style.display = 'inline-block';
+  const bannerClean = document.getElementById('gemini-clean-banner');
+  if (bannerClean) bannerClean.style.display = 'flex';
   if (btnApply) btnApply.style.display = 'inline-block';
   } catch (err) {
     console.error("CRITICAL ERROR IN processExtractedTextToTrip:", err);

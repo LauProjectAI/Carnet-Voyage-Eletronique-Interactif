@@ -900,3 +900,28 @@ Double chantier stratégique : fiabilisation absolue du connecteur de publicatio
      - Non-régression validée sur *Pérou* (12 jours), *Canada Gaspésie* (12 jours), *USA Canada* (12 jours) et *Mexique* (14 jours).
   5. **Mise à jour PWA & Cache** :
      - Version du cache Service Worker incrémentée à `carnet-girardot-v22` dans [sw.js](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).
+
+#### Demande n°116 — *05/11/2026 11:45:00*
+> **Demande Utilisateur :**  
+> *« Inclus le bouton "nettoyage IA du programme" lors de l'import. »*
+
+* **Analyse & Objectifs :**
+  - Les PDF de voyages (brochures ou fiches réceptifs) mélangent souvent du texte narratif et descriptif avec les vraies visites, pouvant occasionner des coupures de phrases ou des étapes parasites.
+  - Intégrer un système de nettoyage et de restructuration sémantique haute précision propulsé par l'IA Google Gemini (Free Tier) directement lors de l'import PDF et dans l'administration des étapes.
+
+* **Actions Réalisées :**
+  1. **Bouton & Encart « Nettoyage IA du programme » dans la modale d'import PDF** :
+     - Dans [`admin.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.html) : ajout d'un encart violet dédié avec explications claires et bouton interactif `#btn-banner-clean-gemini` au sein du résumé de prévisualisation (`#pdf-preview-container`), complété par un bouton d'action `#btn-clean-with-gemini` dans la barre d'outils inférieure de la modale.
+     - Gestion dynamique d'affichage et de réinitialisation dans [`admin.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js) (`resetPdfModalState` et `processExtractedTextToTrip`).
+  2. **Moteur intelligent de nettoyage et restructuration (`cleanParsedTripWithGemini`)** :
+     - Implémenté dans [`gemini_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/gemini_service.js) avec bascule automatique sur les modèles disponibles (`gemini-3.5-flash-lite`, `gemini-3.5-flash`, etc.).
+     - Prompt haute précision appliquant strictement les règles Girardot :
+       - **Titres de visites nominaux courts** (noms propres de lieux/monuments/transports nobles, interdiction absolue de verbes conjugués ou de phrases).
+       - **Élimination des étapes parasites** : les phrases poétiques ou de contexte sont fondues dans le sous-titre de l'étape parente.
+       - **Complétude des journées** : préservation de 100% des jours du voyage.
+       - **Identification et enrichissement des hôtels** : détection de l'ensemble des hôtels réels du voyage et affectation par étape/nuitée.
+       - **Géolocalisation automatique** : résolution GPS instantanée de chaque ville et hébergement via `DESTINATION_CITY_COORDINATES`.
+  3. **Bouton complémentaire dans l'onglet Programme (`cleanActiveCarnetWithGemini`)** :
+     - Ajout dans l'onglet *Programme Jour par Jour* de l'administration du bouton `#btn-admin-clean-days-ia` (*« Nettoyage IA des étapes »*), permettant d'affiner et normaliser les visites d'un carnet déjà créé ou en cours d'édition en un clic.
+  4. **PWA & Cache** :
+     - Version du cache Service Worker incrémentée à `carnet-girardot-v23` dans [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).

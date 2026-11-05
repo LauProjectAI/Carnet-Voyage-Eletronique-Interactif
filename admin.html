@@ -392,6 +392,9 @@
             <button type="button" onclick="openPartnerEnrichModal()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;" title="Ajouter des détails aux visites du programme via un PDF complémentaire sans jamais modifier l'ordre des journées ni l'ordre des visites">
               <i class="fa-solid fa-file-pdf"></i> PDF pour enrichir le texte du programme
             </button>
+            <button type="button" id="btn-admin-clean-days-ia" onclick="cleanActiveCarnetWithGemini()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#f5f3ff; color:#7c3aed; border-color:#c4b5fd; font-weight:700;" title="Nettoyer automatiquement les titres des étapes et éliminer les fausses visites avec l'IA Gemini">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Nettoyage IA des étapes
+            </button>
             <button type="button" onclick="addNewDay()" class="btn-secondary" style="font-size:0.8rem; padding:6px 14px; background:#eef7f2; color:var(--primary-color); border-color:#86efac; font-weight:700;">
               <i class="fa-solid fa-plus"></i> Ajouter un jour
             </button>
@@ -816,6 +819,19 @@
               <option value="disabled">🚫 100% Guidé sans temps libre</option>
             </select>
           </div>
+
+          <!-- Encart Nettoyage IA Gemini -->
+          <div id="gemini-clean-banner" style="display:none; margin-top:14px; padding:12px 14px; background:linear-gradient(135deg, #f5f3ff 0%, #ede9fe 100%); border:1px solid #c4b5fd; border-radius:12px; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+            <div style="font-size:0.8rem; color:#5b21b6; line-height:1.45; max-width:440px;">
+              <strong style="display:flex; align-items:center; gap:6px; font-size:0.85rem; color:#4c1d95; margin-bottom:2px;">
+                <i class="fa-solid fa-wand-magic-sparkles" style="color:#7c3aed;"></i> Nettoyage IA du programme (Gemini) :
+              </strong>
+              Affiner automatiquement les titres des étapes, éliminer les phrases descriptives parasites et valider les hôtels du circuit.
+            </div>
+            <button type="button" id="btn-banner-clean-gemini" onclick="cleanParsedTripWithGemini()" class="btn-secondary" style="font-size:0.8rem; padding:8px 16px; background:#7c3aed; color:white; border:none; font-weight:700; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; gap:6px; box-shadow:0 2px 4px rgba(124,58,237,0.3);">
+              <i class="fa-solid fa-sparkles"></i> Nettoyer avec l'IA
+            </button>
+          </div>
         </div>
       </div>
 
@@ -824,6 +840,9 @@
         <div style="display:flex; gap:8px;">
           <button type="button" id="btn-download-parsed-json" onclick="downloadParsedTripJson()" class="btn-secondary" style="display:none; font-size:0.82rem; padding:8px 16px;">
             <i class="fa-solid fa-download"></i> Télécharger le .json
+          </button>
+          <button type="button" id="btn-clean-with-gemini" onclick="cleanParsedTripWithGemini()" class="btn-secondary" style="display:none; font-size:0.82rem; padding:8px 16px; background:#f5f3ff; color:#7c3aed; border-color:#c4b5fd; font-weight:700;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Nettoyage IA du programme
           </button>
           <button type="button" id="btn-apply-parsed-trip" onclick="applyParsedTripToAdmin()" class="btn-save-main" style="display:none; font-size:0.85rem; padding:8px 20px; border-radius:8px;">
             <i class="fa-solid fa-check"></i> Charger dans l'administration
