@@ -5,7 +5,7 @@
 
 (function(global) {
 
-  const DEFAULT_MODEL = 'gemini-3.5-flash-lite';
+  const DEFAULT_MODEL = 'gemini-2.5-flash';
 
   function getStoredGeminiKey() {
     return localStorage.getItem('girardot_gemini_api_key') || '';
@@ -13,8 +13,8 @@
 
   function getStoredGeminiModel() {
     let m = localStorage.getItem('girardot_gemini_model');
-    // Migration automatique si un ancien modèle obsolète (2.0, 2.5, 1.5) était encore en cache
-    if (!m || m.includes('2.0') || m.includes('2.5') || m.includes('1.5') || m === 'gemini-2.0-flash' || m === 'gemini-2.5-flash') {
+    // Réinitialiser les anciens modèles expérimentaux ou dépréciés
+    if (!m || m.includes('3.5') || m.includes('3.8')) {
       m = DEFAULT_MODEL;
       localStorage.setItem('girardot_gemini_model', m);
     }
@@ -135,6 +135,42 @@
   }
 
   // ---------------------------------------------------------------------------
+  // DÉTECTION DES ERREURS AVEC BASCULE DE MODÈLE (SATURATION, PIC D'AFFLUENCE, 404, QUOTA)
+  // ---------------------------------------------------------------------------
+  function isRetryableGeminiModelError(status, errMsg) {
+    if (status === 404 || status === 429 || status === 500 || status === 502 || status === 503 || status === 504) {
+      return true;
+    }
+    const msg = (errMsg || '').toLowerCase();
+    return msg.includes('high demand') ||
+           msg.includes('spikes in demand') ||
+           msg.includes('overloaded') ||
+           msg.includes('resource_exhausted') ||
+           msg.includes('quota') ||
+           msg.includes('rate limit') ||
+           msg.includes('temporarily unavailable') ||
+           msg.includes('try again later') ||
+           msg.includes('not found') ||
+           msg.includes('no longer available') ||
+           msg.includes('is not supported') ||
+           msg.includes('deprecated');
+  }
+
+  function formatGeminiUserErrorMessage(err) {
+    const msg = err?.message || '';
+    if (/high demand|spikes in demand|overloaded|503/i.test(msg)) {
+      return "Les serveurs Google Gemini rencontrent actuellement un pic mondial d'affluence temporaire. Veuillez patienter quelques secondes puis réessayez, ou choisissez un autre modèle dans les réglages IA.";
+    }
+    if (/quota|resource_exhausted|429/i.test(msg)) {
+      return "Le quota de requêtes par minute de votre clé Gemini a été temporairement dépassé. Patientez environ 30 secondes avant de relancer.";
+    }
+    if (/api key not valid|invalid api key/i.test(msg)) {
+      return "La clé API Google Gemini est invalide ou expirée. Vérifiez-la dans la configuration IA.";
+    }
+    return msg;
+  }
+
+  // ---------------------------------------------------------------------------
   // EXÉCUTION AVEC BASCULE AUTOMATIQUE SUR MODÈLES DE SECOURS (FALLBACK CHAIN)
   // ---------------------------------------------------------------------------
   async function callGeminiApiWithFallback(apiKey, preferredModel, payload) {
@@ -143,12 +179,15 @@
       discovered = await discoverAvailableGeminiModels(apiKey);
     } catch (e) {}
 
+    // Liste ordonnée de modèles réels Google Gemini avec priorité aux modèles ultra-stables
     const candidateModels = [
       preferredModel,
       ...discovered,
-      'gemini-3.5-flash-lite',
-      'gemini-3.5-flash',
-      'gemini-3.8-flash',
+      'gemini-2.5-flash',
+      'gemini-2.0-flash',
+      'gemini-2.0-flash-lite',
+      'gemini-1.5-flash',
+      'gemini-1.5-flash-8b',
       'gemini-flash-latest'
     ].filter((v, i, a) => v && a.indexOf(v) === i);
 
@@ -166,10 +205,11 @@
         if (!res.ok) {
           const err = await res.json().catch(() => ({}));
           const errMsg = err.error?.message || `Erreur HTTP ${res.status}`;
-          if (res.status === 404 || /not found|no longer available|is not supported|deprecated/i.test(errMsg)) {
-            console.warn(`[Gemini] Modèle ${m} indisponible (${errMsg}), tentative avec le modèle suivant...`);
+          
+          if (isRetryableGeminiModelError(res.status, errMsg)) {
+            console.warn(`[Gemini] Modèle ${m} indisponible ou surchargé (${errMsg}), bascule automatique sur le modèle suivant...`);
             lastError = new Error(errMsg);
-            continue;
+            continue; // Tente immédiatement le modèle suivant dans la chaîne de secours
           }
           throw new Error(errMsg);
         }
@@ -184,7 +224,8 @@
 
       } catch (err) {
         lastError = err;
-        if (/not found|no longer available|is not supported|404/i.test(err.message)) {
+        if (isRetryableGeminiModelError(0, err.message)) {
+          console.warn(`[Gemini] Exception sur ${m} (${err.message}), tentative modèle suivant...`);
           continue;
         }
         throw err;
@@ -699,7 +740,8 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOU
         statusEl.style.borderColor = '#fca5a5';
         statusEl.style.background = '#fef2f2';
         statusEl.style.color = '#b91c1c';
-        statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Erreur lors du nettoyage IA : ${err.message}. L'import standard reste intact.`;
+        const friendlyMsg = formatGeminiUserErrorMessage(err);
+        statusEl.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> Nettoyage IA : ${friendlyMsg}. L'import standard reste intact.`;
       }
     } finally {
       if (btnClean) {
@@ -829,7 +871,7 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT :
 
     } catch(err) {
       console.error("Erreur nettoyage IA actif:", err);
-      alert("Erreur lors du nettoyage IA : " + err.message);
+      alert("Nettoyage IA : " + formatGeminiUserErrorMessage(err));
     } finally {
       if (btn) {
         btn.disabled = false;
