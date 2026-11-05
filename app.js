@@ -3385,6 +3385,61 @@ function renderHotelsAndFlights() {
     `;
   }
 
+  // Encart Franchise Bagages (sous les vols)
+  const baggage = currentTrip.baggage || (currentTrip.flights && currentTrip.flights.baggage) || null;
+  if (baggage && (baggage.cabin || baggage.hold || baggage.details)) {
+    const baggageCard = document.createElement('div');
+    baggageCard.className = 'flight-baggage-card';
+    baggageCard.style = "background:white; border-radius:16px; border:1px solid var(--border-light); padding:16px; margin-top:14px; box-shadow:0 2px 8px rgba(0,0,0,0.03);";
+    baggageCard.innerHTML = `
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:10px;">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <div style="background:#e0f2fe; color:#0284c7; border-radius:8px; width:34px; height:34px; display:flex; align-items:center; justify-content:center; font-size:1rem;">
+            <i class="fa-solid fa-suitcase-rolling"></i>
+          </div>
+          <div>
+            <div style="font-weight:800; font-size:0.95rem; color:var(--primary-dark);">Franchise Bagages Autorisée</div>
+            <div style="font-size:0.75rem; color:#64748b;">Par passager selon les règles du transporteur</div>
+          </div>
+        </div>
+      </div>
+      
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:10px;">
+        ${baggage.cabin ? `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 14px; display:flex; align-items:flex-start; gap:10px;">
+            <div style="background:#e0f2fe; color:#0284c7; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.85rem; margin-top:2px;">
+              <i class="fa-solid fa-bag-shopping"></i>
+            </div>
+            <div>
+              <div style="font-size:0.72rem; font-weight:800; color:#0284c7; text-transform:uppercase; letter-spacing:0.5px;">Bagage Cabine</div>
+              <div style="font-size:0.85rem; font-weight:700; color:#0f172a; margin-top:2px; line-height:1.35;">${baggage.cabin}</div>
+            </div>
+          </div>
+        ` : ''}
+
+        ${baggage.hold ? `
+          <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:12px; padding:10px 14px; display:flex; align-items:flex-start; gap:10px;">
+            <div style="background:#dcfce7; color:#15803d; width:28px; height:28px; border-radius:6px; display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:0.85rem; margin-top:2px;">
+              <i class="fa-solid fa-suitcase"></i>
+            </div>
+            <div>
+              <div style="font-size:0.72rem; font-weight:800; color:#15803d; text-transform:uppercase; letter-spacing:0.5px;">Bagage en Soute</div>
+              <div style="font-size:0.85rem; font-weight:700; color:#0f172a; margin-top:2px; line-height:1.35;">${baggage.hold}</div>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+
+      ${baggage.details ? `
+        <div style="font-size:0.76rem; color:#64748b; background:#fffbeb; border:1px solid #fef3c7; border-radius:8px; padding:8px 12px; margin-top:10px; line-height:1.45; display:flex; align-items:flex-start; gap:8px;">
+          <i class="fa-solid fa-circle-exclamation" style="color:#d97706; margin-top:2px; flex-shrink:0;"></i>
+          <span>${baggage.details}</span>
+        </div>
+      ` : ''}
+    `;
+    flightsContainer.appendChild(baggageCard);
+  }
+
   const hotelsContainer = document.getElementById('hotels-container');
   hotelsContainer.innerHTML = '';
   if (currentTrip.hotels) {
@@ -3607,19 +3662,27 @@ function renderContactsAndAlert() {
   }
 
   const practicalBox = document.getElementById('practical-container');
-  // 1. Nouveau format practicalTipsList
+  // 1. Nouveau format practicalTipsList (enrichi avec Bon à savoir, Inclus, Conseils...)
   if (currentTrip.practicalTipsList && currentTrip.practicalTipsList.length > 0) {
     practicalBox.innerHTML = `
       <h3 style="font-size:1.1rem; font-weight:800; color:var(--primary-dark); margin-bottom:12px;">
-        <i class="fa-solid fa-lightbulb" style="color:var(--accent-gold); margin-right:6px;"></i> Conseils Pratiques du Voyageur
+        <i class="fa-solid fa-lightbulb" style="color:var(--accent-gold); margin-right:6px;"></i> Informations & Conseils Pratiques
       </h3>
-      <div style="background:white; border:1px solid var(--border-light); border-radius:16px; padding:16px;">
-        ${currentTrip.practicalTipsList.map((tip, idx) => `
-          <div style="${idx < currentTrip.practicalTipsList.length - 1 ? 'margin-bottom:14px; border-bottom:1px dashed #e2e8f0; padding-bottom:10px;' : ''}">
-            <strong><i class="fa-solid fa-check" style="color:var(--accent-gold); margin-right:6px;"></i> ${tip.title} :</strong>
-            <p style="font-size:0.85rem; color:#475569; margin-top:3px; line-height:1.45;">${tip.content}</p>
-          </div>
-        `).join('')}
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        ${currentTrip.practicalTipsList.map((tip) => {
+          const icon = tip.icon || 'circle-info';
+          return `
+            <div style="background:white; border:1px solid var(--border-light); border-radius:14px; padding:14px 16px; box-shadow:0 2px 6px rgba(0,0,0,0.02);">
+              <div style="display:flex; align-items:center; gap:10px; margin-bottom:8px;">
+                <div style="background:#eef7f2; color:var(--primary-color); width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:0.95rem; flex-shrink:0;">
+                  <i class="fa-solid fa-${icon}"></i>
+                </div>
+                <strong style="font-size:0.95rem; color:var(--primary-dark); font-weight:800;">${tip.title}</strong>
+              </div>
+              <p style="font-size:0.85rem; color:#475569; margin:0; line-height:1.55; white-space:pre-line; word-break:break-word;">${tip.content}</p>
+            </div>
+          `;
+        }).join('')}
       </div>
     `;
   } else if (currentTrip.practicalInfo) {

@@ -379,6 +379,33 @@
           </button>
         </div>
         <div id="adm-flights-list"></div>
+
+        <!-- ENCART FRANCHISE BAGAGES -->
+        <div class="section-box" style="margin-top:20px; border-left:4px solid #0284c7; background:#f8fafc;">
+          <div style="display:flex; align-items:center; gap:10px; margin-bottom:12px;">
+            <div style="background:#e0f2fe; color:#0284c7; width:32px; height:32px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:1rem;">
+              <i class="fa-solid fa-suitcase-rolling"></i>
+            </div>
+            <div>
+              <h4 style="font-size:0.95rem; font-weight:800; color:var(--primary-dark); margin:0;">Franchise & Consignes Bagages Aériens</h4>
+              <p style="font-size:0.75rem; color:#64748b; margin:0;">Nombre de bagages et poids autorisés en cabine et en soute pour chaque passager.</p>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label><i class="fa-solid fa-bag-shopping" style="color:#0284c7;"></i> Bagage Cabine (Quantité & Poids max) :</label>
+              <input type="text" id="adm-baggage-cabin" class="form-control" placeholder="Ex: 1 bagage cabine / pers : 5 Kg max (56 x 45 x 25 cm)" onchange="updateBaggageField('cabin', this.value)">
+            </div>
+            <div class="form-group">
+              <label><i class="fa-solid fa-suitcase" style="color:#059669;"></i> Bagage en Soute (Quantité & Poids max) :</label>
+              <input type="text" id="adm-baggage-hold" class="form-control" placeholder="Ex: 1 bagage en soute / pers : 15 Kg ou 23 Kg max" onchange="updateBaggageField('hold', this.value)">
+            </div>
+          </div>
+          <div class="form-group" style="margin-bottom:0;">
+            <label><i class="fa-solid fa-circle-exclamation" style="color:#d97706;"></i> Consignes & Restrictions (Liquides, surpoids, etc.) :</label>
+            <input type="text" id="adm-baggage-details" class="form-control" placeholder="Ex: Aucun contenant > 100ml en cabine. Dépassement facturé sur place par la compagnie." onchange="updateBaggageField('details', this.value)">
+          </div>
+        </div>
       </div>
 
       <!-- 2. ITINERAIRE -->

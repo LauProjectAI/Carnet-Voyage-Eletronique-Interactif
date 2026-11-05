@@ -40,6 +40,7 @@ function createBlankTripTemplate(title = '') {
     alert: { title: "", text: "", link: "" },
     flights: { outbound: null, inbound: null, domesticFlights: [] },
     flightsList: [],
+    baggage: { cabin: "", hold: "", details: "" },
     itinerary: [
       {
         day: 1,
@@ -646,6 +647,15 @@ function populateForm() {
   ensureFlightsListStructure();
   renderAdminFlights();
 
+  // 1. bis Encart Bagages Aériens
+  const baggage = tripData.baggage || (tripData.flights && tripData.flights.baggage) || {};
+  const cabinEl = document.getElementById('adm-baggage-cabin');
+  const holdEl = document.getElementById('adm-baggage-hold');
+  const detailsEl = document.getElementById('adm-baggage-details');
+  if (cabinEl) cabinEl.value = baggage.cabin || '';
+  if (holdEl) holdEl.value = baggage.hold || '';
+  if (detailsEl) detailsEl.value = baggage.details || '';
+
   // 2. Itinerary & Visits
   renderAdminDays();
 
@@ -990,6 +1000,14 @@ function removeFlight(idx) {
 
 function updateFlightField(idx, field, val) {
   tripData.flightsList[idx][field] = val;
+}
+
+function updateBaggageField(field, val) {
+  if (!tripData.baggage) tripData.baggage = { cabin: "", hold: "", details: "" };
+  tripData.baggage[field] = val;
+  if (!tripData.flights) tripData.flights = {};
+  if (!tripData.flights.baggage) tripData.flights.baggage = {};
+  tripData.flights.baggage[field] = val;
 }
 
 // -----------------------------------------------------------------------------
@@ -5444,23 +5462,177 @@ function buildCruiseConciergerie(shipName, itinerary, rawText) {
 
 // Moteur heuristique d'analyse et de structuration du programme Girardot
 // -----------------------------------------------------------------------------
-// EXTRACTION DES INFOS PRATIQUES DE DESTINATION (CIRCUITS TERRESTRES)
+// EXTRACTION DES INFORMATIONS BAGAGES (AÉRIENS)
+// -----------------------------------------------------------------------------
+function extractBaggageInfoFromText(text) {
+  const baggage = {
+    cabin: "",
+    hold: "",
+    details: ""
+  };
+  if (!text) return baggage;
+
+  const baggageMatch = text.match(/Bagages\s+a[ée]riens\s+autoris[ée]s\s*[:\n]+([\s\S]*?)(?=(?:Jour\s*1\b|Convocation|Formalit[ée]s|Vos\s+h[ôo]tels|$))/i);
+  if (!baggageMatch) return baggage;
+
+  const block = baggageMatch[1].trim();
+  const rawLines = block.split(/\r?\n+/).map(l => l.trim()).filter(Boolean);
+
+  let cabinParts = [];
+  let holdParts = [];
+  let detailParts = [];
+  let currentTarget = "none";
+
+  for (const line of rawLines) {
+    if (/en\s+attente\s+des\s+infos/i.test(line)) {
+      continue;
+    }
+    if (/bagage\s*cabine|sac\s*de\s*\d+\s*cm/i.test(line)) {
+      currentTarget = "cabin";
+      cabinParts.push(line);
+    } else if (/bagage\s*en\s*soute|bagage\s*soute/i.test(line)) {
+      currentTarget = "hold";
+      holdParts.push(line);
+    } else if (/^\*Aucun\s+contenant|d[ée]passement|facturation|r[ée]gler\s+sur\s+place|surpoids/i.test(line)) {
+      currentTarget = "details";
+      detailParts.push(line);
+    } else if (currentTarget === "cabin") {
+      cabinParts.push(line);
+    } else if (currentTarget === "hold") {
+      holdParts.push(line);
+    } else if (currentTarget === "details") {
+      detailParts.push(line);
+    }
+  }
+
+  baggage.cabin = cabinParts.join(' ').replace(/\s+/g, ' ').trim();
+  baggage.hold = holdParts.join(' ').replace(/\s+/g, ' ').trim();
+  baggage.details = detailParts.join(' ').replace(/\s+/g, ' ').trim();
+
+  // Déplacer les restrictions d'objets interdits / liquides dans details pour préserver poids et dimensions en cabine
+  const starAucunMatch = baggage.cabin.match(/\*+\s*(?:Aucun\s+contenant|Liquides?)[^\n.]*\.?/i);
+  if (starAucunMatch) {
+    const restriction = starAucunMatch[0].trim();
+    baggage.cabin = baggage.cabin.replace(starAucunMatch[0], '').trim();
+    baggage.details = (restriction + ' ' + baggage.details).trim();
+  }
+  baggage.cabin = baggage.cabin.replace(/personne\s*\*/gi, 'personne').replace(/\s{2,}/g, ' ').trim();
+
+  return baggage;
+}
+
+// -----------------------------------------------------------------------------
+// EXTRACTION DES INFOS PRATIQUES DE DESTINATION & DU CARNET
 // -----------------------------------------------------------------------------
 function extractDestinationPracticalInfoFromText(text) {
+  const tipsList = [];
+  const practicalInfo = {};
+  if (!text) return { tipsList, practicalInfo };
+
+  // 1. BON À SAVOIR
+  const bonMatch = text.match(/(?:^|\n)\s*Bon\s+[àa]\s+savoir\s*[\n:]+([\s\S]*?)(?=(?:^|\n)\s*(?:Inclus|Assurance|Quelques conseils|Tarifs|$))/i);
+  if (bonMatch) {
+    const content = bonMatch[1].trim().replace(/\r?\n+/g, ' ');
+    if (content.length > 5) {
+      tipsList.push({
+        title: "Bon à savoir",
+        icon: "circle-info",
+        content: content
+      });
+    }
+  }
+
+  // 2. INCLUS (Prestations incluses)
+  const inclusMatch = text.match(/(?:^|\n)\s*Inclus\s*[\n:]+([\s\S]*?)(?=(?:^|\n)\s*(?:Bon\s+[àa]\s+savoir|Assurance|Quelques conseils|Non inclus|Tarifs|$))/i);
+  if (inclusMatch) {
+    const content = inclusMatch[1].trim().replace(/\r?\n+/g, ' ');
+    if (content.length > 5) {
+      tipsList.push({
+        title: "Prestations incluses",
+        icon: "circle-check",
+        content: content
+      });
+    }
+  }
+
+  // 3. ASSURANCE MULTIRISQUE VOYAGE ET ASSISTANCE / RAPATRIEMENT
+  const assuranceMatch = text.match(/(?:^|\n)\s*Assurance\s+multirisque[^\n]*\n+([\s\S]*?)(?=(?:^|\n)\s*(?:Quelques conseils|Nos partenaires|$))/i);
+  if (assuranceMatch) {
+    const content = assuranceMatch[1].trim().replace(/\r?\n+/g, ' ');
+    if (content.length > 10) {
+      tipsList.push({
+        title: "Assurance & Rapatriement",
+        icon: "kit-medical",
+        content: content
+      });
+    }
+  }
+
+  // 4. QUELQUES CONSEILS POUR VOTRE VOYAGE... (avec ses sous-paragraphes)
+  const conseilsBlockMatch = text.match(/(?:^|\n)\s*Quelques\s+conseils\s+pour\s+votre\s+voyage[^\n]*\n+([\s\S]*?)(?=(?:^|\n)\s*(?:Nos\s+partenaires|Tarifs|Conditions|Agence\s+de\s+voyages|$))/i);
+  if (conseilsBlockMatch) {
+    const block = conseilsBlockMatch[1];
+    const introMatch = block.match(/^([\s\S]*?)(?=[✔✓•]\s*[A-ZÀ-Ý])/i);
+    if (introMatch && introMatch[1].trim().length > 20) {
+      tipsList.push({
+        title: "Conseils pour votre voyage",
+        icon: "compass",
+        content: introMatch[1].trim().replace(/\r?\n+/g, ' ')
+      });
+    }
+
+    const itemRegex = /[✔✓•]\s*([A-ZÀ-Ý\s/'-]+?)\s*\r?\n+([\s\S]*?)(?=[✔✓•]\s*[A-ZÀ-Ý]|Assurance|Nos partenaires|$)/g;
+    let m;
+    while ((m = itemRegex.exec(block)) !== null) {
+      const rawTitle = m[1].replace(/\s+/g, ' ').trim();
+      const rawContent = m[2].trim().replace(/\r?\n+/g, ' ');
+      if (rawContent.length > 5) {
+        let icon = "circle-info";
+        let cleanTitle = rawTitle;
+        if (/a[ée]roport|port/i.test(rawTitle)) {
+          icon = "plane-departure";
+          cleanTitle = "Aéroport / Port";
+        } else if (/bagage/i.test(rawTitle)) {
+          icon = "suitcase-rolling";
+          cleanTitle = "Bagages (Conseils)";
+        } else if (/charter|vols?\s*sp[ée]ciaux/i.test(rawTitle)) {
+          icon = "plane-circle-check";
+          cleanTitle = "Charter & Vols spéciaux";
+        } else if (/service/i.test(rawTitle)) {
+          icon = "mug-hot";
+          cleanTitle = "Services à bord";
+        } else if (/douane/i.test(rawTitle)) {
+          icon = "scale-balanced";
+          cleanTitle = "Douanes & Franchises";
+        } else if (/formalit[ée]/i.test(rawTitle)) {
+          icon = "file-shield";
+          cleanTitle = "Formalités";
+        } else if (/s[ûu]ret[ée]/i.test(rawTitle)) {
+          icon = "shield-halved";
+          cleanTitle = "Sûreté aéroportuaire";
+        }
+
+        tipsList.push({
+          title: cleanTitle,
+          icon: icon,
+          content: rawContent
+        });
+      }
+    }
+  }
+
+  // 5. SECTIONS CLASSIQUES DE DESTINATION (Monnaie, Électricité, etc.)
   const sections = [
     { title: "Monnaie & Devises", icon: "coins", field: "money", patterns: [/(?:^|\n)\s*Monnaie(?:\s*nationale|\s*locale)?\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i, /(?:^|\n)\s*Devises?\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] },
     { title: "Électricité & Prises", icon: "plug", field: "electricity", patterns: [/(?:^|\n)\s*[EÉ]lectricit[ée]\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i, /(?:^|\n)\s*Prises?\s*[\n:]+([^\n]+(?:\n[^\n]+){0,2})/i] },
     { title: "Décalage horaire", icon: "clock", field: "timezone", patterns: [/(?:^|\n)\s*D[ée]calage horaire\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
     { title: "Climat & Météo", icon: "cloud-sun", field: "climate", patterns: [/(?:^|\n)\s*Climat\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
     { title: "Vêtements & Valise", icon: "suitcase-rolling", field: "clothing", patterns: [/(?:^|\n)\s*Valise\s*\n+([^\n]+(?:\n[^\n]+){0,5})/i, /(?:^|\n)\s*V[êe]tements?(?:\s*conseill[ée]s)?\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
-    { title: "Pourboires", icon: "hand-holding-dollar", field: "tips", patterns: [/(?:^|\n)\s*Pourboires?\s*\n+(?:Suggestions pour les pourboires\s*:\s*)?([^\n]+(?:\n[^\n]+){0,4})/i, /Les pourboires sont laiss[ée]s [àa] discr[ée]tion[\s\S]*?(?=\n\n|\.\s+[A-Z]|$)/i] },
+    { title: "Pourboires", icon: "hand-holding-dollar", field: "tips", patterns: [/(?:^|\n)\s*Pourboires?\s*\n+(?:Suggestions pour les pourboires\s*:\s*)?([^\n]+(?:\n[^\n]+){0,4})/i] },
     { title: "Santé & Alimentation", icon: "shield-heart", field: "health", patterns: [/(?:^|\n)\s*Sant[ée]\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i, /(?:^|\n)\s*Cuisine\s*\n+([^\n]+(?:\n[^\n]+){0,4})/i] },
     { title: "Téléphone & Réseau", icon: "phone", field: "phone", patterns: [/(?:^|\n)\s*T[ée]l[ée]phone\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] },
     { title: "Formalités d'entrée", icon: "passport", field: "formalities", patterns: [/(?:^|\n)\s*Formalit[ée]s(?:\s*indispensables)?\s*\n+([^\n]+(?:\n[^\n]+){0,3})/i] }
   ];
-
-  const tipsList = [];
-  const practicalInfo = {};
 
   sections.forEach(sec => {
     let matchedText = "";
@@ -5473,11 +5645,13 @@ function extractDestinationPracticalInfoFromText(text) {
     }
     if (matchedText) {
       practicalInfo[sec.field] = matchedText;
-      tipsList.push({
-        title: sec.title,
-        icon: sec.icon,
-        content: matchedText
-      });
+      if (!tipsList.some(t => t.title.toLowerCase() === sec.title.toLowerCase())) {
+        tipsList.push({
+          title: sec.title,
+          icon: sec.icon,
+          content: matchedText
+        });
+      }
     }
   });
 
@@ -7788,6 +7962,7 @@ function processExtractedTextToTrip(text, sourceName) {
     },
     flightsList: flightsList,
     flights: null,
+    baggage: extractBaggageInfoFromText(text),
     itinerary: itinerary,
     hotels: hotels,
     hotelsList: hotels,
@@ -7878,7 +8053,8 @@ function processExtractedTextToTrip(text, sourceName) {
         date: inF.date,
         layover: inF.via
       },
-      domesticFlights: []
+      domesticFlights: [],
+      baggage: currentParsedTrip.baggage
     };
   } else {
     currentParsedTrip.flights = null;
@@ -8180,6 +8356,18 @@ function syncFormDataIntoTrip() {
       address: mainRec.address
     };
   }
+
+  // Synchronisation de l'encart Bagages
+  const cabinVal = document.getElementById('adm-baggage-cabin') ? document.getElementById('adm-baggage-cabin').value.trim() : '';
+  const holdVal = document.getElementById('adm-baggage-hold') ? document.getElementById('adm-baggage-hold').value.trim() : '';
+  const detailsVal = document.getElementById('adm-baggage-details') ? document.getElementById('adm-baggage-details').value.trim() : '';
+  tripData.baggage = {
+    cabin: cabinVal,
+    hold: holdVal,
+    details: detailsVal
+  };
+  if (!tripData.flights) tripData.flights = {};
+  tripData.flights.baggage = tripData.baggage;
 
   return true;
 }
