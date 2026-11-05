@@ -1,5 +1,15 @@
 window.AVAILABLE_TRIPS = [
   {
+    id: "chicago",
+    alias: "chicago",
+    aliases: ["chicago"],
+    title: "Chicago",
+    subtitle: "Elan Chalon",
+    dates: "23/02/2027 au 28/02/2027",
+    file: "voyages/chicago.json"
+  },
+
+  {
     id: "cocktail-mexicain",
     alias: "mexique",
     aliases: ["cocktail-mexicain", "mexique", "voyage-1792069990645"],
