@@ -6290,6 +6290,7 @@ function extractShortVisitTitle(sentence) {
 
   // 2. Repas, Logement, Acheminements standardisés
   if (/^(?:d[îi]ner|repas)\s+et\s+nuit\s+[àa]\s+bord/i.test(s)) return "Dîner et nuit à bord";
+  if (/(?:d[îi]ner\s+logement|d[îi]ner.*campement.*logement|suivi\s+du\s+d[îi]ner.*logement)/i.test(s)) return "Dîner logement";
   if (/^d[îi]ner\s+logement$/i.test(s) || /^d[îi]ner\s+et\s+logement$/i.test(s)) return "Dîner logement";
   if (/^logement$/i.test(s) || /^nuit\s+[àa]\s+l'h[ôo]tel$/i.test(s)) return "Logement";
   if (/^installation\s+(?:[àa]\s+l['’]h[ôo]tel|pour\s+\d+\s+nuits?)/i.test(s)) return "Installation à l'hôtel";
@@ -6306,7 +6307,7 @@ function extractShortVisitTitle(sentence) {
   if (/^d[ée]jeuner\s+libre/i.test(s)) return "Déjeuner libre";
   if (/^d[ée]jeuner\s+traditionnel\s+des\s+andes/i.test(s)) return "Déjeuner traditionnel Pachamanca";
   if (/^d[ée]jeuner\s+d[ée]gustation/i.test(s)) return "Déjeuner dégustation";
-  if (/^d[ée]jeuner\b/i.test(s) || /au\s+cours\s+de\s+votre\s+d[ée]jeuner/i.test(s) || /pour\s+d[ée]jeuner\b/i.test(s) || /^soir[ée]e\s+pi[ñn]ata/i.test(s)) return "Déjeuner";
+  if (/^arr[êe]t\s+d[ée]jeuner\b/i.test(s) || /^d[ée]jeuner\b/i.test(s) || /au\s+cours\s+de\s+votre\s+d[ée]jeuner/i.test(s) || /pour\s+d[ée]jeuner\b/i.test(s) || /^soir[ée]e\s+pi[ñn]ata/i.test(s)) return "Déjeuner";
   if (/^(?:deuxi[èe]me\s+)?d[ée]gustation\b/i.test(s)) return "Dégustation";
   if (/^journ[ée]e\s+libre/i.test(s)) return "Journée libre";
   if (/^matin[ée]e\s+libre/i.test(s)) return "Matinée libre";
@@ -6545,7 +6546,8 @@ function isNewVisitStepSentence(sentence) {
   // Horaire / vol / train
   if (/(?:[01]?\d|2[0-3])[hH:][0-5]\d/i.test(s) && /(?:vol|train|d[ée]part|rendez-vous|embarquement)/i.test(s)) return true;
   // Repas
-  if (/^(?:D[ée]jeuner|D[îi]ner|Souper)\b/i.test(s)) return true;
+  if (/^(?:D[ée]jeuner|D[îi]ner|Souper|Arr[êe]t\s+d[ée]jeuner)\b/i.test(s)) return true;
+  if (/(?:suivi\s+du\s+d[îi]ner|d[îi]ner\s+logement)/i.test(s)) return true;
   // Déplacement majeur
   if (/^(?:Route\s+(?:vers|pour|en)|Travers[ée]e\s+|Envol\s+|Transfert\s+[àa]\s+l['’]a[ée]roport|D[ée]part\s+(?:pour|vers))/i.test(s)) return true;
   // Visite majeure
@@ -6769,8 +6771,8 @@ function extractVisitsFromDay(description, dayTitle) {
     }
 
     const shortTitle = extractShortVisitTitle(lead);
-    const cleanFullNoDot = item.replace(/[.!?]+$/, '').trim();
-    const subtitle = (normStr(shortTitle) === normStr(cleanFullNoDot)) ? "" : item;
+    // Skill Import Carnet : fidélité textuelle stricte (reprendre l'explication intégrale sans résumé)
+    const subtitle = item;
 
     visits.push({
       time: detectedTime,
@@ -6784,11 +6786,53 @@ function extractVisitsFromDay(description, dayTitle) {
   const dedupedVisits = [];
   for (const v of visits) {
     if (dedupedVisits.length > 0 && normStr(dedupedVisits[dedupedVisits.length - 1].title) === normStr(v.title)) {
-      if (v.subtitle) {
+      if (v.subtitle && !dedupedVisits[dedupedVisits.length - 1].subtitle.includes(v.subtitle)) {
         dedupedVisits[dedupedVisits.length - 1].subtitle += (dedupedVisits[dedupedVisits.length - 1].subtitle ? " " : "") + v.subtitle;
       }
     } else {
       dedupedVisits.push(v);
+    }
+  }
+
+  // Application stricte de la Skill "Import Carnet de Voyage" pour les repas :
+  const isFinalReturn = /retour\s+dans\s+votre\s+r[ée]gion/i.test(description) || /retour\s+dans\s+votre\s+r[ée]gion/i.test(dayTitle);
+  const isFreeMeals = /\brepas\s+libres?\b/i.test(description);
+
+  if (!isFinalReturn && dedupedVisits.length > 0) {
+    // 1. Inclusion systématique de l'étape "Déjeuner"
+    const hasLunch = dedupedVisits.some(v => normStr(v.title).includes('dejeuner'));
+    if (!hasLunch) {
+      const isFreeLunch = isFreeMeals || /\bd[ée]jeuner\s+libre\b/i.test(description);
+      const lunchStep = {
+        time: "12:30",
+        title: isFreeLunch ? "Déjeuner libre" : "Déjeuner",
+        subtitle: isFreeLunch ? "Déjeuner libre." : "Déjeuner.",
+        icon: "utensils"
+      };
+      if (dedupedVisits.length <= 1) {
+        dedupedVisits.push(lunchStep);
+      } else {
+        const mid = Math.max(1, Math.floor(dedupedVisits.length / 2));
+        dedupedVisits.splice(mid, 0, lunchStep);
+      }
+    }
+
+    // 2. Inclusion systématique de l'étape "Dîner logement"
+    const hasDinner = dedupedVisits.some(v => {
+      const t = normStr(v.title);
+      return t.includes('diner') || t.includes('logement') || t.includes('nuit a bord');
+    });
+    if (!hasDinner) {
+      const isNightOnBoard = /\bnuit\s+[àa]\s+bord\b/i.test(description);
+      const isFreeDinner = isFreeMeals || /\bd[îi]ner\s+libre\b/i.test(description);
+      const dTitle = isFreeDinner ? "Dîner libre" : (isNightOnBoard ? "Dîner et nuit à bord" : "Dîner logement");
+      const dSub = isFreeDinner ? "Dîner libre." : (isNightOnBoard ? "Dîner et nuit à bord." : "Dîner logement.");
+      dedupedVisits.push({
+        time: "20:00",
+        title: dTitle,
+        subtitle: dSub,
+        icon: isNightOnBoard ? "plane" : "utensils"
+      });
     }
   }
 

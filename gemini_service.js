@@ -549,7 +549,7 @@ Réponds STRICTEMENT sous format JSON valide avec la clé racine "suggestions": 
       statusEl.style.borderColor = '#c084fc';
       statusEl.style.background = '#faf5ff';
       statusEl.style.color = '#7e22ce';
-      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Nettoyage IA Gemini en cours :</strong> Restructuration des étapes, élimination des fausses visites, normalisation des titres et détection des hôtels...`;
+      statusEl.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Structuration IA (Skill Import Carnet) :</strong> Application des règles d'extraction : étapes courtes, inclusion systématique de Déjeuner et Dîner logement, explications d'origine sans résumé...`;
     }
 
     try {
@@ -567,7 +567,9 @@ Réponds STRICTEMENT sous format JSON valide avec la clé racine "suggestions": 
       const rawTextSample = (tripToClean._rawImportedText || "").slice(0, 25000);
 
       const promptText = `Tu es l'expert éditorial et logistique des programmes de voyages touristiques de l'agence "Voyages Girardot".
-Voici un programme de voyage extrait d'un document ou carnet :
+Tu appliques STRICTEMENT la compétence (Skill) : "Import et Structuration de Carnet de Voyage".
+
+Voici les données du programme à structurer :
 TITRE : ${tripToClean.title}
 SOUS-TITRE : ${tripToClean.subtitle || ""}
 DATES : ${tripToClean.dates || ""}
@@ -575,23 +577,31 @@ DATES : ${tripToClean.dates || ""}
 JOURNÉES EXTRAITES INITIALES :
 ${JSON.stringify(itinerarySample, null, 2)}
 
-EXTRAIT DU DOCUMENT SOURCE :
+EXTRAIT DU DOCUMENT SOURCE COMPLET :
 ${rawTextSample}
 
-TA MISSION :
-Nettoyer, corriger et restructurer fidèlement le voyage en respectant STRICTEMENT les règles éditoriales Girardot :
-1. TITRES D'ÉTAPES / VISITES STRICTEMENT NOMINAUX ET COURTS :
-   - Un titre de visite NE DOIT JAMAIS ÊTRE UNE PHRASE, ni commencer par un verbe conjugué (JAMAIS de "Visite de...", "En route pour...", "Découverte de...", "Route vers...", "Ce sanctuaire...").
-   - Utilise le NOM PROPRE NOBLE du lieu, du monument, du transport ou du temps fort :
-     Exemples corrects : "Fort d'Amber", "Palais des Vents", "Temple de Karni Mata", "Dunes de Sam", "Taj Mahal", "Mosquée Jama Masjid", "Puits de Chand Baoli", "Vol intérieur", "Train Shatabdi Express", "Journée libre", "Spectacle de danses".
-   - Élimine les fausses étapes créées par des phrases descriptives, poétiques ou d'ambiance.
-   - Intègre les explications et détails dans le champ 'subtitle'.
-2. COMPLÉTUDE DES JOURS :
-   - Proposer obligatoirement la TOTALITÉ des jours du voyage (du Jour 1 au dernier jour, sans aucun jour manquant).
-   - Si une journée n'a pas de visite guidée (séjour ou journée libre), mettre en titre "Journée libre" et en subtitle "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme".
-3. VILLES ÉTAPES :
-   - Assigner pour chaque jour la ville étape principale ('city') où se déroulent les visites et la nuitée.
-4. HÔTELS DU CIRCUIT :
+CONSIGNES STRICTES DE LA SKILL "IMPORT CARNET DE VOYAGE" :
+1. FORMAT ET TITRES D'ÉTAPES :
+   - Titres d'étapes STRICTEMENT NOMINAUX ET COURTS (Jamais de phrase, pas de "Visite de...", "Route vers...", "Découverte de...", "Ce site...").
+   - Utilise le nom noble ou clair du monument, de la visite, de l'activité, du transport ou du temps fort.
+     Exemples : "Qutub Minar et India Gate", "Fort de Junagarh", "Puits d'Abhaneri", "Taj Mahal", "Dunes de Sam", "Vol intérieur", "Train Shatabdi Express", "Déjeuner", "Dîner logement".
+
+2. FIDÉLITÉ TEXTUELLE STRICTE (ZÉRO RÉSUMÉ DANS L'EXPLICATION) :
+   - Pour chaque étape, le champ 'subtitle' (explication) DOIT reprendre EXACTEMENT le texte d'origine du document source.
+   - NE JAMAIS résumer, abréger, reformuler ou paraphraser. Insère la ou les phrases exactes issues du document source.
+
+3. INCLUSION SYSTÉMATIQUE DES REPAS :
+   - Chaque journée DOIT comporter obligatoirement une étape Déjeuner (title: "Déjeuner") et une étape Dîner logement (title: "Dîner logement" ou "Dîner et nuit à bord").
+   - Seule exception : s'il est expressément indiqué "déjeuner libre", "dîner libre" ou "repas libres" dans le document, l'indiquer explicitement en titre ("Déjeuner libre", "Dîner libre").
+   - Si le document détaille le repas (ex: "Arrêt déjeuner au fort de Pokharan", "Déjeuner dans une ancienne haveli avec petit spectacle de marionnettes", "Spectacle de danses folkloriques Rajasthani suivi du dîner au campement. Logement.", "Dîner et nuit à bord"), inscrire cette phrase exacte dans 'subtitle'.
+   - Si le repas est juste mentionné ou implicite dans la formule pension complète, inscrire "Déjeuner." ou "Dîner logement." dans le 'subtitle'.
+   - Pour le jour du réacheminement final de retour dans la région d'origine (sans nuitée hôtel), ne pas forcer de dîner logement.
+
+4. COMPLÉTUDE ET ORDRE STRICT DES JOURS :
+   - Proposer obligatoirement la TOTALITÉ des jours du voyage (du Jour 1 au dernier jour, dans l'ordre chronologique exact sans omission).
+   - Pour chaque jour, assigner la ville étape principale ('city').
+
+5. HÔTELS DU CIRCUIT :
    - Extraire tous les hôtels réels du voyage (depuis le tableau des hôtels, les coordonnées ou le déroulé). Pour chaque hôtel : 'name' (avec catégorie si mentionnée, ex: "Deventure Sarovar Portico 4*"), 'city', 'dates' (ou jours associés, ex: "Du 2 au 3 décembre" ou "Jours 2 et 14").
 
 RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOUR :
@@ -601,12 +611,12 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOU
   "days": [
     {
       "day": 1,
-      "title": "Titre propre du jour (ex: Paris - Delhi)",
+      "title": "Titre propre du jour (ex: Votre région - Genève - Delhi)",
       "city": "Ville étape",
       "timeline": [
         {
           "title": "Nom court étape",
-          "subtitle": "Description synthétique de l'étape",
+          "subtitle": "Texte exact d'origine de l'étape sans aucun résumé",
           "time": ""
         }
       ]
@@ -730,7 +740,7 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOU
         statusEl.style.borderColor = '#86efac';
         statusEl.style.background = '#f0fdf4';
         statusEl.style.color = '#15803d';
-        statusEl.innerHTML = `<i class="fa-solid fa-sparkles" style="color:#9333ea;"></i> <strong>Nettoyage IA réussi !</strong> Le programme a été restructuré avec succès : titres nominaux courts, fausses visites éliminées, ${tripToClean.itinerary.length} journée(s) et ${tripToClean.hotels.length} hôtel(s) identifié(s).`;
+        statusEl.innerHTML = `<i class="fa-solid fa-sparkles" style="color:#9333ea;"></i> <strong>Structuration IA réussie !</strong> Le programme a été structuré avec succès selon la Skill Import : titres courts nominaux, inclusion systématique des repas (Déjeuner & Dîner logement), explications conformes à la source, ${tripToClean.itinerary.length} journée(s) et ${tripToClean.hotels.length} hôtel(s) identifié(s).`;
       }
 
     } catch(err) {
@@ -764,7 +774,7 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOU
       return;
     }
 
-    if (!confirm(`Voulez-vous lancer le nettoyage IA des étapes pour le voyage "${tripData.title}" ?\n\nL'IA Gemini va :\n• Remplacer les débuts de phrases par des noms propres courts de visites\n• Éliminer les étapes descriptives parasites\n• Respecter strictement l'ordre de vos ${tripData.itinerary.length} journées`)) {
+    if (!confirm(`Voulez-vous lancer la restructuration IA des étapes selon la Skill Import pour le voyage "${tripData.title}" ?\n\nL'IA Gemini va :\n• Structurer des titres d'étapes courts et nominaux\n• Inclure systématiquement les étapes Déjeuner et Dîner logement\n• Conserver le texte d'origine exact sans le résumer dans les explications\n• Respecter strictement l'ordre de vos ${tripData.itinerary.length} journées`)) {
       return;
     }
 
@@ -779,7 +789,7 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOU
     const originalHtml = btn ? btn.innerHTML : '';
     if (btn) {
       btn.disabled = true;
-      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Nettoyage IA...`;
+      btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Structuration IA...`;
     }
 
     try {
@@ -792,6 +802,7 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT, SANS BALISE MARKDOWN NI TEXTE AUTOU
       }));
 
       const promptText = `Tu es l'expert éditorial de "Voyages Girardot".
+Tu appliques STRICTEMENT la compétence (Skill) : "Import et Structuration de Carnet de Voyage".
 Nettoie et normalise les étapes et visites de ce voyage :
 TITRE : ${tripData.title}
 SOUS-TITRE : ${tripData.subtitle || ""}
@@ -800,10 +811,11 @@ PAYS : ${tripData.primaryDestinationCountry || ""}
 JOURNÉES :
 ${JSON.stringify(itinerarySample, null, 2)}
 
-RÈGLES STRICTES :
-1. Titres de visites STRICTEMENT NOMINAUX ET COURTS (Jamais de phrase, pas de "Visite de...", pas de verbes conjugués).
-2. Éliminer les fausses étapes parasites et fondre leurs explications dans 'subtitle'.
-3. Conserver strictement l'ordre des jours et des visites.
+CONSIGNES STRICTES DE LA SKILL "IMPORT CARNET DE VOYAGE" :
+1. Titres d'étapes STRICTEMENT NOMINAUX ET COURTS (Jamais de phrase, pas de "Visite de...", pas de verbes conjugués).
+2. FIDÉLITÉ TEXTUELLE STRICTE (ZÉRO RÉSUMÉ) : Le champ 'subtitle' DOIT reprendre exactement le texte d'origine sans le résumer ni le paraphraser.
+3. INCLUSION SYSTÉMATIQUE DES REPAS : Inclure obligatoirement les étapes Déjeuner (title: "Déjeuner") et Dîner logement (title: "Dîner logement" ou "Dîner et nuit à bord") dans chaque journée, sauf mention expresse de repas libre ("Déjeuner libre", "Dîner libre"). Si le texte source détaille le repas, inscrire cette phrase exacte dans 'subtitle'.
+4. Conserver strictement l'ordre chronologique des jours et des étapes.
 
 RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT :
 {
@@ -815,7 +827,7 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT :
       "timeline": [
         {
           "title": "Nom court étape",
-          "subtitle": "Description synthétique",
+          "subtitle": "Texte exact d'origine",
           "time": ""
         }
       ]
