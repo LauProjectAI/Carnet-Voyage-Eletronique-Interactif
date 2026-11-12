@@ -1,5 +1,15 @@
 window.AVAILABLE_TRIPS = [
   {
+    id: "canada-etats-unis",
+    alias: "canada-etats-unis",
+    aliases: ["canada-etats-unis"],
+    title: "Canada États-Unis",
+    subtitle: "De Québec à New York",
+    dates: "18 au 29 septembre 2026",
+    file: "voyages/canada-etats-unis.json"
+  },
+
+  {
     id: "chicago",
     alias: "chicago",
     aliases: ["chicago"],
