@@ -1,0 +1,1361 @@
+{
+  "id": "canada-etats-unis",
+  "title": "Canada États-Unis",
+  "subtitle": "De Québec à New York",
+  "dates": "18 au 29 septembre 2026",
+  "startDate": "2026-09-18",
+  "endDate": "2026-09-29",
+  "coverImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Ch%C3%A2teau_Frontenac_after_a_snowstorm.jpg/960px-Ch%C3%A2teau_Frontenac_after_a_snowstorm.jpg",
+  "intro": "Du Vieux Québec à Manhattan, en passant par Niagara et la Maison Blanche, votre parcours est jonché de contrastes et de rencontres éblouissantes. Vous serez charmés par l'hospitalité québécoise, séduits par une nature généreuse et exaltés par l'animation trépidante des grandes métropoles qui ont fait l'histoire de l'Amérique des pionniers... Montréal, Ottawa, Toronto, Washington et New-York. Un départ fin septembre sera probablement pour vous l'occasion de vous émerveiller devant les couleurs de l'été indien…",
+  "alert": {
+    "title": "Formalités indispensables",
+    "text": "Passeport valide 6 mois après la date de votre retour.\nFormulaire AVE obligatoire et disponible sur internet. Coût 7 $ à ce jour.\nFormulaire ESTA obligatoire et disponible sur internet : https://esta.cbp.dhs.gov. Coût : 40 $/personne à ce jour.",
+    "link": "https://esta.cbp.dhs.gov"
+  },
+  "flightsList": [
+    {
+      "type": "Aller",
+      "airline": "Air France",
+      "flightNumber": "AF 352",
+      "departureAirport": "Paris Charles de Gaulle, terminal 2E",
+      "departureTime": "21h15",
+      "arrivalAirport": "Québec",
+      "arrivalTime": "22h35 (heure locale)",
+      "date": "18/09/2026",
+      "via": "",
+      "notes": "Convocation à 18h15 au comptoir d'enregistrement • prestations à bord"
+    },
+    {
+      "type": "Retour",
+      "airline": "Air France",
+      "flightNumber": "AF 005",
+      "departureAirport": "New York",
+      "departureTime": "18h30",
+      "arrivalAirport": "Paris Charles de Gaulle",
+      "arrivalTime": "08h05 le 29/09/2026",
+      "date": "28/09/2026",
+      "via": "",
+      "notes": "prestations à bord"
+    }
+  ],
+  "flights": {
+    "outbound": {
+      "airline": "Air France",
+      "flightNumber": "AF 352",
+      "departureAirport": "Paris Charles de Gaulle, terminal 2E",
+      "departureTime": "21h15",
+      "arrivalAirport": "Québec",
+      "arrivalTime": "22h35 (heure locale)",
+      "date": "18/09/2026",
+      "layover": ""
+    },
+    "inbound": {
+      "airline": "Air France",
+      "flightNumber": "AF 005",
+      "departureAirport": "New York",
+      "departureTime": "18h30",
+      "arrivalAirport": "Paris Charles de Gaulle",
+      "arrivalTime": "08h05 le 29/09/2026",
+      "date": "28/09/2026",
+      "layover": ""
+    },
+    "domesticFlights": [],
+    "baggage": {
+      "cabin": "1 Bagage cabine/personne : 1 bagage de 55 x 35 x 25 cm (roues et poignées incluses) et un petit sac de 40 x 30 x 15 cm à ranger sous le siège devant vous, de 12 Kg maximum au total.",
+      "hold": "1 Bagage en soute/personne : 1 bagage de 158 cm maximum (longueur + largeur + hauteur) et de 23 Kg maxi.",
+      "details": "*Aucun contenant de plus de 100 ml, ciseaux, couteau en cabine Le dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place. Conservez avec vous : pièce d'identité et médicaments."
+    }
+  },
+  "baggage": {
+    "cabin": "1 Bagage cabine/personne : 1 bagage de 55 x 35 x 25 cm (roues et poignées incluses) et un petit sac de 40 x 30 x 15 cm à ranger sous le siège devant vous, de 12 Kg maximum au total.",
+    "hold": "1 Bagage en soute/personne : 1 bagage de 158 cm maximum (longueur + largeur + hauteur) et de 23 Kg maxi.",
+    "details": "*Aucun contenant de plus de 100 ml, ciseaux, couteau en cabine Le dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place. Conservez avec vous : pièce d'identité et médicaments."
+  },
+  "itinerary": [
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 1,
+      "title": "Votre région - Paris - Québec",
+      "city": "Québec",
+      "lat": 46.8139,
+      "lng": -71.208,
+      "highlight": "",
+      "description": "Jour consacré à l'acheminement. Transfert à l’aéroport de Paris. Formalités d’embarquement. Envol pour Québec . Accueil à l'aéroport par votre guide francophone. Transfert à l'hôtel. Installation à l'hôtel. Dîner libre. Logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Bas%C3%ADlica_de_Notre-Dame%2C_Montreal%2C_Canad%C3%A1%2C_2017-08-12%2C_DD_22-24_HDR.jpg/960px-Bas%C3%ADlica_de_Notre-Dame%2C_Montreal%2C_Canad%C3%A1%2C_2017-08-12%2C_DD_22-24_HDR.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 1",
+      "timeline": [
+        {
+          "title": "Transfert",
+          "subtitle": "Jour consacré à l'acheminement. Transfert à l’aéroport de Paris.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner.",
+          "time": "12:30",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Envol",
+          "subtitle": "Formalités d’embarquement. Envol pour Québec . Accueil à l'aéroport par votre guide francophone. Transfert à l'hôtel. Installation à l'hôtel.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner libre",
+          "subtitle": "Dîner libre. Logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 2,
+      "title": "Québec",
+      "city": "Québec",
+      "lat": 46.8139,
+      "lng": -71.208,
+      "highlight": "",
+      "description": "Visite guidée de Québec . Seule cité nord-américaine classée au patrimoine mondial de l'Unesco. Découverte de la ville située au bord du fleuve Saint-Laurent, souvent considérée comme un morceau de France en Amérique du Nord. Déjeuner. Temps libre à Québec. Arrêt aux chutes Montmorency . Cette chute de 83 m, plus haute que celles de Niagara, depuis le pont qui la surplombe. Exploration du parc à pied, découverte de la flore environnante et de la vue époustouflante. Dîner dans une cabane à sucre avec dégustation de tire d'érable. Découverte du trésor gastronomique québécois le sirop d'érable et plus particulièrement la tire d'érable. Logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e2/Bas%C3%ADlica_de_Notre-Dame%2C_Montreal%2C_Canad%C3%A1%2C_2017-08-12%2C_DD_22-24_HDR.jpg/960px-Bas%C3%ADlica_de_Notre-Dame%2C_Montreal%2C_Canad%C3%A1%2C_2017-08-12%2C_DD_22-24_HDR.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 2",
+      "timeline": [
+        {
+          "title": "Québec",
+          "subtitle": "Visite guidée de Québec . Seule cité nord-américaine classée au patrimoine mondial de l'Unesco. Découverte de la ville située au bord du fleuve Saint-Laurent, souvent considérée comme un morceau de France en Amérique du Nord.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Chutes Montmorency",
+          "subtitle": "Après un temps libre à Québec. Arrêt aux chutes Montmorency . Cette chute de 83 m, plus haute que celles de Niagara, depuis le pont qui la surplombe. Exploration du parc à pied, découverte de la flore environnante et de la vue époustouflante.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner dans une cabane à sucre avec dégustation de tire d'érable. Découverte du trésor gastronomique québécois le sirop d'érable et plus particulièrement la tire d'érable. Logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 3,
+      "title": "Québec - Montréal",
+      "city": "Montréal",
+      "lat": 45.5017,
+      "lng": -73.5673,
+      "highlight": "",
+      "description": "Route vers Montréal . Déjeuner smoke meat, spécialité montréalaise. Visite guidée de Montréal, la plus grande cité francophone d'Amérique du Nord : la basilique Notre-Dame (entrée non incluse), le quartier du vieux port, le marché couvert Bonsecours, la place Jacques Cartier avec l'hôtel de ville, le parc olympique des JO de 1976, la place des Arts... Dîner logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c6/Bas%C3%ADlica_de_Notre-Dame%2C_Montreal%2C_Canad%C3%A1%2C_2017-08-12%2C_DD_07-09_HDR.jpg/960px-Bas%C3%ADlica_de_Notre-Dame%2C_Montreal%2C_Canad%C3%A1%2C_2017-08-12%2C_DD_07-09_HDR.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 3",
+      "timeline": [
+        {
+          "title": "Montréal",
+          "subtitle": "Route vers Montréal .",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner smoke meat, spécialité montréalaise.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Montréal",
+          "subtitle": "Visite guidée de Montréal, la plus grande cité francophone d'Amérique du Nord : la basilique Notre-Dame (entrée non incluse), le quartier du vieux port, le marché couvert Bonsecours, la place Jacques Cartier avec l'hôtel de ville, le parc olympique des JO de 1976, la place des Arts...",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 4,
+      "title": "Montréal - Ottawa - Gananoque",
+      "city": "Gananoque (Mille Îles)",
+      "lat": 44.3292,
+      "lng": -76.1614,
+      "highlight": "",
+      "description": "Route vers Ottawa, capitale fédérale du Canada et ville cosmopolite. A la frontière entre l'Ontario et le Québec, cité discrète et tranquille, avec au cœur, le Canal Rideau, lieu de rencontre été comme hiver. Tour de ville . Déjeuner. Visite de Rideau Hall , résidence du Gouverneur Général du Canada, située dans un vaste domaine de 79 acres. Temps libre à Ottawa. Gananoque . Dîner logement.",
+      "image": "",
+      "weather": "",
+      "dateStr": "Jour 4",
+      "timeline": [
+        {
+          "title": "Ottawa",
+          "subtitle": "Route vers Ottawa, capitale fédérale du Canada et ville cosmopolite. A la frontière entre l'Ontario et le Québec, cité discrète et tranquille, avec au cœur, le Canal Rideau, lieu de rencontre été comme hiver. Tour de ville .",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Rideau Hall",
+          "subtitle": "Visite de Rideau Hall , résidence du Gouverneur Général du Canada, située dans un vaste domaine de 79 acres.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Temps libre",
+          "subtitle": "Temps libre à Ottawa. Gananoque .",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 5,
+      "title": "Gananoque - Toronto",
+      "city": "Toronto",
+      "lat": 43.6532,
+      "lng": -79.3832,
+      "highlight": "",
+      "description": "Embarquement pour une croisière dans les Mille Îles . Une multitude d'îles et d'îlots, habités ou non, forment un véritable labyrinthe dans un décor paisible, autrefois occupé par des tribus indiennes. Départ vers Kingston. Déjeuner. Tour panoramique de l'ancienne capitale du Canada qui est aujourd'hui un port de plaisance. Route vers Toronto, ville principale de l'Ontario et grand pôle économique. Toronto bénéficie d'une situation exceptionnelle au bord du Lac Ontario. Dîner logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ea/King_St_Toronto_1836.jpg/960px-King_St_Toronto_1836.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 5",
+      "timeline": [
+        {
+          "title": "Croisière des Mille-Îles",
+          "subtitle": "Embarquement pour une croisière dans les Mille Îles . Une multitude d'îles et d'îlots, habités ou non, forment un véritable labyrinthe dans un décor paisible, autrefois occupé par des tribus indiennes.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Kingston",
+          "subtitle": "Départ vers Kingston.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner. Tour panoramique de l'ancienne capitale du Canada qui est aujourd'hui un port de plaisance.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Toronto",
+          "subtitle": "Route vers Toronto, ville principale de l'Ontario et grand pôle économique. Toronto bénéficie d'une situation exceptionnelle au bord du Lac Ontario.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 6,
+      "title": "Toronto - Niagara",
+      "city": "Chutes du Niagara",
+      "lat": 43.0896,
+      "lng": -79.0849,
+      "highlight": "",
+      "description": "Visite d'un vignoble à Niagara On-The-Lake. Route vers Niagara. Découverte des Chutes, mondialement célèbres, site naturel imposant que les Iroquois surnommaient \"tonnerre de l'eau\". Déjeuner panoramique. Embarquement pour une croisière à bord du Hornblower (ou similaire). Ce court trajet permet d'approcher au maximum les bouillonnantes cataractes. C'est une expérience incroyable de voir les chutes depuis la surface de l'eau. Leur dimension en devient exceptionnelle. Dîner logement.",
+      "image": "",
+      "weather": "",
+      "dateStr": "Jour 6",
+      "timeline": [
+        {
+          "title": "Niagara On-The-Lake",
+          "subtitle": "Visite d'un vignoble à Niagara On-The-Lake.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Niagara",
+          "subtitle": "Route vers Niagara.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Chutes du Niagara",
+          "subtitle": "Découverte des Chutes, mondialement célèbres, site naturel imposant que les Iroquois surnommaient \"tonnerre de l'eau\".",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner panoramique.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Croisière Hornblower",
+          "subtitle": "Embarquement pour une croisière à bord du Hornblower (ou similaire). Ce court trajet permet d'approcher au maximum les bouillonnantes cataractes. C'est une expérience incroyable de voir les chutes depuis la surface de l'eau. Leur dimension en devient exceptionnelle.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 7,
+      "title": "Niagara - Carlisle",
+      "city": "Carlisle",
+      "lat": null,
+      "lng": null,
+      "highlight": "",
+      "description": "Passage de la frontière américaine . Arrêt à Corning. Déjeuner. Route vers la région de Harrisburg. Dîner logement.",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/2/28/DICKINSON_COLLEGE%2C_CARLISLE%2C_CUMBERLAND_COUNTY%2C_PA.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "weather": "",
+      "dateStr": "Jour 7",
+      "timeline": [
+        {
+          "title": "Frontière américaine",
+          "subtitle": "Passage de la frontière américaine .",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Corning",
+          "subtitle": "Arrêt à Corning.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Harrisburg",
+          "subtitle": "Route vers la région de Harrisburg.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 8,
+      "title": "Carlisle - Washington",
+      "city": "Washington",
+      "lat": null,
+      "lng": null,
+      "highlight": "",
+      "description": "Route vers Washington , capitale fédérale des États-Unis. Située dans le District de Columbia (et non pas dans un état...), elle fut créée en 1790 par le congrès. A voir : le Capitole, la Cour Suprême, le mémorial dédié à Abraham Lincol, à Georges Washington... Déjeuner au bord de la rivière Potomac . Visite guidée . Les imposants bâtiments en font une des plus belles villes des Etats-Unis. Arrêt au cimetière d'Arlington , créé après la guerre de Sécession. Dîner logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fa/University_of_Washington_-_Eagleson_Hall_01_%28cropped%29.jpg/960px-University_of_Washington_-_Eagleson_Hall_01_%28cropped%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 8",
+      "timeline": [
+        {
+          "title": "Washington",
+          "subtitle": "Route vers Washington , capitale fédérale des États-Unis. Située dans le District de Columbia (et non pas dans un état...), elle fut créée en 1790 par le congrès. A voir : le Capitole, la Cour Suprême, le mémorial dédié à Abraham Lincol, à Georges Washington...",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner au bord de la rivière Potomac .",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Washington",
+          "subtitle": "Visite guidée . Les imposants bâtiments en font une des plus belles villes des Etats-Unis.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Cimetière d'Arlington",
+          "subtitle": "Arrêt au cimetière d'Arlington , créé après la guerre de Sécession.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 9,
+      "title": "Washington - New York",
+      "city": "New York",
+      "lat": null,
+      "lng": null,
+      "highlight": "",
+      "description": "Route vers Philadelphie en Pennsylvanie. Le \"Berceau de l'indépendance américaine\" où furent signées la Déclaration d'Indépendance le 04 juillet 1776 et la Constitution Américaine (1787). Tour panoramique . À voir : le Hall de l'Indépendance, de la cloche de la liberté... Déjeuner. Départ pour New York City . New York et Long Island font partie des premières terres découvertes au début du 17ème siècle. Montée au sommet du One World Observatory, désormais le plus haut gratte-ciel et l'un des symboles du renouveau du quartier financier. Dîner logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/New_Croton_Dam_NY1.jpg/960px-New_Croton_Dam_NY1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 9",
+      "timeline": [
+        {
+          "title": "Philadelphie",
+          "subtitle": "Route vers Philadelphie en Pennsylvanie. Le \"Berceau de l'indépendance américaine\" où furent signées la Déclaration d'Indépendance le 04 juillet 1776 et la Constitution Américaine (1787). Tour panoramique . À voir : le Hall de l'Indépendance, de la cloche de la liberté...",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "New York City",
+          "subtitle": "Départ pour New York City . New York et Long Island font partie des premières terres découvertes au début du 17ème siècle.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "One World Observatory",
+          "subtitle": "Montée au sommet du One World Observatory, désormais le plus haut gratte-ciel et l'un des symboles du renouveau du quartier financier.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 10,
+      "title": "New York",
+      "city": "New York",
+      "lat": null,
+      "lng": null,
+      "highlight": "",
+      "description": "Traversée en ferry, avec audioguide, vers l'inoubliable Statue de la Liberté . Déjeuner chinois. Visite guidée de Manhattan : les légendaires briques rouges de Greenwich Village, les quartiers de Soho, Chinatown, Times Square et détour jusqu'au mythique Central Park. Dîner sur Broadway. Logement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/New_Croton_Dam_NY1.jpg/960px-New_Croton_Dam_NY1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 10",
+      "timeline": [
+        {
+          "title": "Statue de la Liberté",
+          "subtitle": "Traversée en ferry, avec audioguide, vers l'inoubliable Statue de la Liberté .",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner chinois.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Manhattan",
+          "subtitle": "Visite guidée de Manhattan : les légendaires briques rouges de Greenwich Village, les quartiers de Soho, Chinatown, Times Square et détour jusqu'au mythique Central Park.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner logement",
+          "subtitle": "Dîner sur Broadway. Logement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 11,
+      "title": "New York - Paris",
+      "city": "New York",
+      "lat": null,
+      "lng": null,
+      "highlight": "",
+      "description": "Journée libre pour profiter des derniers achats ou une découverte personnelle de cette fantastique ville si surprenante. Déjeuner. Transfert vers l'aéroport. Envol pour Paris. Repas et nuit à bord.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5c/New_Croton_Dam_NY1.jpg/960px-New_Croton_Dam_NY1.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 11",
+      "timeline": [
+        {
+          "title": "Journée libre",
+          "subtitle": "Journée libre pour profiter des derniers achats ou une découverte personnelle de cette fantastique ville si surprenante.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Déjeuner",
+          "subtitle": "Déjeuner. Transfert vers l'aéroport.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Envol",
+          "subtitle": "Envol pour Paris. Repas et nuit à bord.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner et nuit à bord",
+          "subtitle": "Dîner et nuit à bord.",
+          "time": "20:00",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 12,
+      "title": "Paris - Votre région",
+      "city": "Paris",
+      "lat": 43.0896,
+      "lng": -79.0849,
+      "highlight": "",
+      "description": "Journée consacrée au réacheminement. Arrivée à Paris. Retour dans votre région.",
+      "image": "",
+      "weather": "",
+      "dateStr": "Jour 12",
+      "timeline": [
+        {
+          "title": "Réacheminement",
+          "subtitle": "Journée consacrée au réacheminement. Arrivée à Paris. Retour dans votre région.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "name": "Hôtel Le Concorde",
+      "dates": "Du 18 au 20 septembre",
+      "city": "Québec",
+      "address": "1225 Cours du Général de Montcalm, G1R 4W6 Québec City - Québec",
+      "phone": "+1 418 647 2222",
+      "lat": 46.8139,
+      "lng": -71.208,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Sandman Montréal-Longueil",
+      "dates": "Du 20 au 21 septembre",
+      "city": "Montréal (Longueuil)",
+      "address": "999 Rue de Serigny, J4K 2T1 Longueuil - Canada",
+      "phone": "+1 450 670 3030",
+      "lat": 45.5312,
+      "lng": -73.5181,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Tru by Hilton Ganacoque",
+      "dates": "Du 21 au 22 septembre",
+      "city": "Gananoque (Mille Îles)",
+      "address": "379 County Highway 2, K7G 2V4 Gananoque - Canada",
+      "phone": "+1 613 463 9555",
+      "lat": 44.3292,
+      "lng": -76.1614,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Holiday Inn Express & Suites",
+      "dates": "Du 22 au 23 septembre",
+      "city": "Toronto (Mississauga)",
+      "address": "Mississauga - Toronto Southwest by IHG, 2125 North Sheridan Way, L5K 1A3 Mississauga - Canada",
+      "phone": "+1 905 855 2000",
+      "lat": 43.589,
+      "lng": -79.6441,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Americana Conference Resort Spa and Waterpark",
+      "dates": "Du 23 au 24 septembre",
+      "city": "Chutes du Niagara",
+      "address": "8444 Lundy's Lane, L2H 1H4 Niagara Falls - Canada",
+      "phone": "+1 905 356 8444 ou 866 707 0030",
+      "lat": 43.0896,
+      "lng": -79.0849,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Comfort Inn Pa Turnpike",
+      "dates": "Du 24 au 25 septembre",
+      "city": "Carlisle",
+      "address": "77 Shady Lane, 17013 Carlisle - Etats-Unis",
+      "phone": "+1 717 706 3400",
+      "lat": 40.2015,
+      "lng": -77.1889,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Comfort Inn University Center Fairfax",
+      "dates": "Du 25 au 26 septembre",
+      "city": "Washington (Fairfax)",
+      "address": "11180 Fairfax Boulevard, 22030 Fairfax - Etats-Unis",
+      "phone": "+1 703 591 5900",
+      "lat": 38.8462,
+      "lng": -77.3064,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Hyatt Place Fair Lawn Paramus",
+      "dates": "Du 26 au 28 septembre",
+      "city": "New York (Fair Lawn)",
+      "address": "41-01 Broadway 208 North, 07410 Fair Lawn - Etats-Unis",
+      "phone": "+1 201 475 3888",
+      "lat": 40.9404,
+      "lng": -74.1318,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    }
+  ],
+  "hotelsList": [
+    {
+      "name": "Hôtel Le Concorde",
+      "dates": "Du 18 au 20 septembre",
+      "city": "Québec",
+      "address": "1225 Cours du Général de Montcalm, G1R 4W6 Québec City - Québec",
+      "phone": "+1 418 647 2222",
+      "lat": 46.8139,
+      "lng": -71.208,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Sandman Montréal-Longueil",
+      "dates": "Du 20 au 21 septembre",
+      "city": "Montréal (Longueuil)",
+      "address": "999 Rue de Serigny, J4K 2T1 Longueuil - Canada",
+      "phone": "+1 450 670 3030",
+      "lat": 45.5312,
+      "lng": -73.5181,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Tru by Hilton Ganacoque",
+      "dates": "Du 21 au 22 septembre",
+      "city": "Gananoque (Mille Îles)",
+      "address": "379 County Highway 2, K7G 2V4 Gananoque - Canada",
+      "phone": "+1 613 463 9555",
+      "lat": 44.3292,
+      "lng": -76.1614,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Holiday Inn Express & Suites",
+      "dates": "Du 22 au 23 septembre",
+      "city": "Toronto (Mississauga)",
+      "address": "Mississauga - Toronto Southwest by IHG, 2125 North Sheridan Way, L5K 1A3 Mississauga - Canada",
+      "phone": "+1 905 855 2000",
+      "lat": 43.589,
+      "lng": -79.6441,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Americana Conference Resort Spa and Waterpark",
+      "dates": "Du 23 au 24 septembre",
+      "city": "Chutes du Niagara",
+      "address": "8444 Lundy's Lane, L2H 1H4 Niagara Falls - Canada",
+      "phone": "+1 905 356 8444 ou 866 707 0030",
+      "lat": 43.0896,
+      "lng": -79.0849,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Comfort Inn Pa Turnpike",
+      "dates": "Du 24 au 25 septembre",
+      "city": "Carlisle",
+      "address": "77 Shady Lane, 17013 Carlisle - Etats-Unis",
+      "phone": "+1 717 706 3400",
+      "lat": 40.2015,
+      "lng": -77.1889,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Comfort Inn University Center Fairfax",
+      "dates": "Du 25 au 26 septembre",
+      "city": "Washington (Fairfax)",
+      "address": "11180 Fairfax Boulevard, 22030 Fairfax - Etats-Unis",
+      "phone": "+1 703 591 5900",
+      "lat": 38.8462,
+      "lng": -77.3064,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Hôtel Hyatt Place Fair Lawn Paramus",
+      "dates": "Du 26 au 28 septembre",
+      "city": "New York (Fair Lawn)",
+      "address": "41-01 Broadway 208 North, 07410 Fair Lawn - Etats-Unis",
+      "phone": "+1 201 475 3888",
+      "lat": 40.9404,
+      "lng": -74.1318,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    }
+  ],
+  "documents": [],
+  "freeTimeSuggestions": [
+    {
+      "name": "Le Ciel! Bistro-bar",
+      "category": "Bistro Tournant Panoramique",
+      "tag": "Directement à l'hôtel",
+      "city": "Québec",
+      "moment": "Dîner libre",
+      "day": 1,
+      "description": "Situé au sommet de votre hôtel, ce restaurant tournant offre une vue imprenable à 360 degrés sur le fleuve Saint-Laurent et les fortifications. La cuisine bistronomique met en avant les produits du terroir québécois dans un cadre spectaculaire et mouvant.",
+      "address": "1225 Cours du Général-de-Montcalm, Québec, QC G1R 4W6",
+      "location": "1225 Cours du Général-de-Montcalm, Québec, QC G1R 4W6",
+      "tips": "Réservation indispensable pour obtenir une table près de la vitre au coucher du soleil.",
+      "lat": 46.8055,
+      "lng": -71.2168
+    },
+    {
+      "name": "Aux Anciens Canadiens",
+      "category": "Cuisine Traditionnelle Québécoise",
+      "tag": "Institution historique",
+      "city": "Québec",
+      "moment": "Dîner libre",
+      "day": 1,
+      "description": "Installé dans la plus vieille maison de Québec (1675), ce restaurant propose une immersion totale dans l'histoire avec ses serveurs en costume d'époque. C'est l'endroit idéal pour goûter à la tourtière du Lac-Saint-Jean ou au ragoût de boulettes traditionnel.",
+      "address": "34 Rue Saint-Louis, Québec, QC G1R 4P3",
+      "location": "34 Rue Saint-Louis, Québec, QC G1R 4P3",
+      "tips": "Le menu à prix fixe avant 18h00 offre un excellent rapport qualité-prix pour découvrir les classiques.",
+      "lat": 46.8122,
+      "lng": -71.2065
+    },
+    {
+      "name": "Bistro L'Atelier",
+      "category": "Bistro & Mixologie",
+      "tag": "À 2 min à pied",
+      "city": "Québec",
+      "moment": "Dîner libre",
+      "day": 1,
+      "description": "Situé sur la vibrante Grande Allée, ce bistro branché est réputé pour ses tartares créatifs et ses cocktails signatures élaborés. L'ambiance industrielle et chaleureuse est parfaite pour une soirée animée à deux pas de votre chambre.",
+      "address": "624 Grande Allée E, Québec, QC G1R 2K5",
+      "location": "624 Grande Allée E, Québec, QC G1R 2K5",
+      "tips": "Idéal pour ceux qui recherchent une ambiance urbaine et dynamique sans s'éloigner de l'hôtel.",
+      "lat": 46.8068,
+      "lng": -71.2145
+    },
+    {
+      "name": "La Buche",
+      "category": "Cuisine de Cabane à Sucre Urbaine",
+      "tag": "Coup de cœur Girardot",
+      "city": "Québec",
+      "moment": "Dîner libre",
+      "day": 1,
+      "description": "Ce restaurant réinvente les classiques de la cabane à sucre dans un décor boisé et festif au cœur du Vieux-Québec. Vous y dégusterez une cuisine généreuse et authentique, comme le pâté chinois revisité ou le jambon à l'érable.",
+      "address": "49 Rue Saint-Louis, Québec, QC G1R 3Z2",
+      "location": "49 Rue Saint-Louis, Québec, QC G1R 3Z2",
+      "tips": "Ne manquez pas la tire d'érable sur neige, disponible toute l'année à l'intérieur du restaurant.",
+      "lat": 46.8119,
+      "lng": -71.2072
+    },
+    {
+      "name": "Bello Ristorante",
+      "category": "Trattoria Italienne",
+      "tag": "Ambiance raffinée",
+      "city": "Québec",
+      "moment": "Dîner libre",
+      "day": 1,
+      "description": "Une magnifique adresse située sur la rue Saint-Louis proposant des pâtes fraîches maison et des pizzas cuites au four à bois. Le cadre est élégant avec ses murs de pierres d'origine, offrant une atmosphère feutrée et chaleureuse.",
+      "address": "73 Rue Saint-Louis, Québec, QC G1R 3Z2",
+      "location": "73 Rue Saint-Louis, Québec, QC G1R 3Z2",
+      "tips": "Leur risotto aux champignons sauvages est une spécialité très appréciée des locaux.",
+      "lat": 46.8115,
+      "lng": -71.2078
+    },
+    {
+      "name": "Westfield Garden State Plaza",
+      "category": "Grand Magasin & Shopping",
+      "tag": "Le temple du shopping",
+      "city": "New York",
+      "moment": "Matinée libre",
+      "day": 11,
+      "description": "Situé à seulement quelques minutes de l'hôtel, ce centre commercial est l'un des plus vastes et prestigieux de la région avec des enseignes comme Macy's et Nordstrom. C'est l'endroit parfait pour une immersion dans la culture de consommation américaine avec des centaines de boutiques de marques internationales.",
+      "address": "1 Garden State Plaza Pkwy, Paramus, NJ 07652",
+      "location": "1 Garden State Plaza Pkwy, Paramus, NJ 07652",
+      "tips": "Privilégiez le matin pour éviter la foule et profitez de l'absence de taxe sur les vêtements dans le New Jersey.",
+      "lat": 40.9164,
+      "lng": -74.0681
+    },
+    {
+      "name": "Saddle River County Park",
+      "category": "Balade & Panorama",
+      "tag": "Bouffée d'air frais",
+      "city": "New York",
+      "moment": "Matinée libre",
+      "day": 11,
+      "description": "Un magnifique parc linéaire qui s'étend sur plusieurs kilomètres, offrant des sentiers boisés et des étangs paisibles à proximité immédiate de Fair Lawn. C'est une alternative relaxante pour une promenade matinale au calme avant de reprendre la route ou les visites urbaines.",
+      "address": "Saddle River Rd, Fair Lawn, NJ 07410",
+      "location": "Saddle River Rd, Fair Lawn, NJ 07410",
+      "tips": "La section 'Wild Duck Pond' est particulièrement pittoresque pour les amateurs de photographie.",
+      "lat": 40.9285,
+      "lng": -74.1045
+    },
+    {
+      "name": "Bergen Town Center",
+      "category": "Outlets & Shopping",
+      "tag": "Coup de cœur Girardot",
+      "city": "New York",
+      "moment": "Matinée libre",
+      "day": 11,
+      "description": "Ce centre commercial est célèbre pour ses magasins d'usine (outlets) tels que Century 21 et Nordstrom Rack, proposant des prix imbattables. Moins intimidant que les grands centres, il permet de faire des trouvailles authentiques dans une ambiance typiquement locale.",
+      "address": "106 Bergen Town Center, Paramus, NJ 07652",
+      "location": "106 Bergen Town Center, Paramus, NJ 07652",
+      "tips": "Idéal pour acheter des marques américaines (Levi's, Nike) à des tarifs bien inférieurs à ceux de Manhattan.",
+      "lat": 40.9158,
+      "lng": -74.0542
+    },
+    {
+      "name": "The Shops at Riverside",
+      "category": "Shopping de Luxe",
+      "tag": "Ambiance raffinée",
+      "city": "New York",
+      "moment": "Matinée libre",
+      "day": 11,
+      "description": "Un centre commercial haut de gamme offrant une architecture intérieure élégante et des boutiques de créateurs renommés. Parfait pour une flânerie matinale chic, loin de l'agitation, avec d'excellentes options pour un café gourmet.",
+      "address": "390 Hackensack Ave, Hackensack, NJ 07601",
+      "location": "390 Hackensack Ave, Hackensack, NJ 07601",
+      "tips": "Ne manquez pas le niveau supérieur pour admirer le design moderne du centre.",
+      "lat": 40.9095,
+      "lng": -74.0315
+    }
+  ],
+  "contactsList": [
+    {
+      "category": "Accompagnatrice Voyages Girardot",
+      "name": "Laura",
+      "phone": "+33 (0)6 98 02 21 11",
+      "address": "Avec le groupe sur le circuit",
+      "isEmergency": false
+    },
+    {
+      "category": "Guide Local",
+      "name": "Claude Trudel",
+      "phone": "",
+      "address": "Guide local francophone",
+      "isEmergency": false
+    },
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "En semaine aux heures de bureau : 02 40 08 09 39",
+      "phone": "",
+      "address": "Le week-end et les jours fériés : Amérique du Nord : 06 18 84 19 63 • Au Canada & aux Etats-Unis – MISA TOURS INTERNATIONAL : • Coordonnateur : Marie Hélène COURTADE – 7 jours/7 : +1 819 352 1568 • Depuis l’Amérique du Nord, composez uniquement les 10 derniers chiffres. • En France : CARACTERES D'AMERIQUES & D’AFRIQUE :",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France au Canada",
+      "name": "42 Sussex Drive, Ottawa, ON K1M 2C9 (Consulats à Montréal et Québec)",
+      "phone": "+1 613 789 1795",
+      "address": "Consulat général à Montréal : +1 514 878 4385 • Site : https://ca.ambafrance.org",
+      "link": "https://ca.ambafrance.org",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France aux États-Unis",
+      "name": "4101 Reservoir Road NW, Washington, DC 20007 (Consulat à New York : 934 Fifth Ave)",
+      "phone": "+1 202 944 6000",
+      "address": "Consulat général à New York : +1 212 606 3600 • Site : https://franceintheus.org",
+      "link": "https://franceintheus.org",
+      "isEmergency": true
+    },
+    {
+      "category": "Fil d'Ariane — Ressortissants Français",
+      "name": "Portail officiel France Diplomatie (Inscription gratuite)",
+      "phone": "",
+      "address": "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      "link": "https://fildariane.diplomatie.gouv.fr",
+      "isEmergency": false
+    }
+  ],
+  "practicalTipsList": [
+    {
+      "title": "Formalités indispensables (Passeport & Visas)",
+      "icon": "passport",
+      "content": "Passeport valide 6 mois après la date de votre retour.\nFormulaire AVE obligatoire et disponible sur internet. Coût 7 $ à ce jour.\nFormulaire ESTA obligatoire et disponible sur internet : https://esta.cbp.dhs.gov. Coût : 40 $/personne à ce jour."
+    },
+    {
+      "title": "Bon à savoir",
+      "icon": "circle-info",
+      "content": "Pourboires aux guides et au chauffeur non inclus, conseillés : environ 4.5 $/jour/pers. La taxe frontalière américaine incluse : 6 $ révisables. Accompagnateur Voyages Girardot au départ de Paris dès 20 personnes. Voyages avec confrère. Prix calculés sur un dollar canadien CAD = 0.64 € - un dollar US = 0.86 €. Formulaire AVE obligatoire à souscrire par internet : http://www.cic.gc.ca. Coût 7 CAD, révisable. Formulaire ESTA obligatoire et disponible sur internet : https://esta.cbp.dhs.gov. Coût entre 21 USD à ce jour et 40 $. Ces 2 formulaires sont à établir uniquement au nom de jeune fille pour les femmes mariées. Bonne condition physique conseillée."
+    },
+    {
+      "title": "Prestations incluses",
+      "icon": "circle-check",
+      "content": "Vols réguliers Paris / Québec - New-York / Paris, compagnie Air France ou similaire. Taxes aéroport incluses : 430 € révisables. Hôtels 1ère catégorie, en chambre individuelle ou double. Pension complète selon le programme, eau en carafe, thé ou café inclus aux repas. Guide local francophone pendant la durée du circuit."
+    },
+    {
+      "title": "Assurance & Rapatriement",
+      "icon": "kit-medical",
+      "content": "Afin de faire face aux frais d’hospitalisation et aux dépenses de santé, parfois très élevés à l’étranger, il est impératif de disposer d’un contrat d’assistance ou d’une assurance permettant de couvrir tous les frais médicaux (dont la chirurgie et l’hospitalisation) et de rapatriement sanitaire, au risque de ne pas avoir accès aux soins, y compris en cas d’urgence vitale. Ces frais ne pourront en aucun cas être pris en charge par la société VOYAGES GIRARDOT ORGANISATION. Merci de vous munir de votre numéro de contrat d’assurance et le numéro de téléphone d’assistance (sur les documents que vous avez reçu lors la souscription de l’assurance). Canada Est : réglementation et formalités d'entrée L’Est canadien en quelques mots : immensité, chaleur humaine, francophonie, lacs, traversiers, communautés amérindiennes, sirop d’érable, homards, Saint Laurent, baleines, poutine, neige, été indien… Formalités Pour les ressortissants français : passeport valide 6 mois après la date de retour / un billet aller/retour / présenter une preuve de solvabilité (carte de crédit, chèques de voyage…). Obligation de l'AVE : condition d’entrée au Canada, appelée autorisation de voyage électronique (AVE). Santé Si vous avez des médicaments, prenez soin de ne pas oublier votre ordonnance. Prévoir une assurance frais médicaux et rapatriement . Aucun vaccin n’est obligatoire. Un certificat de vaccination contre la fièvre jaune peut être exigé des voyageurs en provenance d’une zone infectée. Cuisine La gastronomie canadienne est une cuisine de terroir plutôt copieuse, énergétique, parfaite par grand froid. Elle s’est nourrie de l’influence de toutes les nations qui ont émigré sur ses terres. C’est une bonne occasion pour déguster un repas traditionnel de la cabane à sucre, les diverses soupes, du homard ou du saumon, une tourtière… et le fameux sirop d’érable. Dans les restaurants, essayez l’une des nombreuses bières issues des microbrasseries locales. Le vin est aussi proposé (plus cher). Il est possible, dans certains restaurants, d'apporter sa propre bouteille de vin achetée dans un \"SAQ\" de la ville (magasin de la Société des Alcools du Québec). Ces restaurants indiquent cette pratique avec la mention \"apportez votre vin\". Pourboires Il est d’usage de laisser 7 CAD par personne et par jour pour le guide, 5 CAD par personne par jour pour le chauffeur et 3 CAD pour les guides locaux. Monnaie La monnaie nationale est le Dollar Canadien . Il est recommandé de se munir de Dollars Canadiens en France. Les cartes de crédits internationales vous seront très utiles pour régler vos achats et retirer de l’argent 24/24 h. Electricité 110 volts. Prévoir un adaptateur (prises à fiches plates). Langues Anglais et français. Décalage horaire -6h au Québec et en Ontario. -5h au Nouveau Brunswick, en Nouvelle Ecosse, sur l’île du Prince Edouard et à Terre Neuve. Climat En hiver : froid et neige (-8°/-20°). En été : chaud (25°) avec de grandes variantes possibles dans la même journée. NB : Le changement climatique peut apporter des variations dans les saisons. Valise En hiver : vêtements chauds pour les activités à l'extérieur, bonnet, foulard, gants et, chaussures fermées et imperméables. Pour le sport ou motoneige, prévoir sous-vêtements et chaussettes en laine ou tissu synthétique respirant. Prévoir un petit sac avec le strict minimum (nécessaire de toilettes, vêtements de rechange). En été : habits légers en coton, chaussures confortables, crème solaire, lunettes et chapeau, lainage pour les lieux climatisés. Les salles de bain dans les hôtels sont souvent équipées de douches fixes. Prévoir un bonnet de bain. Souvenirs Objets en vannerie ou écorce de bouleau, sculptures ou gravures en \"pierres à savon\" ou en bois, tissage de coton, ceintures fléchés, raquettes à neige. Sucre et sirop d’érable, saumon fumé, bières micro brassées… Téléphone Pour appeler le Canada depuis la France : +1 + 8/9 chiffres. Pour appeler la France depuis le Canada : +33 + indicatif 1 (2,3,6...) + 8 chiffres. USA Est : réglementation et formalités d'entrée New York en quelques mots : intense, yellow cab, géant, cosmopolite, musique, grouillant, shopping, musées, lumières, rêves, gratte-ciel, avenues, liberté, ponts, embouteillages, frissons, île… Washington en quelques mots : capitale fédérale, bâtiments officiels prestigieux, grande diversité et qualité des musées, le Mall et son immense allée de verdure… Boston en quelques mots : capitale du Massachusetts, ville culturelle, nombreux musées, édifices coloniaux, ville aménagée pour les piétons... Formalités Pour les ressortissants français : passeport valide à la date de retour / un billet aller/retour / présenter une preuve de solvabilité (carte de crédit, chèques de voyage…). Autorisation ESTA : obligatoire pour toutes arrivées sur le territoire américain . Santé Si vous avez des médicaments, prenez soin de ne pas oublier votre ordonnance. Prévoir une assurance frais médicaux et rapatriement . Aucun vaccin n’est obligatoire. Un certificat de vaccination contre la fièvre jaune peut être exigé des voyageurs en provenance d’une zone infectée. Cuisine Dans certains hôtels de 1ère catégorie, il peut arriver que le petit-déjeuner soit servi dans de la vaisselle jetable. L’art de bien manger à New York se caractérise par sa diversité. Il est possible de manger chinois aussi bien qu’à Canton ; ou bien de manger des bonnes pâtes comme au cœur du Sud italien. Goûter le \"seafood\" (poissons et fruits de mer) sur les côtes et bien sûr le fast-food qu'il soit américain, mexicain, chinois ou italien. Goûter un bon hamburger fait partie intégrante d’un voyage aux Etats-Unis. Privilégiez le Breakfast à l'américaine pour permettre de prendre un déjeuner léger et d'attendre le dîner qui pourra être copieux. La viande américaine est très réputée pour sa qualité et sa saveur, on peut la commander well done (bien cuite), medium (à point) ou rare (saignante). Pour les boissons, si vous n’aimez pas les glaçons, tachez de le préciser bien avant car les Américains en mettent beaucoup dans vos soft drinks (boissons sans alcool). N'hésitez pas à goûter les vins américains, surtout les Californiens. Pourboires Aux Etats-Unis, le pourboire est pratiquement une institution et représente une part importante du salaire des employés de service. Il est d’usage de laisser 7 USD par personne et par jour pour le guide et 5 USD par personne et par jour pour le chauffeur et 3 USD pour les guides locaux (visites guidées de villes). NB : Le service est, contrairement aux pays européens, rarement inclus en Amérique du Nord. Dans les prestations incluses de votre circuit, le service est inclus. Par contre, si vous avez un repas libre ou si vous désirez prendre une consommation, il convient de laisser un pourboire (TIP) en plus du prix indiqué (15 à 20% dans la restauration : 5 dollars au porteur de bagage, 1 ou 2 dollars pour les voituriers, pourboire aux femmes de ménage que l'on peut laisser sur la table de nuit, 10 % dans les taxis, 1 dollar dans les supermarchés, pour les jeunes vous aidant à remplir les sacs). Infos générales Souvenirs : Il existe un proverbe qui dit : “si vous cherchez quelque chose et que vous ne le trouvez pas à New York c’est que cela n’existe pas\"… bagages, disques CD, vêtements, maillots et casquettes des différentes équipes, jeans, chaussures de sport et tout ce qui touche à la vidéo, à l’optique et au son (attention aux problèmes de courant et de fréquence)… Il est aussi très intéressant de faire un petit tour dans un Drugstore (magasin d’alimentation), ouvert sans interruption jusqu’à 21h00, où vous trouverez les ingrédients du quotidien alimentaire américain : ketchup, chewing-gums, sucettes géantes, beurre de cacahuète, boissons gazeuses de tous parfums, sauces… Taxes : Les prix dans les boutiques, hôtels, restaurants etc. sont toujours mentionnés Hors Taxes. Bien se renseigner du montant des taxes avant achat sachant que chaque état et chaque ville sont libres de fixer leurs propres taxes. Poids et mesures : Température : pour convertir les F en °C : soustraire 32, x par 5 et % par 9, si le thermomètre indique 80F, il fait 26,6°. Distance : 1 Mile = 1,6 km - longueur : 1 yard = 0,914 m. Poids : 1 pound = 0,4536 kg. Capacité : 1 gallo, = 3,785 L. Transport aérien : L’attention de nos ressortissants est appelée sur les règlements très stricts à respecter en matière de sécurité. A l’enregistrement des bagages, il convient de répondre avec sérieux et précision aux questions qui vous sont posées par les employés et d’éviter toute plaisanterie sur le contenu de vos bagages, de très sérieux ennuis avec les services de sécurité (pouvant aller jusqu’à l’incarcération) étant susceptibles de résulter de toute attitude prêtant à équivoque. Les voyageurs empruntant l’avion à destination ou en provenance des Etats-Unis doivent savoir que, tant les compagnies aériennes que les autorités (américaines aussi bien qu’européennes), portent une attention de plus en plus vigilante aux incidents provoqués à bord de vols commerciaux par des passagers irascibles ou violents. Qu’il s’agisse d’un simple refus d’obtempérer aux consignes de bord (interdiction de fumer ou interdiction d’utiliser certains appareils électroniques, par exemple) ou, a fortiori, d’actes de violence à l’égard du personnel navigant ou d’autres passagers, notamment en cas d’ivresse, les compagnies aériennes desservant les Etats-Unis appliquent le plus souvent la règle de la \"tolérance zéro\". Les voyageurs doivent donc être conscients de la gravité de tels comportements et des suites pénales auxquelles ils s’exposent. Monnaie La monnaie nationale est le Dollar Américain - USD. Il est recommandé de se munir de Dollars US en France. Les cartes de crédits internationales (Visa, MasterCard, Diners, American Express…) vous seront très utiles pour régler certains achats et surtout pour retirer de l’argent liquide 24 h/24 h. Electricité 110 / 115 volts. Prévoir un adaptateur de type A (prises à fiches plates). Langues Anglais. Décalage horaire En hiver et en été : -6h par rapport à Paris. Climat Le Climat New Yorkais est continental : hivers très froids, étés très chauds et très humides, étés très chauds et très humides. Le Climat de Boston : climat tempéré : froid en hiver, chaud en été. Pluies assez fréquentes. en hiver, chaud en été. Pluies assez fréquentes. Le Climat de Washington : De décembre à février : froid (risque de neige). Printemps et automne : doux et l’été : chauds et humides. La Belle Epoque : le printemps et l’automne, où la nature se pare des couleurs splendides. Le climat de New York est sujet à des changements inattendus et brutaux. NB : le changement climatique peut apporter des variations dans les saisons. Valise En hiver , des vêtements chauds ; et en été , des habits légers en coton, (lainages pour les lieux climatisés). Chaussures confortables pour les balades. Crème solaire, lunettes, chapeau, en été. Un vêtement de pluie. Si messe Gospel, prévoir une tenue correcte. Sachez que New York est réputée comme la Capitale du Shopping… les prix sont souvent plus intéressants qu’en France… N’hésitez pas à laisser de la place dans votre valise pour vos éventuels achats. Téléphone - appel de la France vers les Etats-Unis : 00 + 1 + indicatif régional + numéro du correspondant. - appel des Etats-Unis vers la France : 011 + 33 + numéro du correspondant (sans le 0 initial). Aux Etats-Unis, les numéros de téléphone commençant par 1 800, 1 866, 1 877 et 1 888 sont gratuits et ne peuvent être appelés que depuis le continent américain. Embarquement facile… La sécurité dans les aéroports s’est intensifiée et afin de vous faciliter les formalités d’enregistrement, nous vous rappelons les choses suivantes : Heure de convocation Les compagnies aériennes demandent aux passagers de se présenter 3h avant le décollage. Ceci afin de procéder au contrôle des pièces d’identité, à l’éventuel contrôle des bagages et aux formalités sanitaires. Pièces d’identité Vérifiez que les noms et prénoms sur le billet d'avion correspondent exactement à ceux inscrits sur le passeport et tous les documents de voyage (ESTA, visas, etc.). En cas d'erreur d'orthographe, cela entraînera une réémission du billet, du temps perdu et des frais supplémentaires pouvant atteindre le coût total du billet, à votre charge si les informations fournies étaient incorrectes. Conseils pour vos bagages Identification : Inscrivez vos noms et prénoms à l’intérieur et à l’extérieur de chaque valise enregistrée. Pensez également à prendre une photo de votre bagage avant le départ afin de pouvoir l’identifier en cas de perte. Bagage cabine : Emportez uniquement les objets fragiles, de valeur ou nécessaires à votre confort pendant le vol. Les cigarettes électroniques doivent impérativement être conservées en cabine. Bagage abîmé ou perdu : À votre arrivée, si votre bagage est endommagé ou manquant, ne vous inquiétez pas. Adressez-vous immédiatement au service bagages de l’aéroport pour effectuer une déclaration. Objets interdits Objets interdits en cabine - Armes et objets dangereux : armes à feu (réelles ou factices), couteaux, ciseaux > 6 cm, rasoirs mécaniques, pinces à épiler, outils. - Liquides et gels : interdits au-delà de 100 mL par contenant (sauf médicaments et aliments pour bébé). - Batteries et électroniques à risque : batteries lithium non installées, téléphones à risque (ex. Samsung Galaxy Note7). Interdits en cabine et en soute - Explosifs et inflammables : feux d’artifice, dynamite, essence, gaz comprimés, vernis. - Produits chimiques toxiques : aérosols de défense, corrosifs, poisons. - Briquets et allumettes : interdits sur les vols vers les États-Unis. Exceptions médicales - Médicaments liquides et seringues : avec ordonnance médicale. - Matériel médical (appareils respiratoires, insuline, etc.) : avec certificat médical (français/anglais). - Oxygène médical : selon les compagnies aériennes. …Voyage tranquille"
+    },
+    {
+      "title": "Conseils pour votre voyage",
+      "icon": "compass",
+      "content": "La passion des voyages, des couleurs et des saveurs, de ces lieux lointains, ne doit pas vous faire oublier que les voyages sont souvent l’occasion de changer vos habitudes, votre vigilance et que des aléas sont toujours possibles. Aussi, soucieux que votre voyage soit une réussite, malgré la multiplicité des intervenants au cours de votre périple, voici quelques conseils de voyage. Nous vous conseillons de les lire attentivement et restons à votre disposition pour toutes questions que nous n’aurions pas traitées. Nous vous souhaitons un excellent voyage."
+    },
+    {
+      "title": "Aéroport / Port",
+      "icon": "plane-departure",
+      "content": "Vous aurez très souvent rendez-vous au comptoir d’assistance que nous avons réservé pour vous. Reportez- vous à l’information précisée sur votre convocation. Ensuite, vous serez invités à passer au comptoir d’enregistrement et présenter votre pièce d’identité. Conservez vos pièces d’identité avec vous durant les formalités et jusqu'à l’avion ou le bateau."
+    },
+    {
+      "title": "Bagages (Conseils)",
+      "icon": "suitcase-rolling",
+      "content": "Référez-vous à la page \"Information horaires de vols\". Notre conseil : - Ne placez pas : médicaments, denrées périssables, alimentaires, objets fragiles ou de valeur (bijoux, chèques, devises, appareils photos…), dossiers, papiers importants dans vos bagages en soute. Conservez-les avec vous en cabine. - Par souci de sécurité, n'acceptez jamais des bagages d'une autre personne. - Arrivée à destination, rendez-vous en zone de livraison des bagages. Récupérez les vôtres, En cas d’avarie, manquement, reportez immédiatement au service bagages de l'aéroport, du port ou le représentant de la compagnie, pour procéder à un constat et ouvrir, le cas échéant, un dossier auprès de votre assurance dès votre retour. Conservez le talon joint à votre billet lors de l’enregistrement de votre bagage."
+    },
+    {
+      "title": "Charter & Vols spéciaux",
+      "icon": "plane-circle-check",
+      "content": "Le terme \"charter\", \"vol spécial\", désigne un vol non régulier, opéré à la demande d’une agence de voyages, qui dessert ponctuellement une destination touristique au départ d’un aéroport. Ces vols ont des horaires définitifs qui s’intercalent entre les vols réguliers, connus très souvent qu'une semaine avant le départ. L’horaire de retour vous est souvent confirmé sur place. Ces vols peuvent être tôt le matin/tard le soir."
+    },
+    {
+      "title": "Services à bord",
+      "icon": "mug-hot",
+      "content": "La plupart des compagnies aériennes pour des vols de moins de 3h ne proposent plus de services à bord. La restauration et les boissons, si elles sont proposées, sont désormais très souvent payantes. Des encas sont en vente dans les boutiques de l’aéroport."
+    },
+    {
+      "title": "Douanes & Franchises",
+      "icon": "scale-balanced",
+      "content": "Les adultes peuvent bénéficier de franchises sur certaines marchandises : . Tabacs : franchise 200 cigarettes. . Boissons alcoolisées : franchise 2 L de vin, ou 1 L d’alcool fort. . Parfum : 50 g de parfum, ou 100 ml d'eau de toilette. Et ce dans de nombreux pays, toutefois vérifiez les informations à la douane de chaque pays concerné. Les médicaments que vous transportez, le cas échéant, doivent correspondre à vos besoins personnels."
+    },
+    {
+      "title": "Formalités (Conseils généraux)",
+      "icon": "file-shield",
+      "content": "Il appartient au voyageur de vérifier les formalités administratives et sanitaires nécessaires au voyage auprès des organismes compétents tels que consulats, ambassades et médecin traitant pour vaccins et traitements. La validité des papiers en votre possession doit être vérifiée avant le départ. Tout défaut ou oubli, conduit au refus d’embarquement et vos vacances sont perdues. Pour les mineurs non accompagnés de leur(s) parent(s) une carte nationale d’identité, un passeport, ainsi qu’une autorisation de sortie de territoires sont indispensables."
+    },
+    {
+      "title": "Sûreté aéroportuaire",
+      "icon": "shield-halved",
+      "content": "Soumettez-vous de bonne grâce aux contrôles de sûreté : il y va de votre propre intérêt ! Ces contrôles sont effectués avant l'arrivée en salle d'embarquement. Les bagages à mains doivent passer dans un appareil de contrôle électronique et vous devez vous-même franchir un portique de détection. Posez de côté : ceinture, trousseau de clefs, objet métallique, téléphone… N’oubliez pas de les reprendre. Si vous portez un stimulateur cardiaque (voire même certains appareils auditifs), informez-en l'agent de sûreté et ne passez pas sous le portique. Dans certains pays d'ailleurs, une fouille corporelle complète les procédés de détection électroniques. Sachez ainsi que par précaution supplémentaire, il peut vous être demandé de procéder, au pied de l'appareil, à l'identification de vos bagages enregistrés. Enfin, ne laissez jamais vos bagages sans surveillance dans l'enceinte de l'aérogare. La réglementation gouvernementale (en France et dans de nombreux autres pays) implique la destruction immédiate de tout bagage suspect, sans qu'aucune indemnisation puisse être par la suite réclamée à quiconque."
+    },
+    {
+      "title": "Monnaie & Devises",
+      "icon": "coins",
+      "content": "La monnaie nationale est le Dollar Canadien . Il est recommandé de se munir de Dollars Canadiens en France. Les cartes de crédits internationales vous seront très utiles pour régler vos achats et retirer de l’argent 24/24 h. Electricité 110 volts. Prévoir un adaptateur (prises à fiches plates). Langues"
+    },
+    {
+      "title": "Électricité & Prises",
+      "icon": "plug",
+      "content": "110 volts. Prévoir un adaptateur (prises à fiches plates). Langues Anglais et français. Décalage horaire"
+    },
+    {
+      "title": "Décalage horaire",
+      "icon": "clock",
+      "content": "-6h au Québec et en Ontario. -5h au Nouveau Brunswick, en Nouvelle Ecosse, sur l’île du Prince Edouard et à Terre Neuve. Climat En hiver : froid et neige (-8°/-20°). En été : chaud (25°) avec de grandes variantes possibles dans la même journée."
+    },
+    {
+      "title": "Climat & Météo",
+      "icon": "cloud-sun",
+      "content": "En hiver : froid et neige (-8°/-20°). En été : chaud (25°) avec de grandes variantes possibles dans la même journée. NB : Le changement climatique peut apporter des variations dans les saisons. Valise En hiver : vêtements chauds pour les activités à l'extérieur, bonnet, foulard, gants et, chaussures fermées et"
+    },
+    {
+      "title": "Vêtements & Valise",
+      "icon": "suitcase-rolling",
+      "content": "En hiver : vêtements chauds pour les activités à l'extérieur, bonnet, foulard, gants et, chaussures fermées et imperméables. Pour le sport ou motoneige, prévoir sous-vêtements et chaussettes en laine ou tissu synthétique respirant. Prévoir un petit sac avec le strict minimum (nécessaire de toilettes, vêtements de rechange). En été : habits légers en coton, chaussures confortables, crème solaire, lunettes et chapeau, lainage pour les lieux climatisés. Les salles de bain dans les hôtels sont souvent équipées de douches fixes. Prévoir un bonnet de bain."
+    },
+    {
+      "title": "Pourboires",
+      "icon": "hand-holding-dollar",
+      "content": "Il est d’usage de laisser 7 CAD par personne et par jour pour le guide, 5 CAD par personne par jour pour le chauffeur et 3 CAD pour les guides locaux. Monnaie La monnaie nationale est le Dollar Canadien . Il est recommandé de se munir de Dollars Canadiens en France. Les cartes de crédits internationales vous seront très utiles pour régler vos achats et retirer de l’argent 24/24 h."
+    },
+    {
+      "title": "Santé & Alimentation",
+      "icon": "shield-heart",
+      "content": "Si vous avez des médicaments, prenez soin de ne pas oublier votre ordonnance. Prévoir une assurance frais médicaux et rapatriement . Aucun vaccin n’est obligatoire. Un certificat de vaccination contre la fièvre jaune peut être exigé des voyageurs en provenance d’une zone infectée. Cuisine La gastronomie canadienne est une cuisine de terroir plutôt copieuse, énergétique, parfaite par grand froid. Elle"
+    },
+    {
+      "title": "Téléphone & Réseau",
+      "icon": "phone",
+      "content": "Pour appeler le Canada depuis la France : +1 + 8/9 chiffres. Pour appeler la France depuis le Canada : +33 + indicatif 1 (2,3,6...) + 8 chiffres."
+    }
+  ],
+  "practicalInfo": {
+    "formalities": "Passeport valide 6 mois après la date de votre retour.\nFormulaire AVE obligatoire et disponible sur internet. Coût 7 $ à ce jour.\nFormulaire ESTA obligatoire et disponible sur internet : https://esta.cbp.dhs.gov. Coût : 40 $/personne à ce jour.",
+    "money": "La monnaie nationale est le Dollar Canadien . Il est recommandé de se munir de Dollars Canadiens en France. Les cartes de crédits internationales vous seront très utiles pour régler vos achats et retirer de l’argent 24/24 h. Electricité 110 volts. Prévoir un adaptateur (prises à fiches plates). Langues",
+    "electricity": "110 volts. Prévoir un adaptateur (prises à fiches plates). Langues Anglais et français. Décalage horaire",
+    "timezone": "-6h au Québec et en Ontario. -5h au Nouveau Brunswick, en Nouvelle Ecosse, sur l’île du Prince Edouard et à Terre Neuve. Climat En hiver : froid et neige (-8°/-20°). En été : chaud (25°) avec de grandes variantes possibles dans la même journée.",
+    "climate": "En hiver : froid et neige (-8°/-20°). En été : chaud (25°) avec de grandes variantes possibles dans la même journée. NB : Le changement climatique peut apporter des variations dans les saisons. Valise En hiver : vêtements chauds pour les activités à l'extérieur, bonnet, foulard, gants et, chaussures fermées et",
+    "clothing": "En hiver : vêtements chauds pour les activités à l'extérieur, bonnet, foulard, gants et, chaussures fermées et imperméables. Pour le sport ou motoneige, prévoir sous-vêtements et chaussettes en laine ou tissu synthétique respirant. Prévoir un petit sac avec le strict minimum (nécessaire de toilettes, vêtements de rechange). En été : habits légers en coton, chaussures confortables, crème solaire, lunettes et chapeau, lainage pour les lieux climatisés. Les salles de bain dans les hôtels sont souvent équipées de douches fixes. Prévoir un bonnet de bain.",
+    "tips": "Il est d’usage de laisser 7 CAD par personne et par jour pour le guide, 5 CAD par personne par jour pour le chauffeur et 3 CAD pour les guides locaux. Monnaie La monnaie nationale est le Dollar Canadien . Il est recommandé de se munir de Dollars Canadiens en France. Les cartes de crédits internationales vous seront très utiles pour régler vos achats et retirer de l’argent 24/24 h.",
+    "health": "Si vous avez des médicaments, prenez soin de ne pas oublier votre ordonnance. Prévoir une assurance frais médicaux et rapatriement . Aucun vaccin n’est obligatoire. Un certificat de vaccination contre la fièvre jaune peut être exigé des voyageurs en provenance d’une zone infectée. Cuisine La gastronomie canadienne est une cuisine de terroir plutôt copieuse, énergétique, parfaite par grand froid. Elle",
+    "phone": "Pour appeler le Canada depuis la France : +1 + 8/9 chiffres. Pour appeler la France depuis le Canada : +33 + indicatif 1 (2,3,6...) + 8 chiffres."
+  },
+  "driverDossier": {
+    "busModel": "",
+    "busCapacity": 50,
+    "busPlanUrl": "",
+    "busNotes": "",
+    "roomingList": [],
+    "roomingFileUrl": "",
+    "passengersList": []
+  },
+  "_rawImportedText": "Votre carnet de voyage Canada États-Unis\nvendredi 18 septembre 2026 - mardi 29\nseptembre 2026\nEn date du 02/09/2026 à 13:33:06\nCanada États-Unis\nDe Québec à New York\nDu Vieux Québec à Manhattan, en passant par Niagara et la Maison Blanche, votre parcours\nest jonché de contrastes et de rencontres éblouissantes. Vous serez charmés par l'hospitalité\nquébécoise, séduits par une nature généreuse et exaltés par l'animation trépidante des grandes\nmétropoles qui ont fait l'histoire de l'Amérique des pionniers... Montréal, Ottawa, Toronto,\nWashington et New-York.\nUn départ fin septembre sera probablement pour vous l'occasion de vous émerveiller devant les couleurs de\nl'été indien…\nConvocation aérienne\n\nAller : 18/09/2026\nDécollage de l’aéroport de : Paris Charles de Gaulle, terminal 2E\nHeure de présentation à l’aéroport : 18h15\nLieu : comptoir d'enregistrement du vol\nN° de vol : AF 352\nDécollage prévu à : 21h15\nArrivée prévue à : 22h35 (heure locale)\nA l’aéroport de : Québec\nCompagnie : Air France\nObservations : prestations à bord\nRetour : 28/09/2026\nDécollage de l’aéroport de : New York\nN° de vol : AF 005\nDécollage prévu à : 18h30\nArrivée prévue à : 08h05 le 29/09/2026\nA l’aéroport de : Paris Charles de Gaulle\nCompagnie : Air France\nObservations : prestations à bord\nNous attirons votre attention sur le fait que les horaires prévus peuvent être sujets à\nmodifications. Le vol peut être opéré par des compagnies aériennes partenaires.\nLa compagnie étant souveraine dans le placement, nous nous efforçons au mieux de vous\nregrouper dans l’avion. Lorsque cela est possible, nous avons regroupé les couples.\nToutefois, nous vous remercions de votre compréhension en cas d’impossibilité et vous\ninvitons à intervertir avec d’autres passagers chaque fois que possible. Consultez la\npolitique de chaque compagnie.\nBagages aériens autorisés :\n\n1 Bagage cabine/personne* : 1 bagage de 55 x 35 x 25 cm (roues et poignées\nincluses) et un petit sac de 40 x 30 x 15 cm à ranger sous le siège devant vous, de\n12 Kg maximum au total.\n*Aucun contenant de plus de 100 ml, ciseaux, couteau en cabine\n1 Bagage en soute/personne : 1 bagage de 158 cm maximum (longueur + largeur\n+ hauteur) et de 23 Kg maxi.\nLe dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place.\nConservez avec vous : pièce d'identité et médicaments.\nJour 1 • Votre région - Paris - Québec\nJour consacré à l'acheminement. Transfert à l’aéroport de Paris. Formalités d’embarquement. Envol pour\nQuébec . Accueil à l'aéroport par votre guide francophone. Transfert à l'hôtel. Installation à l'hôtel. Dîner libre.\nLogement.\nJour 2 • Québec\nVisite guidée de Québec . Seule cité nord-américaine classée au patrimoine mondial de l'Unesco. Découverte\nde la ville située au bord du fleuve Saint-Laurent, souvent considérée comme un morceau de France en\nAmérique du Nord. Déjeuner. Temps libre à Québec. Arrêt aux chutes Montmorency . Cette chute de 83 m,\nplus haute que celles de Niagara, depuis le pont qui la surplombe. Exploration du parc à pied, découverte de la\nflore environnante et de la vue époustouflante. Dîner dans une cabane à sucre avec dégustation de tire\nd'érable. Découverte du trésor gastronomique québécois le sirop d'érable et plus particulièrement la tire\nd'érable. Logement.\nJour 3 • Québec - Montréal\nRoute vers Montréal . Déjeuner smoke meat, spécialité montréalaise. Visite guidée de Montréal, la plus\ngrande cité francophone d'Amérique du Nord : la basilique Notre-Dame (entrée non incluse), le quartier du\nvieux port, le marché couvert Bonsecours, la place Jacques Cartier avec l'hôtel de ville, le parc olympique des\nJO de 1976, la place des Arts... Dîner logement.\nJour 4 • Montréal - Ottawa - Gananoque\nRoute vers Ottawa, capitale fédérale du Canada et ville cosmopolite. A la frontière entre l'Ontario et le Québec,\ncité discrète et tranquille, avec au cœur, le Canal Rideau, lieu de rencontre été comme hiver. Tour de ville .\nDéjeuner. Visite de Rideau Hall , résidence du Gouverneur Général du Canada, située dans un vaste domaine\nde 79 acres. Temps libre à Ottawa. Gananoque . Dîner logement.\n\nJour 5 • Gananoque - Toronto\nEmbarquement pour une croisière dans les Mille Îles . Une multitude d'îles et d'îlots, habités ou non, forment\nun véritable labyrinthe dans un décor paisible, autrefois occupé par des tribus indiennes. Départ vers\nKingston. Déjeuner. Tour panoramique de l'ancienne capitale du Canada qui est aujourd'hui un port de\nplaisance. Route vers Toronto, ville principale de l'Ontario et grand pôle économique. Toronto bénéficie d'une\nsituation exceptionnelle au bord du Lac Ontario. Dîner logement.\nJour 6 • Toronto - Niagara\nVisite d'un vignoble à Niagara On-The-Lake. Route vers Niagara. Découverte des Chutes, mondialement\ncélèbres, site naturel imposant que les Iroquois surnommaient \"tonnerre de l'eau\". Déjeuner panoramique.\nEmbarquement pour une croisière à bord du Hornblower (ou similaire). Ce court trajet permet d'approcher\nau maximum les bouillonnantes cataractes. C'est une expérience incroyable de voir les chutes depuis la\nsurface de l'eau. Leur dimension en devient exceptionnelle. Dîner logement.\nJour 7 • Niagara - Carlisle\nPassage de la frontière américaine . Arrêt à Corning. Déjeuner. Route vers la région de Harrisburg. Dîner\nlogement.\nJour 8 • Carlisle - Washington\nRoute vers Washington , capitale fédérale des États-Unis. Située dans le District de Columbia (et non pas dans\nun état...), elle fut créée en 1790 par le congrès. A voir : le Capitole, la Cour Suprême, le mémorial dédié à\nAbraham Lincol, à Georges Washington... Déjeuner au bord de la rivière Potomac . Visite guidée . Les\nimposants bâtiments en font une des plus belles villes des Etats-Unis. Arrêt au cimetière d'Arlington , créé\naprès la guerre de Sécession. Dîner logement.\nJour 9 • Washington - New York\nRoute vers Philadelphie en Pennsylvanie. Le \"Berceau de l'indépendance américaine\" où furent signées la\nDéclaration d'Indépendance le 04 juillet 1776 et la Constitution Américaine (1787). Tour panoramique . À voir :\nle Hall de l'Indépendance, de la cloche de la liberté... Déjeuner. Départ pour New York City . New York et Long\nIsland font partie des premières terres découvertes au début du 17ème siècle. Montée au sommet du One\nWorld Observatory, désormais le plus haut gratte-ciel et l'un des symboles du renouveau du quartier financier.\nDîner logement.\nJour 10 • New York\n\nTraversée en ferry, avec audioguide, vers l'inoubliable Statue de la Liberté . Déjeuner chinois. Visite\nguidée de Manhattan : les légendaires briques rouges de Greenwich Village, les quartiers de Soho, Chinatown,\nTimes Square et détour jusqu'au mythique Central Park. Dîner sur Broadway. Logement.\nJour 11 • New York - Paris\nJournée libre pour profiter des derniers achats ou une découverte personnelle de cette fantastique ville si\nsurprenante. Déjeuner. Transfert vers l'aéroport. Envol pour Paris. Repas et nuit à bord.\nJour 12 • Paris - Votre région\nJournée consacrée au réacheminement. Arrivée à Paris. Retour dans votre région.\nLe voyage n’étant pas une science exacte, votre programme peut être amené à subir quelques modifications\nbien indépendantes de notre volonté.\nEn pareilles circonstances, nous faisons appel à votre compréhension si toutefois le déroulé de celui-ci se\ntrouvait devoir être modifié, inversé, adapté, réorganisé en fonction de la circulation, des retards aériens, des\nconditions climatiques, événements géopolitiques, fermetures exceptionnelles de sites, routes, musées….\nNous vous souhaitons un beau voyage.\nCoordonnées de vos hôtels\nsous réserve de modification\ndu 18 au 20 septembre\nHôtel Le Concorde\n1225 Cours du Général de Montcalm\nG1R 4W6 Québec City - Québec\nTél. : +1 418 647 2222\ndu 20 au 21 septembre\nHôtel Sandman Montréal-Longueil\n999 Rue de Serigny\nJ4K 2T1 Longueuil - Canada\nTél. : +1 450 670 3030\ndu 21 au 22 septembre\n\nHôtel Tru by Hilton Ganacoque\n379 County Highway 2\nK7G 2V4 Gananoque - Canada\nTél. : +1 613 463 9555\ndu 22 au 23 septembre\nHôtel Holiday Inn Express & Suites\nMississauga - Toronto Southwest by IHG\n2125 North Sheridan Way\nL5K 1A3 Mississauga - Canada\nTél. : +1 905 855 2000\ndu 23 au 24 septembre\nHôtel Americana Conference Resort Spa and Waterpark\n8444 Lundy's Lane\nL2H 1H4 Niagara Falls - Canada\nTél. : +1 905 356 8444 ou 866 707 0030\ndu 24 au 25 septembre\nHôtel Comfort Inn Pa Turnpike\n77 Shady Lane\n17013 Carlisle - Etats-Unis\nTél. : +1 717 706 3400\ndu 25 au 26 septembre\nHôtel Comfort Inn University Center Fairfax\n11180 Fairfax Boulevard\n22030 Fairfax - Etats-Unis\nTél. : +1 703 591 5900\ndu 26 au 28 septembre\nHôtel Hyatt Place Fair Lawn Paramus\n41-01 Broadway 208 North\n07410 Fair Lawn - Etats-Unis\nTél. : +1 201 475 3888\nVotre accompagnatrice\n\nLaura\nPortable : +33 (0)6 98 02 21 11\nVotre guide\nClaude Trudel\nVotre contact sur place\nEn France – CARACTERES D'AMERIQUES & D’AFRIQUE :\nEn semaine aux heures de bureau : 02 40 08 09 39\nLe week-end et les jours fériés : Amérique du Nord : 06 18 84 19 63\nAu Canada & aux Etats-Unis – MISA TOURS INTERNATIONAL :\nCoordonnateur : Marie Hélène COURTADE – 7 jours/7 : +1 819 352 1568\nDepuis l’Amérique du Nord, composez uniquement les 10 derniers chiffres.\nFormalités indispensables\nPasseport valide 6 mois après la date de votre retour.\nFormulaire AVE obligatoire et disponible sur internet. Coût 7 $ à ce jour.\nFormulaire ESTA obligatoire et disponible sur internet : https://esta.cbp.dhs.gov. Coût : 40 $/personne à ce jour.\nBon à savoir\nPourboires aux guides et au chauffeur non inclus, conseillés : environ 4.5 $/jour/pers. La taxe frontalière\naméricaine incluse : 6 $ révisables. Accompagnateur Voyages Girardot au départ de Paris dès 20 personnes.\nVoyages avec confrère. Prix calculés sur un dollar canadien CAD = 0.64 € - un dollar US = 0.86 €. Formulaire\nAVE obligatoire à souscrire par internet : http://www.cic.gc.ca. Coût 7 CAD, révisable. Formulaire ESTA\nobligatoire et disponible sur internet : https://esta.cbp.dhs.gov. Coût entre 21 USD à ce jour et 40 $. Ces 2\nformulaires sont à établir uniquement au nom de jeune fille pour les femmes mariées. Bonne condition physique\nconseillée.\nInclus\n\nVols réguliers Paris / Québec - New-York / Paris, compagnie Air France ou similaire. Taxes aéroport incluses :\n430 € révisables. Hôtels 1ère catégorie, en chambre individuelle ou double. Pension complète selon le\nprogramme, eau en carafe, thé ou café inclus aux repas. Guide local francophone pendant la durée du circuit.\nAssurance multirisque voyage et assistance / rapatriement\nAfin de faire face aux frais d’hospitalisation et aux dépenses de santé, parfois très élevés à l’étranger,\nil est impératif de disposer d’un contrat d’assistance ou d’une assurance permettant de couvrir tous\nles frais médicaux (dont la chirurgie et l’hospitalisation) et de rapatriement sanitaire, au risque de ne\npas avoir accès aux soins, y compris en cas d’urgence vitale. Ces frais ne pourront en aucun cas être\npris en charge par la société VOYAGES GIRARDOT ORGANISATION. Merci de vous munir de votre\nnuméro de contrat d’assurance et le numéro de téléphone d’assistance (sur les documents que vous\navez reçu lors la souscription de l’assurance).\nCanada Est : réglementation et formalités d'entrée\nL’Est canadien en quelques mots : immensité, chaleur humaine, francophonie, lacs, traversiers,\ncommunautés amérindiennes, sirop d’érable, homards, Saint Laurent, baleines, poutine, neige, été indien…\nFormalités\nPour les ressortissants français : passeport valide 6 mois après la date de retour / un billet aller/retour /\nprésenter une preuve de solvabilité (carte de crédit, chèques de voyage…).\nObligation de l'AVE : condition d’entrée au Canada, appelée autorisation de voyage électronique (AVE).\nSanté\nSi vous avez des médicaments, prenez soin de ne pas oublier votre ordonnance. Prévoir une assurance frais\nmédicaux et rapatriement . Aucun vaccin n’est obligatoire. Un certificat de vaccination contre la fièvre jaune peut\nêtre exigé des voyageurs en provenance d’une zone infectée.\nCuisine\nLa gastronomie canadienne est une cuisine de terroir plutôt copieuse, énergétique, parfaite par grand froid. Elle\ns’est nourrie de l’influence de toutes les nations qui ont émigré sur ses terres. C’est une bonne occasion pour\ndéguster un repas traditionnel de la cabane à sucre, les diverses soupes, du homard ou du saumon, une\ntourtière… et le fameux sirop d’érable. Dans les restaurants, essayez l’une des nombreuses bières issues des\nmicrobrasseries locales. Le vin est aussi proposé (plus cher). Il est possible, dans certains restaurants,\nd'apporter sa propre bouteille de vin achetée dans un \"SAQ\" de la ville (magasin de la Société des Alcools du\nQuébec). Ces restaurants indiquent cette pratique avec la mention \"apportez votre vin\".\nPourboires\n\nIl est d’usage de laisser 7 CAD par personne et par jour pour le guide, 5 CAD par personne par jour pour le\nchauffeur et 3 CAD pour les guides locaux.\nMonnaie\nLa monnaie nationale est le Dollar Canadien . Il est recommandé de se munir de Dollars Canadiens en France.\nLes cartes de crédits internationales vous seront très utiles pour régler vos achats et retirer de l’argent 24/24 h.\nElectricité\n110 volts. Prévoir un adaptateur (prises à fiches plates).\nLangues\nAnglais et français.\nDécalage horaire\n-6h au Québec et en Ontario.\n-5h au Nouveau Brunswick, en Nouvelle Ecosse, sur l’île du Prince Edouard et à Terre Neuve.\nClimat\nEn hiver : froid et neige (-8°/-20°).\nEn été : chaud (25°) avec de grandes variantes possibles dans la même journée.\nNB : Le changement climatique peut apporter des variations dans les saisons.\nValise\nEn hiver : vêtements chauds pour les activités à l'extérieur, bonnet, foulard, gants et, chaussures fermées et\nimperméables. Pour le sport ou motoneige, prévoir sous-vêtements et chaussettes en laine ou tissu synthétique\nrespirant. Prévoir un petit sac avec le strict minimum (nécessaire de toilettes, vêtements de rechange).\nEn été : habits légers en coton, chaussures confortables, crème solaire, lunettes et chapeau, lainage pour les\nlieux climatisés. Les salles de bain dans les hôtels sont souvent équipées de douches fixes. Prévoir un bonnet\nde bain.\nSouvenirs\nObjets en vannerie ou écorce de bouleau, sculptures ou gravures en \"pierres à savon\" ou en bois, tissage de\ncoton, ceintures fléchés, raquettes à neige.\nSucre et sirop d’érable, saumon fumé, bières micro brassées…\nTéléphone\nPour appeler le Canada depuis la France : +1 + 8/9 chiffres.\nPour appeler la France depuis le Canada : +33 + indicatif 1 (2,3,6...) + 8 chiffres.\n\nUSA Est : réglementation et formalités d'entrée\nNew York en quelques mots : intense, yellow cab, géant, cosmopolite, musique, grouillant, shopping, musées,\nlumières, rêves, gratte-ciel, avenues, liberté, ponts, embouteillages, frissons, île…\nWashington en quelques mots : capitale fédérale, bâtiments officiels prestigieux, grande diversité et qualité des\nmusées, le Mall et son immense allée de verdure…\nBoston en quelques mots : capitale du Massachusetts, ville culturelle, nombreux musées, édifices coloniaux,\nville aménagée pour les piétons...\nFormalités\nPour les ressortissants français : passeport valide à la date de retour / un billet aller/retour / présenter une\npreuve de solvabilité (carte de crédit, chèques de voyage…).\nAutorisation ESTA : obligatoire pour toutes arrivées sur le territoire américain .\nSanté\nSi vous avez des médicaments, prenez soin de ne pas oublier votre ordonnance. Prévoir une assurance frais\nmédicaux et rapatriement . Aucun vaccin n’est obligatoire. Un certificat de vaccination contre la fièvre jaune peut\nêtre exigé des voyageurs en provenance d’une zone infectée.\nCuisine\nDans certains hôtels de 1ère catégorie, il peut arriver que le petit-déjeuner soit servi dans de la vaisselle jetable.\nL’art de bien manger à New York se caractérise par sa diversité. Il est possible de manger chinois aussi bien\nqu’à Canton ; ou bien de manger des bonnes pâtes comme au cœur du Sud italien. Goûter le \"seafood\"\n(poissons et fruits de mer) sur les côtes et bien sûr le fast-food qu'il soit américain, mexicain, chinois ou italien.\nGoûter un bon hamburger fait partie intégrante d’un voyage aux Etats-Unis. Privilégiez le Breakfast à\nl'américaine pour permettre de prendre un déjeuner léger et d'attendre le dîner qui pourra être copieux. La\nviande américaine est très réputée pour sa qualité et sa saveur, on peut la commander well done (bien cuite),\nmedium (à point) ou rare (saignante). Pour les boissons, si vous n’aimez pas les glaçons, tachez de le préciser\nbien avant car les Américains en mettent beaucoup dans vos soft drinks (boissons sans alcool). N'hésitez pas à\ngoûter les vins américains, surtout les Californiens.\nPourboires\nAux Etats-Unis, le pourboire est pratiquement une institution et représente une part importante du salaire des\nemployés de service.\nIl est d’usage de laisser 7 USD par personne et par jour pour le guide et 5 USD par personne et par jour pour le\nchauffeur et 3 USD pour les guides locaux (visites guidées de villes).\nNB : Le service est, contrairement aux pays européens, rarement inclus en Amérique du Nord. Dans les\n\nprestations incluses de votre circuit, le service est inclus. Par contre, si vous avez un repas libre ou si vous\ndésirez prendre une consommation, il convient de laisser un pourboire (TIP) en plus du prix indiqué (15 à 20%\ndans la restauration : 5 dollars au porteur de bagage, 1 ou 2 dollars pour les voituriers, pourboire aux femmes\nde ménage que l'on peut laisser sur la table de nuit, 10 % dans les taxis, 1 dollar dans les supermarchés, pour\nles jeunes vous aidant à remplir les sacs).\nInfos générales\nSouvenirs : Il existe un proverbe qui dit : “si vous cherchez quelque chose et que vous ne le trouvez pas à New\nYork c’est que cela n’existe pas\"… bagages, disques CD, vêtements, maillots et casquettes des différentes\néquipes, jeans, chaussures de sport et tout ce qui touche à la vidéo, à l’optique et au son (attention aux\nproblèmes de courant et de fréquence)… Il est aussi très intéressant de faire un petit tour dans un Drugstore\n(magasin d’alimentation), ouvert sans interruption jusqu’à 21h00, où vous trouverez les ingrédients du quotidien\nalimentaire américain : ketchup, chewing-gums, sucettes géantes, beurre de cacahuète, boissons gazeuses de\ntous parfums, sauces…\nTaxes : Les prix dans les boutiques, hôtels, restaurants etc. sont toujours mentionnés Hors Taxes. Bien se\nrenseigner du montant des taxes avant achat sachant que chaque état et chaque ville sont libres de fixer leurs\npropres taxes.\nPoids et mesures : Température : pour convertir les F en °C : soustraire 32, x par 5 et % par 9, si le\nthermomètre indique 80F, il fait 26,6°. Distance : 1 Mile = 1,6 km - longueur : 1 yard = 0,914 m. Poids : 1 pound\n= 0,4536 kg. Capacité : 1 gallo, = 3,785 L.\nTransport aérien : L’attention de nos ressortissants est appelée sur les règlements très stricts à respecter en\nmatière de sécurité. A l’enregistrement des bagages, il convient de répondre avec sérieux et précision aux\nquestions qui vous sont posées par les employés et d’éviter toute plaisanterie sur le contenu de vos bagages,\nde très sérieux ennuis avec les services de sécurité (pouvant aller jusqu’à l’incarcération) étant susceptibles de\nrésulter de toute attitude prêtant à équivoque. Les voyageurs empruntant l’avion à destination ou en provenance\ndes Etats-Unis doivent savoir que, tant les compagnies aériennes que les autorités (américaines aussi bien\nqu’européennes), portent une attention de plus en plus vigilante aux incidents provoqués à bord de vols\ncommerciaux par des passagers irascibles ou violents. Qu’il s’agisse d’un simple refus d’obtempérer aux\nconsignes de bord (interdiction de fumer ou interdiction d’utiliser certains appareils électroniques, par exemple)\nou, a fortiori, d’actes de violence à l’égard du personnel navigant ou d’autres passagers, notamment en cas\nd’ivresse, les compagnies aériennes desservant les Etats-Unis appliquent le plus souvent la règle de la\n\"tolérance zéro\". Les voyageurs doivent donc être conscients de la gravité de tels comportements et des suites\npénales auxquelles ils s’exposent.\nMonnaie\nLa monnaie nationale est le Dollar Américain - USD. Il est recommandé de se munir de Dollars US en France.\nLes cartes de crédits internationales (Visa, MasterCard, Diners, American Express…) vous seront très utiles\n\npour régler certains achats et surtout pour retirer de l’argent liquide 24 h/24 h.\nElectricité\n110 / 115 volts. Prévoir un adaptateur de type A (prises à fiches plates).\nLangues\nAnglais.\nDécalage horaire\nEn hiver et en été : -6h par rapport à Paris.\nClimat\nLe Climat New Yorkais est continental : hivers très froids, étés très chauds et très humides, étés très chauds\net très humides.\nLe Climat de Boston : climat tempéré : froid en hiver, chaud en été. Pluies assez fréquentes. en hiver, chaud\nen été. Pluies assez fréquentes.\nLe Climat de Washington : De décembre à février : froid (risque de neige). Printemps et automne : doux et l’été\n: chauds et humides.\nLa Belle Epoque : le printemps et l’automne, où la nature se pare des couleurs splendides. Le climat de New\nYork est sujet à des changements inattendus et brutaux.\nNB : le changement climatique peut apporter des variations dans les saisons.\nValise\nEn hiver , des vêtements chauds ; et en été , des habits légers en coton, (lainages pour les lieux climatisés).\nChaussures confortables pour les balades. Crème solaire, lunettes, chapeau, en été. Un vêtement de pluie. Si\nmesse Gospel, prévoir une tenue correcte. Sachez que New York est réputée comme la Capitale du Shopping…\nles prix sont souvent plus intéressants qu’en France… N’hésitez pas à laisser de la place dans votre valise pour\nvos éventuels achats.\nTéléphone\n- appel de la France vers les Etats-Unis : 00 + 1 + indicatif régional + numéro du correspondant.\n- appel des Etats-Unis vers la France : 011 + 33 + numéro du correspondant (sans le 0 initial).\nAux Etats-Unis, les numéros de téléphone commençant par 1 800, 1 866, 1 877 et 1 888 sont gratuits et ne\npeuvent être appelés que depuis le continent américain.\n\nEmbarquement facile…\nLa sécurité dans les aéroports s’est intensifiée et afin de vous faciliter les formalités d’enregistrement, nous vous\nrappelons les choses suivantes :\nHeure de convocation\nLes compagnies aériennes demandent aux passagers de se présenter 3h avant le décollage. Ceci afin de\nprocéder au contrôle des pièces d’identité, à l’éventuel contrôle des bagages et aux formalités sanitaires.\nPièces d’identité\nVérifiez que les noms et prénoms sur le billet d'avion correspondent exactement à ceux inscrits sur le passeport\net tous les documents de voyage (ESTA, visas, etc.). En cas d'erreur d'orthographe, cela entraînera une\nréémission du billet, du temps perdu et des frais supplémentaires pouvant atteindre le coût total du billet, à votre\ncharge si les informations fournies étaient incorrectes.\nConseils pour vos bagages\nIdentification : Inscrivez vos noms et prénoms à l’intérieur et à l’extérieur de chaque valise enregistrée. Pensez\négalement à prendre une photo de votre bagage avant le départ afin de pouvoir l’identifier en cas de perte.\nBagage cabine : Emportez uniquement les objets fragiles, de valeur ou nécessaires à votre confort pendant le\nvol. Les cigarettes électroniques doivent impérativement être conservées en cabine.\nBagage abîmé ou perdu : À votre arrivée, si votre bagage est endommagé ou manquant, ne vous inquiétez\npas. Adressez-vous immédiatement au service bagages de l’aéroport pour effectuer une déclaration.\nObjets interdits\nObjets interdits en cabine\n- Armes et objets dangereux : armes à feu (réelles ou factices), couteaux, ciseaux > 6 cm, rasoirs mécaniques,\npinces à épiler, outils.\n- Liquides et gels : interdits au-delà de 100 mL par contenant (sauf médicaments et aliments pour bébé).\n- Batteries et électroniques à risque : batteries lithium non installées, téléphones à risque (ex. Samsung Galaxy\nNote7).\nInterdits en cabine et en soute\n- Explosifs et inflammables : feux d’artifice, dynamite, essence, gaz comprimés, vernis.\n- Produits chimiques toxiques : aérosols de défense, corrosifs, poisons.\n- Briquets et allumettes : interdits sur les vols vers les États-Unis.\nExceptions médicales\n- Médicaments liquides et seringues : avec ordonnance médicale.\n- Matériel médical (appareils respiratoires, insuline, etc.) : avec certificat médical (français/anglais).\n- Oxygène médical : selon les compagnies aériennes.\n…Voyage tranquille\n\nQuelques conseils pour votre voyage…\nLa passion des voyages, des couleurs et des saveurs, de ces lieux lointains, ne doit pas vous faire oublier que\nles voyages sont souvent l’occasion de changer vos habitudes, votre vigilance et que des aléas sont toujours\npossibles.\nAussi, soucieux que votre voyage soit une réussite, malgré la multiplicité des intervenants au cours de votre\npériple, voici quelques conseils de voyage.\nNous vous conseillons de les lire attentivement et restons à votre disposition pour toutes questions que nous\nn’aurions pas traitées.\nNous vous souhaitons un excellent voyage.\n✔ AEROPORT / PORT\nVous aurez très souvent rendez-vous au comptoir d’assistance que nous avons réservé pour vous. Reportez-\nvous à l’information précisée sur votre convocation. Ensuite, vous serez invités à passer au comptoir\nd’enregistrement et présenter votre pièce d’identité. Conservez vos pièces d’identité avec vous durant les\nformalités et jusqu'à l’avion ou le bateau.\n✔ BAGAGES\nRéférez-vous à la page \"Information horaires de vols\".\nNotre conseil :\n- Ne placez pas : médicaments, denrées périssables, alimentaires, objets fragiles ou de valeur (bijoux, chèques,\ndevises, appareils photos…), dossiers, papiers importants dans vos bagages en soute. Conservez-les avec\nvous en cabine.\n- Par souci de sécurité, n'acceptez jamais des bagages d'une autre personne.\n- Arrivée à destination, rendez-vous en zone de livraison des bagages. Récupérez les vôtres,\nEn cas d’avarie, manquement, reportez immédiatement au service bagages de l'aéroport, du port ou le\nreprésentant de la compagnie, pour procéder à un constat et ouvrir, le cas échéant, un dossier auprès de votre\nassurance dès votre retour. Conservez le talon joint à votre billet lors de l’enregistrement de votre bagage.\n✔ CHARTER - VOLS SPECIAUX\nLe terme \"charter\", \"vol spécial\", désigne un vol non régulier, opéré à la demande d’une agence de voyages, qui\ndessert ponctuellement une destination touristique au départ d’un aéroport. Ces vols ont des horaires définitifs\n\nqui s’intercalent entre les vols réguliers, connus très souvent qu'une semaine avant le départ. L’horaire de retour\nvous est souvent confirmé sur place. Ces vols peuvent être tôt le matin/tard le soir.\n✔ SERVICES A BORD\nLa plupart des compagnies aériennes pour des vols de moins de 3h ne proposent plus de services à bord. La\nrestauration et les boissons, si elles sont proposées, sont désormais très souvent payantes. Des encas sont en\nvente dans les boutiques de l’aéroport.\n✔ DOUANES\nLes adultes peuvent bénéficier de franchises sur certaines marchandises :\n. Tabacs : franchise 200 cigarettes.\n. Boissons alcoolisées : franchise 2 L de vin, ou 1 L d’alcool fort.\n. Parfum : 50 g de parfum, ou 100 ml d'eau de toilette.\nEt ce dans de nombreux pays, toutefois vérifiez les informations à la douane de chaque pays concerné. Les\nmédicaments que vous transportez, le cas échéant, doivent correspondre à vos besoins personnels.\n✔ FORMALITES\nIl appartient au voyageur de vérifier les formalités administratives et sanitaires nécessaires au voyage auprès\ndes organismes compétents tels que consulats, ambassades et médecin traitant pour vaccins et traitements. La\nvalidité des papiers en votre possession doit être vérifiée avant le départ. Tout défaut ou oubli, conduit au refus\nd’embarquement et vos vacances sont perdues. Pour les mineurs non accompagnés de leur(s) parent(s) une\ncarte nationale d’identité, un passeport, ainsi qu’une autorisation de sortie de territoires sont indispensables.\n✔ SURETE\nSoumettez-vous de bonne grâce aux contrôles de sûreté : il y va de votre propre intérêt ! Ces contrôles sont\neffectués avant l'arrivée en salle d'embarquement. Les bagages à mains doivent passer dans un appareil de\ncontrôle électronique et vous devez vous-même franchir un portique de détection. Posez de côté : ceinture,\ntrousseau de clefs, objet métallique, téléphone… N’oubliez pas de les reprendre. Si vous portez un stimulateur\ncardiaque (voire même certains appareils auditifs), informez-en l'agent de sûreté et ne passez pas sous le\nportique. Dans certains pays d'ailleurs, une fouille corporelle complète les procédés de détection électroniques.\n\nSachez ainsi que par précaution supplémentaire, il peut vous être demandé de procéder, au pied de l'appareil, à\nl'identification de vos bagages enregistrés.\nEnfin, ne laissez jamais vos bagages sans surveillance dans l'enceinte de l'aérogare. La réglementation\ngouvernementale (en France et dans de nombreux autres pays) implique la destruction immédiate de tout\nbagage suspect, sans qu'aucune indemnisation puisse être par la suite réclamée à quiconque.\n\n",
+  "_landContactsList": [
+    {
+      "category": "Accompagnatrice Voyages Girardot",
+      "name": "Laura",
+      "phone": "+33 (0)6 98 02 21 11",
+      "address": "Avec le groupe sur le circuit",
+      "isEmergency": false
+    },
+    {
+      "category": "Guide Local",
+      "name": "Claude Trudel",
+      "phone": "",
+      "address": "Guide local francophone",
+      "isEmergency": false
+    },
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "En semaine aux heures de bureau : 02 40 08 09 39",
+      "phone": "",
+      "address": "Le week-end et les jours fériés : Amérique du Nord : 06 18 84 19 63 • Au Canada & aux Etats-Unis – MISA TOURS INTERNATIONAL : • Coordonnateur : Marie Hélène COURTADE – 7 jours/7 : +1 819 352 1568 • Depuis l’Amérique du Nord, composez uniquement les 10 derniers chiffres. • En France : CARACTERES D'AMERIQUES & D’AFRIQUE :",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France au Canada",
+      "name": "42 Sussex Drive, Ottawa, ON K1M 2C9 (Consulats à Montréal et Québec)",
+      "phone": "+1 613 789 1795",
+      "address": "Consulat général à Montréal : +1 514 878 4385 • Site : https://ca.ambafrance.org",
+      "link": "https://ca.ambafrance.org",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France aux États-Unis",
+      "name": "4101 Reservoir Road NW, Washington, DC 20007 (Consulat à New York : 934 Fifth Ave)",
+      "phone": "+1 202 944 6000",
+      "address": "Consulat général à New York : +1 212 606 3600 • Site : https://franceintheus.org",
+      "link": "https://franceintheus.org",
+      "isEmergency": true
+    },
+    {
+      "category": "Fil d'Ariane — Ressortissants Français",
+      "name": "Portail officiel France Diplomatie (Inscription gratuite)",
+      "phone": "",
+      "address": "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      "link": "https://fildariane.diplomatie.gouv.fr",
+      "isEmergency": false
+    }
+  ],
+  "_landFlightsList": [
+    {
+      "type": "Aller",
+      "airline": "Air France",
+      "flightNumber": "AF 352",
+      "departureAirport": "Paris Charles de Gaulle, terminal 2E",
+      "departureTime": "21h15",
+      "arrivalAirport": "Québec",
+      "arrivalTime": "22h35 (heure locale)",
+      "date": "18/09/2026",
+      "via": "",
+      "notes": "Convocation à 18h15 au comptoir d'enregistrement • prestations à bord"
+    },
+    {
+      "type": "Retour",
+      "airline": "Air France",
+      "flightNumber": "AF 005",
+      "departureAirport": "New York",
+      "departureTime": "18h30",
+      "arrivalAirport": "Paris Charles de Gaulle",
+      "arrivalTime": "08h05 le 29/09/2026",
+      "date": "28/09/2026",
+      "via": "",
+      "notes": "prestations à bord"
+    }
+  ],
+  "_detectedShip": "",
+  "_accompName": "Laura",
+  "conciergeMode": "guided",
+  "isCruise": false,
+  "shipName": "",
+  "decks": [],
+  "conciergerie": {
+    "welcomeMessage": "Bonjour ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre aujourd'hui ?",
+    "themes": [
+      {
+        "id": "resto",
+        "label": "Où bien manger ?",
+        "icon": "utensils",
+        "color": "#ea580c",
+        "description": "Tables gourmandes, spécialités africaines et rooftops d'exception sélectionnés par nos guides.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "visites",
+        "label": "Que visiter en temps libre ?",
+        "icon": "compass",
+        "color": "#059669",
+        "description": "Monuments, panoramas incontournables et trésors naturels hors des sentiers battus.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "shopping",
+        "label": "Boutiques & Souvenirs locaux",
+        "icon": "bag-shopping",
+        "color": "#c29958",
+        "description": "Artisanat d'art, marchés authentiques, épiceries fines et créateurs sud-africains.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "pratique",
+        "label": "Bureaux de change, Banques & Santé",
+        "icon": "landmark",
+        "color": "#2563eb",
+        "description": "Distributeurs fiables, bureaux de change certifiés, pharmacies et supermarchés de proximité.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "detente",
+        "label": "Bars branchés, Cafés & Rooftops",
+        "icon": "martini-glass",
+        "color": "#9333ea",
+        "description": "Prendre un verre face au coucher de soleil sur l'Atlantique ou savourer un café d'exception.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "transports",
+        "enabled": true,
+        "label": "Transports & Déplacements urbains",
+        "icon": "taxi",
+        "color": "#0891b2",
+        "description": "Taxis officiels, VTC sécurisés, bus MyCiTi et conseils de mobilité urbaine dans la ville.",
+        "places": []
+      }
+    ]
+  },
+  "contacts": {
+    "receptif": {
+      "name": "Claude Trudel",
+      "emergency": "",
+      "phone": "",
+      "address": "Guide local francophone"
+    },
+    "guide": {
+      "name": "Laura",
+      "role": "Accompagnateur Girardot",
+      "phone": "+33 (0)6 98 02 21 11"
+    },
+    "agence": {
+      "name": "Voyages Girardot",
+      "phone": "03 85 42 82 50",
+      "email": "contact@voyages-girardot.com"
+    }
+  }
+}
