@@ -1,5 +1,15 @@
 window.AVAILABLE_TRIPS = [
   {
+    id: "inde-du-nord",
+    alias: "inde-du-nord",
+    aliases: ["inde-du-nord"],
+    title: "Inde du nord",
+    subtitle: "Du Rajasthan à la Vallée du Gange",
+    dates: "1 au 15 décembre 2026",
+    file: "voyages/inde-du-nord.json"
+  },
+
+  {
     id: "canada-etats-unis",
     alias: "canada-etats-unis",
     aliases: ["canada-etats-unis"],
