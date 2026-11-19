@@ -1,0 +1,1228 @@
+{
+  "id": "inde-du-nord",
+  "title": "Inde du nord",
+  "subtitle": "Du Rajasthan à la Vallée du Gange",
+  "dates": "1 au 15 décembre 2026",
+  "startDate": "2026-12-01",
+  "endDate": "2026-12-15",
+  "coverImage": "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Taj_Mahal_%28Edited%29.jpeg/960px-Taj_Mahal_%28Edited%29.jpeg",
+  "intro": "L'Inde, un pays où fleurit la beauté ! Si une image de l'Inde repose en chacun de nous, c'est en raison de l'aspect universel de la civilisation de ce grand pays ! Voici un voyage dans un pays de légendes, le Rajasthan. Sur une terre aride, les maharajas ont construit des palais de rêve qui accueillent des voyageurs. Ce voyage vous emmène de manoirs en palais, de havelis en demeures princières dans un monde digne des Mille et une Nuits ! Envoûtante, fascinante, déconcertante, paradoxale... l'Inde est à ce point multiple qu'une vie ne suffirait pas à l'appréhender dans sa globalité.",
+  "alert": {
+    "title": "Formalités indispensables",
+    "text": "Passeport valide 6 mois après la date de votre retour.\nVisa obligatoire.\n03/07/2026 : Nouvelle déclaration de santé \"Air Suvidha\", obligatoire depuis le 30/06/2026.\nLe formulaire doit être rempli en ligne sur le site officiel airsuvidha.civilaviation.gov.in dans les 24h\navant l'arrivée en Inde.\nCette nouvelle formalité, gratuite, s'ajoute aux formalités déjà obligatoires de Visa Inde et\nde e-Arrival card.\nUn timing très strict pour le moment :\n\nCette démarche vise à identifier les voyageurs ayant séjourné dans un pays touché par l'épidémie Ebola (Congo\nRD, Ouganda, Soudan du Sud) au cours des 21 derniers jours.\nCette déclaration ne peut pas être anticipée. Le système bloque si on tente de le remplir plus de 24h avant\nl'atterrissage en Inde. En pratique, il doit être complété soit la veille au soir, soit le matin même du départ, selon\nl'horaire du vol.\nInformations à remplir (en anglais) :\n- Prénom et Nom, numéro de passeport\n- Région d'arrivée, ville d'arrivée, aéroport d'arrivée\n- Numéro du vol d'arrivée, date d'arrivée, heure d'arrivée\n- Adresse de domicile\n- Adresse du premier logement en Inde (ou de l'agence locale).\nAprès validation par un code reçu via email, le remplissage génère un document avec QR Code. Il est alors\npossible de l'imprimer ou de l'enregistrer sur un téléphone.\nEntre 120 et 4 jours avant la date de départ, vous devez donc faire votre demande de Visa :\nhttps://indianvisaonline.gov.in/evisa/\nA 72h du départ, vous devez remplir l'e-Arrival Card :\nhttps://indianvisaonline.gov.in/earrival/\nUne fois la formalité accomplie, un PDF téléchargeable comportant un QR code à présenter aux autorités à\nl’arrivée est généré.\nA 24h du départ, vous devez remplir la déclaration sanitaire :\nhttps://airsuvidha.civilaviation.gov.in/",
+    "link": "https://indianvisaonline.gov.in/evisa/"
+  },
+  "flightsList": [
+    {
+      "type": "Aller",
+      "airline": "Turkich Airlines",
+      "flightNumber": "TK 1808",
+      "departureAirport": "Lyon Saint-Exupéry",
+      "departureTime": "10h40",
+      "arrivalAirport": "Delhi",
+      "arrivalTime": "05h15",
+      "date": "01/12/2026",
+      "via": "Escale à Istanbul à 16h00 (redécollage à 20h45 – vol n° TK 716)",
+      "notes": "Convocation à 07h40 au comptoir d'enregistrement • Prestations payantes à bord"
+    },
+    {
+      "type": "Retour",
+      "airline": "Turkich Airlines",
+      "flightNumber": "TK 717",
+      "departureAirport": "Delhi",
+      "departureTime": "06h55",
+      "arrivalAirport": "Lyon Saint-Exupéry",
+      "arrivalTime": "17h10",
+      "date": "15/12/2026",
+      "via": "Escale à Istanbul à 11h30 (redécollage à 15h45 – vol n° TK 1809)",
+      "notes": "Prestations payantes à bord"
+    }
+  ],
+  "flights": {
+    "outbound": {
+      "airline": "Turkich Airlines",
+      "flightNumber": "TK 1808",
+      "departureAirport": "Lyon Saint-Exupéry",
+      "departureTime": "10h40",
+      "arrivalAirport": "Delhi",
+      "arrivalTime": "05h15",
+      "date": "01/12/2026",
+      "layover": "Escale à Istanbul à 16h00 (redécollage à 20h45 – vol n° TK 716)"
+    },
+    "inbound": {
+      "airline": "Turkich Airlines",
+      "flightNumber": "TK 717",
+      "departureAirport": "Delhi",
+      "departureTime": "06h55",
+      "arrivalAirport": "Lyon Saint-Exupéry",
+      "arrivalTime": "17h10",
+      "date": "15/12/2026",
+      "layover": "Escale à Istanbul à 11h30 (redécollage à 15h45 – vol n° TK 1809)"
+    },
+    "domesticFlights": [],
+    "baggage": {
+      "cabin": "1 bagage cabine/personne : 1 bagage de 7 Kg maximum de dimensions maximales : L 55 x l 20 x H 40 cm, incluant les poignets, les poches et les roues.",
+      "hold": "1 bagage en soute/personne : 1 bagage de 15 Kg maximum dont l es dimensions totales (longueur + largeur + hauteur) doivent être de 158 cm maximum. Le poids et les dimensions maximales autorisées pour les bagages sont imposés par les compagnies des vols intérieurs.",
+      "details": "*Aucun contenant de plus de 100 ml, ciseaux, couteau en cabine Le dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place."
+    }
+  },
+  "baggage": {
+    "cabin": "1 bagage cabine/personne : 1 bagage de 7 Kg maximum de dimensions maximales : L 55 x l 20 x H 40 cm, incluant les poignets, les poches et les roues.",
+    "hold": "1 bagage en soute/personne : 1 bagage de 15 Kg maximum dont l es dimensions totales (longueur + largeur + hauteur) doivent être de 158 cm maximum. Le poids et les dimensions maximales autorisées pour les bagages sont imposés par les compagnies des vols intérieurs.",
+    "details": "*Aucun contenant de plus de 100 ml, ciseaux, couteau en cabine Le dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place."
+  },
+  "itinerary": [
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 1,
+      "title": "Lyon - Delhi",
+      "city": "Delhi",
+      "lat": 28.6139,
+      "lng": 77.209,
+      "highlight": "",
+      "description": "Transfert et formalités d'embarquement pour le vol vers l'Inde. Rendez-vous des participants à 07h40 à l’aéroport de Lyon. Envol pour Delhi via Istanbul avec la compagnie Turkish Airlines. Envol à 10h40 à destination de Delhi à bord d’un vol Turkish Airlines avec changement à Istanbul.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c5/Town_hall%2C_Chandni_chowk%2C_Delhi_by_ashish.jpg/960px-Town_hall%2C_Chandni_chowk%2C_Delhi_by_ashish.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 1",
+      "timeline": [
+        {
+          "title": "Aéroport de Lyon",
+          "subtitle": "Transfert et formalités d'embarquement pour le vol vers l'Inde. Rendez-vous des participants à 07h40 à l’aéroport de Lyon.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Vol international",
+          "subtitle": "Envol pour Delhi via Istanbul avec la compagnie Turkish Airlines. Envol à 10h40 à destination de Delhi à bord d’un vol Turkish Airlines avec changement à Istanbul.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 2,
+      "title": "Delhi - Mandawa",
+      "city": "Mandawa",
+      "lat": 28.0551,
+      "lng": 75.1485,
+      "highlight": "",
+      "description": "Rencontre avec le guide local francophone et repos à l'hôtel. Arrivée à 05h15 à Delhi. Formalités de douanes et récupération des bagages. Arrêt dans un village traditionnel en cours de route Découverte des maisons ornées de fresques anciennes dans la région du Shekhawati. Bourg de la région de Shekhawati, cernée par les sables du désert, connu pour ses maisons et havelis ornées de fresques qui sont parmi les plus anciennes de cette région du Rajasthan. La province fut autrefois vassale de Jaipur. Située sur la grande route caravanière, les commerces d’opium, de coton et d’épices furent florissants. De riches marchands se firent construire de somptueuses demeures appelées havelis, dont les façades peintes donnent aujourd’hui un cachet unique à ces villages. Initiation aux saveurs et techniques culinaires indiennes. Démonstration de cuisine Indienne. Suivi du dîner. Nuit à l’hôtel.",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/0/0b/Haveli_mandawa.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+      "weather": "",
+      "dateStr": "Jour 2",
+      "timeline": [
+        {
+          "title": "Accueil à Delhi",
+          "subtitle": "Rencontre avec le guide local francophone et repos à l'hôtel. Arrivée à 05h15 à Delhi. Formalités de douanes et récupération des bagages.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Village Dhani",
+          "subtitle": "Arrêt dans un village traditionnel en cours de route",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Havelis de Mandawa",
+          "subtitle": "Découverte des maisons ornées de fresques anciennes dans la région du Shekhawati. Bourg de la région de Shekhawati, cernée par les sables du désert, connu pour ses maisons et havelis ornées de fresques qui sont parmi les plus anciennes de cette région du Rajasthan. La province fut autrefois vassale de Jaipur. Située sur la grande route caravanière, les commerces d’opium, de coton et d’épices furent florissants. De riches marchands se firent construire de somptueuses demeures appelées havelis, dont les façades peintes donnent aujourd’hui un cachet unique à ces villages.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Démonstration de cuisine",
+          "subtitle": "Initiation aux saveurs et techniques culinaires indiennes. Démonstration de cuisine Indienne. Suivi du dîner. Nuit à l’hôtel.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 3,
+      "title": "Mandawa - Bikaner",
+      "city": "Bikaner",
+      "lat": 28.0229,
+      "lng": 73.3119,
+      "highlight": "",
+      "description": "Halte au premier sanctuaire dédié aux vaches sacrées du Rajasthan. Arrêt en cours de route pour la visite du premier sanctuaire de vaches du Rajasthan, qui offre un abri à 10 000 vaches réparties sur plus de 220 hectares. Visite de l'imposante forteresse et de ses palais richement décorés. Edifié au 16ème siècle au nord-est de la ville, le vaste ensemble de cours et de palais du Junagarh Fort est l’une des rares cités-forteresses à ne pas être bâtie en hauteur. L’intérieur, qui héberge un Musée dédié aux armes, surprend par l’excellent état de conservation des parures. Découverte des collections historiques et artistiques de Bikaner. Puis, du musée Ganga Golden Jubilee. Balade immersive dans le bazar local et le marché aux légumes",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Kotgate%2Cbikaner.jpg/960px-Kotgate%2Cbikaner.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 3",
+      "timeline": [
+        {
+          "title": "Sanctuaire de vaches",
+          "subtitle": "Halte au premier sanctuaire dédié aux vaches sacrées du Rajasthan. Arrêt en cours de route pour la visite du premier sanctuaire de vaches du Rajasthan, qui offre un abri à 10 000 vaches réparties sur plus de 220 hectares.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Fort Junagarh",
+          "subtitle": "Visite de l'imposante forteresse et de ses palais richement décorés. Edifié au 16ème siècle au nord-est de la ville, le vaste ensemble de cours et de palais du Junagarh Fort est l’une des rares cités-forteresses à ne pas être bâtie en hauteur. L’intérieur, qui héberge un Musée dédié aux armes, surprend par l’excellent état de conservation des parures.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Musée Ganga Golden Jubilee",
+          "subtitle": "Découverte des collections historiques et artistiques de Bikaner. Puis, du musée Ganga Golden Jubilee.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Marché d'épices",
+          "subtitle": "Balade immersive dans le bazar local et le marché aux légumes",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 4,
+      "title": "Bikaner - Jaisalmer",
+      "city": "Jaisalmer",
+      "lat": 26.9157,
+      "lng": 70.9083,
+      "highlight": "",
+      "description": "Arrêt déjeuner dans ce fort historique situé sur la route du désert Temps libre dans la ville fortifiée aux remparts de grès jaune. Départ en direction de Jaisalmer , cité magique, profondément romantique et totalement préservée. Elle a été surnommée la Cité Dorée en raison de la couleur que prend la pierre des remparts au coucher du soleil.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/ff/View_from_Jaisalmer_fort.jpg/960px-View_from_Jaisalmer_fort.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 4",
+      "timeline": [
+        {
+          "title": "Fort de Pokharan",
+          "subtitle": "Arrêt déjeuner dans ce fort historique situé sur la route du désert",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Cité Dorée de Jaisalmer",
+          "subtitle": "Temps libre dans la ville fortifiée aux remparts de grès jaune. Départ en direction de Jaisalmer , cité magique, profondément romantique et totalement préservée. Elle a été surnommée la Cité Dorée en raison de la couleur que prend la pierre des remparts au coucher du soleil.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 5,
+      "title": "Jaisalmer",
+      "city": "Jaisalmer",
+      "lat": 26.9157,
+      "lng": 70.9083,
+      "highlight": "",
+      "description": "Exploration de la citadelle habitée dominant le désert de Thar. Entourée de murailles et coiffée d’une imposante citadelle, Jaisalmer nous transporte dans l’Inde médiévale des fiers princes rajpoutes. Elle a conservé intact tout un décor irréel de façade ajourées, une beauté architecturale homogène. Découverte du Fort de Jaisalamer , un des rares “forts vivants” au monde, près d’un quart de la population de l’ancienne ville réside toujours à l’intérieur du fort. Visite des monuments funéraires de Bada Bagh. Puis, visite des cénotaphes Royaux, tombeaux vides édifiés en mémoire de certains Maharadjahs. Excursion en jeep dans les dunes pour le coucher du soleil. (40 kms) Arrivée, départ pour une excursion en jeep dans les Dunes , et enfin apprécier le coucher du soleil. Soirée traditionnelle Rajasthani autour d'un feu de camp. Spectacle de danses folkloriques Rajasthani autour d’un feu de camp, suivi du dîner au campement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f9/Jaisalmer_view.jpg/960px-Jaisalmer_view.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 5",
+      "timeline": [
+        {
+          "title": "Fort de Jaisalmer",
+          "subtitle": "Exploration de la citadelle habitée dominant le désert de Thar. Entourée de murailles et coiffée d’une imposante citadelle, Jaisalmer nous transporte dans l’Inde médiévale des fiers princes rajpoutes. Elle a conservé intact tout un décor irréel de façade ajourées, une beauté architecturale homogène. Découverte du Fort de Jaisalamer , un des rares “forts vivants” au monde, près d’un quart de la population de l’ancienne ville réside toujours à l’intérieur du fort.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Cénotaphes Royaux",
+          "subtitle": "Visite des monuments funéraires de Bada Bagh. Puis, visite des cénotaphes Royaux, tombeaux vides édifiés en mémoire de certains Maharadjahs.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dunes de Sam",
+          "subtitle": "Excursion en jeep dans les dunes pour le coucher du soleil. (40 kms) Arrivée, départ pour une excursion en jeep dans les Dunes , et enfin apprécier le coucher du soleil.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Spectacle de danses folkloriques",
+          "subtitle": "Soirée traditionnelle Rajasthani autour d'un feu de camp. Spectacle de danses folkloriques Rajasthani autour d’un feu de camp, suivi du dîner au campement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 6,
+      "title": "Jaisalmer - Jodhpur - Luni",
+      "city": "Jodphur",
+      "lat": 26.1022,
+      "lng": 73.0189,
+      "highlight": "",
+      "description": "Visite de l'une des plus grandes citadelles d'Inde surplombant la ville bleue. Visite de la remarquable Forteresse de Mehrangarh qui fut édifiée en 1459 par le prince Jodha, elle servit jusqu’au début de notre siècle de résidence aux maharajahs du Marwar. Découverte du mémorial royal en marbre blanc. Continuation avec le Jaswant Thada , magnifique petit temple de marbre blanc entouré d’un joli petit jardin et de cénotaphes. Partez explorer les ruelles étroites dominées par les demeures couleur bleu azure, couleur des Brahmanes. Découverte du Sadar bazar avec ses nombreux artisans. Promenade au cœur du marché artisanal de Jodhpur. Temps libre pour se relaxer et déambuler dans le bazar local haut en couleurs. Installation et découverte libre du fort du village. Dans l’après-midi, route vers le village de Luni. Arrivée, cocktail de bienvenue et installation dans votre hôtel de charme. Découverte du fort librement.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5b/Mehrangarh_Fort.jpg/960px-Mehrangarh_Fort.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 6",
+      "timeline": [
+        {
+          "title": "Forteresse de Mehrangarh",
+          "subtitle": "Visite de l'une des plus grandes citadelles d'Inde surplombant la ville bleue. Visite de la remarquable Forteresse de Mehrangarh qui fut édifiée en 1459 par le prince Jodha, elle servit jusqu’au début de notre siècle de résidence aux maharajahs du Marwar.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Jaswant Thada",
+          "subtitle": "Découverte du mémorial royal en marbre blanc. Continuation avec le Jaswant Thada , magnifique petit temple de marbre blanc entouré d’un joli petit jardin et de cénotaphes. Partez explorer les ruelles étroites dominées par les demeures couleur bleu azure, couleur des Brahmanes. Découverte du Sadar bazar avec ses nombreux artisans.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Sadar Bazar",
+          "subtitle": "Promenade au cœur du marché artisanal de Jodhpur. Temps libre pour se relaxer et déambuler dans le bazar local haut en couleurs.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Fort de Luni",
+          "subtitle": "Installation et découverte libre du fort du village. Dans l’après-midi, route vers le village de Luni. Arrivée, cocktail de bienvenue et installation dans votre hôtel de charme. Découverte du fort librement.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 7,
+      "title": "Luni - Jaipur",
+      "city": "Jaipur",
+      "lat": 26.9124,
+      "lng": 75.7873,
+      "highlight": "",
+      "description": "Première immersion dans les marchés colorés de la capitale du Rajasthan. Ce matin, départ vers Jaipur, capitale du Rajasthan , une des villes les plus colorées et des plus pittoresques de toute l’Inde. Jaipur fut construite au 15è siècle par le Maharaja Jaisingh Ii, d’après le plan idéal exposé dans l’arthashasthra hindou pour lequel la ville doit être à l’image du cosmos et refléter, dans la répartition des habitants, l’ordre social des varnas et des castes. Ainsi, la ville était tracée dans un carré, enceinte de murs percés de 9 portes, et divisée en 9 quartiers dont chacun avait une fonction précise, le palais occupant le centre. Jaipur est sans doute la ville indienne la plus proche du modèle théorique. La magnificence des palais témoigne de la puissance qu’atteignirent les princes rajpoutes qui quittèrent la forteresse d’Amber pour les palais de Jaipur. Parcours dans les ruelles animées de la ville rose en soirée. En soirée, balade en e-rickshaws dans les ruelles de la ville pour une première découverte de la ville.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Hawa_Mahal_Palace_%28Palace_of_Winds%29%2C_famous_landmark_of_Jaipur.jpg/960px-Hawa_Mahal_Palace_%28Palace_of_Winds%29%2C_famous_landmark_of_Jaipur.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 7",
+      "timeline": [
+        {
+          "title": "Bazar de Jaipur",
+          "subtitle": "Première immersion dans les marchés colorés de la capitale du Rajasthan. Ce matin, départ vers Jaipur, capitale du Rajasthan , une des villes les plus colorées et des plus pittoresques de toute l’Inde. Jaipur fut construite au 15è siècle par le Maharaja Jaisingh Ii, d’après le plan idéal exposé dans l’arthashasthra hindou pour lequel la ville doit être à l’image du cosmos et refléter, dans la répartition des habitants, l’ordre social des varnas et des castes. Ainsi, la ville était tracée dans un carré, enceinte de murs percés de 9 portes, et divisée en 9 quartiers dont chacun avait une fonction précise, le palais occupant le centre. Jaipur est sans doute la ville indienne la plus proche du modèle théorique. La magnificence des palais témoigne de la puissance qu’atteignirent les princes rajpoutes qui quittèrent la forteresse d’Amber pour les palais de Jaipur.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Balade en rickshaw",
+          "subtitle": "Parcours dans les ruelles animées de la ville rose en soirée. En soirée, balade en e-rickshaws dans les ruelles de la ville pour une première découverte de la ville.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 8,
+      "title": "Jaipur",
+      "city": "Jaipur",
+      "lat": 26.9124,
+      "lng": 75.7873,
+      "highlight": "",
+      "description": "Montée en jeep vers la forteresse royale dominant le lac Maota. Vous profiterez d’une magnifique excursion au Fort d’Amber , accroché aux flancs d’un piton rocheux, il se reflète dans le lac Maota Sagar. Animation traditionnelle lors d'un déjeuner dans une ancienne haveli. Vous accéderez au Fort en jeep. Déjeuner dans une ancienne haveli (demeure princière). Petit spectacle de marionnettes. Visite du palais du Maharadjah et de ses musées. Visite de la ville surnommée « la ville rose » : – le City Palace , un mélange d’architectures moghole et rajasthanie, il abrite cours, jardins et bâtiments. – l’Observatoire « Jantar Mantar », bâti par Jai Singh en 1728. Apprenez comment ce passionné d’astronomie a réussi à mesurer le temps sur ses énormes cadrans solaires, ainsi que la progression de l’astre du jour à travers le zodiaque. Découverte des instruments astronomiques géants en pierre Démonstration du port des vêtements traditionnels indiens. Démonstration du port du sari pour les femmes et du turban du Maharadjah pour les hommes.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/1/14/Hawa_Mahal_Palace_%28Palace_of_Winds%29%2C_famous_landmark_of_Jaipur.jpg/960px-Hawa_Mahal_Palace_%28Palace_of_Winds%29%2C_famous_landmark_of_Jaipur.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 8",
+      "timeline": [
+        {
+          "title": "Fort d'Amber",
+          "subtitle": "Montée en jeep vers la forteresse royale dominant le lac Maota. Vous profiterez d’une magnifique excursion au Fort d’Amber , accroché aux flancs d’un piton rocheux, il se reflète dans le lac Maota Sagar.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Spectacle de marionnettes",
+          "subtitle": "Animation traditionnelle lors d'un déjeuner dans une ancienne haveli. Vous accéderez au Fort en jeep. Déjeuner dans une ancienne haveli (demeure princière). Petit spectacle de marionnettes.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "City Palace",
+          "subtitle": "Visite du palais du Maharadjah et de ses musées. Visite de la ville surnommée « la ville rose » : – le City Palace , un mélange d’architectures moghole et rajasthanie, il abrite cours, jardins et bâtiments. – l’Observatoire « Jantar Mantar », bâti par Jai Singh en 1728. Apprenez comment ce passionné d’astronomie a réussi à mesurer le temps sur ses énormes cadrans solaires, ainsi que la progression de l’astre du jour à travers le zodiaque.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Observatoire Jantar Mantar",
+          "subtitle": "Découverte des instruments astronomiques géants en pierre",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Atelier Sari et Turban",
+          "subtitle": "Démonstration du port des vêtements traditionnels indiens. Démonstration du port du sari pour les femmes et du turban du Maharadjah pour les hommes.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 9,
+      "title": "Jaipur - Abhaneri - Agra",
+      "city": "Agra",
+      "lat": 27.1767,
+      "lng": 78.0081,
+      "highlight": "",
+      "description": "Visite du Chand Baoli, impressionnant bassin à marches du IXe siècle. En route visite des puits d’Abhaneri : magnifique et très profond bassin à marches (baoli), profond de quinze étages, datant du 8ème siècle, le Chand Baoli, qui constitue le monument principal. Balade dans le village traditionnel et rencontre avec les locaux. Rencontre avec les habitants et balade dans le village Visite du célèbre mausolée de marbre blanc, symbole de l'amour éternel. (Ce jour ne doit pas tomber un vendredi car le Taj Mahal sera fermé) Le Taj Mahal, lumineux mausolée de marbre blanc a été construit par l’empereur moghol Shah Jahan pour immortaliser l’amour qu’il portait à son épouse défunte Mumtaz Mahal. C’est sans doute le monument le plus célèbre de l’Inde et l’illustration de la perfection esthétique qu’atteignit l’art indo-musulman sous la dynastie moghole. C’est sans conteste, l’une des 7 merveilles du MONDE. Animation de soirée à l'hôtel avec cocktail local",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cd/Tajmahal%2C_Agra%2C_India.jpg/960px-Tajmahal%2C_Agra%2C_India.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 9",
+      "timeline": [
+        {
+          "title": "Puits d'Abhaneri",
+          "subtitle": "Visite du Chand Baoli, impressionnant bassin à marches du IXe siècle. En route visite des puits d’Abhaneri : magnifique et très profond bassin à marches (baoli), profond de quinze étages, datant du 8ème siècle, le Chand Baoli, qui constitue le monument principal. Balade dans le village traditionnel et rencontre avec les locaux.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Village traditionnel",
+          "subtitle": "Rencontre avec les habitants et balade dans le village",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Taj Mahal",
+          "subtitle": "Visite du célèbre mausolée de marbre blanc, symbole de l'amour éternel. (Ce jour ne doit pas tomber un vendredi car le Taj Mahal sera fermé) Le Taj Mahal, lumineux mausolée de marbre blanc a été construit par l’empereur moghol Shah Jahan pour immortaliser l’amour qu’il portait à son épouse défunte Mumtaz Mahal. C’est sans doute le monument le plus célèbre de l’Inde et l’illustration de la perfection esthétique qu’atteignit l’art indo-musulman sous la dynastie moghole. C’est sans conteste, l’une des 7 merveilles du MONDE.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Spectacle de magie",
+          "subtitle": "Animation de soirée à l'hôtel avec cocktail local",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "endDay": 0,
+      "day": 10,
+      "title": "Agra - Jhansi - Orchha - Khajuraho",
+      "city": "Khajuraho",
+      "lat": 24.8318,
+      "lng": 79.9199,
+      "highlight": "",
+      "description": "Exploration de la puissante citadelle moghole en grès rouge. Visite du Fort rouge, construit par l’empereur Akbar en 1565 et développé par ses successeurs, renfermé, dans ses murailles, plusieurs palais, une mosquée et les salles d’audiences des empereurs moghols du Khas Mahal, formé de trois pavillons bâtis par Shah Jahan, on découvre une très belle vue sur la Yamuna et le Taj Mahal. Trajet ferroviaire rapide entre Agra et Jhansi. Transfert à la gare d’Agra pour embarquer à bord du train Shatabdi Express à destination de Jhansi. (Horaires : 09h55 /12h35) Arrivée, accueil et route pour Khajuraho. Découverte des sanctuaires et palais du XVIe siècle. En cours de route, visite d’Orchha et de ses temples qui datent du XVIe siècle et qui accueillent toujours des milliers de dévots indiens.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/5d/Khajuraho_tempel_india.jpg/960px-Khajuraho_tempel_india.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 10",
+      "timeline": [
+        {
+          "title": "Fort Rouge d'Agra",
+          "subtitle": "Exploration de la puissante citadelle moghole en grès rouge. Visite du Fort rouge, construit par l’empereur Akbar en 1565 et développé par ses successeurs, renfermé, dans ses murailles, plusieurs palais, une mosquée et les salles d’audiences des empereurs moghols du Khas Mahal, formé de trois pavillons bâtis par Shah Jahan, on découvre une très belle vue sur la Yamuna et le Taj Mahal.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Train Shatabdi Express",
+          "subtitle": "Trajet ferroviaire rapide entre Agra et Jhansi. Transfert à la gare d’Agra pour embarquer à bord du train Shatabdi Express à destination de Jhansi. (Horaires : 09h55 /12h35) Arrivée, accueil et route pour Khajuraho.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Temples d'Orchha",
+          "subtitle": "Découverte des sanctuaires et palais du XVIe siècle. En cours de route, visite d’Orchha et de ses temples qui datent du XVIe siècle et qui accueillent toujours des milliers de dévots indiens.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "day": 11,
+      "title": "Khajuraho - Varanasi",
+      "city": "Varanasi",
+      "lat": 25.3176,
+      "lng": 82.9739,
+      "highlight": "",
+      "description": "Visite des temples sculptés classés au patrimoine mondial de l'Unesco. Visite des principaux temples de Khajuraho , élevé au rang de patrimoine mondial de l’Unesco Des splendides exemples d’architecture indo-aryenne doivent leur renommée mondiale à leur statuaire. Transfert aérien vers Varanasi, l'ancienne Bénarès",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/3/3a/Varanasi_Munshi_Ghat3.jpg/960px-Varanasi_Munshi_Ghat3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 11",
+      "timeline": [
+        {
+          "title": "Temples de Khajuraho",
+          "subtitle": "Visite des temples sculptés classés au patrimoine mondial de l'Unesco. Visite des principaux temples de Khajuraho , élevé au rang de patrimoine mondial de l’Unesco Des splendides exemples d’architecture indo-aryenne doivent leur renommée mondiale à leur statuaire.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Vol intérieur",
+          "subtitle": "Transfert aérien vers Varanasi, l'ancienne Bénarès",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "day": 12,
+      "title": "Varanasi",
+      "city": "Varanasi",
+      "lat": 25.3176,
+      "lng": 82.9739,
+      "highlight": "",
+      "description": "Navigation matinale pour observer les rituels sur les ghâts. Très tôt le matin transfert à l’embarcadère et embarquement pour une promenade sur le Gange . Vous pourrez découvrir le fascinant spectacle des « ghats », marches qui descendent jusqu’au bord du fleuve où grouillent une foule de dévots, de fidèles, de prêtres, de marchands ; d’hommes, de femmes Puis visite de Varanasi : Avec le Temple de Bharat Mata qui fut construit en 1918 et renferme une carte en relief du sous-continent indien taillé dans le marbre. Et balade au bord des ghâts. Les ghats sont les marches qui plongent dans le fleuve et qui servent aux bains rituels des hindous. Certains ghats sont réservés à la crémation des morts. Il y a une centaine de ghâts le long du Gange. Beaucoup d’entre eux sont associés à des légendes ou mythologies. Visite du temple de Bharat Mata, de Durga et de la mosquée Aurangzeb. La Mosquée Aurangzeb , édifié par l’Empereur Aurangzeb à la place d’un temple qu’il avait préalablement détruit. Exploration des ruelles de la vieille ville Rituel de la lumière dédié au fleuve sacré en soirée. Dans la soirée, vous assisterez à la cérémonie Aartie qui se déroule tous les jours, en fin d’après-midi, sur la rive du Gange, près du ghât de Dasasvamedha. Cinq prêtres, vêtus de blanc et de rouge, y conduisent ce rituel de la lumière, dédié au Gange (Mère Gange : Gangâ Ma), accompagnés de chants de mantra et de sons frappés sur des cymbales de fer. (Durée : 45 à 50 minutes).",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/c/c9/Sadhu_V%C3%A2r%C3%A2nas%C3%AE.jpg/960px-Sadhu_V%C3%A2r%C3%A2nas%C3%AE.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 12",
+      "timeline": [
+        {
+          "title": "Promenade sur le Gange",
+          "subtitle": "Navigation matinale pour observer les rituels sur les ghâts. Très tôt le matin transfert à l’embarcadère et embarquement pour une promenade sur le Gange . Vous pourrez découvrir le fascinant spectacle des « ghats », marches qui descendent jusqu’au bord du fleuve où grouillent une foule de dévots, de fidèles, de prêtres, de marchands ; d’hommes, de femmes Puis visite de Varanasi : Avec le Temple de Bharat Mata qui fut construit en 1918 et renferme une carte en relief du sous-continent indien taillé dans le marbre. Et balade au bord des ghâts. Les ghats sont les marches qui plongent dans le fleuve et qui servent aux bains rituels des hindous. Certains ghats sont réservés à la crémation des morts. Il y a une centaine de ghâts le long du Gange. Beaucoup d’entre eux sont associés à des légendes ou mythologies.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Temples et Mosquée",
+          "subtitle": "Visite du temple de Bharat Mata, de Durga et de la mosquée Aurangzeb. La Mosquée Aurangzeb , édifié par l’Empereur Aurangzeb à la place d’un temple qu’il avait préalablement détruit.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Balade en cyclo-pousse",
+          "subtitle": "Exploration des ruelles de la vieille ville",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Cérémonie Aarti",
+          "subtitle": "Rituel de la lumière dédié au fleuve sacré en soirée. Dans la soirée, vous assisterez à la cérémonie Aartie qui se déroule tous les jours, en fin d’après-midi, sur la rive du Gange, près du ghât de Dasasvamedha. Cinq prêtres, vêtus de blanc et de rouge, y conduisent ce rituel de la lumière, dédié au Gange (Mère Gange : Gangâ Ma), accompagnés de chants de mantra et de sons frappés sur des cymbales de fer. (Durée : 45 à 50 minutes).",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "day": 13,
+      "title": "Varanasi - Delhi",
+      "city": "Delhi",
+      "lat": 28.6139,
+      "lng": 77.209,
+      "highlight": "",
+      "description": "Excursion sur le site bouddhiste où Bouddha prononça son premier sermon. Sarnath est une cité bouddhiste située non loin de la ville sacrée de Varanasi. Selon la légende, Bouddha y aurait fait son premier sermon. De ce fait, vous pourrez y croiser de nombreux pèlerins bouddhistes et y découvrir de nombreux vestiges… Un lieu calme, propice à la tranquillité et à la méditation. Envol vers Delhi pour la fin du circuit Repas d'adieu aux saveurs traditionnelles du nord. Retour à l’hôtel en fin de journée. Installation. Dîner d’adieu avec spécialités tandoori et nuit à l’hôtel.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/07/Statue_of_buddha%2C_Sarnath_Buddha_Park%2C_Sarnath.jpg/960px-Statue_of_buddha%2C_Sarnath_Buddha_Park%2C_Sarnath.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 13",
+      "timeline": [
+        {
+          "title": "Cité de Sarnath",
+          "subtitle": "Excursion sur le site bouddhiste où Bouddha prononça son premier sermon. Sarnath est une cité bouddhiste située non loin de la ville sacrée de Varanasi. Selon la légende, Bouddha y aurait fait son premier sermon. De ce fait, vous pourrez y croiser de nombreux pèlerins bouddhistes et y découvrir de nombreux vestiges… Un lieu calme, propice à la tranquillité et à la méditation.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Vol intérieur",
+          "subtitle": "Envol vers Delhi pour la fin du circuit",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Dîner de spécialités tandoori",
+          "subtitle": "Repas d'adieu aux saveurs traditionnelles du nord. Retour à l’hôtel en fin de journée. Installation. Dîner d’adieu avec spécialités tandoori et nuit à l’hôtel.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "day": 14,
+      "title": "Delhi",
+      "city": "Delhi",
+      "lat": 28.6139,
+      "lng": 77.209,
+      "highlight": "",
+      "description": "Visite de la plus haute tour de pierre d'Inde. Découverte du Qtub Minar en matinée, édifice construit par les Moghols peu de temps après leur victoire. Le premier monument édifié est la tour monumentale du Qutab Minar. Commencé en 1199, à la mort de son fondateur, Qutb-ud-Din, seul le premier étage était construit. C’est son fils qui acheva l’édifice. Après un tremblement de terre, le dernier étage fut remonté et doublé en 1386. Poursuite des visites de la ville avec Old Delhi : Jama Masjid , la mosquée du vendredi a été construite de 1644 à 1658 sous le règne de Shahjahan. La mosquée qui mesure 65m sur 35m, et dont la cour forme un carré de 100m de côté est par sa superficie la plus grande construction religieuse de l’Islam. Surmontée par trois coupoles et flanquée de deux minarets hauts de 40 mètres. L’ensemble de la construction, où se marient harmonieusement le marbre et la pierre calcaire rougeâtre est à juste titre considérée comme un chef d’œuvre de l’architecture moghole. Passage devant l'arc de triomphe dédié aux soldats indiens. Passage devant l ’India Gate , un arc de triomphe qui fut érigé en mémoire des 100 000 soldats indiens tués Durant la Première Guerre Mondiale. Découverte de la plus grande mosquée du pays dans le Vieux Delhi. Baignée par les eaux saintes de la Yamuna, Delhi n’est pas une ville de tradition hindoue, mais plutôt le fruit des créations successives des conquérants, turcs ou afghans, toujours musulmans, qui voulurent y imprimer leurs titres de gloire. Sous la domination britannique deux villes s’ignoraient alors : la cité victorienne et la ville désormais “indigène” au pied de sa grande mosquée. Les empires ont croulé mais Delhi n’a rien perdu Immeuble Agora 1 rue Victor Hugo - 44400 REZE de son importance, bien au contraire. C’est aujourd’hui la capitale d’un état de plus de 1 milliard d’habitants et les deux cités de naguère sont désormais réunies dans une métropole résolument tournée vers l’avenir. Balade dans les ruelles du vieux Delhi, dépaysement garanti ! Recueillement sur le lieu de crémation du Mahatma Gandhi. Le Raj Ghat. Ce monument situé sur la rive de la Yamuna où le Mahatma Gandhi fut incinéré à la suite de son assassinat en 1948. Le mémorial (Samadi) du « père de la nation » est constitué d’une plaque de marbre noir, orné de fleurs.",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Qutub_Minar_or_Qutb_Minar_or_Qutab_Minar_3.jpg/960px-Qutub_Minar_or_Qutb_Minar_or_Qutab_Minar_3.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 14",
+      "timeline": [
+        {
+          "title": "Minaret Qutub Minar",
+          "subtitle": "Visite de la plus haute tour de pierre d'Inde. Découverte du Qtub Minar en matinée, édifice construit par les Moghols peu de temps après leur victoire. Le premier monument édifié est la tour monumentale du Qutab Minar. Commencé en 1199, à la mort de son fondateur, Qutb-ud-Din, seul le premier étage était construit. C’est son fils qui acheva l’édifice. Après un tremblement de terre, le dernier étage fut remonté et doublé en 1386. Poursuite des visites de la ville avec Old Delhi : Jama Masjid , la mosquée du vendredi a été construite de 1644 à 1658 sous le règne de Shahjahan. La mosquée qui mesure 65m sur 35m, et dont la cour forme un carré de 100m de côté est par sa superficie la plus grande construction religieuse de l’Islam. Surmontée par trois coupoles et flanquée de deux minarets hauts de 40 mètres. L’ensemble de la construction, où se marient harmonieusement le marbre et la pierre calcaire rougeâtre est à juste titre considérée comme un chef d’œuvre de l’architecture moghole.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "India Gate",
+          "subtitle": "Passage devant l'arc de triomphe dédié aux soldats indiens. Passage devant l ’India Gate , un arc de triomphe qui fut érigé en mémoire des 100 000 soldats indiens tués Durant la Première Guerre Mondiale.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Mosquée Jama Masjid",
+          "subtitle": "Découverte de la plus grande mosquée du pays dans le Vieux Delhi. Baignée par les eaux saintes de la Yamuna, Delhi n’est pas une ville de tradition hindoue, mais plutôt le fruit des créations successives des conquérants, turcs ou afghans, toujours musulmans, qui voulurent y imprimer leurs titres de gloire. Sous la domination britannique deux villes s’ignoraient alors : la cité victorienne et la ville désormais “indigène” au pied de sa grande mosquée. Les empires ont croulé mais Delhi n’a rien perdu Immeuble Agora 1 rue Victor Hugo - 44400 REZE de son importance, bien au contraire. C’est aujourd’hui la capitale d’un état de plus de 1 milliard d’habitants et les deux cités de naguère sont désormais réunies dans une métropole résolument tournée vers l’avenir. Balade dans les ruelles du vieux Delhi, dépaysement garanti !",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Mémorial Raj Ghat",
+          "subtitle": "Recueillement sur le lieu de crémation du Mahatma Gandhi. Le Raj Ghat. Ce monument situé sur la rive de la Yamuna où le Mahatma Gandhi fut incinéré à la suite de son assassinat en 1948. Le mémorial (Samadi) du « père de la nation » est constitué d’une plaque de marbre noir, orné de fleurs.",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "day": 15,
+      "title": "Delhi - Lyon",
+      "city": "Delhi",
+      "lat": 28.6328027,
+      "lng": 77.2197713,
+      "highlight": "",
+      "description": "Formalités et envol vers Lyon via Istanbul Arrivée à Lyon et transfert retour vers votre localité",
+      "image": "https://thumb.wikimedia.org/wikipedia/commons/thumb/5/50/Berlin_Brandenburg_Airport_Turkish_Airlines_Airbus_A350-941_TC-LGJ_%28DSC01105%29.jpg/960px-Berlin_Brandenburg_Airport_Turkish_Airlines_Airbus_A350-941_TC-LGJ_%28DSC01105%29.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail",
+      "weather": "",
+      "dateStr": "Jour 15",
+      "timeline": [
+        {
+          "title": "Vol retour",
+          "subtitle": "Formalités et envol vers Lyon via Istanbul",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "title": "Votre région",
+          "subtitle": "Arrivée à Lyon et transfert retour vers votre localité",
+          "time": "",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "name": "Deventure Sarovar Portico 4*",
+      "city": "Delhi",
+      "dates": "Jours 1 et 13 à 15",
+      "address": "Hôtel à Delhi",
+      "phone": "",
+      "lat": 28.6139,
+      "lng": 77.209,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Desert Resort 3* sup.",
+      "city": "Mandawa",
+      "dates": "Jour 2",
+      "address": "Hôtel à Mandawa",
+      "phone": "",
+      "lat": 28.0551,
+      "lng": 75.1485,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Raj Haveli 3*",
+      "city": "Bikaner",
+      "dates": "Jour 3",
+      "address": "Hôtel à Bikaner",
+      "phone": "",
+      "lat": 28.0229,
+      "lng": 73.3119,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Naryan Niwas Palace 4*",
+      "city": "Jaisalmer",
+      "dates": "Jours 4 et 5",
+      "address": "Hôtel à Jaisalmer",
+      "phone": "",
+      "lat": 26.9157,
+      "lng": 70.9083,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Fort Chanwa 4*",
+      "city": "Luni",
+      "dates": "Jour 6",
+      "address": "Hôtel à Luni",
+      "phone": "",
+      "lat": 26.1022,
+      "lng": 73.0189,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Regenta Central 4*",
+      "city": "Jaipur",
+      "dates": "Jours 7 et 8",
+      "address": "Hôtel à Jaipur",
+      "phone": "",
+      "lat": 26.9124,
+      "lng": 75.7873,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Taj Pearl 3*",
+      "city": "Agra",
+      "dates": "Jour 9",
+      "address": "Hôtel à Agra",
+      "phone": "",
+      "lat": 27.1767,
+      "lng": 78.0081,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Syna Heritage (charme)",
+      "city": "Khajuraho",
+      "dates": "Jour 10",
+      "address": "Hôtel à Khajuraho",
+      "phone": "",
+      "lat": 24.8318,
+      "lng": 79.9199,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Pristine Hotel 4*",
+      "city": "Varanasi",
+      "dates": "Jours 11 et 12",
+      "address": "Hôtel à Varanasi",
+      "phone": "",
+      "lat": 25.3176,
+      "lng": 82.9739,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    }
+  ],
+  "hotelsList": [
+    {
+      "name": "Deventure Sarovar Portico 4*",
+      "city": "Delhi",
+      "dates": "Jours 1 et 13 à 15",
+      "address": "Hôtel à Delhi",
+      "phone": "",
+      "lat": 28.6139,
+      "lng": 77.209,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Desert Resort 3* sup.",
+      "city": "Mandawa",
+      "dates": "Jour 2",
+      "address": "Hôtel à Mandawa",
+      "phone": "",
+      "lat": 28.0551,
+      "lng": 75.1485,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Raj Haveli 3*",
+      "city": "Bikaner",
+      "dates": "Jour 3",
+      "address": "Hôtel à Bikaner",
+      "phone": "",
+      "lat": 28.0229,
+      "lng": 73.3119,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Naryan Niwas Palace 4*",
+      "city": "Jaisalmer",
+      "dates": "Jours 4 et 5",
+      "address": "Hôtel à Jaisalmer",
+      "phone": "",
+      "lat": 26.9157,
+      "lng": 70.9083,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Fort Chanwa 4*",
+      "city": "Luni",
+      "dates": "Jour 6",
+      "address": "Hôtel à Luni",
+      "phone": "",
+      "lat": 26.1022,
+      "lng": 73.0189,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Regenta Central 4*",
+      "city": "Jaipur",
+      "dates": "Jours 7 et 8",
+      "address": "Hôtel à Jaipur",
+      "phone": "",
+      "lat": 26.9124,
+      "lng": 75.7873,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Taj Pearl 3*",
+      "city": "Agra",
+      "dates": "Jour 9",
+      "address": "Hôtel à Agra",
+      "phone": "",
+      "lat": 27.1767,
+      "lng": 78.0081,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Syna Heritage (charme)",
+      "city": "Khajuraho",
+      "dates": "Jour 10",
+      "address": "Hôtel à Khajuraho",
+      "phone": "",
+      "lat": 24.8318,
+      "lng": 79.9199,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    },
+    {
+      "name": "Pristine Hotel 4*",
+      "city": "Varanasi",
+      "dates": "Jours 11 et 12",
+      "address": "Hôtel à Varanasi",
+      "phone": "",
+      "lat": 25.3176,
+      "lng": 82.9739,
+      "notes": "",
+      "isStayHotel": false,
+      "presentation": null
+    }
+  ],
+  "documents": [],
+  "freeTimeSuggestions": [],
+  "contactsList": [
+    {
+      "category": "Accompagnatrice Voyages Girardot",
+      "name": "Frédérique",
+      "phone": "",
+      "address": "Avec le groupe sur le circuit",
+      "isEmergency": false
+    },
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "En cas d’urgence : Mr Sunil CHADHA",
+      "phone": "",
+      "address": "Mobile : +91 99 53 14 22 68",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France en Inde",
+      "name": "2/50-E Shantipath, Chanakyapuri, New Delhi 110021",
+      "phone": "+91 11 4319 6100",
+      "address": "Site officiel : https://in.ambafrance.org",
+      "link": "https://in.ambafrance.org",
+      "isEmergency": true
+    },
+    {
+      "category": "Fil d'Ariane — Ressortissants Français",
+      "name": "Portail officiel France Diplomatie (Inscription gratuite)",
+      "phone": "",
+      "address": "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      "link": "https://fildariane.diplomatie.gouv.fr",
+      "isEmergency": false
+    }
+  ],
+  "practicalTipsList": [
+    {
+      "title": "Formalités indispensables (Passeport & Visas)",
+      "icon": "passport",
+      "content": "Passeport valide 6 mois après la date de votre retour.\nVisa obligatoire.\n03/07/2026 : Nouvelle déclaration de santé \"Air Suvidha\", obligatoire depuis le 30/06/2026.\nLe formulaire doit être rempli en ligne sur le site officiel airsuvidha.civilaviation.gov.in dans les 24h\navant l'arrivée en Inde.\nCette nouvelle formalité, gratuite, s'ajoute aux formalités déjà obligatoires de Visa Inde et\nde e-Arrival card.\nUn timing très strict pour le moment :\n\nCette démarche vise à identifier les voyageurs ayant séjourné dans un pays touché par l'épidémie Ebola (Congo\nRD, Ouganda, Soudan du Sud) au cours des 21 derniers jours.\nCette déclaration ne peut pas être anticipée. Le système bloque si on tente de le remplir plus de 24h avant\nl'atterrissage en Inde. En pratique, il doit être complété soit la veille au soir, soit le matin même du départ, selon\nl'horaire du vol.\nInformations à remplir (en anglais) :\n- Prénom et Nom, numéro de passeport\n- Région d'arrivée, ville d'arrivée, aéroport d'arrivée\n- Numéro du vol d'arrivée, date d'arrivée, heure d'arrivée\n- Adresse de domicile\n- Adresse du premier logement en Inde (ou de l'agence locale).\nAprès validation par un code reçu via email, le remplissage génère un document avec QR Code. Il est alors\npossible de l'imprimer ou de l'enregistrer sur un téléphone.\nEntre 120 et 4 jours avant la date de départ, vous devez donc faire votre demande de Visa :\nhttps://indianvisaonline.gov.in/evisa/\nA 72h du départ, vous devez remplir l'e-Arrival Card :\nhttps://indianvisaonline.gov.in/earrival/\nUne fois la formalité accomplie, un PDF téléchargeable comportant un QR code à présenter aux autorités à\nl’arrivée est généré.\nA 24h du départ, vous devez remplir la déclaration sanitaire :\nhttps://airsuvidha.civilaviation.gov.in/"
+    },
+    {
+      "title": "Bon à savoir",
+      "icon": "circle-info",
+      "content": "Le programme peut être modifié ou inversé, selon les impératifs locaux. Frais de droits d'appareil photo sur certains sites (à régler sur place). Circuit non adapté aux personnes à mobilité réduite. Les rotations aériennes ne sont pas définitivement arrêtées par la compagnie, de ce fait, la date du voyage peut changer et envol Paris possible. Vols de nuit."
+    },
+    {
+      "title": "Prestations incluses",
+      "icon": "circle-check",
+      "content": "Vols réguliers Genève / Delhi / Genève, via une escale, compagnie Qatar Airways ou similaire. Les vols intérieurs Khajuraho / Varanasi et Varanasi / Delhi. Taxes aéroports : 160 € révisables. Train Shatabdi Express. Hôtel 1ère catégorie, en chambre individuelle ou double. Pension complète selon programme. Une bouteille d'eau par jour et par personne. Guides accompagnateurs francophones. Accompagnateur Voyages Girardot."
+    },
+    {
+      "title": "Assurance & Rapatriement",
+      "icon": "kit-medical",
+      "content": "Afin de faire face aux frais d’hospitalisation et aux dépenses de santé, parfois très élevés à l’étranger, il est impératif de disposer d’un contrat d’assistance ou d’une assurance permettant de couvrir tous les frais médicaux (dont la chirurgie et l’hospitalisation) et de rapatriement sanitaire, au risque de ne pas avoir accès aux soins, y compris en cas d’urgence vitale. Ces frais ne pourront en aucun cas être pris en charge par la société VOYAGES GIRARDOT ORGANISATION. Merci de vous munir de votre numéro de contrat d’assurance et le numéro de téléphone d’assistance (sur les documents que vous avez reçu lors la souscription de l’assurance). Petits secrets d'Inde L’Inde, un pays où fleurit la beauté ! Si une image de l’Inde repose en chacun de nous, c’est en raison de l’aspect universel de la civilisation de ce grand pays ! Envoûtante, fascinante, déconcertante, paradoxale… Dans ce pays, tout n’est que profusion. Tout assaille, surprend, ravit, dérange : les bruits, les odeurs, la foule, les couleurs, la misère, les temples d’une beauté époustouflante, la présence des mendiants décharnés et des femmes aux allures de princesses vêtues de saris flamboyants, les vaches qui se promènent nonchalamment au milieu des carrefours chaotiques, les éléphants croisés au détour d’une ruelle suivant docilement leur cornac… Des montagnes du Ladakh à la luxuriante région du Kérala, en passant par le mythique Rajasthan, pays des Maharadjas, la vallée du Gange ou encore le célèbre Taj Mahal… l’Inde est à ce point multiple qu’une vie ne suffirait pas à l’appréhender dans sa globalité. Informations pratiques Monnaie La monnaie est la roupie indienne (INR) : 1 € = 106,233 INR // 1 INR = 0,00941 € (octobre 2026). Nous vous conseillons de changer vos euros dans les bureaux de change, dans certaines banques, généralement sans commission ou dans certains hôtels. Vous pouvez retirer des espèces avec votre carte de crédit dans la plupart des grandes villes indiennes. Pourboires Votre guide, votre chauffeur et toutes les personnes qui vous accueillent font toujours de leur mieux pour que votre voyage se passe dans les meilleures conditions. C’est pourquoi nous vous conseillons de donner : - Guide : 2.5 € / jour / personne, - Chauffeur : 1.5 € / jour / personne, - Aide-chauffeur / porteurs de bagages : 0.75 € / jour / personne., - Petits pourboires (porteurs de bagages, tuk tuk, jeep, restaurants... : 1.5 € / jour / personne. Le montant des pourboires reste bien sûr à votre bon vouloir et dépend de votre degré de satisfaction. Santé Aucun vaccin n’est obligatoire. Toutefois une mise à jour de votre carnet de vaccination (DTPolio, Hépatite, Typhoïde…) est fortement recommandée comme pour tout voyage. Dans tous les cas, nous vous recommandons de vous rapprocher de votre médecin traitant. Ordonnance : Si vous emmenez avec vous un traitement médical, il est impératif d’avoir l’ordonnance du médecin correspondante, en cas de contrôle par la douane. Ainsi qu'une version traduite en anglais. Dans l'hypothèse d'un souci sur place, il faut tout de suite ouvrir un dossier auprès de votre assurance de voyage, que celle-ci soit votre assurance de carte bancaire ou celle que vous avez souscrite avec nous pour ce voyage. Nous conseillons aux voyageurs de boire uniquement de l’eau minérale ou du thé. Il est recommandé de ne pas boire d’eau du robinet, de ne pas manger de fruits non pelés et de prévoir du gel ou des lingettes antibactériennes. Décalage horaire Eté + 3h30 : lorsqu’il est midi en France, il est 15h30 à New Delhi. Hiver + 4h30 : lorsqu’il est midi en France, il est 16h30 à New Delhi. Langue L'hindi est la langue officielle de l'Inde, mais chaque État a en plus ses propres langues officielles. Les langues les plus parlées, en plus de l'hindi, sont le bengali, le télougou et le marathi. On parle l'hindi principalement dans le nord du pays. Electricité 220 volts en général. Les prises de courant sont, en principe, de type européen, mais de nombreux hôtels sont au standard indien (3 grosses fiches rondes), un adaptateur \"Afrique du Sud - Inde\" est alors indispensable (on ne trouve pas ce format sur les adaptateurs dits \"universels\"). Sécurité et situation sanitaire Avant votre départ nous vous invitons à consulter le site du Ministère des Affaires Etrangères et ses conseils aux voyageurs : http://www.diplomatie.gouv.fr/fr/conseils-aux-voyageurs. Vous y trouverez les dernières recommandations notamment en matière de sécurité, formalités, douane et santé, ainsi que le lien pour vous inscrire sur Ariane. Tenue Lors de visites de temples, les jambes doivent être couvertes (foulard, pantalon ou jupe longue) ainsi que les épaules (éviter les débardeurs). Photos Certaines restrictions s'appliquent pour la prise de photos dans les temples : - La plupart des temples peuvent être photographiés de l'extérieur seulement, prendre des photos des sanctuaires ou des divinités est interdit. - Des taxes peuvent s'appliquer dans certains lieux : elles s'élèvent généralement à moins d'un euro. - Par exemple, les frais d'appareil photo du temple Kapelshwara sont de 25 roupies, soit moins de 30 cents, alors que dans certains endroits, ils sont de l'ordre de 50 cents. Climat La meilleure saison pour visiter l’Inde du Nord est de mi-novembre (l’automne indien !) à fin mars, hormis au Ladakh, où la bonne saison s’étend de mi-mai (voir juin) à fin septembre - début octobre et au Sikkim, où l’on se rendra de préférence entre mi-mars et mi-mai, ou entre fin septembre et novembre. La meilleure saison pour visiter l’Inde du Sud se situe de mi-novembre à fin mars, sauf pour le Sud- Est et l’extrême Sud, en raison de la mousson tardive. Sur la côte sud-est, de Chennai (Madras) à Trivandrum, le pic de la mousson tourne autour d’octobre-novembre (parfois jusqu’à début décembre)."
+    },
+    {
+      "title": "Conseils pour votre voyage",
+      "icon": "compass",
+      "content": "La passion des voyages, des couleurs et des saveurs, de ces lieux lointains, ne doit pas vous faire oublier que les voyages sont souvent l’occasion de changer vos habitudes, votre vigilance et que des aléas sont toujours possibles. Aussi, soucieux que votre voyage soit une réussite, malgré la multiplicité des intervenants au cours de votre périple, voici quelques conseils de voyage. Nous vous conseillons de les lire attentivement et restons à votre disposition pour toutes questions que nous n’aurions pas traitées. Nous vous souhaitons un excellent voyage."
+    },
+    {
+      "title": "Aéroport / Port",
+      "icon": "plane-departure",
+      "content": "Vous aurez très souvent rendez-vous au comptoir d’assistance que nous avons réservé pour vous. Reportez- vous à l’information précisée sur votre convocation. Ensuite, vous serez invités à passer au comptoir d’enregistrement et présenter votre pièce d’identité. Conservez vos pièces d’identité avec vous durant les formalités et jusqu'à l’avion ou le bateau."
+    },
+    {
+      "title": "Bagages (Conseils)",
+      "icon": "suitcase-rolling",
+      "content": "Référez-vous à la page \"Information horaires de vols\". Notre conseil : - Ne placez pas : médicaments, denrées périssables, alimentaires, objets fragiles ou de valeur (bijoux, chèques, devises, appareils photos…), dossiers, papiers importants dans vos bagages en soute. Conservez-les avec vous en cabine. - Par souci de sécurité, n'acceptez jamais des bagages d'une autre personne. - Arrivée à destination, rendez-vous en zone de livraison des bagages. Récupérez les vôtres, En cas d’avarie, manquement, reportez immédiatement au service bagages de l'aéroport, du port ou le représentant de la compagnie, pour procéder à un constat et ouvrir, le cas échéant, un dossier auprès de votre assurance dès votre retour. Conservez le talon joint à votre billet lors de l’enregistrement de votre bagage."
+    },
+    {
+      "title": "Charter & Vols spéciaux",
+      "icon": "plane-circle-check",
+      "content": "Le terme \"charter\", \"vol spécial\", désigne un vol non régulier, opéré à la demande d’une agence de voyages, qui dessert ponctuellement une destination touristique au départ d’un aéroport. Ces vols ont des horaires définitifs qui s’intercalent entre les vols réguliers, connus très souvent qu'une semaine avant le départ. L’horaire de retour vous est souvent confirmé sur place. Ces vols peuvent être tôt le matin/tard le soir."
+    },
+    {
+      "title": "Services à bord",
+      "icon": "mug-hot",
+      "content": "La plupart des compagnies aériennes pour des vols de moins de 3h ne proposent plus de services à bord. La restauration et les boissons, si elles sont proposées, sont désormais très souvent payantes. Des encas sont en vente dans les boutiques de l’aéroport."
+    },
+    {
+      "title": "Douanes & Franchises",
+      "icon": "scale-balanced",
+      "content": "Les adultes peuvent bénéficier de franchises sur certaines marchandises : . Tabacs : franchise 200 cigarettes. . Boissons alcoolisées : franchise 2 L de vin, ou 1 L d’alcool fort. . Parfum : 50 g de parfum, ou 100 ml d'eau de toilette. Et ce dans de nombreux pays, toutefois vérifiez les informations à la douane de chaque pays concerné. Les médicaments que vous transportez, le cas échéant, doivent correspondre à vos besoins personnels."
+    },
+    {
+      "title": "Formalités (Conseils généraux)",
+      "icon": "file-shield",
+      "content": "Il appartient au voyageur de vérifier les formalités administratives et sanitaires nécessaires au voyage auprès des organismes compétents tels que consulats, ambassades et médecin traitant pour vaccins et traitements. La validité des papiers en votre possession doit être vérifiée avant le départ. Tout défaut ou oubli, conduit au refus d’embarquement et vos vacances sont perdues. Pour les mineurs non accompagnés de leur(s) parent(s) une carte nationale d’identité, un passeport, ainsi qu’une autorisation de sortie de territoires sont indispensables."
+    },
+    {
+      "title": "Sûreté aéroportuaire",
+      "icon": "shield-halved",
+      "content": "Soumettez-vous de bonne grâce aux contrôles de sûreté : il y va de votre propre intérêt ! Ces contrôles sont effectués avant l'arrivée en salle d'embarquement. Les bagages à mains doivent passer dans un appareil de contrôle électronique et vous devez vous-même franchir un portique de détection. Posez de côté : ceinture, trousseau de clefs, objet métallique, téléphone… N’oubliez pas de les reprendre. Si vous portez un stimulateur cardiaque (voire même certains appareils auditifs), informez-en l'agent de sûreté et ne passez pas sous le portique. Dans certains pays d'ailleurs, une fouille corporelle complète les procédés de détection électroniques. Sachez ainsi que par précaution supplémentaire, il peut vous être demandé de procéder, au pied de l'appareil, à l'identification de vos bagages enregistrés. Enfin, ne laissez jamais vos bagages sans surveillance dans l'enceinte de l'aérogare. La réglementation gouvernementale (en France et dans de nombreux autres pays) implique la destruction immédiate de tout bagage suspect, sans qu'aucune indemnisation puisse être par la suite réclamée à quiconque. Une idée de votre prochaine escapade ? Laissez-vous tenter par..."
+    },
+    {
+      "title": "Monnaie & Devises",
+      "icon": "coins",
+      "content": "La monnaie est la roupie indienne (INR) : 1 € = 106,233 INR // 1 INR = 0,00941 € (octobre 2026). Nous vous conseillons de changer vos euros dans les bureaux de change, dans certaines banques, généralement sans commission ou dans certains hôtels. Vous pouvez retirer des espèces avec votre carte de crédit dans la plupart des grandes villes indiennes. Pourboires"
+    },
+    {
+      "title": "Électricité & Prises",
+      "icon": "plug",
+      "content": "220 volts en général. Les prises de courant sont, en principe, de type européen, mais de nombreux hôtels sont au standard indien (3 grosses fiches rondes), un adaptateur \"Afrique du Sud - Inde\" est alors indispensable (on ne trouve pas ce format sur les adaptateurs dits \"universels\"). Sécurité et situation sanitaire"
+    },
+    {
+      "title": "Décalage horaire",
+      "icon": "clock",
+      "content": "Eté + 3h30 : lorsqu’il est midi en France, il est 15h30 à New Delhi. Hiver + 4h30 : lorsqu’il est midi en France, il est 16h30 à New Delhi. Langue L'hindi est la langue officielle de l'Inde, mais chaque État a en plus ses propres langues officielles. Les langues les plus parlées, en plus de l'hindi, sont le bengali, le télougou et le marathi. On parle l'hindi principalement dans"
+    },
+    {
+      "title": "Climat & Météo",
+      "icon": "cloud-sun",
+      "content": "La meilleure saison pour visiter l’Inde du Nord est de mi-novembre (l’automne indien !) à fin mars, hormis au Ladakh, où la bonne saison s’étend de mi-mai (voir juin) à fin septembre - début octobre et au Sikkim, où l’on se rendra de préférence entre mi-mars et mi-mai, ou entre fin septembre et novembre. La meilleure saison pour visiter l’Inde du Sud se situe de mi-novembre à fin mars, sauf pour le Sud- Est et l’extrême Sud, en raison de la mousson tardive. Sur la côte sud-est, de Chennai (Madras) à Trivandrum, le pic"
+    },
+    {
+      "title": "Pourboires",
+      "icon": "hand-holding-dollar",
+      "content": "Votre guide, votre chauffeur et toutes les personnes qui vous accueillent font toujours de leur mieux pour que votre voyage se passe dans les meilleures conditions. C’est pourquoi nous vous conseillons de donner : - Guide : 2.5 € / jour / personne, - Chauffeur : 1.5 € / jour / personne, - Aide-chauffeur / porteurs de bagages : 0.75 € / jour / personne.,"
+    },
+    {
+      "title": "Santé & Alimentation",
+      "icon": "shield-heart",
+      "content": "Aucun vaccin n’est obligatoire. Toutefois une mise à jour de votre carnet de vaccination (DTPolio, Hépatite, Typhoïde…) est fortement recommandée comme pour tout voyage. Dans tous les cas, nous vous recommandons de vous rapprocher de votre médecin traitant. Ordonnance : Si vous emmenez avec vous un traitement médical, il est impératif d’avoir l’ordonnance du médecin correspondante, en cas de contrôle par la douane. Ainsi qu'une version traduite en anglais. Dans"
+    }
+  ],
+  "practicalInfo": {
+    "formalities": "Passeport valide 6 mois après la date de votre retour.\nVisa obligatoire.\n03/07/2026 : Nouvelle déclaration de santé \"Air Suvidha\", obligatoire depuis le 30/06/2026.\nLe formulaire doit être rempli en ligne sur le site officiel airsuvidha.civilaviation.gov.in dans les 24h\navant l'arrivée en Inde.\nCette nouvelle formalité, gratuite, s'ajoute aux formalités déjà obligatoires de Visa Inde et\nde e-Arrival card.\nUn timing très strict pour le moment :\n\nCette démarche vise à identifier les voyageurs ayant séjourné dans un pays touché par l'épidémie Ebola (Congo\nRD, Ouganda, Soudan du Sud) au cours des 21 derniers jours.\nCette déclaration ne peut pas être anticipée. Le système bloque si on tente de le remplir plus de 24h avant\nl'atterrissage en Inde. En pratique, il doit être complété soit la veille au soir, soit le matin même du départ, selon\nl'horaire du vol.\nInformations à remplir (en anglais) :\n- Prénom et Nom, numéro de passeport\n- Région d'arrivée, ville d'arrivée, aéroport d'arrivée\n- Numéro du vol d'arrivée, date d'arrivée, heure d'arrivée\n- Adresse de domicile\n- Adresse du premier logement en Inde (ou de l'agence locale).\nAprès validation par un code reçu via email, le remplissage génère un document avec QR Code. Il est alors\npossible de l'imprimer ou de l'enregistrer sur un téléphone.\nEntre 120 et 4 jours avant la date de départ, vous devez donc faire votre demande de Visa :\nhttps://indianvisaonline.gov.in/evisa/\nA 72h du départ, vous devez remplir l'e-Arrival Card :\nhttps://indianvisaonline.gov.in/earrival/\nUne fois la formalité accomplie, un PDF téléchargeable comportant un QR code à présenter aux autorités à\nl’arrivée est généré.\nA 24h du départ, vous devez remplir la déclaration sanitaire :\nhttps://airsuvidha.civilaviation.gov.in/",
+    "money": "La monnaie est la roupie indienne (INR) : 1 € = 106,233 INR // 1 INR = 0,00941 € (octobre 2026). Nous vous conseillons de changer vos euros dans les bureaux de change, dans certaines banques, généralement sans commission ou dans certains hôtels. Vous pouvez retirer des espèces avec votre carte de crédit dans la plupart des grandes villes indiennes. Pourboires",
+    "electricity": "220 volts en général. Les prises de courant sont, en principe, de type européen, mais de nombreux hôtels sont au standard indien (3 grosses fiches rondes), un adaptateur \"Afrique du Sud - Inde\" est alors indispensable (on ne trouve pas ce format sur les adaptateurs dits \"universels\"). Sécurité et situation sanitaire",
+    "timezone": "Eté + 3h30 : lorsqu’il est midi en France, il est 15h30 à New Delhi. Hiver + 4h30 : lorsqu’il est midi en France, il est 16h30 à New Delhi. Langue L'hindi est la langue officielle de l'Inde, mais chaque État a en plus ses propres langues officielles. Les langues les plus parlées, en plus de l'hindi, sont le bengali, le télougou et le marathi. On parle l'hindi principalement dans",
+    "climate": "La meilleure saison pour visiter l’Inde du Nord est de mi-novembre (l’automne indien !) à fin mars, hormis au Ladakh, où la bonne saison s’étend de mi-mai (voir juin) à fin septembre - début octobre et au Sikkim, où l’on se rendra de préférence entre mi-mars et mi-mai, ou entre fin septembre et novembre. La meilleure saison pour visiter l’Inde du Sud se situe de mi-novembre à fin mars, sauf pour le Sud- Est et l’extrême Sud, en raison de la mousson tardive. Sur la côte sud-est, de Chennai (Madras) à Trivandrum, le pic",
+    "tips": "Votre guide, votre chauffeur et toutes les personnes qui vous accueillent font toujours de leur mieux pour que votre voyage se passe dans les meilleures conditions. C’est pourquoi nous vous conseillons de donner : - Guide : 2.5 € / jour / personne, - Chauffeur : 1.5 € / jour / personne, - Aide-chauffeur / porteurs de bagages : 0.75 € / jour / personne.,",
+    "health": "Aucun vaccin n’est obligatoire. Toutefois une mise à jour de votre carnet de vaccination (DTPolio, Hépatite, Typhoïde…) est fortement recommandée comme pour tout voyage. Dans tous les cas, nous vous recommandons de vous rapprocher de votre médecin traitant. Ordonnance : Si vous emmenez avec vous un traitement médical, il est impératif d’avoir l’ordonnance du médecin correspondante, en cas de contrôle par la douane. Ainsi qu'une version traduite en anglais. Dans"
+  },
+  "driverDossier": {
+    "busModel": "",
+    "busCapacity": 50,
+    "busPlanUrl": "",
+    "busNotes": "",
+    "roomingList": [],
+    "roomingFileUrl": "",
+    "passengersList": []
+  },
+  "_rawImportedText": "Votre carnet de voyage Inde du nord mardi 1\ndécembre 2026 - mardi 15 décembre 2026\nEn date du 18/11/2026 à 15:51:46\nInde du nord\nDu Rajasthan à la Vallée du Gange\nL'Inde, un pays où fleurit la beauté ! Si une image de l'Inde repose en chacun de nous, c'est en raison de\nl'aspect universel de la civilisation de ce grand pays ! Voici un voyage dans un pays de légendes, le Rajasthan.\nSur une terre aride, les maharajas ont construit des palais de rêve qui accueillent des voyageurs. Ce voyage\nvous emmène de manoirs en palais, de havelis en demeures princières dans un monde digne des Mille et une\nNuits !\nEnvoûtante, fascinante, déconcertante, paradoxale... l'Inde est à ce point multiple qu'une vie ne suffirait pas à\nl'appréhender dans sa globalité.\n\nConvocation aérienne\nAller : 01/12/2026\nDécollage de l’aéroport de : Lyon Saint-Exupéry\nHeure de présentation à l’aéroport : 07h40\nLieu : comptoir d'enregistrement du vol\nN° de vol : TK 1808\nDécollage prévu à : 10h40\nEscale à : Istanbul à 16h00\nDécollage prévu à : 20h45 – vol n° TK 716\nArrivée prévue à : 05h15\nA l’aéroport de : Delhi\nCompagnie : Turkich Airlines\nObservations : Prestations payantes à bord\nVol intérieur : 11/12/2026\nDécollage de l’aéroport de : Khajuraho\nN° de vol : AI 2568\nDécollage prévu à : 15h15\nArrivée prévue à : 16h00\nA l’aéroport de : Varanasi\nCompagnie : Air India\nVol intérieur : 13/12/2026\nDécollage de l’aéroport de : Varanasi\nN° de vol : 6E 5325\nDécollage prévu à : 14h45\n\nArrivée prévue à : 16h20\nA l’aéroport de : Delhi\nCompagnie : IndiGo\nRetour : 15/12/2026\nDécollage de l’aéroport de : Delhi\nN° de vol : TK 717\nDécollage prévu à : 06h55\nEscale à : Istanbul à 11h30\nDécollage prévu à : 15h45 – vol n° TK 1809\nArrivée prévue à : 17h10\nA l’aéroport de : Lyon Saint-Exupéry\nCompagnie : Turkich Airlines\nObservations : Prestations payantes à bord\nNous attirons votre attention sur le fait que les horaires prévus peuvent être sujets à\nmodifications. Le vol peut être opéré par des compagnies aériennes partenaires.\nLa compagnie étant souveraine dans le placement, nous nous efforçons au mieux de vous\nregrouper dans l’avion. Lorsque cela est possible, nous avons regroupé les couples.\nToutefois, nous vous remercions de votre compréhension en cas d’impossibilité et vous\ninvitons à intervertir avec d’autres passagers chaque fois que possible. Consultez la\npolitique de chaque compagnie.\nBagages aériens autorisés :\n\n1 bagage cabine/personne* : 1 bagage de 7 Kg maximum de dimensions\nmaximales : L 55 x l 20 x H 40 cm, incluant les poignets, les poches et les roues.\n*Aucun contenant de plus de 100 ml, ciseaux, couteau en cabine\n1 bagage en soute/personne : 1 bagage de 15 Kg maximum dont l es dimensions\ntotales (longueur + largeur + hauteur) doivent être de 158 cm maximum.\nLe poids et les dimensions maximales autorisées pour les bagages sont imposés par les\ncompagnies des vols intérieurs.\nLe dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à\nrégler sur place.\n\nJour 1 • Votre région - Lyon - Delhi\nJour consacré à l'acheminement. Transfert à l'aéroport de Lyon . Formalités d'embarquement. Envol pour\nDehli via une escale. Dîner et nuit à bord.\nJour 2 • Delhi - Mandawa\nArrivée à Delhi . Accueil par votre guide local francophone. Transfert à l’hôtel, petit déjeuner et repos dans les\nchambres. Route pour Mandawa . Arrêt dans un village Dhani . Déjeuner en cours de route. Visite de Mandawa ,\nprincipale ville du Shekhawati, cernée par les sables du désert , connu pour ses maisons et havelis ornées de\nfresques qui sont parmi les plus anciennes de cette région du Rajasthan. Arrivée à l'hôtel, cocktail de bienvenue\net installation. D émonstration de cuisine indienne . Dîner logement.\nJour 3 • Mandawa - Bikaner\nRoute vers Bikaner par l' ancienne route des caravanes . Arrêt au premier sanctuaire de vaches du\nRajasthan. Arrivée à l'hôtel, cocktail de bienvenue et d éjeuner. Visite du fort Junagarh puis du musée Ganga\nGolden Jubilee . La journée se finira par une balade dans le bazar local et le marché d'épices et légumes .\nRetour à l'hôtel. Dîner logement.\nJour 4 • Bikaner - Jaisalmer\nDirection Jaisalmer . Arrêt déjeuner au fort de Pokharan . Arrivée à l'hôtel, cocktail de bienvenue et\ninstallation. Fin de journée libre dans cette cité magique, profondément romantique et totalement\npréservée , surnommée la Cité Dorée en raison de la couleur que prend la pierre des remparts au coucher du\nsoleil. Dîner logement.\nJour 5 • Jaisalmer - Dunes de Sam - Jaisalmer\nExploration de cette ville fascinante en plein désert. Découverte du fort de Jaisalmer où près d'un quart de la\npopulation y réside toujours. Visite des cénotaphes Royaux . Dégustation de thé indien dans une échoppe.\nDéjeuner. Départ en jeep dans les dunes de Sam afin d'apprécier le coucher de soleil . Spectacle de danses\nfolkloriques Rajasthani autour d'un feu de camp suivi du dîner au campement . Retour à l'hôtel. Logement.\nJour 6 • Jaisalmer - Jodhpur - Luni\nDirection Jodhpur. Visite de la remarquable forteresse de Mehrangarh , du temple de marbre blanc Jaswant\nThada . Enfin, balade dans le Sadar Bazar et ses nombreux artisans. Déjeuner. Départ pour le village de\nLuni . Arrivée à l'hôtel, cocktail de bienvenue et installation. D écouverte du fort librement . Dîner logement.\nJour 7 • Luni - Jaipur\n\nDépart vers Jaipur , capitale du Rajasthan , une des villes les plus colorées et des plus pittoresques de toute\nl'Inde. Arrivée à l’hôtel, cocktail de bienvenue et déjeuner tardif. Première balade dans le bazar local . En soirée\nbalade en rickshaws dans les ruelles de la ville. Dîner logement.\nJour 8 • Jaipur\nExcursion en Jeep au fort d'Amber . Accroché aux flancs d'un piton rocheux, il se reflète dans le lac Maota\nSagar. Déjeuner dans une ancienne haveli (demeure princière) avec petit spectacle de marionnettes . Visite\nde la ville surnommée \"la ville rose \": le City Palace , l' observatoire \"Jantar Mantar\" . Démonstration du port\ndu sari pour les femmes et du turban du Maharadjah pour les hommes . Dîner logement.\nJour 9 • Jaipur - Abhanieri - Agra\nDépart pour Agra . En route, visite des puits d'Abhaneri : magnifique et très profond bassin à marches (baoli),\npuis balade dans le village traditionnel et rencontre avec les locaux . Déjeuner. Continuation vers\nAgra . Départ pour la visite du Taj Mahal , lumineux mausolée de marbre blanc, construit par l'empereur moghol\nShah Jahan pour immortaliser l'amour qu'il portait à son épouse défunte Mumtaz Mahal. Transfère à l'hôtel,\ncocktail de bienvenue et installation. Petit s pectacle de magie en soirée à l'hôtel avec cocktail local . Dîner\nlogement.\nJour 10 • Agra - Jhansi - Orccha - Khajuraho\nVisite du fort Rouge , formé de trois pavillons bâtis par Shah Jahan, d'où on découvre une très belle vue sur la\nYamuna et le Taj Mahal . Transfert à la gare d'Agra pour embarquer à bord du train Shatabdi Express à\ndestination de Jhansi (horaires : 09h55 /12h35). Arrivée, accueil et route pour Khajuraho avec arrêt à Orchha et\nses temples datant du 16ème siècle. Déjeuner en cours de route. Continuation vers Khajuraho . Installation à\nvotre hôtel. Dîner logement.\nJour 11 • Khajuraho - Varanasi\nVisite des principaux temples de Khajuraho , élevé au rang de patrimoine mondial de l'Unesco. Il s'agit de\nsplendides exemples d' architecture indo-aryenne de renommée mondiale. Déjeuner à l'hôtel. Transfert à\nl'aéroport et envol vers Varanasi (ancienne Bénares). Transfert à votre hôtel et installation. Dîner logement.\nJour 12 • Varanasi\nTrès tôt le matin, transfert à l'embarcadère et embarquement pour une promenade sur le Gange . Vous\npourrez découvrir le fascinant spectacle des ghâts avec une foule de dévots. Visite de Varanasi : temple de\nBharat Mata , Temple de Durga , la Mosquée Aurangzeb et balade au bord des ghâts . Petit-déjeuner à l'hôtel\net temps libre jusqu'au déjeuner. Balade en cylco-pousse dans la vieille ville. En soirée, cérémonie\n\nAartie . Cinq prêtres, vêtus de blanc et de rouge, y conduisent ce rituel de la lumière, dédié au Gange,\naccompagnés de chants de mantra et de sons frappés sur des cymbales de fer. Dîner logement.\nJour 13 • Varanasi\nEn matinée, excursion à Sarnath , cité bouddhiste . Déjeuner. Transfert à l'aéroport et envol pour\nDelhi . Arrivée, transfert pour le dîner. Logement.\nJour 14 • Delhi\nDécouverte du Qtub Minar en matinée, passage devant l 'India Gate . Visite de Old Delhi : Jama Masjid ou\nMosquée du Vendredi, Raj Ghat . Balade dans les ruelles du Vieux Delhi . Retour à l'hôtel. Dîner d’adieu avec\nspécialités tandoori, logement.\nJour 15 • Delhi - Lyon - Votre région\nPetit déjeuner sous forme de panier repas. Jour consacré au réacheminement. Transfert à l'aéroport de\nDelhi. Formalités d'embarquement. Envol pour Lyon avec une étape . Repas à bord. Arrivée à Lyon . Retour\ndans votre région.\nLe voyage n’étant pas une science exacte, votre programme peut\nêtre amené à subir quelques modifications bien indépendantes\nde notre volonté.\nEn pareilles circonstances, nous faisons appel à votre compréhension si toutefois le déroulé de celui-ci se\ntrouvait devoir être modifié, inversé, adapté, réorganisé en fonction de la circulation, des retards aériens, des\nconditions climatiques, événements géopolitiques, fermetures exceptionnelles de sites, routes, musées...\nNous vous souhaitons un beau voyage.\nCoordonnées de vos hôtels\nsous réserve de modification\ndu 1 au 2 décembre et d u 13 au 15 décembre\nHôtel Deventure Sarovar Portico 4*** NL\n88-89, Bijwasan Road, Kapashera\n\nDELHI, INDE\nTél. : +91 72 9003 9902\nDu 2 au 3 décembre\nHôtel Desert Resort 3*** sup. NL\nDistrict Jhunjhunu\nMANDAWA, RAJASTHAN, INDE\nTél. : +91 98110 95698\nDu 3 au 4 décembre\nHôtel Raj Haveli 3*** NL\nB-222, Sadul Ganj\nBIKANER, INDE\nTél. : +91 15 1220 8777\nDu 4 au 6 décembre\nHôtel Naryan Niwas Palace 4**** NL\nNear, Jain Bhawan, near Jain Bhawan, Malka Pol, Amar Sagar Pol\nJAISALMER, INDE\nTél. : +91 90 0108 3081\nDu 6 au 7 décembre\nHôtel Fort Chanwa Hôtel 4**** NL\nSh68, Near Gram Panchayat, Luni District de Jodhpur\nLUNI, INDE\nTél. : +91 2931 284 216\nDu 7 au 9 décembre\nHôtel Regenta Central 4**** NL\nRamnath Puri, 91- 92, Kalwar Rd, Jhotwara\nJAIPUR, INDE\nTél. : +91 141 716 5100\nDu 9 au 10 décembre\nHôtel Taj Pearl 3*** NL\nIcone Greens, Plot No. 20, Taj Nagri Phase 2\nAGRA, INDE\nTél. : +91 96 9000 3777\nDu 10 au 11 décembre\nHôtel Syna Heritage (charme)\nPower House Road, Madhya Pradesh 471606\n\nKHAJURAHO, INDE\nTél. : +91 98 2139 3830\nDu 11 au 13 décembre\nHôtel Pristine Hotel 4**** NL\nThe Mall Road Cantonment\nVARANASI, INDE\nTél. : +91 953 251 0999\nVotre accompagnatrice\nFrédérique\nVotre guide francophone\nMr Arjun SINGH\nMobile : +91 70 14 67 65 87\nVotre contact sur place\nEn cas d’urgence : Mr Sunil CHADHA\nMobile : +91 99 53 14 22 68\nFormalités indispensables\nPasseport valide 6 mois après la date de votre retour.\nVisa obligatoire.\n03/07/2026 : Nouvelle déclaration de santé \"Air Suvidha\", obligatoire depuis le 30/06/2026.\nLe formulaire doit être rempli en ligne sur le site officiel airsuvidha.civilaviation.gov.in dans les 24h\navant l'arrivée en Inde.\nCette nouvelle formalité, gratuite, s'ajoute aux formalités déjà obligatoires de Visa Inde et\nde e-Arrival card.\nUn timing très strict pour le moment :\n\nCette démarche vise à identifier les voyageurs ayant séjourné dans un pays touché par l'épidémie Ebola (Congo\nRD, Ouganda, Soudan du Sud) au cours des 21 derniers jours.\nCette déclaration ne peut pas être anticipée. Le système bloque si on tente de le remplir plus de 24h avant\nl'atterrissage en Inde. En pratique, il doit être complété soit la veille au soir, soit le matin même du départ, selon\nl'horaire du vol.\nInformations à remplir (en anglais) :\n- Prénom et Nom, numéro de passeport\n- Région d'arrivée, ville d'arrivée, aéroport d'arrivée\n- Numéro du vol d'arrivée, date d'arrivée, heure d'arrivée\n- Adresse de domicile\n- Adresse du premier logement en Inde (ou de l'agence locale).\nAprès validation par un code reçu via email, le remplissage génère un document avec QR Code. Il est alors\npossible de l'imprimer ou de l'enregistrer sur un téléphone.\nEntre 120 et 4 jours avant la date de départ, vous devez donc faire votre demande de Visa :\nhttps://indianvisaonline.gov.in/evisa/\nA 72h du départ, vous devez remplir l'e-Arrival Card :\nhttps://indianvisaonline.gov.in/earrival/\nUne fois la formalité accomplie, un PDF téléchargeable comportant un QR code à présenter aux autorités à\nl’arrivée est généré.\nA 24h du départ, vous devez remplir la déclaration sanitaire :\nhttps://airsuvidha.civilaviation.gov.in/\nBon à savoir\nLe programme peut être modifié ou inversé, selon les impératifs locaux. Frais de droits d'appareil photo sur\ncertains sites (à régler sur place). Circuit non adapté aux personnes à mobilité réduite. Les rotations aériennes\nne sont pas définitivement arrêtées par la compagnie, de ce fait, la date du voyage peut changer et envol Paris\npossible. Vols de nuit.\nInclus\nVols réguliers Genève / Delhi / Genève, via une escale, compagnie Qatar Airways ou similaire. Les vols\nintérieurs Khajuraho / Varanasi et Varanasi / Delhi. Taxes aéroports : 160 € révisables. Train Shatabdi Express.\nHôtel 1ère catégorie, en chambre individuelle ou double. Pension complète selon programme. Une bouteille\nd'eau par jour et par personne. Guides accompagnateurs francophones. Accompagnateur Voyages Girardot.\n\nAssurance multirisque voyage et assistance / rapatriement\nAfin de faire face aux frais d’hospitalisation et aux dépenses de santé, parfois très élevés à l’étranger,\nil est impératif de disposer d’un contrat d’assistance ou d’une assurance permettant de couvrir tous\nles frais médicaux (dont la chirurgie et l’hospitalisation) et de rapatriement sanitaire, au risque de ne\npas avoir accès aux soins, y compris en cas d’urgence vitale. Ces frais ne pourront en aucun cas être\npris en charge par la société VOYAGES GIRARDOT ORGANISATION. Merci de vous munir de votre\nnuméro de contrat d’assurance et le numéro de téléphone d’assistance (sur les documents que vous\navez reçu lors la souscription de l’assurance).\nPetits secrets d'Inde\nL’Inde, un pays où fleurit la beauté ! Si une image de l’Inde repose en chacun de nous, c’est en raison de\nl’aspect universel de la civilisation de ce grand pays ! Envoûtante, fascinante, déconcertante, paradoxale…\nDans ce pays, tout n’est que profusion. Tout assaille, surprend, ravit, dérange : les bruits, les odeurs, la foule,\nles couleurs, la misère, les temples d’une beauté époustouflante, la présence des mendiants décharnés et des\nfemmes aux allures de princesses vêtues de saris flamboyants, les vaches qui se promènent nonchalamment\nau milieu des carrefours chaotiques, les éléphants croisés au détour d’une ruelle suivant docilement leur\ncornac…\nDes montagnes du Ladakh à la luxuriante région du Kérala, en passant par le mythique Rajasthan, pays des\nMaharadjas, la vallée du Gange ou encore le célèbre Taj Mahal… l’Inde est à ce point multiple qu’une vie ne\nsuffirait pas à l’appréhender dans sa globalité.\nInformations pratiques\nMonnaie\nLa monnaie est la roupie indienne (INR) : 1 € = 106,233 INR // 1 INR = 0,00941 € (octobre 2026).\nNous vous conseillons de changer vos euros dans les bureaux de change, dans certaines banques,\ngénéralement sans commission ou dans certains hôtels. Vous pouvez retirer des espèces avec votre carte de\ncrédit dans la plupart des grandes villes indiennes.\nPourboires\nVotre guide, votre chauffeur et toutes les personnes qui vous accueillent font toujours de leur mieux pour que\nvotre voyage se passe dans les meilleures conditions. C’est pourquoi nous vous conseillons de donner :\n- Guide : 2.5 € / jour / personne,\n- Chauffeur : 1.5 € / jour / personne,\n- Aide-chauffeur / porteurs de bagages : 0.75 € / jour / personne.,\n\n- Petits pourboires (porteurs de bagages, tuk tuk, jeep, restaurants... : 1.5 € / jour / personne.\nLe montant des pourboires reste bien sûr à votre bon vouloir et dépend de votre degré de satisfaction.\nSanté\nAucun vaccin n’est obligatoire. Toutefois une mise à jour de votre carnet de vaccination (DTPolio, Hépatite,\nTyphoïde…) est fortement recommandée comme pour tout voyage. Dans tous les cas, nous vous\nrecommandons de vous rapprocher de votre médecin traitant.\nOrdonnance : Si vous emmenez avec vous un traitement médical, il est impératif d’avoir l’ordonnance du\nmédecin correspondante, en cas de contrôle par la douane. Ainsi qu'une version traduite en anglais. Dans\nl'hypothèse d'un souci sur place, il faut tout de suite ouvrir un dossier auprès de votre assurance de voyage, que\ncelle-ci soit votre assurance de carte bancaire ou celle que vous avez souscrite avec nous pour ce voyage.\nNous conseillons aux voyageurs de boire uniquement de l’eau minérale ou du thé. Il est recommandé de ne pas\nboire d’eau du robinet, de ne pas manger de fruits non pelés et de prévoir du gel ou des lingettes\nantibactériennes.\nDécalage horaire\nEté + 3h30 : lorsqu’il est midi en France, il est 15h30 à New Delhi.\nHiver + 4h30 : lorsqu’il est midi en France, il est 16h30 à New Delhi.\nLangue\nL'hindi est la langue officielle de l'Inde, mais chaque État a en plus ses propres langues officielles. Les langues\nles plus parlées, en plus de l'hindi, sont le bengali, le télougou et le marathi. On parle l'hindi principalement dans\nle nord du pays.\nElectricité\n220 volts en général. Les prises de courant sont, en principe, de type européen, mais de nombreux hôtels sont\nau standard indien (3 grosses fiches rondes), un adaptateur \"Afrique du Sud - Inde\" est alors indispensable (on\nne trouve pas ce format sur les adaptateurs dits \"universels\").\nSécurité et situation sanitaire\nAvant votre départ nous vous invitons à consulter le site du Ministère des Affaires Etrangères et ses conseils\naux voyageurs : http://www.diplomatie.gouv.fr/fr/conseils-aux-voyageurs.\nVous y trouverez les dernières recommandations notamment en matière de sécurité, formalités, douane et\nsanté, ainsi que le lien pour vous inscrire sur Ariane.\nTenue\nLors de visites de temples, les jambes doivent être couvertes (foulard, pantalon ou jupe longue) ainsi que les\népaules (éviter les débardeurs).\nPhotos\n\nCertaines restrictions s'appliquent pour la prise de photos dans les temples :\n- La plupart des temples peuvent être photographiés de l'extérieur seulement, prendre des photos des\nsanctuaires ou des divinités est interdit.\n- Des taxes peuvent s'appliquer dans certains lieux : elles s'élèvent généralement à moins d'un euro.\n- Par exemple, les frais d'appareil photo du temple Kapelshwara sont de 25 roupies, soit moins de 30 cents,\nalors que dans certains endroits, ils sont de l'ordre de 50 cents.\nClimat\nLa meilleure saison pour visiter l’Inde du Nord est de mi-novembre (l’automne indien !) à fin mars, hormis au\nLadakh, où la bonne saison s’étend de mi-mai (voir juin) à fin septembre - début octobre et au Sikkim, où l’on se\nrendra de préférence entre mi-mars et mi-mai, ou entre fin septembre et novembre.\nLa meilleure saison pour visiter l’Inde du Sud se situe de mi-novembre à fin mars, sauf pour le Sud- Est et\nl’extrême Sud, en raison de la mousson tardive. Sur la côte sud-est, de Chennai (Madras) à Trivandrum, le pic\nde la mousson tourne autour d’octobre-novembre (parfois jusqu’à début décembre).\nQuelques conseils pour votre voyage…\nLa passion des voyages, des couleurs et des saveurs, de ces lieux lointains, ne doit pas vous faire oublier que\nles voyages sont souvent l’occasion de changer vos habitudes, votre vigilance et que des aléas sont toujours\npossibles.\nAussi, soucieux que votre voyage soit une réussite, malgré la multiplicité des intervenants au cours de votre\npériple, voici quelques conseils de voyage.\nNous vous conseillons de les lire attentivement et restons à votre disposition pour toutes questions que nous\nn’aurions pas traitées.\nNous vous souhaitons un excellent voyage.\n✔ AEROPORT / PORT\nVous aurez très souvent rendez-vous au comptoir d’assistance que nous avons réservé pour vous. Reportez-\nvous à l’information précisée sur votre convocation. Ensuite, vous serez invités à passer au comptoir\nd’enregistrement et présenter votre pièce d’identité. Conservez vos pièces d’identité avec vous durant les\nformalités et jusqu'à l’avion ou le bateau.\n✔ BAGAGES\nRéférez-vous à la page \"Information horaires de vols\".\nNotre conseil :\n\n- Ne placez pas : médicaments, denrées périssables, alimentaires, objets fragiles ou de valeur (bijoux, chèques,\ndevises, appareils photos…), dossiers, papiers importants dans vos bagages en soute. Conservez-les avec\nvous en cabine.\n- Par souci de sécurité, n'acceptez jamais des bagages d'une autre personne.\n- Arrivée à destination, rendez-vous en zone de livraison des bagages. Récupérez les vôtres,\nEn cas d’avarie, manquement, reportez immédiatement au service bagages de l'aéroport, du port ou le\nreprésentant de la compagnie, pour procéder à un constat et ouvrir, le cas échéant, un dossier auprès de votre\nassurance dès votre retour. Conservez le talon joint à votre billet lors de l’enregistrement de votre bagage.\n✔ CHARTER - VOLS SPECIAUX\nLe terme \"charter\", \"vol spécial\", désigne un vol non régulier, opéré à la demande d’une agence de voyages, qui\ndessert ponctuellement une destination touristique au départ d’un aéroport. Ces vols ont des horaires définitifs\nqui s’intercalent entre les vols réguliers, connus très souvent qu'une semaine avant le départ. L’horaire de retour\nvous est souvent confirmé sur place. Ces vols peuvent être tôt le matin/tard le soir.\n✔ SERVICES A BORD\nLa plupart des compagnies aériennes pour des vols de moins de 3h ne proposent plus de services à bord. La\nrestauration et les boissons, si elles sont proposées, sont désormais très souvent payantes. Des encas sont en\nvente dans les boutiques de l’aéroport.\n✔ DOUANES\nLes adultes peuvent bénéficier de franchises sur certaines marchandises :\n. Tabacs : franchise 200 cigarettes.\n. Boissons alcoolisées : franchise 2 L de vin, ou 1 L d’alcool fort.\n. Parfum : 50 g de parfum, ou 100 ml d'eau de toilette.\nEt ce dans de nombreux pays, toutefois vérifiez les informations à la douane de chaque pays concerné. Les\nmédicaments que vous transportez, le cas échéant, doivent correspondre à vos besoins personnels.\n✔ FORMALITES\n\nIl appartient au voyageur de vérifier les formalités administratives et sanitaires nécessaires au voyage auprès\ndes organismes compétents tels que consulats, ambassades et médecin traitant pour vaccins et traitements. La\nvalidité des papiers en votre possession doit être vérifiée avant le départ. Tout défaut ou oubli, conduit au refus\nd’embarquement et vos vacances sont perdues. Pour les mineurs non accompagnés de leur(s) parent(s) une\ncarte nationale d’identité, un passeport, ainsi qu’une autorisation de sortie de territoires sont indispensables.\n✔ SURETE\nSoumettez-vous de bonne grâce aux contrôles de sûreté : il y va de votre propre intérêt ! Ces contrôles sont\neffectués avant l'arrivée en salle d'embarquement. Les bagages à mains doivent passer dans un appareil de\ncontrôle électronique et vous devez vous-même franchir un portique de détection. Posez de côté : ceinture,\ntrousseau de clefs, objet métallique, téléphone… N’oubliez pas de les reprendre. Si vous portez un stimulateur\ncardiaque (voire même certains appareils auditifs), informez-en l'agent de sûreté et ne passez pas sous le\nportique. Dans certains pays d'ailleurs, une fouille corporelle complète les procédés de détection électroniques.\nSachez ainsi que par précaution supplémentaire, il peut vous être demandé de procéder, au pied de l'appareil, à\nl'identification de vos bagages enregistrés.\nEnfin, ne laissez jamais vos bagages sans surveillance dans l'enceinte de l'aérogare. La réglementation\ngouvernementale (en France et dans de nombreux autres pays) implique la destruction immédiate de tout\nbagage suspect, sans qu'aucune indemnisation puisse être par la suite réclamée à quiconque.\nUne idée de votre prochaine escapade ?\nLaissez-vous tenter par...\n\n",
+  "_landContactsList": [
+    {
+      "category": "Accompagnatrice Voyages Girardot",
+      "name": "Frédérique",
+      "phone": "",
+      "address": "Avec le groupe sur le circuit",
+      "isEmergency": false
+    },
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "En cas d’urgence : Mr Sunil CHADHA",
+      "phone": "",
+      "address": "Mobile : +91 99 53 14 22 68",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France en Inde",
+      "name": "2/50-E Shantipath, Chanakyapuri, New Delhi 110021",
+      "phone": "+91 11 4319 6100",
+      "address": "Site officiel : https://in.ambafrance.org",
+      "link": "https://in.ambafrance.org",
+      "isEmergency": true
+    },
+    {
+      "category": "Fil d'Ariane — Ressortissants Français",
+      "name": "Portail officiel France Diplomatie (Inscription gratuite)",
+      "phone": "",
+      "address": "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      "link": "https://fildariane.diplomatie.gouv.fr",
+      "isEmergency": false
+    }
+  ],
+  "_landFlightsList": [
+    {
+      "type": "Aller",
+      "airline": "Turkich Airlines",
+      "flightNumber": "TK 1808",
+      "departureAirport": "Lyon Saint-Exupéry",
+      "departureTime": "10h40",
+      "arrivalAirport": "Delhi",
+      "arrivalTime": "05h15",
+      "date": "01/12/2026",
+      "via": "Escale à Istanbul à 16h00 (redécollage à 20h45 – vol n° TK 716)",
+      "notes": "Convocation à 07h40 au comptoir d'enregistrement • Prestations payantes à bord"
+    },
+    {
+      "type": "Retour",
+      "airline": "Turkich Airlines",
+      "flightNumber": "TK 717",
+      "departureAirport": "Delhi",
+      "departureTime": "06h55",
+      "arrivalAirport": "Lyon Saint-Exupéry",
+      "arrivalTime": "17h10",
+      "date": "15/12/2026",
+      "via": "Escale à Istanbul à 11h30 (redécollage à 15h45 – vol n° TK 1809)",
+      "notes": "Prestations payantes à bord"
+    }
+  ],
+  "_detectedShip": "",
+  "_accompName": "Frédérique",
+  "conciergeMode": "guided",
+  "isCruise": false,
+  "shipName": "",
+  "decks": [],
+  "conciergerie": {
+    "welcomeMessage": "Bonjour ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre aujourd'hui ?",
+    "themes": [
+      {
+        "id": "resto",
+        "label": "Où bien manger ?",
+        "icon": "utensils",
+        "color": "#ea580c",
+        "description": "Tables gourmandes, spécialités africaines et rooftops d'exception sélectionnés par nos guides.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "visites",
+        "label": "Que visiter en temps libre ?",
+        "icon": "compass",
+        "color": "#059669",
+        "description": "Monuments, panoramas incontournables et trésors naturels hors des sentiers battus.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "shopping",
+        "label": "Boutiques & Souvenirs locaux",
+        "icon": "bag-shopping",
+        "color": "#c29958",
+        "description": "Artisanat d'art, marchés authentiques, épiceries fines et créateurs sud-africains.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "pratique",
+        "label": "Bureaux de change, Banques & Santé",
+        "icon": "landmark",
+        "color": "#2563eb",
+        "description": "Distributeurs fiables, bureaux de change certifiés, pharmacies et supermarchés de proximité.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "detente",
+        "label": "Bars branchés, Cafés & Rooftops",
+        "icon": "martini-glass",
+        "color": "#9333ea",
+        "description": "Prendre un verre face au coucher de soleil sur l'Atlantique ou savourer un café d'exception.",
+        "places": [],
+        "enabled": true
+      },
+      {
+        "id": "transports",
+        "enabled": true,
+        "label": "Transports & Déplacements urbains",
+        "icon": "taxi",
+        "color": "#0891b2",
+        "description": "Taxis officiels, VTC sécurisés, bus MyCiTi et conseils de mobilité urbaine dans la ville.",
+        "places": []
+      }
+    ]
+  },
+  "contacts": {
+    "receptif": {
+      "name": "En cas d’urgence : Mr Sunil CHADHA",
+      "emergency": "",
+      "phone": "",
+      "address": "Mobile : +91 99 53 14 22 68"
+    },
+    "guide": {
+      "name": "Frédérique",
+      "role": "Accompagnateur Girardot",
+      "phone": ""
+    },
+    "agence": {
+      "name": "Voyages Girardot",
+      "phone": "03 85 42 82 50",
+      "email": "contact@voyages-girardot.com"
+    }
+  }
+}
