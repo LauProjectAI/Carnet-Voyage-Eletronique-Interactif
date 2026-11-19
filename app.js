@@ -1,8 +1,17 @@
 // Service Worker Registration for Offline Mode
 if ('serviceWorker' in navigator) {
+  const hadController = !!navigator.serviceWorker.controller;
+  let swRefreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (hadController && !swRefreshing) {
+      swRefreshing = true;
+      window.location.reload();
+    }
+  });
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('./sw.js').then((reg) => {
       console.log('SW enregistré:', reg.scope);
+      reg.update().catch(() => {});
     }).catch((err) => {
       console.log('SW registration failed:', err);
     });
@@ -656,15 +665,17 @@ function renderTodayFocus() {
     weatherPill.innerHTML = `<i class="fa-solid fa-location-dot"></i> ${currentDay.city || ''}`;
   }
 
-  // Next Event Card
+  // Next Event Card (Uniquement NEXT / ÉTAPE À VENIR et le titre de la journée)
   const nextEvent = currentDay.nextEvent || {
-    title: currentDay.highlight || currentDay.title,
-    sub: currentDay.description ? (currentDay.description.slice(0, 75) + '...') : "Programme de la journée",
+    title: currentDay.title || currentDay.highlight || `Jour ${currentDay.day}`,
+    sub: "",
     qrCodeText: `GIRARDOT-JOUR-${currentDay.day}`
   };
 
-  document.getElementById('next-title').innerText = nextEvent.title;
-  document.getElementById('next-sub').innerText = nextEvent.badge || nextEvent.sub || "Programme Girardot";
+  const nextTitleEl = document.getElementById('next-title');
+  if (nextTitleEl) nextTitleEl.innerText = currentDay.title || nextEvent.title || `Jour ${currentDay.day}`;
+  const nextSubEl = document.getElementById('next-sub');
+  if (nextSubEl) nextSubEl.style.display = 'none';
   
   const qrBtn = document.getElementById('btn-show-qr');
   if (qrBtn) {

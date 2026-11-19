@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnet-girardot-v26';
+const CACHE_NAME = 'carnet-girardot-v27';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -50,7 +50,11 @@ self.addEventListener('activate', (event) => {
 });
 
 self.addEventListener('fetch', (event) => {
+  if (event.request.method !== 'GET') return;
+
   const url = event.request.url;
+  if (!url.startsWith('http')) return;
+
   // Let GitHub API, map tiles and cross-origin services fetch naturally without service worker interference
   if (url.includes('api.github.com') ||
       url.includes('tile.openstreetmap.org') ||
@@ -59,21 +63,44 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  // Same-origin application files: Network-First with cache fallback so updates appear immediately when online
+  const isSameOrigin = new URL(url).origin === self.location.origin;
+  if (isSameOrigin) {
+    event.respondWith(
+      fetch(event.request.url, { cache: 'no-cache' }).then((fetchRes) => {
+        if (fetchRes && fetchRes.status === 200) {
+          const resClone = fetchRes.clone();
+          caches.open(CACHE_NAME).then((cache) => {
+            try {
+              cache.put(event.request, resClone);
+            } catch(e) {}
+          });
+        }
+        return fetchRes;
+      }).catch(() => {
+        return caches.match(event.request).then((cached) => {
+          if (cached) return cached;
+          if (event.request.destination === 'document' || event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
+        });
+      })
+    );
+    return;
+  }
+
+  // External CDN assets (fonts, Leaflet, Font Awesome): Cache-First
   event.respondWith(
     caches.match(event.request).then((response) => {
       return response || fetch(event.request).then((fetchRes) => {
         return caches.open(CACHE_NAME).then((cache) => {
-          if (event.request.method === 'GET' && url.startsWith('http') && fetchRes && fetchRes.status === 200) {
+          if (fetchRes && fetchRes.status === 200) {
             try {
               cache.put(event.request, fetchRes.clone());
             } catch(e) {}
           }
           return fetchRes;
         });
-      }).catch(() => {
-        if (event.request.destination === 'document') {
-          return caches.match('./index.html');
-        }
       });
     })
   );
