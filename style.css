@@ -203,7 +203,7 @@ body {
 /* "NEXT / À VENIR" HERO CARD (Copie conforme style magazine de la photo) */
 .next-event-card {
   margin: 4px 20px 20px;
-  background: linear-gradient(145deg, #62723e 0%, #4f5d32 100%);
+  background: linear-gradient(145deg, var(--next-banner-start, #62723e) 0%, var(--next-banner-end, #4f5d32) 100%);
   color: white;
   border-radius: 20px;
   padding: 20px 22px;
@@ -1203,4 +1203,156 @@ body {
   border-left: 8px solid transparent;
   border-right: 8px solid transparent;
   border-top: 55px solid #cbd5e1; /* Flèche Sud blanche/grise */
+}
+
+/* ==========================================================================
+   LOT 2 : MARQUE BLANCHE & PERSONNALISATION INDIVIDUELLE VOYAGEUR
+   ========================================================================== */
+.brand-partner-logo {
+  max-height: 30px;
+  max-width: 92px;
+  object-fit: contain;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.personal-banner-card {
+  margin: 4px 20px 14px;
+  background: #ffffff;
+  border: 1px solid var(--border-light);
+  border-left: 4px solid var(--primary-color);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-subtle);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.personal-banner-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.personal-greeting {
+  font-size: 0.98rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.personal-dossier-badge {
+  background: var(--accent-gold-light);
+  color: #855e1c;
+  border: 1px solid rgba(194, 153, 88, 0.35);
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 3px 9px;
+  border-radius: 999px;
+}
+
+.personal-welcome-msg {
+  background: var(--bg-sand);
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 8px 11px;
+  font-size: 0.8rem;
+  color: var(--text-main);
+  line-height: 1.42;
+}
+
+.personal-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 8px;
+}
+
+.personal-info-pill {
+  background: #f8faf8;
+  border: 1px solid var(--border-light);
+  border-radius: 10px;
+  padding: 8px 10px;
+}
+
+.personal-info-label {
+  font-size: 0.66rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.personal-info-label i {
+  color: var(--accent-gold);
+}
+
+.personal-info-val {
+  font-size: 0.82rem;
+  font-weight: 800;
+  color: var(--primary-dark);
+}
+
+.personal-options-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-top: 6px;
+  border-top: 1px dashed var(--border-color);
+}
+
+.personal-option-chip {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.timeline-option-card {
+  margin-top: 14px;
+  padding: 13px 15px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%);
+  border: 1px solid #fcd34d;
+  border-left: 4px solid var(--accent-gold);
+  border-radius: 14px;
+  box-shadow: 0 4px 12px rgba(194, 153, 88, 0.14);
+}
+
+.timeline-option-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #92400e;
+  margin-bottom: 4px;
+}
+
+.client-doc-card.nominative-doc {
+  border-left: 4px solid var(--accent-gold);
+  background: linear-gradient(180deg, #fffdf7 0%, #ffffff 45%);
+}
+
+.doc-badge-nominative {
+  background: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fde68a;
 }

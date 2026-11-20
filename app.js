@@ -211,11 +211,50 @@ function getClientAvailableTrips() {
   return Array.from(map.values());
 }
 
-// Load data: from URL parameter (?trip= ou ?id=), or localStorage, or default
-function loadTripData() {
+// Helper de cloisonnement strict par utilisateur + voyage (rétrocompatible mode invité)
+function getClientScopedKey(baseName, tripId) {
+  const cleanTrip = tripId || (currentTrip ? currentTrip.id : 'default') || 'default';
+  if (window.GirardotAuth && typeof window.GirardotAuth.getScopedStorageKey === 'function') {
+    return window.GirardotAuth.getScopedStorageKey(baseName, cleanTrip);
+  }
+  return `girardot_${baseName}_${cleanTrip}`;
+}
+
+async function persistTripToLocalCaches(tripObj) {
+  if (!tripObj || !tripObj.id) return;
+  const key = `girardot_trip_data_${tripObj.id}`;
+  if (window.GirardotStorage) {
+    try { await window.GirardotStorage.set(key, tripObj); } catch (e) {}
+  } else {
+    try { localStorage.setItem(key, JSON.stringify(tripObj)); } catch (e) {}
+  }
+  try { localStorage.setItem('girardot_active_trip_id', tripObj.id); } catch (e) {}
+}
+
+async function readTripFromLocalCaches(candidateId) {
+  if (!candidateId) return null;
+  const key = `girardot_trip_data_${candidateId}`;
+  if (window.GirardotStorage) {
+    try {
+      const fromIdb = await window.GirardotStorage.get(key, null);
+      if (fromIdb && fromIdb.itinerary) return fromIdb;
+    } catch (e) {}
+  }
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.itinerary) return parsed;
+    }
+  } catch (e) {}
+  return null;
+}
+
+// Chargement asynchrone IndexedDB-First (dépasse le plafond des 5 Mo en multi-voyages)
+async function loadTripDataAsync(explicitTripId = null) {
   const urlParams = new URLSearchParams(window.location.search);
-  const tripParam = urlParams.get('trip');
-  const idParam = urlParams.get('id');
+  const tripParam = explicitTripId ? null : urlParams.get('trip');
+  const idParam = explicitTripId || urlParams.get('id');
 
   // 1. Paramètre Base64 complet dans l'URL (?trip=<base64>)
   if (tripParam && tripParam.length > 50) {
@@ -223,61 +262,53 @@ function loadTripData() {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(tripParam))));
       currentTrip = decoded;
       normalizeTripTransitMaps();
-      if (decoded && decoded.id) {
-        localStorage.setItem(`girardot_trip_data_${decoded.id}`, JSON.stringify(decoded));
-        localStorage.setItem('girardot_active_trip_id', decoded.id);
-      }
+      await persistTripToLocalCaches(decoded);
       return;
     } catch (e) {
       console.warn('Impossible de charger le voyage Base64 depuis l URL, tentative en tant qu\'ID ou alias:', e);
     }
   }
 
-  // 2. Paramètre ID ou Alias dans l'URL (?id=reves-orient ou ?trip=reves-orient ou ?trip=croisiere)
+  // 2. Paramètre ID ou Alias (?id=... ou explicitTripId)
   const candidateId = idParam || tripParam;
   if (candidateId) {
-    const stored = localStorage.getItem(`girardot_trip_data_${candidateId}`);
-    if (stored) {
-      try {
-        currentTrip = JSON.parse(stored);
-        normalizeTripTransitMaps();
-        return;
-      } catch (e) {}
-    }
-    // Vérifier si le voyage est présent dans les voyages préenregistrés du dossier voyages/
-    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => 
-      t.id === candidateId || 
-      t.alias === candidateId || 
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t =>
+      t.id === candidateId ||
+      t.alias === candidateId ||
       (t.aliases && t.aliases.includes(candidateId)) ||
       (t.id && t.id.toLowerCase().includes(candidateId.toLowerCase()))
     );
+    const resolvedId = (foundPredefined && foundPredefined.id) ? foundPredefined.id : candidateId;
+    const cached = await readTripFromLocalCaches(resolvedId) || (resolvedId !== candidateId ? await readTripFromLocalCaches(candidateId) : null);
+    if (cached) {
+      currentTrip = cached;
+      normalizeTripTransitMaps();
+      try { localStorage.setItem('girardot_active_trip_id', currentTrip.id); } catch (e) {}
+      return;
+    }
+
     const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${candidateId}.json`;
     try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', encodeURI(targetFile), false); // Synchrone pour initialisation immédiate
-      xhr.send(null);
-      if (xhr.status === 200 || xhr.status === 0) {
-        currentTrip = JSON.parse(xhr.responseText);
+      const res = await fetch(encodeURI(targetFile), { cache: 'no-cache' });
+      if (res && res.ok) {
+        currentTrip = await res.json();
         normalizeTripTransitMaps();
-        localStorage.setItem(`girardot_trip_data_${currentTrip.id}`, JSON.stringify(currentTrip));
-        localStorage.setItem('girardot_active_trip_id', currentTrip.id);
+        await persistTripToLocalCaches(currentTrip);
         return;
       }
     } catch (err) {
-      console.warn('Chargement synchrone du fichier voyage impossible, essai différé:', err);
+      console.warn('Chargement réseau du fichier voyage impossible:', err);
     }
   }
 
   // 3. Voyage actif mémorisé dans le navigateur
   const activeId = localStorage.getItem('girardot_active_trip_id');
   if (activeId) {
-    const storedTrip = localStorage.getItem(`girardot_trip_data_${activeId}`);
+    const storedTrip = await readTripFromLocalCaches(activeId);
     if (storedTrip) {
-      try {
-        currentTrip = JSON.parse(storedTrip);
-        normalizeTripTransitMaps();
-        return;
-      } catch (e) {}
+      currentTrip = storedTrip;
+      normalizeTripTransitMaps();
+      return;
     }
   }
 
@@ -386,48 +417,218 @@ function renderClientTripSelector() {
 }
 
 function onClientTripSwitch(tripId) {
-  // Sauvegarder comme voyage actif
-  localStorage.setItem('girardot_active_trip_id', tripId);
-  sessionStorage.removeItem('girardot_selected_day');
-
-  // Si présent en local
-  const localData = localStorage.getItem(`girardot_trip_data_${tripId}`);
-  if (localData) {
-    currentTrip = JSON.parse(localData);
-    refreshAppAfterTripChange();
-    return;
-  }
-
-  // Si présent dans les voyages prédéfinis (Italie, San Francisco, Chicago, Mexique...)
-  const predefinedTrip = (window.AVAILABLE_TRIPS || []).find(t => t.id === tripId || t.alias === tripId || (t.aliases && t.aliases.includes(tripId)));
-  if (predefinedTrip && predefinedTrip.file) {
-    fetch(encodeURI(predefinedTrip.file))
-      .then(res => res.json())
-      .then(data => {
-        currentTrip = data;
-        localStorage.setItem(`girardot_trip_data_${currentTrip.id}`, JSON.stringify(currentTrip));
-        refreshAppAfterTripChange();
-      })
-      .catch(() => {
-        window.location.href = `index.html?id=${tripId}`;
-      });
-    return;
-  }
-
-  // Si c'est l'Afrique du Sud
-  if (tripId === 'afrique-du-sud-2026') {
-    currentTrip = window.defaultTravelData;
-    refreshAppAfterTripChange();
-    return;
-  }
-
-  window.location.href = `index.html?id=${tripId}`;
+  selectClientTripFromPortal(tripId);
 }
 
+function escapeClientHtml(str) {
+  return String(str || '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function adjustHexColor(hex, delta) {
+  if (!/^#[0-9a-fA-F]{6}$/.test(String(hex || ''))) return hex;
+  const num = parseInt(hex.slice(1), 16);
+  const clamp = (v) => Math.max(0, Math.min(255, v));
+  const r = clamp((num >> 16) + delta);
+  const g = clamp(((num >> 8) & 0xff) + delta);
+  const b = clamp((num & 0xff) + delta);
+  return '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+}
+
+function normalizeTravelerOption(opt) {
+  if (!opt) return null;
+  if (typeof opt === 'string') {
+    const clean = opt.trim();
+    return clean ? { title: clean, day: null, time: '', details: '' } : null;
+  }
+  if (typeof opt === 'object' && opt.title) {
+    const dayNum = opt.day !== undefined && opt.day !== null && opt.day !== '' ? Number(opt.day) : null;
+    return {
+      title: String(opt.title).trim(),
+      day: (dayNum && !isNaN(dayNum)) ? dayNum : null,
+      time: opt.time ? String(opt.time).trim() : '',
+      details: opt.details ? String(opt.details).trim() : ''
+    };
+  }
+  return null;
+}
+
+function applyTripBranding() {
+  const rootStyle = document.documentElement ? document.documentElement.style : null;
+  if (rootStyle) {
+    ['--primary-color', '--primary-dark', '--primary-light', '--accent-gold', '--next-banner-start', '--next-banner-end'].forEach(v => {
+      rootStyle.removeProperty(v);
+    });
+  }
+
+  const b = (currentTrip && currentTrip.branding) ? currentTrip.branding : null;
+  const logoImg = document.getElementById('brand-partner-logo');
+  const logoText = document.getElementById('brand-logo-text');
+  const logoSub = document.getElementById('brand-logo-sub');
+
+  if (b && rootStyle) {
+    if (/^#[0-9a-fA-F]{6}$/.test(b.primaryColor || '') && b.primaryColor.toLowerCase() !== '#144534') {
+      rootStyle.setProperty('--primary-color', b.primaryColor);
+      rootStyle.setProperty('--primary-dark', adjustHexColor(b.primaryColor, -28));
+      rootStyle.setProperty('--primary-light', adjustHexColor(b.primaryColor, 24));
+      rootStyle.setProperty('--next-banner-start', b.primaryColor);
+      rootStyle.setProperty('--next-banner-end', adjustHexColor(b.primaryColor, -22));
+    }
+    if (/^#[0-9a-fA-F]{6}$/.test(b.accentColor || '') && b.accentColor.toLowerCase() !== '#c29958') {
+      rootStyle.setProperty('--accent-gold', b.accentColor);
+    }
+  }
+
+  if (logoImg) {
+    if (b && b.partnerLogoUrl && b.partnerLogoUrl.trim()) {
+      logoImg.src = b.partnerLogoUrl.trim();
+      logoImg.style.display = 'block';
+    } else {
+      logoImg.src = '';
+      logoImg.style.display = 'none';
+    }
+  }
+
+  if (logoText && logoSub) {
+    if (b && b.partnerName && b.partnerName.trim()) {
+      logoText.innerText = b.partnerName.trim();
+      logoSub.innerText = b.hideGirardotBrand ? 'CARNET DE VOYAGE' : 'AVEC VOYAGES GIRARDOT';
+    } else {
+      logoText.innerText = 'Voyages Girardot';
+      logoSub.innerText = 'DEPUIS 1920';
+    }
+  }
+}
+
+function renderTravelerPersonalBanner() {
+  const box = document.getElementById('traveler-personal-banner');
+  if (!box) return;
+
+  const session = (window.GirardotAuth && typeof window.GirardotAuth.getSession === 'function')
+    ? window.GirardotAuth.getSession()
+    : null;
+  const tripId = currentTrip ? currentTrip.id : null;
+  const pers = (window.GirardotAuth && tripId)
+    ? window.GirardotAuth.getSessionTripPersonalization(tripId)
+    : null;
+  const welcomeMsg = (currentTrip && currentTrip.branding && currentTrip.branding.welcomeMessage)
+    ? currentTrip.branding.welcomeMessage.trim()
+    : '';
+
+  const isTraveler = !!(session && session.role === 'traveler');
+  if (!isTraveler && !welcomeMsg) {
+    box.style.display = 'none';
+    box.innerHTML = '';
+    return;
+  }
+
+  const pills = [];
+  if (pers && pers.pickupPoint) {
+    const timeStr = pers.pickupTime ? ` • ${pers.pickupTime}` : '';
+    pills.push(`
+      <div class="personal-info-pill">
+        <div class="personal-info-label"><i class="fa-solid fa-location-dot"></i> Prise en charge</div>
+        <div class="personal-info-val">${escapeClientHtml(pers.pickupPoint + timeStr)}</div>
+      </div>
+    `);
+  }
+  if (pers && pers.seatNumber) {
+    pills.push(`
+      <div class="personal-info-pill">
+        <div class="personal-info-label"><i class="fa-solid fa-chair"></i> Place autocar</div>
+        <div class="personal-info-val">${escapeClientHtml(pers.seatNumber)}</div>
+      </div>
+    `);
+  }
+  if (pers && (pers.cabinNumber || pers.roomNumber)) {
+    const isCabin = !!pers.cabinNumber;
+    const val = pers.cabinNumber || pers.roomNumber;
+    pills.push(`
+      <div class="personal-info-pill">
+        <div class="personal-info-label"><i class="fa-solid ${isCabin ? 'fa-ship' : 'fa-bed'}"></i> ${isCabin ? 'Ma Cabine' : 'Ma Chambre'}</div>
+        <div class="personal-info-val">${escapeClientHtml(val)}</div>
+      </div>
+    `);
+  }
+
+  const rawOpts = (pers && Array.isArray(pers.options)) ? pers.options : [];
+  const normOpts = rawOpts.map(normalizeTravelerOption).filter(Boolean);
+  const optionsHtml = normOpts.length > 0 ? `
+    <div class="personal-options-row">
+      <span style="font-size:0.7rem; font-weight:800; color:#92400e; text-transform:uppercase; margin-right:2px;">
+        <i class="fa-solid fa-star"></i> Mes options :
+      </span>
+      ${normOpts.map(o => {
+        const dayPrefix = o.day ? `J${o.day} • ` : '';
+        const clickAttr = (o.day && currentTrip && Array.isArray(currentTrip.itinerary) && currentTrip.itinerary[o.day - 1])
+          ? `onclick="selectDay(${o.day - 1})"`
+          : '';
+        return `<button type="button" class="personal-option-chip" ${clickAttr} title="${escapeClientHtml(o.details || o.title)}"><i class="fa-solid fa-check-circle"></i> ${escapeClientHtml(dayPrefix + o.title)}</button>`;
+      }).join('')}
+    </div>
+  ` : '';
+
+  const dossierBadge = (pers && pers.dossierRef)
+    ? `<span class="personal-dossier-badge">Dossier ${escapeClientHtml(pers.dossierRef)}</span>`
+    : (session && session.dossierRef ? `<span class="personal-dossier-badge">Dossier ${escapeClientHtml(session.dossierRef)}</span>` : '');
+
+  const multiSwitchBtn = (isTraveler && Array.isArray(session.assignedTripIds) && session.assignedTripIds.length > 1)
+    ? `<button type="button" onclick="openClientAuthPortal({mode:'portal'})" style="background:#eef7f2; color:#144534; border:1px solid #bbf7d0; border-radius:999px; padding:3px 9px; font-size:0.7rem; font-weight:800; cursor:pointer;"><i class="fa-solid fa-repeat"></i> Mes Voyages</button>`
+    : '';
+
+  box.innerHTML = `
+    <div class="personal-banner-card">
+      ${isTraveler ? `
+        <div class="personal-banner-top">
+          <div class="personal-greeting">
+            <i class="fa-solid fa-hand-sparkles" style="color:var(--accent-gold);"></i>
+            Bonjour ${escapeClientHtml(session.displayName)}
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            ${dossierBadge}
+            ${multiSwitchBtn}
+          </div>
+        </div>
+      ` : ''}
+      ${welcomeMsg ? `<div class="personal-welcome-msg"><i class="fa-solid fa-quote-left" style="color:var(--accent-gold); margin-right:6px;"></i>${escapeClientHtml(welcomeMsg)}</div>` : ''}
+      ${pills.length > 0 ? `<div class="personal-info-grid">${pills.join('')}</div>` : ''}
+      ${optionsHtml}
+    </div>
+  `;
+  box.style.display = 'block';
+}
+
+function getNominativeTravelerDocs() {
+  if (!window.GirardotAuth || !currentTrip) return [];
+  const pers = window.GirardotAuth.getSessionTripPersonalization(currentTrip.id);
+  if (!pers || !Array.isArray(pers.personalDocs)) return [];
+  const session = window.GirardotAuth.getSession();
+  return pers.personalDocs.map((d, idx) => Object.assign({
+    id: d.id || `nom_doc_${idx}`,
+    beneficiary: d.beneficiary || (session ? session.displayName : ''),
+    type: d.type || 'other'
+  }, d, { source: 'nominative' }));
+}
+
+window.GirardotPersonalizationHelpers = {
+  adjustHexColor,
+  normalizeTravelerOption,
+  getNominativeTravelerDocs
+};
+
 function refreshAppAfterTripChange() {
+  inMemorySouvenirs = null;
+  inMemoryPersonalDocs = null;
   normalizeTripTransitMaps();
+  applyTripBranding();
+  updateNavigationForConciergeMode();
   activeDayIndex = determineInitialDayIndex();
   renderClientTripSelector();
+  renderTravelerPersonalBanner();
   renderDaySelectorPills();
   renderTodayFocus();
   renderFullCircuit();
@@ -435,7 +636,9 @@ function refreshAppAfterTripChange() {
   renderConciergerie();
   renderHotelsAndFlights();
   renderContactsAndAlert();
+  renderClientDocuments();
   updateMapFilterButtonsVisibility();
+  updateClientAuthHeaderButton();
   if (leafletMap) {
     renderMapMarkers('all');
   }
@@ -467,19 +670,31 @@ function determineInitialDayIndex() {
   return 0;
 }
 
-// Initialize Application
-document.addEventListener('DOMContentLoaded', () => {
-  // 1. Initialiser la navigation par onglets EN PREMIER pour garantir l'interactivité quoi qu'il arrive
-  initNavigation();
+function updateClientAuthHeaderButton() {
+  const btn = document.getElementById('client-auth-btn');
+  if (!btn || !window.GirardotAuth) return;
+  const session = window.GirardotAuth.getSession();
+  if (session) {
+    const shortName = (session.firstName || session.displayName || 'Mon espace').split(' ')[0];
+    btn.style.background = '#144534';
+    btn.style.color = '#ffffff';
+    btn.style.borderColor = '#144534';
+    btn.innerHTML = `<i class="fa-solid fa-suitcase-rolling"></i> <span>${shortName} • Voyages</span>`;
+  } else {
+    btn.style.background = '#eef7f2';
+    btn.style.color = '#144534';
+    btn.style.borderColor = '#bbf7d0';
+    btn.innerHTML = `<i class="fa-solid fa-user-lock"></i> <span>Connexion</span>`;
+  }
+}
 
-  // 2. Charger les données du voyage et normaliser
-  loadTripData();
+function renderAllClientComponents() {
   normalizeTripItinerary();
+  applyTripBranding();
   renderClientTripSelector();
   updateNavigationForConciergeMode();
   activeDayIndex = determineInitialDayIndex();
-  
-  // 3. Rendu sécurisé de chaque sous-composant
+  try { renderTravelerPersonalBanner(); } catch(e) { console.error('PersonalBanner error:', e); }
   try { renderDaySelectorPills(); } catch(e) { console.error('Pills error:', e); }
   try { renderTodayFocus(); } catch(e) { console.error('TodayFocus error:', e); }
   try { renderFullCircuit(); } catch(e) { console.error('FullCircuit error:', e); }
@@ -489,8 +704,148 @@ document.addEventListener('DOMContentLoaded', () => {
   try { renderContactsAndAlert(); } catch(e) { console.error('Contacts error:', e); }
   try { renderClientDocuments(); } catch(e) { console.error('ClientDocs error:', e); }
   try { initCaptureFeature(); } catch(e) { console.error('Capture error:', e); }
+  updateClientAuthHeaderButton();
+}
 
-  // 4. Revalidation automatique en tâche de fond (Stale-While-Revalidate)
+async function selectClientTripFromPortal(tripId) {
+  if (!tripId) return;
+  sessionStorage.removeItem('girardot_selected_day');
+  await loadTripDataAsync(tripId);
+  if (window.GirardotAuth) window.GirardotAuth.closeAuthOverlay();
+  const mainEl = document.querySelector('.app-container main');
+  if (mainEl) mainEl.style.display = '';
+  refreshAppAfterTripChange();
+  try {
+    const newUrl = `index.html?id=${encodeURIComponent(currentTrip.id || tripId)}`;
+    window.history.replaceState({}, '', newUrl);
+  } catch (e) {}
+  setTimeout(() => {
+    try { revalidateTripDataFromServer(); } catch (e) {}
+  }, 400);
+}
+
+function openClientAuthPortal(options = {}) {
+  if (!window.GirardotAuth) return;
+  const session = window.GirardotAuth.getSession();
+  const mode = options.mode || (session ? 'portal' : 'login');
+
+  window.GirardotAuth.mountAuthPortal({
+    mode: mode,
+    theme: 'client',
+    blocking: options.blocking === true,
+    reasonText: options.reasonText || '',
+    tripObj: currentTrip,
+    activeTripId: currentTrip ? currentTrip.id : null,
+    onAuthenticated: async (newSession) => {
+      updateClientAuthHeaderButton();
+      const isPro = newSession.role === 'driver' || newSession.role === 'guide' || newSession.role === 'admin';
+      const urlId = new URLSearchParams(window.location.search).get('id');
+
+      if (isPro) {
+        if (urlId && window.GirardotAuth.canSessionAccessTrip(newSession, urlId, 'client')) {
+          await selectClientTripFromPortal(urlId);
+          return;
+        }
+        openClientAuthPortal({ mode: 'portal', blocking: options.blocking === true });
+        return;
+      }
+
+      const assigned = Array.isArray(newSession.assignedTripIds) ? newSession.assignedTripIds : [];
+      if (urlId && window.GirardotAuth.canSessionAccessTrip(newSession, urlId, 'client')) {
+        await selectClientTripFromPortal(urlId);
+      } else if (assigned.length === 1) {
+        await selectClientTripFromPortal(assigned[0]);
+      } else {
+        openClientAuthPortal({ mode: 'portal', blocking: false });
+      }
+    },
+    onSelectTrip: async (tripId, targetContext) => {
+      if (targetContext === 'driver') {
+        window.location.href = `conducteur.html?id=${encodeURIComponent(tripId)}`;
+      } else {
+        await selectClientTripFromPortal(tripId);
+      }
+    },
+    onLogout: () => {
+      updateClientAuthHeaderButton();
+      inMemorySouvenirs = null;
+      inMemoryPersonalDocs = null;
+      if (currentTrip && currentTrip.accessControl && currentTrip.accessControl.requireAuth) {
+        const mainEl = document.querySelector('.app-container main');
+        if (mainEl) mainEl.style.display = 'none';
+        openClientAuthPortal({ mode: 'login', blocking: true });
+      } else {
+        renderAllClientComponents();
+        openClientAuthPortal({ mode: 'login', blocking: false });
+      }
+    }
+  });
+}
+
+// Initialize Application
+document.addEventListener('DOMContentLoaded', async () => {
+  // 1. Initialiser la navigation par onglets EN PREMIER pour garantir l'interactivité quoi qu'il arrive
+  initNavigation();
+
+  // 2. Charger le registre d'accès et détecter le mode portail / session
+  if (window.GirardotAuth) {
+    await window.GirardotAuth.loadRegistry();
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlId = urlParams.get('id');
+  const urlTrip = urlParams.get('trip');
+  const forceLogin = urlParams.get('login') === '1';
+  const forcePortal = urlParams.get('portal') === '1';
+  const session = window.GirardotAuth ? window.GirardotAuth.getSession() : null;
+
+  let initialExplicitId = null;
+  let showPortalAfterBoot = false;
+  if (!urlId && !urlTrip && session) {
+    if (session.role === 'traveler' && Array.isArray(session.assignedTripIds)) {
+      if (session.assignedTripIds.length === 1) {
+        initialExplicitId = session.assignedTripIds[0];
+      } else if (session.assignedTripIds.length > 1) {
+        initialExplicitId = session.assignedTripIds[0];
+        showPortalAfterBoot = true;
+      }
+    } else if (session.role === 'driver' || session.role === 'guide') {
+      showPortalAfterBoot = true;
+    }
+  }
+
+  // 3. Charger les données du voyage (IndexedDB-First)
+  await loadTripDataAsync(initialExplicitId);
+
+  // 4. Contrôle d'accès hybride : si le voyage exige une authentification
+  const isProtected = window.GirardotAuth
+    ? await window.GirardotAuth.isTripProtected(currentTrip ? currentTrip.id : null, currentTrip)
+    : false;
+  const hasAccess = (!isProtected) || (window.GirardotAuth && window.GirardotAuth.canSessionAccessTrip(session, currentTrip.id, 'client'));
+
+  if (!hasAccess) {
+    const mainEl = document.querySelector('.app-container main');
+    if (mainEl) mainEl.style.display = 'none';
+    updateClientAuthHeaderButton();
+    openClientAuthPortal({
+      mode: 'login',
+      blocking: true,
+      reasonText: session
+        ? `Le compte "${session.displayName}" n'est pas inscrit sur ce voyage. Connectez-vous avec les identifiants de ce dossier.`
+        : ''
+    });
+    return;
+  }
+
+  // 5. Rendu sécurisé de chaque sous-composant
+  renderAllClientComponents();
+
+  if (forceLogin) {
+    openClientAuthPortal({ mode: 'login', blocking: false });
+  } else if (forcePortal || showPortalAfterBoot) {
+    openClientAuthPortal({ mode: 'portal', blocking: false });
+  }
+
+  // 6. Revalidation automatique en tâche de fond (Stale-While-Revalidate)
   setTimeout(() => {
     try { revalidateTripDataFromServer(); } catch(e) { console.warn('Erreur revalidation:', e); }
   }, 600);
@@ -554,33 +909,23 @@ function revalidateTripDataFromServer() {
     .then(freshData => {
       if (!freshData || !freshData.itinerary) return;
       
-      const currentHash = currentTrip ? JSON.stringify({
-        title: currentTrip.title,
-        itinerary: currentTrip.itinerary,
-        hotels: currentTrip.hotels,
-        flightsList: currentTrip.flightsList,
-        freeTimeSuggestions: currentTrip.freeTimeSuggestions,
-        practicalTipsList: currentTrip.practicalTipsList
-      }) : '';
-
-      const freshHash = JSON.stringify({
-        title: freshData.title,
-        itinerary: freshData.itinerary,
-        hotels: freshData.hotels,
-        flightsList: freshData.flightsList,
-        freeTimeSuggestions: freshData.freeTimeSuggestions,
-        practicalTipsList: freshData.practicalTipsList
+      const hashFields = (t) => JSON.stringify({
+        title: t.title,
+        itinerary: t.itinerary,
+        hotels: t.hotels,
+        flightsList: t.flightsList,
+        freeTimeSuggestions: t.freeTimeSuggestions,
+        practicalTipsList: t.practicalTipsList,
+        accessControl: t.accessControl || null,
+        branding: t.branding || null
       });
+      const currentHash = currentTrip ? hashFields(currentTrip) : '';
+      const freshHash = hashFields(freshData);
 
       if (currentHash !== freshHash) {
         console.log("Nouvelle version du voyage détectée sur le serveur, mise à jour transparente...");
         currentTrip = freshData;
-        if (window.GirardotStorage) {
-          window.GirardotStorage.set(`girardot_trip_data_${freshData.id}`, freshData);
-        }
-        try {
-          localStorage.setItem(`girardot_trip_data_${freshData.id}`, JSON.stringify(freshData));
-        } catch(e) {}
+        persistTripToLocalCaches(freshData);
         refreshAppAfterTripChange();
         showDiscreetSyncToast("Carnet actualisé avec les dernières informations de l'agence.");
       }
@@ -697,7 +1042,7 @@ function renderTodayFocus() {
   ];
 
   // Retrieve user checked timeline entries from storage
-  const checkedKey = `girardot_timeline_checked_${currentTrip.id}_j${currentDay.day}`;
+  const checkedKey = `${getClientScopedKey('timeline_checked', currentTrip.id)}_j${currentDay.day}`;
   let checkedItems = JSON.parse(localStorage.getItem(checkedKey) || '[]');
 
   timelineItems.forEach((entry, idx) => {
@@ -759,6 +1104,26 @@ function renderTodayFocus() {
     timelineStream.appendChild(itemEl);
   });
 
+  // Excursions & options facultatives réservées spécifiquement par ce voyageur pour ce jour
+  if (window.GirardotAuth && currentTrip) {
+    const persDay = window.GirardotAuth.getSessionTripPersonalization(currentTrip.id);
+    const dayOpts = (persDay && Array.isArray(persDay.options))
+      ? persDay.options.map(normalizeTravelerOption).filter(o => o && o.day === Number(currentDay.day))
+      : [];
+    dayOpts.forEach(opt => {
+      const optEl = document.createElement('div');
+      optEl.className = 'timeline-option-card';
+      optEl.innerHTML = `
+        <div class="timeline-option-badge">
+          <i class="fa-solid fa-star"></i> Option réservée sur votre dossier${opt.time ? ' • ' + escapeClientHtml(opt.time) : ''}
+        </div>
+        <div style="font-size:0.95rem; font-weight:800; color:var(--primary-dark);">${escapeClientHtml(opt.title)}</div>
+        ${opt.details ? `<div style="font-size:0.8rem; color:#78350f; margin-top:3px;">${escapeClientHtml(opt.details)}</div>` : ''}
+      `;
+      timelineStream.appendChild(optEl);
+    });
+  }
+
   // Notification temps libre ciblé pour la journée si présent
   if (currentTrip.freeTimeSuggestions && currentTrip.freeTimeSuggestions.length > 0) {
     const dayFreeTime = currentTrip.freeTimeSuggestions.filter(s => String(s.day) === String(currentDay.day));
@@ -785,7 +1150,7 @@ function renderTodayFocus() {
 
 function toggleTimelineCheck(dayIdx, entryIdx) {
   const currentDay = currentTrip.itinerary[dayIdx];
-  const checkedKey = `girardot_timeline_checked_${currentTrip.id}_j${currentDay.day}`;
+  const checkedKey = `${getClientScopedKey('timeline_checked', currentTrip.id)}_j${currentDay.day}`;
   let checkedItems = JSON.parse(localStorage.getItem(checkedKey) || '[]');
   
   if (checkedItems.includes(entryIdx)) {
@@ -1060,7 +1425,7 @@ function quickAddPhotoForEntry(entryTitle) {
 let inMemorySouvenirs = null;
 
 function getSouvenirsKey() {
-  return `girardot_souvenirs_${currentTrip ? currentTrip.id : 'default'}`;
+  return getClientScopedKey('souvenirs', currentTrip ? currentTrip.id : 'default');
 }
 
 function getSouvenirsList() {
@@ -2478,16 +2843,23 @@ function decodeCruiseCabin(rawInput) {
 function getCruiseStoredCabin() {
   if (!currentTrip) return "";
   const tripKey = currentTrip.id || 'current';
-  return localStorage.getItem(`girardot_cruise_cabin_${tripKey}`) || "";
+  const stored = localStorage.getItem(getClientScopedKey('cruise_cabin', tripKey));
+  if (stored) return stored;
+  if (window.GirardotAuth) {
+    const pers = window.GirardotAuth.getSessionTripPersonalization(currentTrip.id);
+    if (pers && pers.cabinNumber) return String(pers.cabinNumber).trim();
+  }
+  return "";
 }
 
 function saveCruiseStoredCabin(val) {
   if (!currentTrip) return;
   const tripKey = currentTrip.id || 'current';
+  const key = getClientScopedKey('cruise_cabin', tripKey);
   if (val) {
-    localStorage.setItem(`girardot_cruise_cabin_${tripKey}`, val.trim());
+    localStorage.setItem(key, val.trim());
   } else {
-    localStorage.removeItem(`girardot_cruise_cabin_${tripKey}`);
+    localStorage.removeItem(key);
   }
 }
 
@@ -4178,7 +4550,7 @@ let currentPendingScan = null; // Données en cours de validation dans le modal 
 let inMemoryPersonalDocs = null;
 
 function getClientPersonalDocsKey() {
-  return `girardot_personal_docs_${currentTrip ? currentTrip.id : 'default'}`;
+  return getClientScopedKey('personal_docs', currentTrip ? currentTrip.id : 'default');
 }
 
 function getClientPersonalDocs() {
@@ -4318,14 +4690,15 @@ function renderClientDocuments() {
   const container = document.getElementById('client-documents-list');
   if (!container) return;
 
+  const nominativeDocs = getNominativeTravelerDocs();
   const agencyDocs = (currentTrip && currentTrip.documents) ? currentTrip.documents.map(d => ({ ...d, source: 'agency' })) : [];
   const personalDocs = getClientPersonalDocs().map(d => ({ ...d, source: 'personal' }));
-  const allDocs = [...agencyDocs, ...personalDocs];
+  const allDocs = [...nominativeDocs, ...agencyDocs, ...personalDocs];
 
   // Mettre à jour les compteurs des badges de filtre
   const counts = {
     all: allDocs.length,
-    agency: agencyDocs.length,
+    agency: agencyDocs.length + nominativeDocs.length,
     flight: allDocs.filter(d => d.type === 'flight').length,
     voucher: allDocs.filter(d => d.type === 'voucher').length,
     identity: allDocs.filter(d => d.type === 'identity').length,
@@ -4341,7 +4714,7 @@ function renderClientDocuments() {
   // Filtrer la liste
   let filtered = allDocs;
   if (activeDocFilter === 'agency') {
-    filtered = allDocs.filter(d => d.source === 'agency');
+    filtered = allDocs.filter(d => d.source === 'agency' || d.source === 'nominative');
   } else if (activeDocFilter !== 'all') {
     filtered = allDocs.filter(d => d.type === activeDocFilter);
   }
@@ -4368,14 +4741,19 @@ function renderClientDocuments() {
   filtered.forEach(doc => {
     const typeInfo = getDocTypeInfo(doc.type);
     const isAgency = doc.source === 'agency';
+    const isNominative = doc.source === 'nominative';
     const card = document.createElement('div');
-    card.className = `client-doc-card ${isAgency ? 'agency-doc' : 'personal-doc'}`;
+    card.className = `client-doc-card ${isNominative ? 'nominative-doc' : (isAgency ? 'agency-doc' : 'personal-doc')}`;
+
+    const badgeClass = isNominative ? 'doc-badge-nominative' : (isAgency ? 'doc-badge-agency' : 'doc-badge-personal');
+    const badgeIcon = isNominative ? 'fa-id-badge' : (isAgency ? 'fa-building' : 'fa-user-shield');
+    const badgeLabel = isNominative ? 'Document Nominatif • Votre Dossier' : (isAgency ? 'Document Agence' : 'Mon Coffre-Fort');
 
     card.innerHTML = `
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:8px; gap:8px;">
-        <span class="doc-badge-source ${isAgency ? 'doc-badge-agency' : 'doc-badge-personal'}">
-          <i class="fa-solid ${isAgency ? 'fa-building' : 'fa-user-shield'}"></i>
-          ${isAgency ? 'Document Agence' : 'Mon Coffre-Fort'}
+        <span class="doc-badge-source ${badgeClass}">
+          <i class="fa-solid ${badgeIcon}"></i>
+          ${badgeLabel}
         </span>
         <span style="font-size:0.75rem; font-weight:700; color:${typeInfo.color}; display:inline-flex; align-items:center; gap:4px;">
           <i class="fa-solid ${typeInfo.icon}"></i> ${typeInfo.label}
@@ -4545,9 +4923,10 @@ function saveNewClientDocument() {
 }
 
 function findDocById(docId) {
+  const nominativeDocs = getNominativeTravelerDocs();
   const agencyDocs = (currentTrip && currentTrip.documents) ? currentTrip.documents.map(d => ({ ...d, source: 'agency' })) : [];
   const personalDocs = getClientPersonalDocs().map(d => ({ ...d, source: 'personal' }));
-  return [...agencyDocs, ...personalDocs].find(d => d.id === docId);
+  return [...nominativeDocs, ...agencyDocs, ...personalDocs].find(d => d.id === docId);
 }
 
 function openDocQrModal(docId) {

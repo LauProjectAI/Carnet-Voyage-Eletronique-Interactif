@@ -3,22 +3,240 @@ let driverTrip = null;
 let currentActiveDay = 0;
 let boardedPassengers = new Set();
 
-document.addEventListener('DOMContentLoaded', () => {
-  loadDriverTripData();
+function getDriverScopedKey(baseName, tripId) {
+  const cleanTrip = tripId || (driverTrip ? driverTrip.id : 'default') || 'default';
+  if (window.GirardotAuth && typeof window.GirardotAuth.getScopedStorageKey === 'function') {
+    return window.GirardotAuth.getScopedStorageKey(baseName, cleanTrip);
+  }
+  return `girardot_${baseName}_${cleanTrip}`;
+}
+
+async function readDriverTripFromCaches(candidateId) {
+  if (!candidateId) return null;
+  const key = `girardot_trip_data_${candidateId}`;
+  if (window.GirardotStorage) {
+    try {
+      const fromIdb = await window.GirardotStorage.get(key, null);
+      if (fromIdb && fromIdb.itinerary) return fromIdb;
+    } catch (e) {}
+  }
+  try {
+    const raw = localStorage.getItem(key);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed && parsed.itinerary) return parsed;
+    }
+  } catch (e) {}
+  return null;
+}
+
+async function persistDriverTripToCaches(tripObj) {
+  if (!tripObj || !tripObj.id) return;
+  const key = `girardot_trip_data_${tripObj.id}`;
+  if (window.GirardotStorage) {
+    try { await window.GirardotStorage.set(key, tripObj); } catch (e) {}
+  } else {
+    try { localStorage.setItem(key, JSON.stringify(tripObj)); } catch (e) {}
+  }
+}
+
+function updateDriverAuthHeaderButton() {
+  const btn = document.getElementById('driver-auth-btn');
+  if (!btn || !window.GirardotAuth) return;
+  const session = window.GirardotAuth.getSession();
+  if (session) {
+    const shortName = (session.firstName || session.displayName || 'Équipe').split(' ')[0];
+    btn.style.background = '#0284c7';
+    btn.style.color = '#ffffff';
+    btn.style.borderColor = '#38bdf8';
+    btn.innerHTML = `<i class="fa-solid fa-bus"></i> <span>${shortName} • Départs</span>`;
+  } else {
+    btn.style.background = '#0f172a';
+    btn.style.color = '#38bdf8';
+    btn.style.borderColor = '#334155';
+    btn.innerHTML = `<i class="fa-solid fa-user-shield"></i> <span>Connexion</span>`;
+  }
+}
+
+function showDriverSyncToast(message) {
+  let toast = document.getElementById('girardot-driver-sync-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'girardot-driver-sync-toast';
+    toast.style.cssText = 'position:fixed; bottom:76px; left:50%; transform:translateX(-50%) translateY(30px); background:#0f172a; color:#e0f2fe; border:1px solid #38bdf8; padding:10px 16px; border-radius:28px; font-size:0.8rem; font-weight:700; box-shadow:0 6px 20px rgba(0,0,0,0.4); z-index:99999; display:flex; align-items:center; gap:8px; opacity:0; transition:all 0.3s ease; pointer-events:none;';
+    document.body.appendChild(toast);
+  }
+  toast.innerHTML = `<i class="fa-solid fa-arrows-rotate" style="color:#38bdf8;"></i> <span>${message}</span>`;
+  toast.style.opacity = '1';
+  toast.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => {
+    toast.style.opacity = '0';
+    toast.style.transform = 'translateX(-50%) translateY(30px)';
+  }, 4000);
+}
+
+function revalidateDriverTripFromServer() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const candidateId = urlParams.get('id') || urlParams.get('trip');
+  const targetId = candidateId || (driverTrip ? driverTrip.id : null);
+  if (!targetId || targetId.length > 50) return;
+
+  const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === targetId || t.alias === targetId || (t.aliases && t.aliases.includes(targetId)));
+  const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${targetId}.json`;
+
+  fetch(encodeURI(targetFile) + `?_t=${Date.now()}`, { cache: 'no-cache' })
+    .then(res => {
+      if (!res.ok) throw new Error('Introuvable');
+      return res.json();
+    })
+    .then(async freshData => {
+      if (!freshData || !freshData.itinerary) return;
+      const hashOf = (obj) => obj ? JSON.stringify({
+        title: obj.title,
+        itinerary: obj.itinerary,
+        driverDossier: obj.driverDossier,
+        documents: obj.documents,
+        contacts: obj.contacts,
+        hotels: obj.hotels
+      }) : '';
+
+      if (hashOf(driverTrip) !== hashOf(freshData)) {
+        driverTrip = freshData;
+        await persistDriverTripToCaches(freshData);
+        initDriverApp();
+        showDriverSyncToast('Dossier conducteur actualisé (passagers / rooming à jour).');
+      }
+    })
+    .catch(() => {});
+}
+
+async function selectDriverTripFromPortal(tripId) {
+  if (!tripId) return;
+  currentActiveDay = 0;
+  await loadDriverTripDataAsync(tripId);
+  if (window.GirardotAuth) window.GirardotAuth.closeAuthOverlay();
+  const container = document.querySelector('.driver-container');
+  if (container) container.style.display = '';
   initDriverApp();
+  updateDriverAuthHeaderButton();
+  try {
+    window.history.replaceState({}, '', `conducteur.html?id=${encodeURIComponent(driverTrip.id || tripId)}`);
+  } catch (e) {}
+  setTimeout(() => revalidateDriverTripFromServer(), 400);
+}
+
+function openDriverAuthPortal(options = {}) {
+  if (!window.GirardotAuth) return;
+  const session = window.GirardotAuth.getSession();
+  const mode = options.mode || (session ? 'portal' : 'login');
+
+  window.GirardotAuth.mountAuthPortal({
+    mode: mode,
+    theme: 'driver',
+    blocking: options.blocking === true,
+    reasonText: options.reasonText || '',
+    tripObj: driverTrip,
+    activeTripId: driverTrip ? driverTrip.id : null,
+    onAuthenticated: async (newSession) => {
+      updateDriverAuthHeaderButton();
+      if (newSession.role === 'traveler') {
+        const targetClient = (newSession.assignedTripIds && newSession.assignedTripIds[0]) ? `?id=${encodeURIComponent(newSession.assignedTripIds[0])}` : '';
+        window.location.href = `index.html${targetClient}`;
+        return;
+      }
+      const urlId = new URLSearchParams(window.location.search).get('id');
+      const assigned = Array.isArray(newSession.assignedTripIds) ? newSession.assignedTripIds : [];
+      if (urlId && window.GirardotAuth.canSessionAccessTrip(newSession, urlId, 'driver')) {
+        await selectDriverTripFromPortal(urlId);
+      } else if (assigned.length === 1 && assigned[0] !== '*') {
+        await selectDriverTripFromPortal(assigned[0]);
+      } else {
+        openDriverAuthPortal({ mode: 'portal', blocking: false });
+      }
+    },
+    onSelectTrip: async (tripId, targetContext) => {
+      if (targetContext === 'client') {
+        window.location.href = `index.html?id=${encodeURIComponent(tripId)}`;
+      } else {
+        await selectDriverTripFromPortal(tripId);
+      }
+    },
+    onLogout: () => {
+      updateDriverAuthHeaderButton();
+      if (driverTrip && driverTrip.accessControl && driverTrip.accessControl.requireAuth) {
+        const container = document.querySelector('.driver-container');
+        if (container) container.style.display = 'none';
+        openDriverAuthPortal({ mode: 'login', blocking: true });
+      } else {
+        openDriverAuthPortal({ mode: 'login', blocking: false });
+      }
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+  if (window.GirardotAuth) {
+    await window.GirardotAuth.loadRegistry();
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlId = urlParams.get('id');
+  const urlTrip = urlParams.get('trip');
+  const forcePortal = urlParams.get('portal') === '1';
+  const session = window.GirardotAuth ? window.GirardotAuth.getSession() : null;
+
+  let explicitId = null;
+  let showPortalAfterBoot = false;
+  if (!urlId && !urlTrip && session && (session.role === 'driver' || session.role === 'guide' || session.role === 'admin')) {
+    const assigned = Array.isArray(session.assignedTripIds) ? session.assignedTripIds : [];
+    if (assigned.length === 1 && assigned[0] !== '*') {
+      explicitId = assigned[0];
+    } else if (assigned.length > 0) {
+      explicitId = assigned[0] === '*' ? null : assigned[0];
+      showPortalAfterBoot = true;
+    }
+  }
+
+  await loadDriverTripDataAsync(explicitId);
+
+  const isProtected = window.GirardotAuth
+    ? await window.GirardotAuth.isTripProtected(driverTrip ? driverTrip.id : null, driverTrip)
+    : false;
+  const hasProAccess = (!isProtected) || (window.GirardotAuth && window.GirardotAuth.canSessionAccessTrip(session, driverTrip.id, 'driver'));
+
+  if (!hasProAccess) {
+    const container = document.querySelector('.driver-container');
+    if (container) container.style.display = 'none';
+    updateDriverAuthHeaderButton();
+    openDriverAuthPortal({
+      mode: 'login',
+      blocking: true,
+      reasonText: session
+        ? `Accès réservé à l'équipe Conducteur / Accompagnateur assignée à ce départ.`
+        : 'Connectez-vous avec votre identifiant Conducteur / Accompagnateur Voyages Girardot.'
+    });
+    return;
+  }
+
+  initDriverApp();
+  updateDriverAuthHeaderButton();
+  if (forcePortal || showPortalAfterBoot) {
+    openDriverAuthPortal({ mode: 'portal', blocking: false });
+  }
+  setTimeout(() => revalidateDriverTripFromServer(), 600);
 });
 
-// Chargement des données du voyage
-function loadDriverTripData() {
+// Chargement des données du voyage (IndexedDB-First)
+async function loadDriverTripDataAsync(explicitId = null) {
   const urlParams = new URLSearchParams(window.location.search);
-  const tripParam = urlParams.get('trip');
-  const idParam = urlParams.get('id');
+  const tripParam = explicitId ? null : urlParams.get('trip');
+  const idParam = explicitId || urlParams.get('id');
 
   // 1. Paramètre Base64 complet dans l'URL (?trip=...)
-  if (tripParam) {
+  if (tripParam && tripParam.length > 50) {
     try {
       const decoded = JSON.parse(decodeURIComponent(escape(atob(tripParam))));
       driverTrip = decoded;
+      await persistDriverTripToCaches(decoded);
       return;
     } catch (e) {
       console.warn("Impossible de décoder le voyage base64:", e);
@@ -26,23 +244,22 @@ function loadDriverTripData() {
   }
 
   // 2. Paramètre ID dans l'URL (?id=...)
-  if (idParam) {
-    const stored = localStorage.getItem(`girardot_trip_data_${idParam}`);
-    if (stored) {
-      try {
-        driverTrip = JSON.parse(stored);
-        return;
-      } catch (e) {}
+  const candidateId = idParam || tripParam;
+  if (candidateId) {
+    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === candidateId || t.alias === candidateId || (t.aliases && t.aliases.includes(candidateId)));
+    const resolvedId = (foundPredefined && foundPredefined.id) ? foundPredefined.id : candidateId;
+    const cached = await readDriverTripFromCaches(resolvedId) || (resolvedId !== candidateId ? await readDriverTripFromCaches(candidateId) : null);
+    if (cached) {
+      driverTrip = cached;
+      return;
     }
-    // Vérifier si présent dans les voyages préenregistrés ou dans voyages/<id>.json
-    const foundPredefined = (window.AVAILABLE_TRIPS || []).find(t => t.id === idParam || t.alias === idParam || (t.aliases && t.aliases.includes(idParam)));
-    const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${idParam}.json`;
+
+    const targetFile = (foundPredefined && foundPredefined.file) ? foundPredefined.file : `voyages/${candidateId}.json`;
     try {
-      const xhr = new XMLHttpRequest();
-      xhr.open('GET', encodeURI(targetFile), false);
-      xhr.send(null);
-      if (xhr.status === 200 || xhr.status === 0) {
-        driverTrip = JSON.parse(xhr.responseText);
+      const res = await fetch(encodeURI(targetFile), { cache: 'no-cache' });
+      if (res && res.ok) {
+        driverTrip = await res.json();
+        await persistDriverTripToCaches(driverTrip);
         return;
       }
     } catch (err) {}
@@ -51,12 +268,10 @@ function loadDriverTripData() {
   // 3. Dernier voyage actif en cache
   const activeId = localStorage.getItem('girardot_active_trip_id');
   if (activeId) {
-    const storedTrip = localStorage.getItem(`girardot_trip_data_${activeId}`);
+    const storedTrip = await readDriverTripFromCaches(activeId);
     if (storedTrip) {
-      try {
-        driverTrip = JSON.parse(storedTrip);
-        return;
-      } catch (e) {}
+      driverTrip = storedTrip;
+      return;
     }
   }
 
@@ -95,10 +310,18 @@ function ensureDriverDataStructure() {
     };
   }
 
-  // Restaurer l'état du pointage passager pour ce voyage
-  const storageKey = `girardot_driver_boarded_${driverTrip.id || 'default'}`;
+  // Restaurer l'état du pointage passager cloisonné (conducteur + voyage)
+  const storageKey = getDriverScopedKey('driver_boarded', driverTrip.id || 'default');
   const saved = JSON.parse(localStorage.getItem(storageKey) || '[]');
   boardedPassengers = new Set(saved);
+  if (window.GirardotStorage) {
+    window.GirardotStorage.get(storageKey, null).then(idbSaved => {
+      if (Array.isArray(idbSaved) && idbSaved.length !== boardedPassengers.size) {
+        boardedPassengers = new Set(idbSaved);
+        renderDriverPassengersList(document.getElementById('driver-passenger-search') ? document.getElementById('driver-passenger-search').value : "");
+      }
+    }).catch(() => {});
+  }
 }
 
 function initDriverApp() {
@@ -297,16 +520,19 @@ function togglePassengerBoarding(idx) {
   } else {
     boardedPassengers.add(idx);
   }
-  const storageKey = `girardot_driver_boarded_${driverTrip.id || 'default'}`;
-  localStorage.setItem(storageKey, JSON.stringify(Array.from(boardedPassengers)));
+  const storageKey = getDriverScopedKey('driver_boarded', driverTrip.id || 'default');
+  const arr = Array.from(boardedPassengers);
+  try { localStorage.setItem(storageKey, JSON.stringify(arr)); } catch (e) {}
+  if (window.GirardotStorage) window.GirardotStorage.set(storageKey, arr).catch(() => {});
   renderDriverPassengersList(document.getElementById('driver-passenger-search') ? document.getElementById('driver-passenger-search').value : "");
 }
 
 function resetBoarding() {
   if (confirm("Réinitialiser le pointage de tous les passagers à zéro ?")) {
     boardedPassengers.clear();
-    const storageKey = `girardot_driver_boarded_${driverTrip.id || 'default'}`;
-    localStorage.removeItem(storageKey);
+    const storageKey = getDriverScopedKey('driver_boarded', driverTrip.id || 'default');
+    try { localStorage.removeItem(storageKey); } catch (e) {}
+    if (window.GirardotStorage) window.GirardotStorage.remove(storageKey).catch(() => {});
     renderDriverPassengersList();
   }
 }

@@ -1,0 +1,6 @@
+﻿Dossier;Nom;Prenom;Email;Mot_de_Passe;Ramassage;Horaire;Siege;Chambre;Cabine;Options
+GIR-2026-201;DUPONT;"Jean & Marie";dupont@client.demo;;"Chalon-sur-Saône (Gare)";05h30;"4A / 4B";"Double Supérieure";;"J3: Visite guidée VIP | J7: Dîner Croisière"
+GIR-2026-202;MARTIN;Claire;claire.martin@exemple.fr;MAR2026;"Beaune (Péage)";06h00;6A;"Chambre Twin";;"J4: Survol en hélicoptère"
+GIR-2026-203;BERNARD;Luc;luc.bernard@exemple.fr;;"Dijon (Palais des Congrès)";06h30;6B;"Individuelle (Single)";;
+GIR-2026-204;LEFEBVRE;Sophie;sophie.lefevre@exemple.fr;SOF2026;"Mâcon (Gare TGV)";07h15;8C;;"Pont 7 • Cabine 7214";"J2: Forfait Boissons All-Inclusive | Excursion Île privée"
+GIR-2026-205;ROUSSEAU;Paul & Hélène;;;"Lyon Saint-Exupéry (Terminal 1)";08h00;"10A / 10B";"Double Vue Jardin";;"J5: Soirée Spectacle Folklorique"

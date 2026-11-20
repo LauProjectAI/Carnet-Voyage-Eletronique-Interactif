@@ -1,0 +1,101 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-19T12:58:00Z",
+  "tripsAccess": {
+    "canada-etats-unis": {
+      "requireAuth": false
+    },
+    "chicago": {
+      "requireAuth": false
+    },
+    "cocktail-mexicain": {
+      "requireAuth": false
+    }
+  },
+  "staffAccounts": [
+    {
+      "id": "staff-demo-conducteur",
+      "login": "conducteur@girardot.demo",
+      "passwordHash": "fa057210b86a896622bff9fc458563059bf33ca6ad1fc16fe56aedb5a13bfac0",
+      "role": "driver",
+      "firstName": "Marc",
+      "lastName": "Laurent",
+      "displayName": "Marc Laurent (Conducteur)",
+      "active": true,
+      "assignedTrips": [
+        "canada-etats-unis",
+        "chicago",
+        "cocktail-mexicain"
+      ]
+    }
+  ],
+  "travelerAccounts": [
+    {
+      "id": "client-demo-dupont",
+      "login": "dupont@client.demo",
+      "dossierRef": "GIR-2026-001",
+      "passwordHash": "a8d20732ec9a71f11f3213c8a3483d90122c6d04b867d35c1a65d15a38ceb940",
+      "role": "traveler",
+      "firstName": "Jean & Marie",
+      "lastName": "Dupont",
+      "displayName": "M. & Mme Dupont",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "canada-etats-unis",
+          "dossierRef": "GIR-2026-001",
+          "pickupPoint": "Chalon-sur-Saône (Gare)",
+          "pickupTime": "05h30",
+          "seatNumber": "4A / 4B",
+          "roomNumber": "Double Supérieure",
+          "options": [
+            {
+              "title": "Survol en hélicoptère des Chutes du Niagara",
+              "day": 8,
+              "time": "15h00",
+              "details": "Départ héliport Niagara • Confirmé sur votre dossier"
+            }
+          ],
+          "personalDocs": [
+            {
+              "id": "nom-etkt-canada-dupont",
+              "type": "flight",
+              "title": "E-Ticket Vol Aller/Retour — M. & Mme Dupont",
+              "reference": "AF-GIR-2026-DUP",
+              "date": "18/09/2026",
+              "notes": "Sièges pré-réservés 24A / 24B • Bagage soute 23 kg inclus",
+              "qrCode": "ETKT-AF-DUPONT-GIR2026001"
+            }
+          ]
+        },
+        {
+          "tripId": "chicago",
+          "dossierRef": "GIR-2027-042",
+          "pickupPoint": "Beaune (Péage)",
+          "pickupTime": "07h15",
+          "seatNumber": "2C / 2D",
+          "roomNumber": "Chambre Twin",
+          "options": [
+            {
+              "title": "Place Tribune VIP — Match NBA United Center",
+              "day": 3,
+              "time": "19h30",
+              "details": "Section 112 • Rang 6 • Places 14 & 15"
+            }
+          ],
+          "personalDocs": [
+            {
+              "id": "nom-nba-chicago-dupont",
+              "type": "ticket",
+              "title": "Billet Match NBA — United Center",
+              "reference": "NBA-CHI-112-R6",
+              "date": "25/02/2027",
+              "notes": "Accès Porte 3 — Ouverture 18h00",
+              "qrCode": "NBA-VIP-DUPONT-CHI2027"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

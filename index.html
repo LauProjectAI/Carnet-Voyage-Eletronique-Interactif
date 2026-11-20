@@ -28,12 +28,16 @@
     <!-- Top Minimal Branding & Emergency Row -->
     <header class="editorial-topbar">
       <a href="#" class="brand-minimal" onclick="switchMainTab('tab-today'); return false;">
+        <img id="brand-partner-logo" class="brand-partner-logo" src="" alt="Logo partenaire" style="display:none;">
         <div>
-          <div class="logo-text">Voyages Girardot</div>
-          <span class="logo-sub">DEPUIS 1920</span>
+          <div class="logo-text" id="brand-logo-text">Voyages Girardot</div>
+          <span class="logo-sub" id="brand-logo-sub">DEPUIS 1920</span>
         </div>
       </a>
       <div class="top-right-actions">
+        <button type="button" id="client-auth-btn" onclick="openClientAuthPortal()" style="background:#eef7f2; color:#144534; border:1px solid #bbf7d0; border-radius:999px; padding:5px 11px; font-size:0.74rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Espace personnel — Connexion ou Mes Voyages">
+          <i class="fa-solid fa-user-lock"></i> <span>Connexion</span>
+        </button>
         <a href="#sos" class="sos-badge" onclick="switchMainTab('tab-pratique'); return false;" title="Assistance et urgence 24/7">
           <i class="fa-solid fa-phone"></i> SOS
         </a>
@@ -54,6 +58,9 @@
             <h1 id="destination-hero-title" style="color:white; font-size:1.45rem; font-weight:800; margin:0; line-height:1.2;"></h1>
           </div>
         </div>
+
+        <!-- Bandeau Personnalisé Voyageur & Groupe (Lot 2) -->
+        <div id="traveler-personal-banner" style="display:none;"></div>
 
         <!-- Titre Editorial du Jour -->
         <div class="day-focus-header">
@@ -492,6 +499,7 @@
   <!-- Data & Application Logic -->
   <script src="storage_service.js"></script>
   <script src="voyages/index_voyages.js"></script>
+  <script src="auth_service.js"></script>
   <script src="data.js"></script>
   <script src="cruise_fleet.js"></script>
   <script src="app.js"></script>

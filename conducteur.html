@@ -224,6 +224,9 @@
       </div>
     </div>
     <div style="display:flex; align-items:center; gap:8px;">
+      <button type="button" id="driver-auth-btn" onclick="openDriverAuthPortal()" style="font-size:0.74rem; padding:4px 10px; border-radius:14px; background:#0f172a; color:#38bdf8; border:1px solid #334155; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Connexion ou Mes Départs Assignés">
+        <i class="fa-solid fa-user-shield"></i> <span>Connexion</span>
+      </button>
       <a href="index.html" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; border-radius:14px; background:#1e293b; color:#94a3b8; border-color:#334155; text-decoration:none;">
         <i class="fa-solid fa-user"></i> Vue Voyageur
       </a>
@@ -423,6 +426,7 @@
   <script src="storage_service.js"></script>
   <script src="data.js"></script>
   <script src="voyages/index_voyages.js"></script>
+  <script src="auth_service.js"></script>
   <script src="conducteur.js"></script>
 </body>
 </html>

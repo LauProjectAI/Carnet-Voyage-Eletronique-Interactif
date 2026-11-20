@@ -610,11 +610,14 @@ function importTripJsonFile(event) {
 }
 
 function switchAdminTab(tabName) {
-  const sections = ['general', 'itinerary', 'driver', 'documents', 'hotels', 'freetime', 'concierge', 'contacts'];
+  const sections = ['general', 'itinerary', 'driver', 'documents', 'hotels', 'freetime', 'concierge', 'contacts', 'access'];
   sections.forEach(sec => {
     const el = document.getElementById(`adm-sec-${sec}`);
     if (el) el.style.display = (sec === tabName) ? 'block' : 'none';
   });
+  if (tabName === 'access' && typeof renderAdminAccessTab === 'function') {
+    renderAdminAccessTab();
+  }
 
   const buttons = document.querySelectorAll('.admin-nav button');
   buttons.forEach(b => {
@@ -635,6 +638,27 @@ function populateForm() {
   document.getElementById('adm-cover').value = tripData.coverImage || '';
   document.getElementById('adm-intro').value = tripData.intro || '';
   updateCoverPreview(tripData.coverImage || '');
+
+  const accessSel = document.getElementById('adm-access-mode');
+  if (accessSel) {
+    accessSel.value = (tripData.accessControl && tripData.accessControl.requireAuth) ? 'protected' : 'public';
+  }
+
+  // Branding / Marque Blanche
+  const b = tripData.branding || {};
+  const bName = document.getElementById('adm-brand-name');
+  const bLogo = document.getElementById('adm-brand-logo');
+  const bPrim = document.getElementById('adm-brand-primary');
+  const bAcc = document.getElementById('adm-brand-accent');
+  const bWel = document.getElementById('adm-brand-welcome');
+  const bHide = document.getElementById('adm-brand-hide-girardot');
+  if (bName) bName.value = b.partnerName || '';
+  if (bLogo) bLogo.value = b.partnerLogoUrl || '';
+  if (bPrim) bPrim.value = b.primaryColor || '#144534';
+  if (bAcc) bAcc.value = b.accentColor || '#c29958';
+  if (bWel) bWel.value = b.welcomeMessage || '';
+  if (bHide) bHide.checked = b.hideGirardotBrand === true;
+  if (typeof updateBrandLogoPreview === 'function') updateBrandLogoPreview(b.partnerLogoUrl || '');
 
   // Alert
   if (tripData.alert) {
@@ -683,6 +707,9 @@ function populateForm() {
   populateGeminiDaySelector();
   if (typeof updateGeminiStatusIndicator === 'function') {
     updateGeminiStatusIndicator();
+  }
+  if (typeof renderAdminAccessTab === 'function') {
+    renderAdminAccessTab();
   }
 }
 
@@ -4125,6 +4152,10 @@ function updatePracticalField(idx, field, value) {
 function saveAllCarnet() {
   if (!syncFormDataIntoTrip()) return;
 
+  if (typeof syncCurrentTripAccessIntoRegistry === 'function') {
+    syncCurrentTripAccessIntoRegistry();
+  }
+
   // Save to LocalStorage & Catalog
   saveTripToCatalogAndStorage(tripData);
 
@@ -4214,6 +4245,62 @@ function updateShareLink() {
 // MODULE DE RECHERCHE & PROPOSITION DE PHOTOS LIBRES (Wikimedia Commons)
 // -----------------------------------------------------------------------------
 let currentPhotoTarget = { type: null, dayIndex: null };
+
+function updateBrandLogoPreview(url) {
+  const preview = document.getElementById('adm-brand-logo-preview');
+  if (!preview) return;
+  if (url && url.trim()) {
+    preview.innerHTML = `<img src="${url.trim()}" alt="Logo" style="max-width:100%; max-height:100%; object-fit:contain;" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-triangle-exclamation\\' style=\\'color:#f59e0b;\\'></i>';">`;
+  } else {
+    preview.innerHTML = '<i class="fa-solid fa-image" style="color:#94a3b8;"></i>';
+  }
+}
+
+function clearBrandLogo() {
+  const inp = document.getElementById('adm-brand-logo');
+  if (inp) inp.value = '';
+  const fInp = document.getElementById('adm-brand-logo-file');
+  if (fInp) fInp.value = '';
+  updateBrandLogoPreview('');
+}
+
+function resetAdminBrandingColors() {
+  const prim = document.getElementById('adm-brand-primary');
+  const acc = document.getElementById('adm-brand-accent');
+  if (prim) prim.value = '#144534';
+  if (acc) acc.value = '#c29958';
+}
+
+function handleBrandLogoUpload(event) {
+  const file = event && event.target && event.target.files ? event.target.files[0] : null;
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const dataUrl = e.target.result;
+    if (file.type === 'image/svg+xml' || !dataUrl.startsWith('data:image/')) {
+      const inp = document.getElementById('adm-brand-logo');
+      if (inp) inp.value = dataUrl;
+      updateBrandLogoPreview(dataUrl);
+      return;
+    }
+    const img = new Image();
+    img.onload = function() {
+      const maxW = 320;
+      const ratio = img.width > maxW ? (maxW / img.width) : 1;
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.round(img.width * ratio);
+      canvas.height = Math.round(img.height * ratio);
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      const outUrl = canvas.toDataURL('image/png');
+      const inp = document.getElementById('adm-brand-logo');
+      if (inp) inp.value = outUrl;
+      updateBrandLogoPreview(outUrl);
+    };
+    img.src = dataUrl;
+  };
+  reader.readAsDataURL(file);
+}
 
 function updateCoverPreview(url) {
   const preview = document.getElementById('adm-cover-preview');
@@ -8415,6 +8502,35 @@ function syncFormDataIntoTrip() {
     }
   }
 
+  // Synchronisation du mode d'accès hybride (libre vs ID + MDP)
+  const accessSel = document.getElementById('adm-access-mode');
+  if (accessSel) {
+    tripData.accessControl = Object.assign({}, tripData.accessControl || {}, {
+      requireAuth: accessSel.value === 'protected'
+    });
+  }
+
+  // Synchronisation du branding / marque blanche
+  const bName = document.getElementById('adm-brand-name') ? document.getElementById('adm-brand-name').value.trim() : '';
+  const bLogo = document.getElementById('adm-brand-logo') ? document.getElementById('adm-brand-logo').value.trim() : '';
+  const bPrim = document.getElementById('adm-brand-primary') ? document.getElementById('adm-brand-primary').value.trim() : '#144534';
+  const bAcc = document.getElementById('adm-brand-accent') ? document.getElementById('adm-brand-accent').value.trim() : '#c29958';
+  const bWel = document.getElementById('adm-brand-welcome') ? document.getElementById('adm-brand-welcome').value.trim() : '';
+  const bHide = document.getElementById('adm-brand-hide-girardot') ? document.getElementById('adm-brand-hide-girardot').checked : false;
+  const hasCustomColors = (bPrim.toLowerCase() !== '#144534') || (bAcc.toLowerCase() !== '#c29958');
+  if (bName || bLogo || bWel || bHide || hasCustomColors) {
+    tripData.branding = {
+      partnerName: bName,
+      partnerLogoUrl: bLogo,
+      primaryColor: bPrim,
+      accentColor: bAcc,
+      welcomeMessage: bWel,
+      hideGirardotBrand: bHide
+    };
+  } else {
+    tripData.branding = null;
+  }
+
   // Synchronisation rétrocompatible des contacts
   if (tripData.contactsList && tripData.contactsList.length > 0) {
     const mainRec = tripData.contactsList.find(c => c.category.toLowerCase().includes('réceptif') || c.category.toLowerCase().includes('local')) || tripData.contactsList[0];
@@ -8812,6 +8928,17 @@ async function saveTripDirectToGitHub() {
       console.warn("Index voyages non mis à jour automatiquement (non bloquant):", indexErr);
     }
 
+    // Publication sécurisée du registre des accès (voyageurs, conducteurs & SHA-256)
+    let accessSyncStatus = '';
+    if (typeof publishAccessRegistryToGitHub === 'function') {
+      try {
+        await publishAccessRegistryToGitHub(repo, branch, cfg.token);
+        accessSyncStatus = '\n🔐 Registre des accès (voyages/access_registry.json) synchronisé.';
+      } catch (accErr) {
+        console.warn("Registre des accès non publié automatiquement (non bloquant):", accErr);
+      }
+    }
+
     const [owner, repoName] = repo.split('/');
     const cleanRepoName = repoName || 'Carnet-Voyage-Eletronique-Interactif';
     const clientPublicUrl = `https://${(owner || 'lauprojectai').toLowerCase()}.github.io/${cleanRepoName}/index.html?id=${slug}`;
@@ -8823,7 +8950,7 @@ async function saveTripDirectToGitHub() {
 
     alert(
       `🎉 SUCCÈS ! Le carnet a été publié directement sur GitHub !\n\n` +
-      `📁 Fichier : ${filePath}\n\n` +
+      `📁 Fichier : ${filePath}${accessSyncStatus}\n\n` +
       `🔗 Lien Voyageur (copié dans votre presse-papier) :\n${clientPublicUrl}\n\n` +
       `🔗 Lien Dossier Conducteur :\n${driverPublicUrl}\n\n` +
       `(Note : GitHub Pages prend 30 à 60 secondes pour propager les nouveaux fichiers en ligne).`

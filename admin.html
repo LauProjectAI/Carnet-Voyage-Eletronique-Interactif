@@ -284,6 +284,7 @@
       <button onclick="switchAdminTab('freetime')"><i class="fa-solid fa-compass"></i> Suggestions</button>
       <button onclick="switchAdminTab('concierge')"><i class="fa-solid fa-bell-concierge"></i> Conciergerie IA</button>
       <button onclick="switchAdminTab('contacts')"><i class="fa-solid fa-phone"></i> Contacts & Pratique</button>
+      <button type="button" onclick="switchAdminTab('access')"><i class="fa-solid fa-user-lock"></i> Voyageurs &amp; Accès</button>
     </div>
 
     <!-- FORM -->
@@ -291,7 +292,7 @@
 
       <!-- 1. GENERAL & VOLS -->
       <div id="adm-sec-general" class="admin-section">
-        <div class="section-box" style="border-left:4px solid var(--accent-gold); background:#fffbeb; margin-bottom:20px; padding:14px 16px;">
+        <div class="section-box" style="border-left:4px solid var(--accent-gold); background:#fffbeb; margin-bottom:14px; padding:14px 16px;">
           <div class="form-row" style="margin-bottom:0;">
             <div class="form-group" style="margin-bottom:0;">
               <label style="font-weight:800; color:#92400e; font-size:0.9rem;">
@@ -309,6 +310,79 @@
             </div>
           </div>
         </div>
+
+        <div class="section-box" style="border-left:4px solid #144534; background:#f0fdf4; margin-bottom:14px; padding:14px 16px;">
+          <div class="form-row" style="margin-bottom:0;">
+            <div class="form-group" style="margin-bottom:0;">
+              <label style="font-weight:800; color:#144534; font-size:0.9rem;">
+                <i class="fa-solid fa-user-lock" style="color:#144534;"></i> Contrôle d'Accès au Carnet (Mode Hybride) :
+              </label>
+              <select id="adm-access-mode" class="form-control" style="font-weight:700; background:white; border-color:#86efac;">
+                <option value="public">Accès libre par lien direct (?id=...) — Idéal démo / test</option>
+                <option value="protected">Accès protégé par Identifiant + Mot de passe (Voyageurs &amp; Conducteurs)</option>
+              </select>
+              <small style="color:#166534; font-size:0.75rem; display:block; margin-top:4px;">
+                🔐 En mode protégé, seuls les voyageurs et conducteurs inscrits sur ce départ (ou les comptes de test) peuvent ouvrir le carnet.
+              </small>
+            </div>
+          </div>
+        </div>
+
+        <details class="section-box" style="border-left:4px solid #7c3aed; background:#faf5ff; margin-bottom:20px; padding:12px 16px;">
+          <summary style="font-weight:800; color:#5b21b6; font-size:0.9rem; cursor:pointer; display:flex; align-items:center; gap:8px;">
+            <i class="fa-solid fa-palette" style="color:#7c3aed;"></i> Personnalisation Visuelle / Marque Blanche (Groupe, CE, Club)
+          </summary>
+          <div style="margin-top:12px;">
+            <div class="form-row">
+              <div class="form-group">
+                <label>Nom du groupe / partenaire / club :</label>
+                <input type="text" id="adm-brand-name" class="form-control" placeholder="Ex: Élan Chalon, CE Michelin, Association...">
+              </div>
+              <div class="form-group">
+                <label>Couleurs du thème (Principale &amp; Accent) :</label>
+                <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+                  <label style="margin:0; font-size:0.78rem; display:inline-flex; align-items:center; gap:6px;">
+                    Principale <input type="color" id="adm-brand-primary" value="#144534" style="width:38px; height:32px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+                  </label>
+                  <label style="margin:0; font-size:0.78rem; display:inline-flex; align-items:center; gap:6px;">
+                    Accent <input type="color" id="adm-brand-accent" value="#c29958" style="width:38px; height:32px; border:1px solid #cbd5e1; border-radius:6px; cursor:pointer;">
+                  </label>
+                  <button type="button" onclick="resetAdminBrandingColors()" class="btn-secondary" style="font-size:0.75rem; padding:5px 10px;">
+                    Couleurs Girardot
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label>Logo partenaire (URL ou image importée) :</label>
+                <div style="display:flex; gap:8px; align-items:center;">
+                  <input type="text" id="adm-brand-logo" class="form-control" placeholder="URL ou image importée..." oninput="updateBrandLogoPreview(this.value)">
+                  <input type="file" id="adm-brand-logo-file" accept="image/*" style="display:none;" onchange="handleBrandLogoUpload(event)">
+                  <button type="button" onclick="document.getElementById('adm-brand-logo-file').click()" class="btn-secondary" style="white-space:nowrap; font-size:0.75rem; padding:6px 10px;">
+                    <i class="fa-solid fa-upload"></i> Importer
+                  </button>
+                  <button type="button" onclick="clearBrandLogo()" class="btn-secondary" style="white-space:nowrap; font-size:0.75rem; padding:6px 10px; color:#dc2626;">
+                    Effacer
+                  </button>
+                  <div id="adm-brand-logo-preview" style="width:46px; height:36px; border-radius:6px; border:1px solid #cbd5e1; background:white; display:flex; align-items:center; justify-content:center; flex-shrink:0; overflow:hidden;">
+                    <i class="fa-solid fa-image" style="color:#94a3b8;"></i>
+                  </div>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>Message d'accueil du groupe (optionnel) :</label>
+                <input type="text" id="adm-brand-welcome" class="form-control" placeholder="Ex: Bienvenue dans votre carnet officiel Élan Chalon !">
+              </div>
+            </div>
+
+            <label style="display:inline-flex; align-items:center; gap:8px; font-size:0.82rem; font-weight:700; color:#4c1d95; cursor:pointer; margin:0;">
+              <input type="checkbox" id="adm-brand-hide-girardot">
+              Marque blanche complète (masquer « Voyages Girardot » dans l'en-tête au profit du nom partenaire)
+            </label>
+          </div>
+        </details>
 
         <h3 style="font-size:1.1rem; color:var(--primary-dark); margin-bottom:14px;">1. Informations Générales du Séjour</h3>
         
@@ -708,6 +782,77 @@
         <div id="adm-practical-list"></div>
       </div>
 
+      <!-- 6. VOYAGEURS & ACCÈS (ID, MDP, PERSONNALISATION, LOGITO & PUBLIPOSTAGE) -->
+      <div id="adm-sec-access" class="admin-section" style="display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; margin-bottom:14px;">
+          <div>
+            <h3 style="font-size:1.15rem; color:var(--primary-dark); margin:0; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+              <i class="fa-solid fa-user-lock" style="color:var(--accent-gold);"></i>
+              Gestion des Voyageurs, Accès &amp; Équipe Pro
+              <span id="adm-access-status-badge"></span>
+            </h3>
+            <p style="font-size:0.8rem; color:#64748b; margin:4px 0 0;">
+              Fiches individuelles (ID, MDP, prise en charge, siège, chambre, options, billets nominatifs), import LogiTO et export CSV publipostage.
+            </p>
+          </div>
+          <button type="button" id="btn-publish-access-github" onclick="publishAccessRegistryButtonClick()" class="btn-save-main" style="background:#0f172a; color:#38bdf8; padding:8px 16px; font-size:0.82rem; border:1px solid #334155;">
+            <i class="fa-brands fa-github"></i> Publier les accès sur GitHub
+          </button>
+        </div>
+
+        <!-- Sous-onglets Voyageurs vs Équipe Pro -->
+        <div style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px;">
+          <button type="button" id="access-tab-btn-travelers" onclick="switchAccessSubTab('travelers')" class="btn-secondary" style="font-size:0.84rem; padding:8px 16px; font-weight:800; background:#144534; color:white; border:none;">
+            <i class="fa-solid fa-users"></i> Voyageurs de ce départ (<span id="access-count-travelers">0</span>)
+          </button>
+          <button type="button" id="access-tab-btn-staff" onclick="switchAccessSubTab('staff')" class="btn-secondary" style="font-size:0.84rem; padding:8px 16px; font-weight:800; background:#f1f5f9; color:#334155; border:none;">
+            <i class="fa-solid fa-bus"></i> Équipe Conducteurs &amp; Accompagnateurs (<span id="access-count-staff">0</span>)
+          </button>
+        </div>
+
+        <!-- PANNEAU VOYAGEURS -->
+        <div id="adm-access-panel-travelers">
+          <div class="section-box" style="background:#f8fafc; margin-bottom:16px; padding:12px 14px;">
+            <div style="display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+              <button type="button" onclick="syncTravelersFromDriverDossier()" class="btn-secondary" style="font-size:0.78rem; padding:7px 12px; background:#eef7f2; color:#144534; border-color:#86efac; font-weight:800;">
+                <i class="fa-solid fa-arrows-rotate"></i> Synchro Passagers / Rooming
+              </button>
+              <button type="button" onclick="triggerLogitoCsvImport()" class="btn-secondary" style="font-size:0.78rem; padding:7px 12px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:800;">
+                <i class="fa-solid fa-file-csv"></i> Importer CSV LogiTO
+              </button>
+              <input type="file" id="adm-travelers-csv-input" accept=".csv,.txt" style="display:none;" onchange="handleLogitoCsvFileSelected(event)">
+              <button type="button" onclick="downloadLogitoCsvTemplate()" class="btn-secondary" style="font-size:0.78rem; padding:7px 12px;">
+                <i class="fa-solid fa-table"></i> Modèle CSV
+              </button>
+              <button type="button" onclick="addNewTravelerAccount()" class="btn-secondary" style="font-size:0.78rem; padding:7px 12px; background:white; font-weight:700;">
+                <i class="fa-solid fa-user-plus"></i> + Ajouter un voyageur
+              </button>
+              <button type="button" onclick="generateMissingPasswordsForTrip()" class="btn-secondary" style="font-size:0.78rem; padding:7px 12px; background:#fef3c7; color:#92400e; border-color:#fcd34d; font-weight:700;">
+                <i class="fa-solid fa-key"></i> Générer MDP manquants
+              </button>
+              <button type="button" onclick="exportMailMergeCsvClick()" class="btn-save-main" style="font-size:0.78rem; padding:7px 14px; margin-left:auto;">
+                <i class="fa-solid fa-file-export"></i> Exporter CSV Publipostage
+              </button>
+            </div>
+          </div>
+
+          <div id="adm-access-travelers-list"></div>
+        </div>
+
+        <!-- PANNEAU ÉQUIPE PRO -->
+        <div id="adm-access-panel-staff" style="display:none;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:8px;">
+            <p style="font-size:0.82rem; color:#64748b; margin:0;">
+              Chaque conducteur ou accompagnateur dispose de ses propres identifiants et n'accède qu'aux départs cochés ci-dessous.
+            </p>
+            <button type="button" onclick="addNewStaffAccount()" class="btn-secondary" style="font-size:0.82rem; padding:7px 14px; background:#eff6ff; color:#0369a1; border-color:#93c5fd; font-weight:800;">
+              <i class="fa-solid fa-user-plus"></i> + Ajouter un Conducteur / Accompagnateur
+            </button>
+          </div>
+          <div id="adm-access-staff-list"></div>
+        </div>
+      </div>
+
       <!-- Action buttons -->
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top:30px; border-top:1px solid #e2e8f0; padding-top:20px;">
         <button type="button" onclick="resetToDefaultData()" class="btn-secondary" style="color:#dc2626; border-color:#fca5a5;">
@@ -976,6 +1121,8 @@
   </script>
   <script src="storage_service.js"></script>
   <script src="voyages/index_voyages.js"></script>
+  <script src="auth_service.js"></script>
+  <script src="admin_access.js"></script>
   <script src="data.js"></script>
   <script src="cruise_fleet.js"></script>
   <script src="gemini_service.js"></script>
