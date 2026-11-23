@@ -1,8 +1,8 @@
 # Récapitulatif Exhaustif de la Conversation — Carnet de Voyages Électronique Interactif
 **Organisation :** Voyages Girardot  
-**Date d'édition du document :** 30 octobre 2026  
-**Dépôt Source :** [GitHub: LauProjectAI/Carnet-Voyage-Eletronique-Interactif](https://github.com/LauProjectAI/Carnet-Voyage-Eletronique-Interactif)  
-**Total des échanges :** 108 demandes utilisateur traitées chronologiquement  
+**Date d'édition du document :** 20 novembre 2026  
+**Dépôt Source :** [GitHub: LauProjectAI/Carnet-Voyage-Eletronique-Interactif](https://github.com/LauProjectAI/Carnet-Voyage-Eletronique-Interactif) (Branches `main` & `feature/personnalisation-et-acces-auth`)  
+**Total des échanges :** 139 demandes utilisateur traitées chronologiquement  
 
 ---
 
@@ -22,7 +22,10 @@
 | **10** | [Pérennisation de l'IA : Migration Gemini 3.5 Flash-Lite & Fallback Chain](#chap-10) | 28 - 29 Octobre 2026 | Demandes 93 à 96 |
 | **11** | [Perfectionnement Import PDF Mexique, Horaires Réels & Titres de Trajets](#chap-11) | 29 Octobre 2026 | Demandes 97 à 98 |
 | **12** | [Publication GitHub, Problématique du LocalStorage & Révolution IndexedDB](#chap-12) | 29 - 30 Octobre 2026 | Demandes 99 à 105 |
-| **13** | [Résolution de l'Erreur 422 GitHub, Import Inde & Enrichissement PDF Partenaire](#chap-13) | 30 Octobre 2026 | Demandes 106 à 108 |
+| **13** | [Résolution de l'Erreur 422 GitHub, Import Inde & Enrichissement PDF Partenaire](#chap-13) | 30 Octobre - 05 Novembre 2026 | Demandes 106 à 116 |
+| **14** | [Skill `import-carnet-voyage`, Fidélité Textuelle & Épuration Carte NEXT (SW v27)](#chap-14) | 05 - 19 Novembre 2026 | Demandes 117 à 124 |
+| **15** | [Documentation Technique, Export PDF & Diaporama de Formation](#chap-15) | 19 Novembre 2026 | Demandes 125 à 126 |
+| **16** | [Branche Dédiée : Accès ID/MDP Multi-Voyages, Personnalisation & LogiTO (Lots 1 à 3)](#chap-16) | 19 - 20 Novembre 2026 | Demandes 127 à 139 |
 
 ---
 
@@ -571,7 +574,7 @@ Résolution de la divergence entre le carnet local (`localhost`) et le carnet pu
 
 ---
 
-## 📜 Index Exhaustif des 105 Demandes Utilisateur
+## 📜 Index Exhaustif des 139 Demandes Utilisateur
 
 | N° | Date & Heure | Contenu synthétique de la demande |
 | :---: | :--- | :--- |
@@ -682,11 +685,43 @@ Résolution de la divergence entre le carnet local (`localhost`) et le carnet pu
 | **105** | 30/10/2026 | Mise à jour de l'historique exhaustif (105 échanges) et de la synthèse globale du projet |
 | **106** | 30/10/2026 | Import d'un nouveau voyage "Inde" : absence d'extraction de l'hôtel, du contact réceptif sur place et des formalités spécifiques |
 | **107** | 30/10/2026 | Échec de publication GitHub (422 Invalid request "sha" wasn't supplied) : diagnostic du cache Service Worker et résolution pérenne |
+| **108** | 30/10/2026 | Enrichissement des étapes du programme via un PDF partenaire sans écraser les hôtels, vols, contacts ni formalités Girardot |
+| **109** | 30/10/2026 | Nouvelle erreur 422 GitHub : diagnostic CORS (`cache: 'no-store'`), architecture SHA à 4 niveaux et sync complète du formulaire |
+| **110** | 02/11/2026 | Création du guide d'hébergement serveur Girardot (`GUIDE_HEBERGEMENT_SERVEUR_GIRARDOT.md`) |
+| **111** | 04/11/2026 | Correction fuite Coups de Cœur Afrique du Sud, lettrines PDF, fusion sous-phrases et titrage nominal (Gaspésie & USA Canada) |
+| **112** | 04/11/2026 | Suppression du cartouche blanc QR code dans la carte NEXT (maintien des vouchers par visite dans le programme) |
+| **113** | 04/11/2026 | Refonte titrage nominal strict (Volcan Sabancaya, vol intérieur LA2326, train Inca Rail) et référentiel Pérou |
+| **114** | 04/11/2026 | Éradication du faux positif « Dunes de Sam » (recherche par mots entiers et filtrage strict par pays) |
+| **115** | 04/11/2026 | Garantie de la totalité des jours du voyage (séjour Pouilles) et encart de présentation Hôtel de séjour |
+| **116** | 05/11/2026 | Intégration du bouton et moteur « Nettoyage IA du programme » avec Google Gemini |
+| **117** | 05/11/2026 | Lecture d'un PDF et structuration d'un plan par jour et par étapes (`Titre : Explication`) |
+| **118** | 12/11/2026 | Inclusion systématique des repas (« Déjeuner » et « Dîner logement ») et fidélité textuelle exacte sans résumé |
+| **119** | 12/11/2026 | Création de la skill `import-carnet-voyage` (`SKILL.md`) |
+| **120** | 12/11/2026 | Incorporation de la skill `import-carnet-voyage` dans l'import initial et la structuration IA de l'application |
+| **121** | 12/11/2026 | Publication de la mise à jour sur GitHub (`main`, commit `36deee5`) |
+| **122** | 12/11/2026 | Suppression des informations sous le titre de la journée dans la carte NEXT côté client |
+| **123** | 19/11/2026 | Diagnostic du sous-titre encore visible : passage du Service Worker en `carnet-girardot-v27` (Network-First) |
+| **124** | 19/11/2026 | Publication du correctif carte NEXT et Service Worker `v27` sur GitHub (`main`, commit `24c4c89`) |
+| **125** | 19/11/2026 | Refonte de la Présentation Technique et création du Diaporama de Formation HTML (avec rappel connexions Gemini & GitHub) |
+| **126** | 19/11/2026 | Export de la Présentation Technique au format PDF avec titre et sous-titre |
+| **127** | 19/11/2026 | Création de la branche secondaire `feature/personnalisation-et-acces-auth` pour la personnalisation et l'accès ID/MDP |
+| **128** | 19/11/2026 | Analyse technique du risque de mélange en cache navigateur/IndexedDB pour clients multi-voyages et conducteurs |
+| **129** | 19/11/2026 | Atelier `/grill me` : cadrage complet de l'architecture d'authentification, marque blanche et import/export LogiTO |
+| **130** | 19/11/2026 | Développement Lot 1 : `auth_service.js`, `access_registry.json`, portail unique et cloisonnement `userId + tripId` (SW `v28`) |
+| **131** | 19/11/2026 | Test et validation en local du Lot 1 sur `http://localhost:8080` |
+| **132** | 19/11/2026 | Développement Lot 2 : marque blanche/co-branding, fiche nominative client, options datées et coffre-fort personnel (SW `v29`) |
+| **133** | 19/11/2026 | Développement Lot 3 : `admin_access.js`, onglet Voyageurs & Accès, import/export CSV LogiTO et conducteurs (SW `v30`) |
+| **134** | 19/11/2026 | Création et validation du fichier exemple téléchargeable `Documentation/exemple_import_voyageurs_logito.csv` |
+| **135** | 20/11/2026 | Explication des 3 méthodes pour extraire et exporter un fichier CSV compatible depuis LogiTO (InfoSup / Voyagenet) |
+| **136** | 20/11/2026 | Commit (`650dd60`) et push des Lots 1–3 et du CSV exemple sur `origin/feature/personnalisation-et-acces-auth` |
+| **137** | 20/11/2026 | Vérification sur la possibilité de travailler en local sur la branche principale `main` |
+| **138** | 20/11/2026 | Bascule locale sur `main` et récupération de `origin/main` par `git pull --ff-only` (`4479720`, carnet Inde du nord) |
+| **139** | 20/11/2026 | Mise à jour de `HISTORIQUE_COMPLET_CONVERSATION.md` et `RESUME_PROJET_CARNET_VOYAGES.md` |
 
 ---
 
 ## <a id="chap-13"></a>Chapitre 13 : Résolution de l'Erreur 422 GitHub, Import Inde & Déclaration Sanitaire Air Suvidha
-*Période : 30 Octobre 2026 — Demandes utilisateur 106 à 107*
+*Période : 30 Octobre - 05 Novembre 2026 — Demandes utilisateur 106 à 116*
 
 ### 🎯 Synthèse de la Phase
 Double chantier stratégique : fiabilisation absolue du connecteur de publication GitHub (résolution de l'erreur 422 `"sha" wasn't supplied` causée par l'interception et le cache persistant des erreurs 404 de l'API GitHub par le Service Worker PWA) et adaptation de l'intelligence d'importation PDF aux particularités des circuits en Asie (Inde du Nord) : hébergement unique non-daté, coordonnées GPS de Delhi, contact réceptif local sans deux-points (`ASI TRAVELS PVT LTD`), formalités d'entrée strictes (Passeport + Visa obligatoire) et détection automatique des formulaires sanitaires gouvernementaux obligatoires (*Air Suvidha* sous 24h avec lien actif).
@@ -925,3 +960,212 @@ Double chantier stratégique : fiabilisation absolue du connecteur de publicatio
      - Ajout dans l'onglet *Programme Jour par Jour* de l'administration du bouton `#btn-admin-clean-days-ia` (*« Nettoyage IA des étapes »*), permettant d'affiner et normaliser les visites d'un carnet déjà créé ou en cours d'édition en un clic.
   4. **PWA & Cache** :
      - Version du cache Service Worker incrémentée à `carnet-girardot-v23` dans [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js).
+
+> **Évolutions complémentaires sur `main` (05 - 19 novembre 2026) :**  
+> En parallèle des échanges ci-dessous, plusieurs correctifs et carnets ont été intégrés sur la branche principale : extraction des infos pratiques et de la franchise bagages (`fd1e53f`), bascule automatique sur modèles Gemini de secours en cas de saturation (`ecefc94`), extraction complète des formalités sans troncature de date (`730733c`), ainsi que la publication des carnets *Chicago* (`b751706` / `ba2966e`), *Canada États-Unis* (`6f70aec` / `5d78857`) et *Inde du nord* (`876d3ef` / `4479720`).
+
+---
+
+## <a id="chap-14"></a>Chapitre 14 : Skill `import-carnet-voyage`, Fidélité Textuelle & Épuration Carte NEXT (SW v27)
+*Période : 05 - 19 Novembre 2026 — Demandes utilisateur 117 à 124*
+
+### 🎯 Synthèse de la Phase
+Standardisation de l'extraction de brochures PDF au travers d'une compétence dédiée (`import-carnet-voyage`), imposant l'inclusion systématique des repas (« Déjeuner » et « Dîner logement » sauf mention libre explicite) et une fidélité textuelle stricte sans résumé. Côté voyageur, la carte d'en-tête `NEXT / ÉTAPE À VENIR` a été épurée de son sous-titre descriptif et le Service Worker [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js) est passé en stratégie **Network-First** (`carnet-girardot-v27`) pour éviter les effets de cache figé après mise à jour.
+
+### 💬 Détail Chronologique des Échanges
+
+#### Demande n°117 — *05/11/2026 11:38:01*
+> **Demande Utilisateur :**  
+> *« Lis ce PDF et propose moi une structure dégageant un plan du type jour 1 : Titre / Etape 1 : Titre : Explication / Etape 2 : Titre : Explication »*
+
+* **Actions Réalisées :**
+  - Lecture intégrale du PDF transmis et restitution d'une proposition de découpage structurée journée par journée et étape par étape au format `Jour N : Titre` → `Étape k : Titre : Explication`.
+
+#### Demande n°118 — *12/11/2026 12:44:16*
+> **Demande Utilisateur :**  
+> *« Le plan est pas mal. Il manque cependant les repas. Inclure les étapes "déjeuner" et dîner-logement" systématiquement sauf si il est expressement indiqué déjeuner libre, dîner libre ou repas libres. Ne pas faire de résumé pour la partie explication qui doit correspondre exactement à l'information du document  à importer. »*
+
+* **Actions Réalisées :**
+  - Révision complète du plan extrait pour inclure systématiquement les étapes **« Déjeuner »** et **« Dîner logement »** à chaque journée (hors mentions *déjeuner libre*, *dîner libre* ou *repas libres*).
+  - Remplacement de toute formulation synthétique par la reprise textuelle exacte du document d'origine dans chaque explication d'étape.
+
+#### Demande n°119 — *12/11/2026 14:04:39*
+> **Demande Utilisateur :**  
+> *« Super. Tu peux créer une skill import carnet de voyage avec ce travail ? »*
+
+* **Actions Réalisées :**
+  - Création de la compétence [`.agents/skills/import-carnet-voyage/SKILL.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/.agents/skills/import-carnet-voyage/SKILL.md) codifiant le format cible, l'intégration systématique des repas, la fidélité textuelle stricte (zéro résumé), le découpage chronologique fin, les règles de titrage et l'exemple de référence.
+
+#### Demande n°120 — *12/11/2026 14:09:07*
+> **Demande Utilisateur :**  
+> *« Incorpore cette skill dans l'application Carnet de Voyage Electronique Interactif pour la partie import du programme initial. »*
+
+* **Actions Réalisées :**
+  - Intégration des règles de la skill `import-carnet-voyage` dans le parseur PDF initial ([`admin.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js)) et dans le prompt IA de [`gemini_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/gemini_service.js).
+  - Mise à jour des libellés et boutons de l'interface d'administration dans [`admin.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.html) (*« Structuration IA (Skill Import) »* et *« Appliquer la Skill Import IA »*).
+
+#### Demande n°121 — *12/11/2026 14:25:51*
+> **Demande Utilisateur :**  
+> *« Pousse la mise à jour sur Github »*
+
+* **Actions Réalisées :**
+  - Commit `36deee5` (`feat: ajout et integration de la skill import-carnet-voyage (repas systematiques et fidelite textuelle)`) poussé sur `origin/main`.
+
+#### Demande n°122 — *12/11/2026 16:00:36*
+> **Demande Utilisateur :**  
+> *« Dans la partie carnet de voyage client, peux tu supprimer les informations sous le titre de la journée. Ne laise que NEXT / ETAPE A VENIR / Le titre de la journée »*
+
+* **Actions Réalisées :**
+  - Suppression de l'élément `#next-sub` sous le titre dans la carte `#next-event-box` de [`index.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/index.html) et ajustement associé dans [`app.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/app.js) et [`style.css`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/style.css).
+
+#### Demande n°123 — *19/11/2026 09:23:13*
+> **Demande Utilisateur :**  
+> *« Tu peux vérifier la dernière modification. J'ai toujours le sous titre descriptif sur mon template client »*
+
+* **Diagnostic & Actions Réalisées :**
+  - Identification d'un maintien en cache navigateur dû à l'ancienne stratégie Cache-First du Service Worker et de l'absence de rechargement automatique lors de la bascule de version SW.
+  - Passage de [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js) en version `carnet-girardot-v27` avec stratégie **Network-First** pour tous les fichiers de même origine (fallback cache conservé pour le mode hors-ligne) et ajout dans [`app.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/app.js) d'une garde de sécurité sur `#next-sub` (`style.display = 'none'`) ainsi que du rechargement automatique lors de l'événement `controllerchange`.
+
+#### Demande n°124 — *19/11/2026 09:29:27*
+> **Demande Utilisateur :**  
+> *« Poçusse sur Github »*
+
+* **Actions Réalisées :**
+  - Commit `24c4c89` (`fix(client): supprimer le sous-titre de la carte NEXT et passer le SW en v27 Network-First`) poussé sur `origin/main`.
+
+---
+
+## <a id="chap-15"></a>Chapitre 15 : Documentation Technique, Export PDF & Diaporama de Formation
+*Période : 19 Novembre 2026 — Demandes utilisateur 125 à 126*
+
+### 🎯 Synthèse de la Phase
+Actualisation complète des supports de transmission interne (technique et formation utilisateur) pour intégrer les dernières évolutions de l'application et formaliser la procédure de configuration sur un nouveau poste (clés API Google Gemini et PAT GitHub).
+
+### 💬 Détail Chronologique des Échanges
+
+#### Demande n°125 — *19/11/2026 09:50:17*
+> **Demande Utilisateur :**  
+> *« Suite à ces différentes mises à jour, tu peux me refaire la présentation technique de l'application, et me préparer un diaporama de formation pour l'utilisation. Rappelle moi bien les étapes sur un nouveau poste des connexions à Gemini et Github. »*
+
+* **Actions Réalisées :**
+  - Rédaction de [`Documentation/Presentation_Technique_Application.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Presentation_Technique_Application.md) couvrant l'architecture 3 espaces, le stockage IndexedDB, la skill `import-carnet-voyage`, la bascule Gemini, le Service Worker `v27` Network-First et le guide détaillé de connexion sur un nouveau poste (GitHub PAT + clé API Google Gemini).
+  - Création du support interactif de formation [`Documentation/Diaporama_Formation_Utilisation.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Diaporama_Formation_Utilisation.html).
+
+#### Demande n°126 — *19/11/2026 11:42:30*
+> **Demande Utilisateur :**  
+> *« Tu peux m'enregistrer la Présentation Technique sous PDF avec titre et sous titre »*
+
+* **Actions Réalisées :**
+  - Génération et mise en page du document imprimable [`Documentation/Presentation_Technique_Application.pdf`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Presentation_Technique_Application.pdf) avec page de garde titrée et sous-titrée.
+
+---
+
+## <a id="chap-16"></a>Chapitre 16 : Branche Dédiée — Accès ID/MDP Multi-Voyages, Personnalisation & LogiTO (Lots 1 à 3)
+*Période : 19 - 20 Novembre 2026 — Demandes utilisateur 127 à 139*
+
+### 🎯 Synthèse de la Phase
+Ouverture d'un chantier isolé sur la branche secondaire **`feature/personnalisation-et-acces-auth`** afin d'apporter l'authentification individuelle par identifiant et mot de passe, la gestion propre des clients et conducteurs multi-voyages sans collision de cache, la personnalisation marque blanche / co-branding des groupes, l'insertion de données nominatives par voyageur et l'outillage complet d'import/export CSV avec LogiTO — le tout développé et vérifié en 3 lots, puis poussé sur GitHub sans perturber la production `main`.
+
+### 💬 Détail Chronologique des Échanges
+
+#### Demande n°127 — *19/11/2026 11:57:26*
+> **Demande Utilisateur :**  
+> *« Crée une branche secondaire car je voudrais travailler sur la personnalisation du carnet de voyage et la création d'un accès via ID et MDP »*
+
+* **Actions Réalisées :**
+  - Création et bascule sur la branche dédiée `feature/personnalisation-et-acces-auth` à partir de `main` (`24c4c89`).
+
+#### Demande n°128 — *19/11/2026 11:59:35*
+> **Demande Utilisateur :**  
+> *« Je m'interroge techniquement. Si un client est inscrit sur plusieurs voyages durant la même année, ou nos conducteurs / accompagnateurs, les différents carnets ne vont ils pas se mélanger à cause la mise en cache dans le navigateur , »*
+
+* **Analyse & Réponse Technique :**
+  - Explication du risque réel avec des clés locales génériques ou non cloisonnées (collision de brouillons, de photos souvenirs, de documents personnels et de notes entre deux départs d'un même compte).
+  - Définition de l'architecture de cloisonnement strict par couple `(userId + tripId)` et registre central multi-voyages.
+
+#### Demande n°129 — *19/11/2026 12:22:55*
+> **Demande Utilisateur :**  
+> *« /grill me »*
+
+* **Atelier de Conception & Décisions Validées (3 Lots) :**
+  - Couche d'authentification modulaire côté navigateur (registre JSON + hachage SHA-256 + cache `IndexedDB` hors-ligne) structurée pour une future migration transparente vers le serveur Voyages Girardot.
+  - Mode hybride activable par voyage (accès libre par lien direct `?id=...` ou accès protégé ID + MDP).
+  - Portail de connexion unique intelligent détectant automatiquement le profil (**Voyageur** → *Mes Voyages*, ou **Conducteur / Accompagnateur** → *Mes Départs Assignés*).
+  - Personnalisation groupe (logo, couleurs, marque blanche ou co-branding), fiche nominative client et intégration LogiTO (synchro liste passagers/rooming + import/export CSV).
+
+#### Demande n°130 — *19/11/2026 12:37:46*
+> **Demande Utilisateur :**  
+> *« Commence le Lot 1 »*
+
+* **Actions Réalisées (Lot 1 — Authentification, Multi-Voyages & Cloisonnement) :**
+  - Création de `auth_service.js` (`window.GirardotAuth`, `mountAuthPortal`, `getScopedStorageKey` pour cloisonner par `userId + tripId`) et de `voyages/access_registry.json` (comptes de démo `dupont@client.demo` / `GIR2026` et `conducteur@girardot.demo` / `COND2026`).
+  - Intégration du bouton de connexion et du sélecteur multi-voyages côté client (`index.html`, `app.js`) et conducteur (`conducteur.html`, `conducteur.js`), passage de `sw.js` en `carnet-girardot-v28` et validation par suite de tests Node.
+
+#### Demande n°131 — *19/11/2026 12:50:31*
+> **Demande Utilisateur :**  
+> *« je voudrais d'abord tester en local le lot 1 »*
+
+* **Actions Réalisées :**
+  - Mise à disposition des instructions et identifiants de test sur `http://localhost:8080` avant d'engager le lot suivant.
+
+#### Demande n°132 — *19/11/2026 12:56:46*
+> **Demande Utilisateur :**  
+> *« Ok pour moi. Lance le lot 2 »*
+
+* **Actions Réalisées (Lot 2 — Personnalisation Visuelle & Dossier Nominatif Client) :**
+  - Panneau de personnalisation Marque Blanche / Co-branding dans `admin.html` et `admin.js` (nom du groupe, message d'accueil, logo, couleurs principale & accent).
+  - Rendu dynamique côté client (`index.html`, `style.css`, `app.js`) : théming personnalisé, bandeau nominatif `#traveler-personal-banner` (*Mon dossier voyageur* : point et heure de ramassage, siège, chambre/cabine), injection des options facultatives datées dans le programme du jour et des documents personnels dans le coffre-fort.
+  - Passage de `sw.js` en `carnet-girardot-v29` et validation Node.
+
+#### Demande n°133 — *19/11/2026 14:46:16*
+> **Demande Utilisateur :**  
+> *« Vérifié. Va s y pour le lot 3 »*
+
+* **Actions Réalisées (Lot 3 — Module Administration des Accès & Passerelle LogiTO) :**
+  - Création de `admin_access.js` (`window.GirardotAdminAccess`) et ajout de l'onglet dédié **Voyageurs & Accès** dans `admin.html` / `admin.js`.
+  - Synchronisation automatique depuis la liste des passagers et le rooming list, import CSV/Excel LogiTO (`parseLogitoTravelersCsv`) avec rattachement multi-voyages sans écrasement des autres départs, modèle téléchargeable (`downloadLogitoCsvTemplate`), édition par voyageur (MDP lisible, prise en charge, siège, chambre, cabine, options datées, documents nominatifs), export CSV de publipostage, gestion des comptes conducteurs et publication GitHub de `voyages/access_registry.json`.
+  - Passage de `sw.js` en `carnet-girardot-v30` et validation Node.
+
+#### Demande n°134 — *19/11/2026 15:08:52*
+> **Demande Utilisateur :**  
+> *« Tu peux me créer un exemple de fichier csv à télécharger ? »*
+
+* **Actions Réalisées :**
+  - Génération sur la branche dédiée du fichier `Documentation/exemple_import_voyageurs_logito.csv` (UTF-8 avec BOM `EF BB BF`, fins de ligne CRLF, séparateur `;`, 5 voyageurs réalistes incluant `dupont@client.demo`, cabines, chambres, options datées et repli d'identifiant sur le numéro de dossier).
+  - Vérification automatisée dans `parseLogitoTravelersCsv` (5 lignes valides sans erreur).
+
+#### Demande n°135 — *20/11/2026 09:32:30*
+> **Demande Utilisateur :**  
+> *« Comment je peux récupérer un fichier CSV de ce type depuis LogiTO ? »*
+
+* **Actions Réalisées :**
+  - Présentation des 3 méthodes adaptées à LogiTO (InfoSup / Voyagenet) : export des listes Excel standard puis enregistrement en CSV UTF-8 depuis Excel, adaptation de `admin_access.js` aux en-têtes bruts d'un export LogiTO réel (avec fusion par numéro de dossier), ou requête/extraction automatisée dédiée depuis LogiTO.
+
+#### Demande n°136 — *20/11/2026 09:41:27*
+> **Demande Utilisateur :**  
+> *« Est que tu peux pousser la mise à jour dans la branche dédiée sur Github »*
+
+* **Actions Réalisées :**
+  - Commit `650dd60` regroupant exactement les 12 fichiers fonctionnels des Lots 1–3 et le CSV exemple (`auth_service.js`, `admin_access.js`, `voyages/access_registry.json`, `index.html`, `app.js`, `style.css`, `sw.js`, `conducteur.html`, `conducteur.js`, `admin.html`, `admin.js`, `Documentation/exemple_import_voyageurs_logito.csv`), suivi du `git push -u origin feature/personnalisation-et-acces-auth`.
+  - Maintien hors commit de `main` et des 4 fichiers locaux non liés.
+
+#### Demande n°137 — *20/11/2026 12:03:13*
+> **Demande Utilisateur :**  
+> *« En local est ce que je peux toujours travailler sur la branche principale ? »*
+
+* **Actions Réalisées :**
+  - Confirmation que le changement de branche vers `main` est sans risque une fois le travail poussé, avec explication des commandes (`git switch main` / `git pull origin main`) et du réflexe `Ctrl + Shift + R` dû aux versions différentes du Service Worker (`v27` sur `main` vs `v30` sur la branche dédiée).
+
+#### Demande n°138 — *20/11/2026 12:05:03*
+> **Demande Utilisateur :**  
+> *« oui »*
+
+* **Actions Réalisées :**
+  - Bascule locale sur `main` (`git switch main`) et mise à jour par `git pull --ff-only origin main` (`24c4c89..4479720`), récupérant [`voyages/inde-du-nord.json`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/voyages/inde-du-nord.json) et la mise à jour de [`voyages/index_voyages.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/voyages/index_voyages.js) (commits `876d3ef` et `4479720`).
+
+#### Demande n°139 — *20/11/2026 12:06:09*
+> **Demande Utilisateur :**  
+> *« mets à jour aussi le résumé de notre conversation. »*
+
+* **Actions Réalisées :**
+  - Mise à jour complète de [`HISTORIQUE_COMPLET_CONVERSATION.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/HISTORIQUE_COMPLET_CONVERSATION.md) et [`RESUME_PROJET_CARNET_VOYAGES.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/RESUME_PROJET_CARNET_VOYAGES.md) en local sur `main` (sans commit ni push).

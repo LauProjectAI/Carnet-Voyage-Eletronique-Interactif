@@ -1,8 +1,8 @@
 # Synthèse Structurée du Projet — Carnet de Voyages Électronique Interactif
 **Client / Organisation :** Voyages Girardot  
 **Application :** Web-App PWA Offline-First Responsive (Mobile / Tablette / Bureau)  
-**Dépôt GitHub :** `https://github.com/LauProjectAI/Carnet-Voyage-Eletronique-Interactif.git` (Branche `main`)  
-**Date de mise à jour :** 4 novembre 2026  
+**Dépôt GitHub :** `https://github.com/LauProjectAI/Carnet-Voyage-Eletronique-Interactif.git` (Branche `main` `4479720` & Branche dédiée `feature/personnalisation-et-acces-auth` `650dd60`)  
+**Date de mise à jour :** 20 novembre 2026  
 
 ---
 
@@ -11,7 +11,7 @@
 Le projet consiste en un **Carnet de Voyages Électronique Interactif et Intelligent**, destiné aux voyageurs et aux équipes d'accompagnement de **Voyages Girardot** (conducteurs, accompagnateurs, conseillers voyages).
 
 ### Piliers d'Architecture
-- **100% Autonome & Offline-First (PWA)** : L'application fonctionne sans connexion Internet une fois chargée dans le navigateur du voyageur (Service Worker cache `carnet-girardot-v20`, base locale haute capacité).
+- **100% Autonome & Offline-First (PWA)** : L'application fonctionne sans connexion Internet une fois chargée dans le navigateur du voyageur (Service Worker `carnet-girardot-v27` en **Network-First** sur `main`, `carnet-girardot-v30` sur la branche dédiée `feature/personnalisation-et-acces-auth`, base locale haute capacité).
 - **Zéro Coût Voyageur (0 token)** : La consultation du carnet, des cartes, des documents et de la conciergerie par les clients ne génère aucun coût d'API ni de consommation de jetons.
 - **Stockage Local Haute Capacité (`IndexedDB`)** : Remplacement de la barrière des 5 Mo du `localStorage` par le moteur `storage_service.js`, permettant d'accueillir des dizaines de Mégaoctets de documents (scans de passeports, visas, billets d'avion PDF, photos souvenirs).
 - **Synchronisation Transparente (*Stale-While-Revalidate*)** : Ouverture instantanée hors-ligne depuis le cache local, puis vérification automatique en arrière-plan des mises à jour publiées sur GitHub avec notification discrète.
@@ -141,29 +141,52 @@ Face aux risques de fragmentation excessive et de titres verbeux constatés lors
 5. **Isolation totale des Coups de Cœur et Conciergerie** :
    - Aucun lieu ni coup de cœur sud-africain ne peut subsister lors d'une page vierge ou de l'import d'un nouveau circuit (zéro pollution carte ou conciergerie).
 
+### F. Skill `import-carnet-voyage`, Nettoyage IA Gemini, Formalités & Épuration Client (05 - 19 novembre 2026)
+- **Compétence standardisée [`SKILL.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/.agents/skills/import-carnet-voyage/SKILL.md)** (`36deee5`) : intégrée dans [`admin.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.html), [`admin.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js) et [`gemini_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/gemini_service.js) ; impose l'inclusion systématique des étapes **« Déjeuner »** et **« Dîner logement »** (hors mentions *libre* explicites) et une **fidélité textuelle stricte sans résumé**.
+- **Robustesse IA, infos pratiques & formalités** : bascule automatique sur modèles Gemini de secours en cas de saturation (`ecefc94`), extraction complète des formalités et liens officiels sans troncature de date (`730733c`), extraction des infos pratiques et encart franchise bagages (`fd1e53f`).
+- **Épuration de la carte client & Service Worker Network-First (`24c4c89`)** : retrait du sous-titre `#next-sub` sous le titre de la journée dans la carte `NEXT / ÉTAPE À VENIR` (`index.html`, `app.js`, `style.css`), passage de [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js) en `carnet-girardot-v27` (**Network-First** sur le même domaine, Cache-First sur les CDN) et rechargement automatique sur `controllerchange`.
+- **Nouveaux carnets sur `main`** : publication de *Chicago* (`b751706`/`ba2966e`), *Canada États-Unis* (`6f70aec`/`5d78857`) et *Inde du nord* (`876d3ef`/`4479720`).
+- **Supports techniques & formation** : création dans `Documentation/` de [`Presentation_Technique_Application.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Presentation_Technique_Application.md), [`Presentation_Technique_Application.pdf`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Presentation_Technique_Application.pdf) et [`Diaporama_Formation_Utilisation.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Diaporama_Formation_Utilisation.html) (incluant la procédure nouveau poste pour GitHub PAT et Google Gemini).
+
 ---
 
-## 📂 6. Cartographie des Fichiers Clés du Projet
+## 🔐 6. Chantier Branche Dédiée (`feature/personnalisation-et-acces-auth`) : Accès ID/MDP Multi-Voyages, Personnalisation & LogiTO (Lots 1 à 3)
+
+Développé et validé en 3 lots sur la branche dédiée (commit `650dd60`), ce chantier prépare l'authentification individuelle et la personnalisation client/groupe sans altérer la branche de production `main` :
+
+- **Couche d'authentification modulaire (`auth_service.js`, `voyages/access_registry.json`, SW `v30`)** : mots de passe hachés en SHA-256 + cache `IndexedDB` hors-ligne, conçus comme façade (`window.GirardotAuth`) prête pour la future migration vers le serveur Voyages Girardot sans retoucher les écrans.
+- **Portail unique intelligent & Mode hybride (`mountAuthPortal`)** : écran de connexion unique détectant automatiquement les profils **Voyageur** (*Mes Voyages*) et **Conducteur / Accompagnateur** (*Mes Départs Assignés* dans `conducteur.html` / `conducteur.js`), avec option d'accès libre ou protégé activable par voyage.
+- **Cloisonnement multi-voyages (`getScopedStorageKey`)** : isolation stricte des données locales par couple `(userId + tripId)` afin d'éviter toute collision de cache navigateur entre plusieurs voyages d'un même client ou conducteur.
+- **Personnalisation Marque Blanche / Co-branding & Fiche Nominative (Lot 2)** : paramétrage groupe dans `admin.html` / `admin.js` (nom, accueil, logo, couleurs), bandeau client `#traveler-personal-banner` (*Mon dossier voyageur* : ramassage, horaire, siège, chambre/cabine), options datées dans la timeline et documents nominatifs dans le coffre-fort.
+- **Passerelle Back-Office & LogiTO (`admin_access.js` — Lot 3)** : onglet *Voyageurs & Accès*, synchro Passagers / Rooming, import CSV/Excel LogiTO (`parseLogitoTravelersCsv`) avec rattachement multi-départs, modèle CSV téléchargeable (`downloadLogitoCsvTemplate` et `Documentation/exemple_import_voyageurs_logito.csv`), export CSV publipostage, gestion conducteurs et publication GitHub de `voyages/access_registry.json`.
+
+---
+
+## 📂 7. Cartographie des Fichiers Clés du Projet
 
 | Fichier | Rôle & Évolutions majeures |
 | :--- | :--- |
-| [`storage_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/storage_service.js) | **Nouveau** : Moteur universel `IndexedDB` haute capacité, gestion des gros fichiers (PDF, scans, photos) et auto-migration. |
-| [`admin.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.html) | Interface d'administration, sélecteur de profil à l'import PDF, modale Gemini, bouton flottant de publication directe GitHub. |
-| [`admin.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js) | Convertisseur PDF multi-pages, garantie de la totalité absolue des jours du voyage (déploiement multi-jours et comblement automatique des journées libres), encart de présentation détaillée pour les hôtels de séjour (chambres, restauration, formule tout inclus, sports & loisirs, plage), résolution des étapes et villes blindée par frontières de mots entiers et filtre pays strict, connecteur GitHub ultra-robuste. |
-| [`app.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/app.js) | Moteur voyageur, synchronisation Stale-While-Revalidate, coffre-fort documents et souvenirs illimités sur IndexedDB, pastilles d'étapes sans faux horaires, filtrage strict des coups de cœur, bon d'échange/QR code contextualisé par visite dans le programme (suppression du cartouche générique haut). |
-| [`gemini_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/gemini_service.js) | Assistant IA pour temps libres (Gemini 3.5 Flash-Lite), découverte dynamique des modèles autorisés et chaîne de repli. |
+| [`storage_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/storage_service.js) | Moteur universel `IndexedDB` haute capacité, gestion des gros fichiers (PDF, scans, photos) et auto-migration. |
+| [`admin.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.html) | Interface d'administration, sélecteur de profil à l'import PDF, encart *Structuration IA (Skill Import)*, modale Gemini, publication directe GitHub ; *Personnalisation & onglet Voyageurs & Accès sur la branche dédiée*. |
+| [`admin.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/admin.js) | Convertisseur PDF multi-pages, garantie de la totalité absolue des jours du voyage, encart de présentation pour les hôtels de séjour, extraction infos pratiques / franchise bagages, formalités complètes, intégration de la skill `import-carnet-voyage`, connecteur GitHub SHA 4 paliers. |
+| [`app.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/app.js) | Moteur voyageur, synchronisation Stale-While-Revalidate, coffre-fort documents et souvenirs sur IndexedDB, épuration carte `NEXT` (`#next-sub` masqué) et rechargement `controllerchange` ; *connexion multi-voyages, marque blanche et fiche nominative sur la branche dédiée*. |
+| [`gemini_service.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/gemini_service.js) | Assistant IA temps libres & restructuration de programme (Gemini 3.5 Flash-Lite), incorporation de la skill `import-carnet-voyage`, bascule automatique sur modèles de secours en cas de saturation. |
+| [`.agents/skills/import-carnet-voyage/SKILL.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/.agents/skills/import-carnet-voyage/SKILL.md) | Compétence standardisée d'extraction PDF : repas systématiques (*Déjeuner*, *Dîner logement*) et fidélité textuelle stricte. |
 | [`cruise_fleet.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/cruise_fleet.js) | Flottes de navires de croisière, plans interactifs des ponts, décodeur de cabine et boussole marine. |
-| [`conducteur.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/conducteur.html) / [`.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/conducteur.js) | Espace autocariste : schéma du car, passagers, rooming list, plans PDF grand format. |
-| [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js) | Service Worker PWA (`carnet-girardot-v22`) avec bypass GitHub API et mise en cache offline stricte des réponses HTTP 200. |
-| [`voyages/index_voyages.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/voyages/index_voyages.js) | Catalogue des voyages enregistrés avec résolutions d'alias (`cocktail-mexicain`, `san-francisco-perso`, `afrique-du-sud-2026`, etc.). |
+| [`conducteur.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/conducteur.html) / [`.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/conducteur.js) | Espace autocariste : schéma du car, passagers, rooming list, plans PDF grand format ; *portail conducteur multi-départs sur la branche dédiée*. |
+| [`sw.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/sw.js) | Service Worker PWA (`carnet-girardot-v27` Network-First sur `main` ; `carnet-girardot-v30` sur `feature/personnalisation-et-acces-auth`) avec bypass GitHub API. |
+| [`voyages/index_voyages.js`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/voyages/index_voyages.js) | Catalogue des voyages enregistrés (*Inde du nord*, *Canada États-Unis*, *Chicago*, *Cocktail Mexicain*, *Afrique du Sud*, *Italie*, croisières, etc.). |
+| `auth_service.js`, `admin_access.js`, `voyages/access_registry.json`, `Documentation/exemple_import_voyageurs_logito.csv` | *(Branche `feature/personnalisation-et-acces-auth`)* Authentification SHA-256 multi-voyages, cloisonnement `userId + tripId`, gestion des accès/options/documents et passerelle CSV LogiTO. |
+| [`Presentation_Technique_Application.md`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Presentation_Technique_Application.md) / [`.pdf`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Presentation_Technique_Application.pdf) & [`Diaporama_Formation_Utilisation.html`](file:///c:/Users/lbidet/Documents/Projet%20AI/Carnet%20de%20Voyages%20Electronique%20Interactif/Documentation/Diaporama_Formation_Utilisation.html) | Documentation technique complète (incluant setup nouveau poste Gemini/GitHub) et diaporama interactif de formation. |
 
 ---
 
-## 🎯 7. État de Déploiement & Prochaines Évolutions
+## 🎯 8. État de Déploiement & Prochaines Évolutions
 
-* **Statut Technique** : L'écosystème est stable, autonome, testé sur mobile et desktop, et entièrement synchronisé sur la branche principale GitHub (`main`).
-* **Expérience Voyageur** : Temps de chargement nul, réactivité complète hors-ligne, coffre-fort de documents sans limitation de volume et mise à jour automatique des carnets.
-* **Axes d'extension possibles** :
-  1. Continuer l'intégration de nouveaux circuits (Europe, Asie, Amériques) et croisières fluviales/maritimes.
-  2. Enrichir le module conducteur avec la signature numérique des feuilles de route.
-  3. Proposer le téléchargement groupé d'un carnet sous forme d'archive imprimable en cas de secours.
+* **Branche `main` (Production — commit `4479720`)** : Écosystème stable en **PWA `v27` Network-First**, enrichi des derniers carnets (*Chicago*, *Canada États-Unis*, *Inde du nord*) et de la skill `import-carnet-voyage`.
+* **Branche `feature/personnalisation-et-acces-auth` (Chantier Auth & Personnalisation — commit `650dd60`)** : Lots 1 à 3 implémentés, testés sous Node et poussés sur GitHub, prêts pour recette métier et tests d'import réels depuis LogiTO.
+* **Prochaines étapes possibles** :
+  1. Adapter `admin_access.js` (sur la branche dédiée) à partir d'un export brut réel de LogiTO (et fusion multi-fichiers Inscrits + Ramassage / Rooming si nécessaire).
+  2. Recetter la branche `feature/personnalisation-et-acces-auth` puis la fusionner vers `main` via Pull Request GitHub le moment venu.
+  3. Préparer la migration du backend d'authentification (`auth_service.js`) lors de l'hébergement final sur le serveur Voyages Girardot.
+  4. Enrichir le module conducteur avec la signature numérique des feuilles de route et proposer un export imprimable groupé de secours.
