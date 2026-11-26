@@ -149,17 +149,36 @@
 
       <!-- 4. VUE "MES SOUVENIRS / TEMPS LIBRE" (Capture de photos et carnet) -->
       <section id="tab-souvenirs" class="tab-page-view" style="padding: 16px 20px;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; gap:8px; flex-wrap:wrap;">
           <h2 style="font-size:1.3rem; font-weight:800; color:var(--primary-dark);">
             <i class="fa-solid fa-images" style="color:var(--accent-gold); margin-right:6px;"></i> Mes Souvenirs
           </h2>
-          <button id="add-souvenir-btn" class="btn-entry-gps" style="background:var(--primary-color); color:white; padding:6px 14px;">
-            <i class="fa-solid fa-camera"></i> Ajouter une photo
-          </button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="add-souvenir-note-btn" class="btn-entry-gps" onclick="toggleSouvenirNoteComposer()" style="background:#eef7f2; color:var(--primary-color); border:1px solid #cfe2d8; padding:6px 12px; cursor:pointer;">
+              <i class="fa-solid fa-pen-to-square"></i> Note
+            </button>
+            <button type="button" id="add-souvenir-btn" class="btn-entry-gps" style="background:var(--primary-color); color:white; padding:6px 14px; border:none; cursor:pointer;">
+              <i class="fa-solid fa-camera"></i> Ajouter une photo
+            </button>
+          </div>
         </div>
         <p style="font-size:0.82rem; color:var(--text-muted); margin-bottom:16px;">
-          Vos clichés et anecdotes capturés pendant votre périple (conservés sur votre smartphone).
+          Vos clichés et anecdotes capturés pendant votre périple.
         </p>
+
+        <div id="souvenir-note-composer" class="souvenir-note-composer" style="display:none;">
+          <div style="font-size:0.86rem; font-weight:800; color:var(--primary-dark); margin-bottom:8px;">
+            <i class="fa-solid fa-feather-pointed" style="color:var(--accent-gold); margin-right:6px;"></i> Ajouter une anecdote ou note souvenir
+          </div>
+          <input type="text" id="souvenir-note-title" class="form-control" placeholder="Titre (ex: Dîner sur le port)" style="margin-bottom:8px;">
+          <textarea id="souvenir-note-text" class="form-control" rows="3" placeholder="Écrivez votre souvenir ou anecdote du voyage..." style="margin-bottom:10px; resize:vertical;"></textarea>
+          <div style="display:flex; justify-content:flex-end; gap:8px;">
+            <button type="button" onclick="toggleSouvenirNoteComposer(false)" class="btn-entry-gps" style="background:#f1f5f9; color:#475569; border:none; cursor:pointer;">Annuler</button>
+            <button type="button" onclick="saveSouvenirNoteFromComposer()" class="btn-entry-gps" style="background:var(--primary-color); color:white; border:none; cursor:pointer;">
+              <i class="fa-solid fa-check"></i> Enregistrer la note
+            </button>
+          </div>
+        </div>
 
         <!-- Zone de saisie d'un nouveau souvenir -->
         <input type="file" id="camera-file-input" accept="image/*" style="display:none;">

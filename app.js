@@ -1,5 +1,9 @@
+function isStandaloneArchiveMode() {
+  return Boolean(typeof window !== 'undefined' && window.__GIRARDOT_STANDALONE_SNAPSHOT__);
+}
+
 // Service Worker Registration for Offline Mode
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && !isStandaloneArchiveMode()) {
   const hadController = !!navigator.serviceWorker.controller;
   let swRefreshing = false;
   navigator.serviceWorker.addEventListener('controllerchange', () => {
@@ -656,7 +660,8 @@ function determineInitialDayIndex() {
   if (!currentTrip || !currentTrip.itinerary || !currentTrip.itinerary.length) return 0;
   
   // If the user previously selected a day in this session, keep it
-  const savedDay = sessionStorage.getItem('girardot_selected_day');
+  let savedDay = null;
+  try { savedDay = sessionStorage.getItem('girardot_selected_day'); } catch (_) {}
   if (savedDay !== null) {
     const idx = parseInt(savedDay);
     if (idx >= 0 && idx < currentTrip.itinerary.length) return idx;
@@ -789,10 +794,134 @@ function openClientAuthPortal(options = {}) {
   });
 }
 
+function getDayCheckedItems(dayNum) {
+  if (!currentTrip) return [];
+  if (isStandaloneArchiveMode()) {
+    const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__;
+    const map = (snap && snap.timelineChecked && typeof snap.timelineChecked === 'object') ? snap.timelineChecked : {};
+    const list = map[`j${dayNum}`];
+    return Array.isArray(list) ? list.slice() : [];
+  }
+  const checkedKey = `${getClientScopedKey('timeline_checked', currentTrip.id)}_j${dayNum}`;
+  try {
+    return JSON.parse(localStorage.getItem(checkedKey) || '[]');
+  } catch (_) {
+    return [];
+  }
+}
+
+function setDayCheckedItems(dayNum, items) {
+  if (!currentTrip) return;
+  if (isStandaloneArchiveMode()) {
+    const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__;
+    if (!snap.timelineChecked || typeof snap.timelineChecked !== 'object') {
+      snap.timelineChecked = {};
+    }
+    snap.timelineChecked[`j${dayNum}`] = Array.isArray(items) ? items.slice() : [];
+    markStandaloneArchiveDirty();
+    return;
+  }
+  const checkedKey = `${getClientScopedKey('timeline_checked', currentTrip.id)}_j${dayNum}`;
+  try {
+    localStorage.setItem(checkedKey, JSON.stringify(items));
+  } catch (_) {}
+}
+
+function mountStandaloneArchiveBar() {
+  if (!isStandaloneArchiveMode()) return;
+  const header = document.querySelector('header.editorial-topbar');
+  if (!header || document.getElementById('standalone-archive-bar')) return;
+
+  const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__ || {};
+  const souvCount = Array.isArray(snap.souvenirs) ? snap.souvenirs.length : 0;
+  const bar = document.createElement('div');
+  bar.id = 'standalone-archive-bar';
+  bar.className = 'standalone-archive-bar';
+  bar.innerHTML = `
+    <div class="standalone-archive-status">
+      <i class="fa-solid fa-box-archive" style="color:var(--primary-color);"></i>
+      <span id="standalone-archive-label">Carnet numérique hors-ligne${snap.exportedAt ? ` • ${escapeClientHtml(snap.exportedAt)}` : ''}</span>
+    </div>
+    <div class="standalone-archive-actions">
+      <button type="button" class="standalone-bar-btn" onclick="switchMainTab('tab-souvenirs')">
+        <i class="fa-solid fa-images"></i> Souvenirs (<span id="standalone-souvenirs-count">${souvCount}</span>)
+      </button>
+      <button type="button" id="standalone-save-copy-btn" class="standalone-bar-btn standalone-bar-save" onclick="downloadClientCarnet()">
+        <i class="fa-solid fa-floppy-disk"></i> Enregistrer la copie
+      </button>
+    </div>
+  `;
+  header.insertAdjacentElement('afterend', bar);
+}
+
+function updateStandaloneArchiveCounter() {
+  const countEl = document.getElementById('standalone-souvenirs-count');
+  if (countEl && isStandaloneArchiveMode()) {
+    const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__ || {};
+    const list = Array.isArray(snap.souvenirs) ? snap.souvenirs : getSouvenirsList();
+    countEl.textContent = String(list.length);
+  }
+}
+
+function markStandaloneArchiveDirty() {
+  if (!isStandaloneArchiveMode()) return;
+  const bar = document.getElementById('standalone-archive-bar');
+  const label = document.getElementById('standalone-archive-label');
+  if (bar) bar.classList.add('is-dirty');
+  if (label) label.textContent = 'Modifications non enregistrées — cliquez sur Enregistrer la copie';
+}
+
+function clearStandaloneArchiveDirty() {
+  if (!isStandaloneArchiveMode()) return;
+  const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__ || {};
+  const bar = document.getElementById('standalone-archive-bar');
+  const label = document.getElementById('standalone-archive-label');
+  if (bar) bar.classList.remove('is-dirty');
+  if (label) label.textContent = `Copie mise à jour${snap.exportedAt ? ` • ${snap.exportedAt}` : ''}`;
+}
+
+function installStandaloneAuthShim(snap) {
+  const sess = (snap && snap.session) ? snap.session : null;
+  const pers = (snap && snap.personalization) ? snap.personalization : null;
+  const tripId = (snap && snap.trip && snap.trip.id) ? snap.trip.id : 'archive';
+  window.GirardotAuth = {
+    loadRegistry: async () => null,
+    getSession: () => sess,
+    getSessionTripPersonalization: (id) => (pers && (!id || id === tripId) ? pers : null),
+    isTripProtected: async () => false,
+    canSessionAccessTrip: () => true,
+    getScopedStorageKey: (base, id) => `girardot_${base}_${id || tripId}`,
+    closeAuthOverlay: () => {}
+  };
+}
+
 // Initialize Application
 document.addEventListener('DOMContentLoaded', async () => {
   // 1. Initialiser la navigation par onglets EN PREMIER pour garantir l'interactivité quoi qu'il arrive
   initNavigation();
+
+  // 1bis. Mode Carnet Numérique Autonome (fichier HTML téléchargé hors-cache)
+  if (isStandaloneArchiveMode()) {
+    const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__ || {};
+    currentTrip = snap.trip || null;
+    inMemorySouvenirs = Array.isArray(snap.souvenirs) ? snap.souvenirs.slice() : [];
+    inMemoryPersonalDocs = [];
+    installStandaloneAuthShim(snap);
+
+    const authBtn = document.getElementById('client-auth-btn');
+    if (authBtn) authBtn.style.display = 'none';
+    const docAddBtn = document.querySelector('#tab-documents button[onclick*="triggerClientDocScanner"]');
+    if (docAddBtn) docAddBtn.style.display = 'none';
+    const dlBtn = document.getElementById('btn-download-carnet');
+    if (dlBtn) {
+      dlBtn.title = 'Enregistrer une nouvelle copie mise à jour (.html)';
+      dlBtn.setAttribute('aria-label', 'Enregistrer une nouvelle copie mise à jour');
+    }
+
+    mountStandaloneArchiveBar();
+    renderAllClientComponents();
+    return;
+  }
 
   // 2. Charger le registre d'accès et détecter le mode portail / session
   if (window.GirardotAuth) {
@@ -1049,8 +1178,7 @@ function renderTodayFocus() {
   ];
 
   // Retrieve user checked timeline entries from storage
-  const checkedKey = `${getClientScopedKey('timeline_checked', currentTrip.id)}_j${currentDay.day}`;
-  let checkedItems = JSON.parse(localStorage.getItem(checkedKey) || '[]');
+  const checkedItems = getDayCheckedItems(currentDay.day);
 
   timelineItems.forEach((entry, idx) => {
     const isChecked = checkedItems.includes(idx);
@@ -1157,15 +1285,14 @@ function renderTodayFocus() {
 
 function toggleTimelineCheck(dayIdx, entryIdx) {
   const currentDay = currentTrip.itinerary[dayIdx];
-  const checkedKey = `${getClientScopedKey('timeline_checked', currentTrip.id)}_j${currentDay.day}`;
-  let checkedItems = JSON.parse(localStorage.getItem(checkedKey) || '[]');
-  
+  let checkedItems = getDayCheckedItems(currentDay.day);
+
   if (checkedItems.includes(entryIdx)) {
     checkedItems = checkedItems.filter(i => i !== entryIdx);
   } else {
     checkedItems.push(entryIdx);
   }
-  localStorage.setItem(checkedKey, JSON.stringify(checkedItems));
+  setDayCheckedItems(currentDay.day, checkedItems);
   renderTodayFocus();
 }
 
@@ -1401,8 +1528,8 @@ function initCaptureFeature() {
     fileInput.click();
   };
 
-  quickCaptureBtn.addEventListener('click', triggerCamera);
-  addSouvenirBtn.addEventListener('click', triggerCamera);
+  if (quickCaptureBtn) quickCaptureBtn.addEventListener('click', triggerCamera);
+  if (addSouvenirBtn) addSouvenirBtn.addEventListener('click', triggerCamera);
 }
 
 function quickAddPhotoForEntry(entryTitle) {
@@ -1437,6 +1564,11 @@ function getSouvenirsKey() {
 
 function getSouvenirsList() {
   if (inMemorySouvenirs !== null) return inMemorySouvenirs;
+  if (isStandaloneArchiveMode()) {
+    const snap = window.__GIRARDOT_STANDALONE_SNAPSHOT__ || {};
+    inMemorySouvenirs = Array.isArray(snap.souvenirs) ? snap.souvenirs.slice() : [];
+    return inMemorySouvenirs;
+  }
   const key = getSouvenirsKey();
   try {
     const raw = localStorage.getItem(key);
@@ -1461,11 +1593,18 @@ function getSouvenirsList() {
 }
 
 function saveSouvenir(item) {
-  const key = getSouvenirsKey();
   const list = getSouvenirsList();
   list.unshift(item);
   inMemorySouvenirs = list;
 
+  if (isStandaloneArchiveMode()) {
+    window.__GIRARDOT_STANDALONE_SNAPSHOT__.souvenirs = list.slice();
+    markStandaloneArchiveDirty();
+    renderSouvenirs();
+    return;
+  }
+
+  const key = getSouvenirsKey();
   // 1. Sauvegarde IndexedDB sans limitation de taille de photos
   if (window.GirardotStorage) {
     window.GirardotStorage.set(key, list).catch(err => console.warn('Erreur sauvegarde IndexedDB souvenir:', err));
@@ -1485,10 +1624,17 @@ function saveSouvenir(item) {
 }
 
 function deleteSouvenir(souvId) {
-  const key = getSouvenirsKey();
   let list = getSouvenirsList().filter(s => s.id !== souvId);
   inMemorySouvenirs = list;
 
+  if (isStandaloneArchiveMode()) {
+    window.__GIRARDOT_STANDALONE_SNAPSHOT__.souvenirs = list.slice();
+    markStandaloneArchiveDirty();
+    renderSouvenirs();
+    return;
+  }
+
+  const key = getSouvenirsKey();
   if (window.GirardotStorage) {
     window.GirardotStorage.set(key, list);
   }
@@ -1499,13 +1645,45 @@ function deleteSouvenir(souvId) {
   renderSouvenirs();
 }
 
+function toggleSouvenirNoteComposer(forceOpen) {
+  const box = document.getElementById('souvenir-note-composer');
+  if (!box) return;
+  const shouldOpen = typeof forceOpen === 'boolean' ? forceOpen : (box.style.display === 'none' || !box.style.display);
+  box.style.display = shouldOpen ? 'block' : 'none';
+  if (shouldOpen) {
+    const titleEl = document.getElementById('souvenir-note-title');
+    if (titleEl) titleEl.focus();
+  }
+}
+
+function saveSouvenirNoteFromComposer() {
+  const titleEl = document.getElementById('souvenir-note-title');
+  const textEl = document.getElementById('souvenir-note-text');
+  const titleVal = titleEl ? titleEl.value.trim() : '';
+  const noteVal = textEl ? textEl.value.trim() : '';
+  if (!titleVal && !noteVal) {
+    showDiscreetSyncToast('Saisissez un titre ou une note souvenir.');
+    return;
+  }
+  saveSouvenir({
+    id: 'note_' + Date.now(),
+    title: titleVal || `Note Jour ${activeDayIndex + 1}`,
+    note: noteVal,
+    date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+  });
+  if (titleEl) titleEl.value = '';
+  if (textEl) textEl.value = '';
+  toggleSouvenirNoteComposer(false);
+}
+
 function renderSouvenirs() {
   const grid = document.getElementById('souvenirs-list');
   if (!grid) return;
+  updateStandaloneArchiveCounter();
   let list = getSouvenirsList();
 
   // Uniquement pour l'Afrique du Sud si aucun souvenir n'a été pris
-  if (list.length === 0 && currentTrip.id === 'afrique-du-sud-2026') {
+  if (list.length === 0 && currentTrip.id === 'afrique-du-sud-2026' && !isStandaloneArchiveMode()) {
     list = [
       { id: 'def1', title: 'Safari Big Five • Kruger', date: 'Jour 5', image: 'Business Profile Girardot/resource_atKV0GRzzlHfARUCYbAOW1.png', isDemo: true },
       { id: 'def2', title: 'Colonie des manchots', date: 'Jour 10', image: 'Business Profile Girardot/resource_81SHDV3ufg44rvmTPYt_h0.png', isDemo: true }
@@ -1517,24 +1695,25 @@ function renderSouvenirs() {
     grid.innerHTML = `
       <div style="grid-column: 1 / -1; background:white; border:1px dashed #cbd5e1; border-radius:16px; padding:24px; text-align:center; color:#64748b; font-size:0.85rem;">
         <i class="fa-solid fa-camera-retro" style="font-size:1.6rem; color:var(--accent-gold); margin-bottom:8px; display:block;"></i>
-        Aucun souvenir enregistré pour le moment.<br>Appuyez sur <strong>« Ajouter une photo »</strong> ou sur le bouton <strong>CAPTURE</strong> pour immortaliser votre voyage !
+        Aucun souvenir enregistré pour le moment.<br>Ajoutez une <strong>photo</strong> ou une <strong>note</strong> pour immortaliser votre voyage !
       </div>
     `;
   } else {
     list.forEach(s => {
       const card = document.createElement('div');
-      card.className = 'souvenir-card';
+      card.className = s.image ? 'souvenir-card' : 'souvenir-card souvenir-note-card';
       card.style.position = 'relative';
       card.innerHTML = `
-        <img src="${s.image}" alt="${s.title}">
+        ${s.image ? `<img src="${s.image}" alt="${escapeClientHtml(s.title)}">` : ''}
         ${!s.isDemo ? `
-          <button onclick="deleteSouvenir('${s.id}')" title="Supprimer cette photo" style="position:absolute; top:8px; right:8px; background:rgba(15,23,42,0.65); color:white; border:none; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.75rem;">
+          <button type="button" onclick="deleteSouvenir('${escapeClientHtml(s.id)}')" title="Supprimer ce souvenir" style="position:absolute; top:8px; right:8px; background:rgba(15,23,42,0.65); color:white; border:none; width:26px; height:26px; border-radius:50%; cursor:pointer; font-size:0.75rem;">
             <i class="fa-solid fa-trash"></i>
           </button>
         ` : ''}
         <div class="souvenir-body">
-          <div class="souvenir-title">${s.title}</div>
-          <div class="souvenir-date">${s.date}</div>
+          <div class="souvenir-title">${escapeClientHtml(s.title)}</div>
+          ${s.note ? `<div class="souvenir-note-text">${escapeClientHtml(s.note)}</div>` : ''}
+          <div class="souvenir-date">${escapeClientHtml(s.date)}</div>
         </div>
       `;
       grid.appendChild(card);
@@ -4130,7 +4309,34 @@ function renderContactsAndAlert() {
 // 6. LEAFLET MAP LOGIC
 function initMap() {
   const mapElement = document.getElementById('travel-map');
-  if (!mapElement || typeof L === 'undefined') return;
+  if (!mapElement) return;
+  if (typeof L === 'undefined' || (isStandaloneArchiveMode() && navigator.onLine === false)) {
+    mapElement.classList.add('map-offline-fallback');
+    const days = (currentTrip && Array.isArray(currentTrip.itinerary)) ? currentTrip.itinerary : [];
+    const itemsHtml = days.map(d => {
+      const hasGps = d.lat && d.lng;
+      const gpsHref = hasGps ? getGpsUrl(d.lat, d.lng, d.title || d.city) : '';
+      return `
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #eef2ef;">
+          <div>
+            <div style="font-size:0.8rem; font-weight:800; color:var(--primary-dark);">Jour ${escapeClientHtml(d.day)}${d.city ? ` • ${escapeClientHtml(d.city)}` : ''}</div>
+            <div style="font-size:0.76rem; color:#475569;">${escapeClientHtml(d.title || '')}</div>
+          </div>
+          ${gpsHref ? `<a href="${gpsHref}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="flex-shrink:0;"><i class="fa-solid fa-location-arrow"></i> GPS</a>` : ''}
+        </div>
+      `;
+    }).join('');
+    mapElement.innerHTML = `
+      <div style="font-size:0.84rem; font-weight:800; color:var(--primary-dark); margin-bottom:6px;">
+        <i class="fa-solid fa-wifi" style="color:var(--accent-gold); margin-right:6px;"></i>
+        Carte interactive disponible dès qu'une connexion Internet est active
+      </div>
+      <p style="font-size:0.76rem; color:#64748b; margin-bottom:10px;">Liste des étapes et points GPS du voyage :</p>
+      ${itemsHtml || '<p style="font-size:0.78rem; color:#64748b;">Aucune étape géolocalisée.</p>'}
+    `;
+    return;
+  }
+  mapElement.classList.remove('map-offline-fallback');
 
   if (leafletMap) {
     updateMapFilterButtonsVisibility();
@@ -4561,6 +4767,9 @@ function getClientPersonalDocsKey() {
 }
 
 function getClientPersonalDocs() {
+  if (isStandaloneArchiveMode()) {
+    return [];
+  }
   if (inMemoryPersonalDocs !== null) {
     return inMemoryPersonalDocs;
   }

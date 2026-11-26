@@ -6,7 +6,18 @@
     <path d="M0 15.48C0 9.6 4.42 5.1 10.39 4.86V9.81C7.43 10.07 5.25 12.41 5.25 15.48C5.25 18.74 7.7 21.19 10.93 21.19C12.78 21.19 14.31 20.41 15.22 19.17C15.42 18.93 15.57 18.68 15.7 18.41H11.52V13.75H21.4V13.77C21.4 13.77 22.82 25.63 11.65 26.12C11.42 26.13 11.18 26.14 10.93 26.14C4.69 26.14 0 21.54 0 15.48Z" fill="#1F3428"/>
   </svg>`;
 
+  const GIRARDOT_LOGO_DATA_URI = 'data:image/svg+xml;utf8,' + encodeURIComponent(
+    '<svg width="33" height="27" viewBox="0 0 33 27" fill="none" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M32.9496 10.66C32.9496 16.54 28.5296 21.04 22.5596 21.28V16.33C25.5196 16.07 27.6996 13.73 27.6996 10.66C27.6996 7.4 25.2496 4.95 22.0196 4.95C20.1696 4.95 18.6396 5.73 17.7296 6.97C17.5296 7.21 17.3796 7.46 17.2496 7.73H21.4296V12.39H11.5496V12.37C11.5496 12.37 10.1296 0.51 21.2996 0.02C21.5296 0.01 21.7696 0 22.0196 0C28.2596 0 32.9496 4.6 32.9496 10.66Z" fill="#29513B"/>' +
+      '<path d="M0 15.48C0 9.6 4.42 5.1 10.39 4.86V9.81C7.43 10.07 5.25 12.41 5.25 15.48C5.25 18.74 7.7 21.19 10.93 21.19C12.78 21.19 14.31 20.41 15.22 19.17C15.42 18.93 15.57 18.68 15.7 18.41H11.52V13.75H21.4V13.77C21.4 13.77 22.82 25.63 11.65 26.12C11.42 26.13 11.18 26.14 10.93 26.14C4.69 26.14 0 21.54 0 15.48Z" fill="#1F3428"/>' +
+    '</svg>'
+  );
+
   const PRINT_ICON_SVG = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>`;
+
+  const CLOSE_SCRIPT_RE = new RegExp('<' + '/script', 'gi');
+  const CLOSE_STYLE_RE = new RegExp('<' + '/style', 'gi');
+  const OPEN_COMMENT_RE = new RegExp('<' + '!--', 'g');
 
   function escapeExportHtml(str) {
     return String(str == null ? '' : str)
@@ -17,10 +28,20 @@
       .replace(/'/g, '&#39;');
   }
 
+  function escapeInlineScript(str) {
+    return String(str == null ? '' : str)
+      .replace(CLOSE_SCRIPT_RE, '<' + '\\/script')
+      .replace(OPEN_COMMENT_RE, '<' + '\\!--');
+  }
+
+  function escapeInlineStyle(str) {
+    return String(str == null ? '' : str).replace(CLOSE_STYLE_RE, '<' + '\\/style');
+  }
+
   function safeExportUrl(url) {
     const raw = String(url || '').trim();
     if (!raw) return '';
-    if (/^data:image\/(?:png|jpeg|jpg|gif|webp|svg\+xml);base64,[a-z0-9+/=]+$/i.test(raw)) {
+    if (/^data:image\/(?:png|jpeg|jpg|gif|webp|svg\+xml);(?:base64|utf8|charset=utf-8),.+$/i.test(raw)) {
       return raw;
     }
     if (/^https?:\/\//i.test(raw)) {
@@ -58,10 +79,8 @@
     return true;
   }
 
-  async function inlineLocalImageAsDataUri(url) {
-    if (!isRelativeLocalImage(url) || typeof fetch !== 'function' || typeof FileReader === 'undefined') {
-      return '';
-    }
+  async function fetchLocalFileAsDataUri(url) {
+    if (typeof fetch !== 'function' || typeof FileReader === 'undefined') return '';
     try {
       const controller = typeof AbortController !== 'undefined' ? new AbortController() : null;
       const timer = controller ? setTimeout(() => controller.abort(), 2500) : null;
@@ -80,28 +99,270 @@
     }
   }
 
-  async function collectInlinedImages(ctx) {
-    const map = {};
-    const trip = (ctx && ctx.trip) || {};
-    const candidates = new Set();
-    if (trip.coverImage) candidates.add(trip.coverImage);
-    if (trip.branding && trip.branding.partnerLogoUrl) candidates.add(trip.branding.partnerLogoUrl);
-    if (Array.isArray(trip.itinerary)) {
-      trip.itinerary.forEach((day) => {
-        if (day && day.image) candidates.add(day.image);
-      });
+  function convertImageViaCanvas(url, maxWidth = 1000, quality = 0.75) {
+    if (typeof Image === 'undefined' || typeof document === 'undefined') {
+      return Promise.resolve('');
     }
-    const tasks = Array.from(candidates)
-      .filter((u) => isRelativeLocalImage(u))
-      .map(async (u) => {
-        const dataUri = await inlineLocalImageAsDataUri(u);
-        if (dataUri) map[safeExportUrl(u)] = dataUri;
-      });
-    await Promise.all(tasks);
-    return map;
+    return new Promise((resolve) => {
+      let settled = false;
+      const done = (val) => {
+        if (!settled) {
+          settled = true;
+          clearTimeout(timer);
+          resolve(val);
+        }
+      };
+      const timer = setTimeout(() => done(''), 3500);
+      const img = new Image();
+      if (/^https?:\/\//i.test(url)) {
+        img.crossOrigin = 'anonymous';
+      }
+      img.onload = () => {
+        try {
+          let w = img.naturalWidth || img.width;
+          let h = img.naturalHeight || img.height;
+          if (!w || !h) return done('');
+          if (w > maxWidth) {
+            h = Math.round((h * maxWidth) / w);
+            w = maxWidth;
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = w;
+          canvas.height = h;
+          const ctx = canvas.getContext('2d');
+          ctx.drawImage(img, 0, 0, w, h);
+          done(canvas.toDataURL('image/jpeg', quality));
+        } catch (_) {
+          done('');
+        }
+      };
+      img.onerror = () => done('');
+      img.src = url;
+    });
   }
 
-  function collectClientCarnetContext() {
+  async function convertImageUrlToDataUri(url, isLogo = false) {
+    const clean = safeExportUrl(url);
+    if (!clean) return '';
+    if (clean.startsWith('data:')) return clean;
+
+    if (isLogo || (/\.svg(?:$|\?)/i.test(clean) && isRelativeLocalImage(clean))) {
+      const svgUri = isRelativeLocalImage(clean) ? await fetchLocalFileAsDataUri(clean) : '';
+      if (svgUri) return svgUri;
+    }
+
+    const canvasUri = await convertImageViaCanvas(clean, isLogo ? 400 : 1000, 0.75);
+    if (canvasUri) return canvasUri;
+
+    if (isRelativeLocalImage(clean)) {
+      const localUri = await fetchLocalFileAsDataUri(clean);
+      if (localUri) return localUri;
+    }
+    return '';
+  }
+
+  async function embedTripImagesForDigitalCarnet(trip) {
+    const cloned = trip ? JSON.parse(JSON.stringify(trip)) : {};
+    if (typeof window !== 'undefined' && window.__GIRARDOT_STANDALONE_SNAPSHOT__) {
+      return cloned;
+    }
+    const urlMap = {};
+    const urlsToConvert = [];
+    const register = (u, isLogo) => {
+      const clean = safeExportUrl(u);
+      if (!clean || clean.startsWith('data:') || urlMap[clean] !== undefined) return;
+      urlMap[clean] = null;
+      urlsToConvert.push({ url: clean, isLogo: Boolean(isLogo) });
+    };
+
+    register(cloned.coverImage, false);
+    if (cloned.branding && cloned.branding.partnerLogoUrl) {
+      register(cloned.branding.partnerLogoUrl, true);
+    }
+    if (Array.isArray(cloned.itinerary)) {
+      cloned.itinerary.forEach((day) => {
+        if (!day) return;
+        register(day.image, false);
+        if (Array.isArray(day.timeline)) {
+          day.timeline.forEach((step) => {
+            if (step && step.image) register(step.image, false);
+          });
+        }
+      });
+    }
+
+    const concurrency = 4;
+    let idx = 0;
+    const worker = async () => {
+      while (idx < urlsToConvert.length) {
+        const item = urlsToConvert[idx++];
+        const dataUri = await convertImageUrlToDataUri(item.url, item.isLogo);
+        urlMap[item.url] = dataUri || item.url;
+      }
+    };
+    const workers = [];
+    for (let i = 0; i < Math.min(concurrency, urlsToConvert.length); i++) {
+      workers.push(worker());
+    }
+    await Promise.all(workers);
+
+    const applyUrl = (u) => {
+      const clean = safeExportUrl(u);
+      return (clean && urlMap[clean]) ? urlMap[clean] : u;
+    };
+    if (cloned.coverImage) cloned.coverImage = applyUrl(cloned.coverImage);
+    if (cloned.branding && cloned.branding.partnerLogoUrl) {
+      cloned.branding.partnerLogoUrl = applyUrl(cloned.branding.partnerLogoUrl);
+    }
+    if (Array.isArray(cloned.itinerary)) {
+      cloned.itinerary.forEach((day) => {
+        if (!day) return;
+        if (day.image) day.image = applyUrl(day.image);
+        if (Array.isArray(day.timeline)) {
+          day.timeline.forEach((step) => {
+            if (step && step.image) step.image = applyUrl(step.image);
+          });
+        }
+      });
+    }
+
+    return cloned;
+  }
+
+  function collectTimelineCheckedMap(trip) {
+    if (typeof window !== 'undefined' && window.__GIRARDOT_STANDALONE_SNAPSHOT__) {
+      const snapMap = window.__GIRARDOT_STANDALONE_SNAPSHOT__.timelineChecked;
+      return (snapMap && typeof snapMap === 'object') ? JSON.parse(JSON.stringify(snapMap)) : {};
+    }
+    const result = {};
+    if (!trip || !Array.isArray(trip.itinerary) || typeof localStorage === 'undefined') return result;
+    const scopeFn = (typeof getClientScopedKey === 'function')
+      ? getClientScopedKey
+      : ((base, id) => `girardot_${base}_${id || 'default'}`);
+    trip.itinerary.forEach((day) => {
+      if (!day || day.day == null) return;
+      const key = `${scopeFn('timeline_checked', trip.id)}_j${day.day}`;
+      try {
+        const raw = localStorage.getItem(key);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            result[`j${day.day}`] = parsed;
+          }
+        }
+      } catch (_) {}
+    });
+    return result;
+  }
+
+  function collectDigitalArchiveSnapshot(clonedTrip, ctxOverride) {
+    const ctx = ctxOverride || collectClientCarnetContext({ excludePersonalDocs: true });
+    const trip = clonedTrip || (ctx.trip ? JSON.parse(JSON.stringify(ctx.trip)) : {});
+    const sess = ctx.session ? {
+      role: ctx.session.role || 'traveler',
+      displayName: ctx.session.displayName || '',
+      firstName: ctx.session.firstName || '',
+      dossierRef: ctx.session.dossierRef || '',
+      assignedTripIds: trip.id ? [trip.id] : []
+    } : null;
+    const pers = ctx.personalization ? JSON.parse(JSON.stringify(ctx.personalization)) : null;
+    const souvenirs = Array.isArray(ctx.souvenirs) ? JSON.parse(JSON.stringify(ctx.souvenirs)) : [];
+    const timelineChecked = collectTimelineCheckedMap(trip);
+
+    return {
+      version: 1,
+      exportedAt: new Date().toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' }),
+      trip,
+      session: sess,
+      personalization: pers,
+      souvenirs,
+      timelineChecked
+    };
+  }
+
+  async function collectBundleSources() {
+    if (typeof window !== 'undefined' && window.__GIRARDOT_STANDALONE_SNAPSHOT__) {
+      const tplEl = document.getElementById('girardot-shell-template');
+      const styleEl = document.getElementById('girardot-inline-style');
+      const cruiseEl = document.getElementById('girardot-inline-cruise');
+      const appEl = document.getElementById('girardot-inline-app');
+      const exportEl = document.getElementById('girardot-inline-export');
+      if (tplEl && styleEl && cruiseEl && appEl && exportEl) {
+        return {
+          htmlShell: decodeURIComponent(tplEl.textContent.trim()),
+          cssText: styleEl.textContent,
+          cruiseFleetJs: cruiseEl.textContent,
+          appJs: appEl.textContent,
+          exportJs: exportEl.textContent
+        };
+      }
+    }
+
+    const fetchText = async (path) => {
+      const res = await fetch(path, { cache: 'no-cache' });
+      if (!res || !res.ok) throw new Error(`Impossible de charger ${path} (${res ? res.status : 'network'})`);
+      return res.text();
+    };
+
+    const [htmlShell, cssText, cruiseFleetJs, appJs, exportJs] = await Promise.all([
+      fetchText('./index.html'),
+      fetchText('./style.css'),
+      fetchText('./cruise_fleet.js'),
+      fetchText('./app.js'),
+      fetchText('./carnet_export.js')
+    ]);
+
+    return { htmlShell, cssText, cruiseFleetJs, appJs, exportJs };
+  }
+
+  function buildInteractiveDigitalCarnetHtml(params) {
+    const p = params || {};
+    const htmlShell = String(p.htmlShell || '');
+    const cssText = String(p.cssText || '');
+    const cruiseFleetJs = String(p.cruiseFleetJs || '');
+    const appJs = String(p.appJs || '');
+    const exportJs = String(p.exportJs || '');
+    const snapshot = p.snapshot || {};
+    const trip = snapshot.trip || {};
+    const b = trip.branding || {};
+    const brandName = (b.partnerName && b.partnerName.trim()) ? b.partnerName.trim() : 'Voyages Girardot';
+
+    const closeScriptTag = '<' + '/script>';
+    const encodedShell = encodeURIComponent(htmlShell);
+    const snapshotJson = escapeInlineScript(JSON.stringify(snapshot)).replace(/[\u2028\u2029]/g, (c) =>
+      c === '\u2028' ? '\\u2028' : '\\u2029'
+    );
+
+    const inlineScriptsBlock = [
+      `<script type="text/plain" id="girardot-shell-template">${encodedShell}${closeScriptTag}`,
+      `<script id="girardot-snapshot-data">window.__GIRARDOT_STANDALONE_SNAPSHOT__ = ${snapshotJson};${closeScriptTag}`,
+      `<script id="girardot-inline-cruise">${escapeInlineScript(cruiseFleetJs)}${closeScriptTag}`,
+      `<script id="girardot-inline-app">${escapeInlineScript(appJs)}${closeScriptTag}`,
+      `<script id="girardot-inline-export">${escapeInlineScript(exportJs)}${closeScriptTag}`
+    ].join('\n  ');
+
+    const scriptsBundleRegex = new RegExp(
+      '<script\\s+src="storage_service\\.js">[\\s\\S]*?<script\\s+src="carnet_export\\.js">\\s*<' + '/script>',
+      'i'
+    );
+
+    let out = htmlShell
+      .replace(/<title>[\s\S]*?<\/title>/i, `<title>${escapeExportHtml(trip.title || 'Carnet de Voyages')} — ${escapeExportHtml(brandName)}</title>`)
+      .replace(/<link\s+rel="manifest"[^>]*>\s*/i, '')
+      .replace(/<link\s+rel="stylesheet"\s+href="style\.css"\s*\/?>/i, `<style id="girardot-inline-style">${escapeInlineStyle(cssText)}<` + `/style>`)
+      .replace(/src="logo-groupe-girardot\.svg"/gi, `src="${GIRARDOT_LOGO_DATA_URI}"`);
+
+    if (scriptsBundleRegex.test(out)) {
+      out = out.replace(scriptsBundleRegex, inlineScriptsBlock);
+    } else {
+      out = out.replace(/<\/body>/i, `  ${inlineScriptsBlock}\n</body>`);
+    }
+
+    return out;
+  }
+
+  function collectClientCarnetContext(options) {
+    const opts = options || {};
     const trip = (typeof currentTrip !== 'undefined' && currentTrip)
       ? currentTrip
       : (root.currentTrip || null);
@@ -120,7 +381,7 @@
     if (typeof getNominativeTravelerDocs === 'function') {
       (getNominativeTravelerDocs() || []).forEach((d) => docs.push(d));
     }
-    if (typeof getClientPersonalDocs === 'function') {
+    if (!opts.excludePersonalDocs && typeof getClientPersonalDocs === 'function') {
       (getClientPersonalDocs() || []).forEach((d) => docs.push(Object.assign({ source: 'personal' }, d)));
     }
 
@@ -578,6 +839,7 @@
           ${src ? `<img src="${escapeExportHtml(src)}" alt="${escapeExportHtml(s.title || 'Souvenir')}">` : ''}
           <figcaption>
             <div class="souv-title">${escapeExportHtml(s.title || 'Souvenir')}</div>
+            ${s.note ? `<div class="souv-note">${formatRichText(s.note)}</div>` : ''}
             ${s.date ? `<div class="souv-date">${escapeExportHtml(s.date)}</div>` : ''}
           </figcaption>
         </figure>
@@ -586,7 +848,7 @@
 
     return `
       <section class="export-section">
-        <h2 class="section-title">Mes Photos Souvenirs (${list.length})</h2>
+        <h2 class="section-title">Mes Souvenirs (${list.length})</h2>
         <div class="souvenirs-export-grid">${items}</div>
       </section>
     `;
@@ -788,7 +1050,8 @@
     .souvenir-card img { width: 100%; height: 170px; object-fit: cover; display: block; }
     .souvenir-card figcaption { padding: 8px 10px; }
     .souv-title { font-size: 12.5px; font-weight: 700; color: var(--ink); }
-    .souv-date { font-size: 11px; color: var(--muted); }
+    .souv-note { font-size: 12px; color: #334155; margin-top: 3px; }
+    .souv-date { font-size: 11px; color: var(--muted); margin-top: 2px; }
     .doc-footer {
       margin-top: 28px;
       padding-top: 14px;
@@ -854,7 +1117,8 @@
   }
 
   function printClientCarnet() {
-    const ctx = collectClientCarnetContext();
+    const isArchive = typeof window !== 'undefined' && Boolean(window.__GIRARDOT_STANDALONE_SNAPSHOT__);
+    const ctx = collectClientCarnetContext({ excludePersonalDocs: isArchive });
     if (!ctx.trip) {
       if (typeof showDiscreetSyncToast === 'function') {
         showDiscreetSyncToast('Aucun carnet chargé à imprimer.');
@@ -903,7 +1167,7 @@
   }
 
   async function downloadClientCarnet() {
-    const ctx = collectClientCarnetContext();
+    const ctx = collectClientCarnetContext({ excludePersonalDocs: true });
     if (!ctx.trip) {
       if (typeof showDiscreetSyncToast === 'function') {
         showDiscreetSyncToast('Aucun carnet chargé à télécharger.');
@@ -911,37 +1175,72 @@
       return;
     }
 
-    const inlinedImages = await collectInlinedImages(ctx);
-    const html = buildStandaloneCarnetHtml(ctx, { mode: 'download', inlinedImages });
-    const filename = `Carnet-Voyage-${slugifyFilename(ctx.trip.title || ctx.trip.id)}.html`;
-    const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    const url = URL.createObjectURL(blob);
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-    setTimeout(() => {
-      try {
-        if (a.parentNode) a.parentNode.removeChild(a);
-        URL.revokeObjectURL(url);
-      } catch (_) {}
-    }, 1000);
-
+    const dlBtn = document.getElementById('btn-download-carnet');
+    if (dlBtn) dlBtn.disabled = true;
     if (typeof showDiscreetSyncToast === 'function') {
-      showDiscreetSyncToast(`Carnet téléchargé (${filename})`);
+      showDiscreetSyncToast('Préparation du carnet numérique hors-ligne...');
+    }
+
+    try {
+      const [sources, clonedTrip] = await Promise.all([
+        collectBundleSources(),
+        embedTripImagesForDigitalCarnet(ctx.trip)
+      ]);
+      const snapshot = collectDigitalArchiveSnapshot(clonedTrip, ctx);
+      const html = buildInteractiveDigitalCarnetHtml({
+        htmlShell: sources.htmlShell,
+        cssText: sources.cssText,
+        cruiseFleetJs: sources.cruiseFleetJs,
+        appJs: sources.appJs,
+        exportJs: sources.exportJs,
+        snapshot
+      });
+
+      const filename = `Carnet-Voyage-${slugifyFilename(ctx.trip.title || ctx.trip.id)}.html`;
+      const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        try {
+          if (a.parentNode) a.parentNode.removeChild(a);
+          URL.revokeObjectURL(url);
+        } catch (_) {}
+      }, 1000);
+
+      if (typeof clearStandaloneArchiveDirty === 'function') {
+        clearStandaloneArchiveDirty();
+      }
+      if (typeof showDiscreetSyncToast === 'function') {
+        showDiscreetSyncToast(`Carnet numérique téléchargé (${filename})`);
+      }
+    } catch (err) {
+      console.error('Erreur export carnet numérique:', err);
+      if (typeof showDiscreetSyncToast === 'function') {
+        showDiscreetSyncToast('Erreur lors de la création du carnet numérique.');
+      }
+    } finally {
+      if (dlBtn) dlBtn.disabled = false;
     }
   }
 
   const api = {
     GIRARDOT_INLINE_SVG,
+    GIRARDOT_LOGO_DATA_URI,
     escapeExportHtml,
+    escapeInlineScript,
+    escapeInlineStyle,
     safeExportUrl,
     slugifyFilename,
     collectClientCarnetContext,
+    collectDigitalArchiveSnapshot,
     buildStandaloneCarnetHtml,
+    buildInteractiveDigitalCarnetHtml,
     printClientCarnet,
     downloadClientCarnet
   };

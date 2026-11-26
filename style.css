@@ -1531,3 +1531,102 @@ body {
   color: #92400e;
   border: 1px solid #fde68a;
 }
+
+/* ==========================================================================
+   MODE ARCHIVE NUMÉRIQUE AUTONOME & NOTES SOUVENIRS
+   ========================================================================== */
+.standalone-archive-bar {
+  margin: 8px 18px 6px;
+  padding: 9px 12px;
+  background: #eef7f2;
+  border: 1px solid #cfe2d8;
+  border-radius: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.standalone-archive-bar.is-dirty {
+  background: #fffbeb;
+  border-color: #f59e0b;
+}
+
+.standalone-archive-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--primary-dark);
+}
+
+.standalone-archive-bar.is-dirty .standalone-archive-status {
+  color: #92400e;
+}
+
+.standalone-archive-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.standalone-bar-btn {
+  border: 1px solid #cfe2d8;
+  background: #ffffff;
+  color: var(--primary-color);
+  border-radius: 8px;
+  padding: 5px 10px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.standalone-bar-save {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #ffffff;
+}
+
+.standalone-archive-bar.is-dirty .standalone-bar-save {
+  background: #d97706;
+  border-color: #d97706;
+}
+
+.souvenir-note-composer {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--accent-gold);
+  border-radius: 14px;
+  padding: 14px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-subtle);
+}
+
+.souvenir-note-card {
+  background: linear-gradient(180deg, #fffdf7 0%, #ffffff 100%);
+  border: 1px solid #e7dec6;
+  border-left: 4px solid var(--accent-gold);
+}
+
+.souvenir-note-text {
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.45;
+  margin-top: 4px;
+  white-space: pre-line;
+  word-break: break-word;
+}
+
+.map-offline-fallback {
+  height: auto !important;
+  min-height: 220px;
+  background: #ffffff !important;
+  padding: 16px;
+  overflow-y: auto;
+}
