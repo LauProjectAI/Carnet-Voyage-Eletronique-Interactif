@@ -425,6 +425,7 @@ function onClientTripSwitch(tripId) {
 }
 
 function refreshAppAfterTripChange() {
+  try { updateDynamicPwaManifest(); } catch(e) {}
   normalizeTripTransitMaps();
   activeDayIndex = determineInitialDayIndex();
   renderClientTripSelector();
@@ -468,6 +469,89 @@ function determineInitialDayIndex() {
 }
 
 // Initialize Application
+
+// Synchronisation dynamique du Manifest PWA et des métas mobiles selon le voyage actif
+function updateDynamicPwaManifest() {
+  if (!currentTrip) return;
+  const tripId = currentTrip.id || '';
+  const tripTitle = (currentTrip.title || 'Voyage').trim();
+  const shortTitle = tripTitle.length > 18 ? tripTitle.substring(0, 16) + '…' : tripTitle;
+
+  // 1. Aligner la barre d'adresse si elle ne contient pas déjà l'id
+  if (tripId && window.history && window.history.replaceState) {
+    try {
+      const currentUrl = new URL(window.location.href);
+      if (currentUrl.searchParams.get('id') !== tripId && !currentUrl.searchParams.get('trip')) {
+        currentUrl.searchParams.set('id', tripId);
+        window.history.replaceState({ tripId: tripId }, '', currentUrl.toString());
+      }
+    } catch (e) {
+      console.warn("Erreur alignement URL:", e);
+    }
+  }
+
+  // 2. Mettre à jour le titre du document pour iOS Safari et navigateurs
+  document.title = `${tripTitle} — Carnet Voyages Girardot`;
+
+  // 3. Mettre à jour la balise apple-mobile-web-app-title pour l'écran d'accueil iOS
+  let appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (!appleTitleMeta) {
+    appleTitleMeta = document.createElement('meta');
+    appleTitleMeta.name = 'apple-mobile-web-app-title';
+    document.head.appendChild(appleTitleMeta);
+  }
+  appleTitleMeta.content = shortTitle;
+
+  // 4. Construire le start_url absolu ou relatif avec ?id=
+  const startUrl = tripId ? `./index.html?id=${encodeURIComponent(tripId)}` : './index.html';
+
+  // 5. Générer le Manifest PWA dynamique avec start_url ciblé
+  const dynamicManifest = {
+    short_name: shortTitle,
+    name: `Carnet Girardot — ${tripTitle}`,
+    icons: [
+      {
+        src: "icon-girardot.svg",
+        type: "image/svg+xml",
+        sizes: "any",
+        purpose: "any"
+      },
+      {
+        src: "icon-192.png",
+        type: "image/png",
+        sizes: "192x192",
+        purpose: "any maskable"
+      },
+      {
+        src: "icon-512.png",
+        type: "image/png",
+        sizes: "512x512",
+        purpose: "any maskable"
+      }
+    ],
+    start_url: startUrl,
+    scope: "./",
+    background_color: "#144534",
+    theme_color: "#144534",
+    display: "standalone",
+    orientation: "portrait"
+  };
+
+  try {
+    const blob = new Blob([JSON.stringify(dynamicManifest)], { type: 'application/manifest+json' });
+    const manifestBlobUrl = URL.createObjectURL(blob);
+    let manifestLink = document.querySelector('link[rel="manifest"]');
+    if (!manifestLink) {
+      manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      document.head.appendChild(manifestLink);
+    }
+    manifestLink.href = manifestBlobUrl;
+  } catch (err) {
+    console.warn("Mise à jour dynamique du manifest PWA ignorée:", err);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialiser la navigation par onglets EN PREMIER pour garantir l'interactivité quoi qu'il arrive
   initNavigation();
@@ -477,6 +561,7 @@ document.addEventListener('DOMContentLoaded', () => {
   normalizeTripItinerary();
   renderClientTripSelector();
   updateNavigationForConciergeMode();
+  try { updateDynamicPwaManifest(); } catch(e) { console.error('Manifest error:', e); }
   activeDayIndex = determineInitialDayIndex();
   
   // 3. Rendu sécurisé de chaque sous-composant

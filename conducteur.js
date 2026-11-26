@@ -3,8 +3,82 @@ let driverTrip = null;
 let currentActiveDay = 0;
 let boardedPassengers = new Set();
 
+
+// Synchronisation dynamique du Manifest PWA pour le dossier conducteur
+function updateDriverDynamicPwaManifest() {
+  if (!driverTrip) return;
+  const tripId = driverTrip.id || '';
+  const tripTitle = (driverTrip.title || 'Voyage').trim();
+  const shortTitle = `Cond. ${tripTitle.length > 12 ? tripTitle.substring(0, 10) + '…' : tripTitle}`;
+
+  if (tripId && window.history && window.history.replaceState) {
+    try {
+      const currentUrl = new URL(window.location.href);
+      if (currentUrl.searchParams.get('id') !== tripId && !currentUrl.searchParams.get('trip')) {
+        currentUrl.searchParams.set('id', tripId);
+        window.history.replaceState({ tripId: tripId }, '', currentUrl.toString());
+      }
+    } catch (e) {}
+  }
+
+  document.title = `Conducteur • ${tripTitle} — Voyages Girardot`;
+
+  let appleTitleMeta = document.querySelector('meta[name="apple-mobile-web-app-title"]');
+  if (!appleTitleMeta) {
+    appleTitleMeta = document.createElement('meta');
+    appleTitleMeta.name = 'apple-mobile-web-app-title';
+    document.head.appendChild(appleTitleMeta);
+  }
+  appleTitleMeta.content = shortTitle;
+
+  const startUrl = tripId ? `./conducteur.html?id=${encodeURIComponent(tripId)}` : './conducteur.html';
+  const dynamicManifest = {
+    short_name: shortTitle,
+    name: `Conducteur Girardot — ${tripTitle}`,
+    icons: [
+      {
+        src: "icon-girardot.svg",
+        type: "image/svg+xml",
+        sizes: "any",
+        purpose: "any"
+      },
+      {
+        src: "icon-192.png",
+        type: "image/png",
+        sizes: "192x192",
+        purpose: "any maskable"
+      },
+      {
+        src: "icon-512.png",
+        type: "image/png",
+        sizes: "512x512",
+        purpose: "any maskable"
+      }
+    ],
+    start_url: startUrl,
+    scope: "./",
+    background_color: "#0f172a",
+    theme_color: "#0f172a",
+    display: "standalone",
+    orientation: "portrait"
+  };
+
+  try {
+    const blob = new Blob([JSON.stringify(dynamicManifest)], { type: 'application/manifest+json' });
+    const manifestBlobUrl = URL.createObjectURL(blob);
+    let manifestLink = document.querySelector('link[rel="manifest"]');
+    if (!manifestLink) {
+      manifestLink = document.createElement('link');
+      manifestLink.rel = 'manifest';
+      document.head.appendChild(manifestLink);
+    }
+    manifestLink.href = manifestBlobUrl;
+  } catch (err) {}
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   loadDriverTripData();
+  try { updateDriverDynamicPwaManifest(); } catch(e) {}
   initDriverApp();
 });
 
