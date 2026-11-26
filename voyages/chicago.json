@@ -748,7 +748,7 @@
       "content": "Disponible gratuitement dans l'hôtel à la réception et dans les chambres."
     }
   ],
-  "conciergeMode": "guided",
+  "conciergeMode": "full",
   "isCruise": false,
   "shipName": "",
   "decks": [],
