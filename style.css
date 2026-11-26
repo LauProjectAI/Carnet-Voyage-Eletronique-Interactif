@@ -54,43 +54,218 @@ body {
 
 /* Minimal Top Branding bar */
 .editorial-topbar {
-  padding: 14px 20px 8px;
+  padding: 12px clamp(14px, 4vw, 20px) 10px;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
   background: var(--bg-sand);
+  border-bottom: 1px solid rgba(20, 69, 52, 0.08);
   position: sticky;
   top: 0;
   z-index: 999;
+  container: topbar / inline-size;
+}
+
+.topbar-main-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: safe center;
+  gap: 10px;
+  inline-size: 100%;
 }
 
 .brand-minimal {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
   text-decoration: none;
   color: var(--primary-dark);
+  min-inline-size: 0;
+}
+
+.brand-logo-mark {
+  display: block;
+  inline-size: clamp(36px, 9cqi, 44px);
+  block-size: auto;
+  aspect-ratio: 33 / 27;
+  flex-shrink: 0;
+}
+
+.brand-text-group {
+  min-inline-size: 0;
 }
 
 .brand-minimal .logo-text {
-  font-size: 0.95rem;
+  font-size: clamp(1.12rem, 0.92rem + 1.2cqi, 1.32rem);
   font-weight: 800;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.4px;
+  line-height: 1.1;
   text-transform: uppercase;
+  color: var(--primary-dark);
 }
 
 .brand-minimal .logo-sub {
-  font-size: 0.6rem;
-  letter-spacing: 2px;
+  font-size: 0.64rem;
+  letter-spacing: 2.2px;
   color: var(--accent-gold);
   font-weight: 700;
   display: block;
+  line-height: 1.2;
+  margin-block-start: 2px;
 }
 
 .top-right-actions {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
+  flex-shrink: 0;
+}
+
+.sos-actions-col {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 5px;
+}
+
+.topbar-export-tools {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.topbar-icon-btn {
+  min-inline-size: 28px;
+  min-block-size: 28px;
+  padding: 4px 7px;
+  border-radius: 8px;
+  border: 1px solid #cfe2d8;
+  background: #eef7f2;
+  color: var(--primary-color);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.15s ease, border-color 0.15s ease;
+}
+
+.topbar-icon-btn:hover {
+  background: #dcf0e5;
+  border-color: var(--primary-color);
+  transform: translateY(-1px);
+}
+
+.topbar-icon-btn:active {
+  transform: scale(0.96);
+}
+
+.topbar-icon-btn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.topbar-title-row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-block-start: 8px;
+  padding-block-start: 7px;
+  border-top: 1px solid var(--border-light);
+}
+
+.topbar-carnet-title {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: clamp(0.92rem, 0.82rem + 0.6cqi, 1.06rem);
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--primary-color);
+  text-align: center;
+  line-height: 1.2;
+}
+
+.topbar-carnet-title::before,
+.topbar-carnet-title::after {
+  content: '';
+  inline-size: 18px;
+  block-size: 1.5px;
+  background: var(--accent-gold);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+@container topbar (inline-size < 460px) {
+  .topbar-main-row {
+    gap: 8px;
+  }
+  .brand-minimal {
+    gap: 8px;
+  }
+  .top-right-actions {
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+  }
+  .sos-actions-col {
+    gap: 4px;
+  }
+  .topbar-export-tools {
+    gap: 5px;
+  }
+  .topbar-icon-btn {
+    min-inline-size: 26px;
+    min-block-size: 26px;
+    padding: 3px 6px;
+    font-size: 0.74rem;
+  }
+  .top-right-actions .sos-badge {
+    padding: 3px 10px;
+    font-size: 0.7rem;
+  }
+  #client-auth-btn {
+    padding: 4px 10px !important;
+    font-size: 0.7rem !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .topbar-icon-btn {
+    min-inline-size: 28px;
+    min-block-size: 28px;
+  }
+}
+
+@container topbar (inline-size < 430px) {
+  .topbar-main-row {
+    gap: 6px;
+  }
+  .brand-minimal {
+    gap: 7px;
+  }
+  .brand-logo-mark {
+    inline-size: 34px;
+  }
+  .brand-minimal .logo-text {
+    font-size: 1.04rem;
+    letter-spacing: 0.1px;
+  }
+  #client-auth-btn {
+    padding: 3px 8px !important;
+    font-size: 0.68rem !important;
+  }
+}
+
+@container topbar (inline-size < 370px) {
+  .topbar-carnet-title {
+    letter-spacing: 0.1em;
+    gap: 8px;
+  }
+  .topbar-carnet-title::before,
+  .topbar-carnet-title::after {
+    inline-size: 12px;
+  }
 }
 
 .sos-badge {

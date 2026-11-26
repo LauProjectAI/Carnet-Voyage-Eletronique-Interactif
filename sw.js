@@ -1,4 +1,4 @@
-const CACHE_NAME = 'carnet-girardot-v30';
+const CACHE_NAME = 'carnet-girardot-v32';
 const ASSETS_TO_CACHE = [
   './',
   './index.html',
@@ -9,6 +9,7 @@ const ASSETS_TO_CACHE = [
   './auth_service.js',
   './admin_access.js',
   './app.js',
+  './carnet_export.js',
   './admin.js',
   './conducteur.js',
   './data.js',
@@ -18,6 +19,7 @@ const ASSETS_TO_CACHE = [
   './voyages/access_registry.json',
   './manifest.json',
   './icon-girardot.svg',
+  './logo-groupe-girardot.svg',
   './icon-192.png',
   './icon-512.png',
   'https://fonts.googleapis.com/css2?family=Archivo:wght@300;400;500;600;700;800&display=swap',

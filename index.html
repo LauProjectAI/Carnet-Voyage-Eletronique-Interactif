@@ -27,20 +27,36 @@
 
     <!-- Top Minimal Branding & Emergency Row -->
     <header class="editorial-topbar">
-      <a href="#" class="brand-minimal" onclick="switchMainTab('tab-today'); return false;">
-        <img id="brand-partner-logo" class="brand-partner-logo" src="" alt="Logo partenaire" style="display:none;">
-        <div>
-          <div class="logo-text" id="brand-logo-text">Voyages Girardot</div>
-          <span class="logo-sub" id="brand-logo-sub">DEPUIS 1920</span>
-        </div>
-      </a>
-      <div class="top-right-actions">
-        <button type="button" id="client-auth-btn" onclick="openClientAuthPortal()" style="background:#eef7f2; color:#144534; border:1px solid #bbf7d0; border-radius:999px; padding:5px 11px; font-size:0.74rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Espace personnel — Connexion ou Mes Voyages">
-          <i class="fa-solid fa-user-lock"></i> <span>Connexion</span>
-        </button>
-        <a href="#sos" class="sos-badge" onclick="switchMainTab('tab-pratique'); return false;" title="Assistance et urgence 24/7">
-          <i class="fa-solid fa-phone"></i> SOS
+      <div class="topbar-main-row">
+        <a href="#" class="brand-minimal" onclick="switchMainTab('tab-today'); return false;">
+          <img id="brand-girardot-logo" src="logo-groupe-girardot.svg" alt="" width="42" height="34" class="brand-logo-mark" decoding="async">
+          <img id="brand-partner-logo" class="brand-partner-logo" src="" alt="Logo partenaire" style="display:none;">
+          <div class="brand-text-group">
+            <div class="logo-text" id="brand-logo-text">Voyages Girardot</div>
+            <span class="logo-sub" id="brand-logo-sub">DEPUIS 1920</span>
+          </div>
         </a>
+        <div class="top-right-actions">
+          <button type="button" id="client-auth-btn" onclick="openClientAuthPortal()" style="background:#eef7f2; color:#144534; border:1px solid #bbf7d0; border-radius:999px; padding:5px 11px; font-size:0.74rem; font-weight:800; cursor:pointer; display:inline-flex; align-items:center; gap:5px;" title="Espace personnel — Connexion ou Mes Voyages">
+            <i class="fa-solid fa-user-lock"></i> <span>Connexion</span>
+          </button>
+          <div class="sos-actions-col">
+            <a href="#sos" class="sos-badge" onclick="switchMainTab('tab-pratique'); return false;" title="Assistance et urgence 24/7">
+              <i class="fa-solid fa-phone" aria-hidden="true"></i> SOS
+            </a>
+            <div class="topbar-export-tools" role="group" aria-label="Imprimer ou télécharger le carnet">
+              <button type="button" id="btn-print-carnet" class="topbar-icon-btn" onclick="printClientCarnet()" aria-label="Imprimer le carnet ou enregistrer en PDF" title="Imprimer / Enregistrer en PDF">
+                <i class="fa-solid fa-print" aria-hidden="true"></i>
+              </button>
+              <button type="button" id="btn-download-carnet" class="topbar-icon-btn" onclick="downloadClientCarnet()" aria-label="Télécharger le carnet souvenir hors-ligne" title="Télécharger le carnet pour le conserver hors-ligne">
+                <i class="fa-solid fa-download" aria-hidden="true"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="topbar-title-row">
+        <span class="topbar-carnet-title">Carnet de Voyages</span>
       </div>
     </header>
 
@@ -503,5 +519,6 @@
   <script src="data.js"></script>
   <script src="cruise_fleet.js"></script>
   <script src="app.js"></script>
+  <script src="carnet_export.js"></script>
 </body>
 </html>

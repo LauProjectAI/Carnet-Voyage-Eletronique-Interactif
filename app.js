@@ -466,9 +466,12 @@ function applyTripBranding() {
   }
 
   const b = (currentTrip && currentTrip.branding) ? currentTrip.branding : null;
+  const girardotLogoImg = document.getElementById('brand-girardot-logo');
   const logoImg = document.getElementById('brand-partner-logo');
   const logoText = document.getElementById('brand-logo-text');
   const logoSub = document.getElementById('brand-logo-sub');
+  const hasPartnerLogo = Boolean(b && b.partnerLogoUrl && b.partnerLogoUrl.trim());
+  const hideGirardot = Boolean(b && b.hideGirardotBrand);
 
   if (b && rootStyle) {
     if (/^#[0-9a-fA-F]{6}$/.test(b.primaryColor || '') && b.primaryColor.toLowerCase() !== '#144534') {
@@ -483,8 +486,12 @@ function applyTripBranding() {
     }
   }
 
+  if (girardotLogoImg) {
+    girardotLogoImg.style.display = (hideGirardot || hasPartnerLogo) ? 'none' : 'block';
+  }
+
   if (logoImg) {
-    if (b && b.partnerLogoUrl && b.partnerLogoUrl.trim()) {
+    if (hasPartnerLogo) {
       logoImg.src = b.partnerLogoUrl.trim();
       logoImg.style.display = 'block';
     } else {
