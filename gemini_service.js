@@ -1261,6 +1261,331 @@ Retourne UNIQUEMENT un objet JSON valide au format exact :
   }
 
   // ---------------------------------------------------------------------------
+  // 7. GÉNÉRATEUR IA CONCIERGERIE (RECHERCHE RÉELLE GEMINI + GOOGLE SEARCH GROUNDING)
+  // ---------------------------------------------------------------------------
+  function extractJsonObjectFromGeminiText(rawText) {
+    const str = String(rawText || '').trim();
+    if (!str) {
+      throw new Error("Réponse vide reçue de Google Gemini.");
+    }
+
+    // 1. Retirer les éventuelles balises Markdown ```json ... ```
+    const stripped = str
+      .replace(/^```(?:json)?\s*/i, '')
+      .replace(/\s*```$/i, '')
+      .trim();
+
+    try {
+      return JSON.parse(stripped);
+    } catch (_) {}
+
+    // 2. Rechercher le bloc objet JSON équilibré { ... } au milieu d'un texte éventuel
+    const firstBrace = str.indexOf('{');
+    if (firstBrace !== -1) {
+      let depth = 0;
+      let inString = false;
+      let escaped = false;
+      for (let i = firstBrace; i < str.length; i++) {
+        const ch = str[i];
+        if (escaped) {
+          escaped = false;
+          continue;
+        }
+        if (ch === '\\') {
+          escaped = true;
+          continue;
+        }
+        if (ch === '"') {
+          inString = !inString;
+          continue;
+        }
+        if (!inString) {
+          if (ch === '{') depth++;
+          else if (ch === '}') {
+            depth--;
+            if (depth === 0) {
+              const candidate = str.slice(firstBrace, i + 1);
+              return JSON.parse(candidate);
+            }
+          }
+        }
+      }
+    }
+
+    throw new Error("Format JSON introuvable dans la réponse de Gemini.");
+  }
+
+  function sanitizeConciergePhone(rawPhone) {
+    const p = String(rawPhone || '').trim();
+    if (!p) return '';
+    const digits = p.replace(/\D/g, '');
+    // Rejeter les faux numéros génériques du type +33 00 00 00 00 ou suites de zéros
+    if (!digits || /^0+$/.test(digits) || /^(?:33)?0{7,}$/.test(digits) || digits.length < 5) {
+      return '';
+    }
+    return p;
+  }
+
+  function isGenericPlaceholderPlace(place) {
+    if (!place || typeof place !== 'object') return true;
+    const name = String(place.name || '').trim();
+    if (!name || name.length < 2) return true;
+
+    const fakeNamePattern = /^(?:restaurant gastronomique [eé]toil[eé]|burger gourmet & viandes r[oô]ties|bistro v[eé]g[eé]tarien & saveurs|table asiatique,\s*dim sum|brasserie traditionnelle & terroir|monuments & c[oœ]ur historique|grand mus[eé]e & belv[eé]d[eè]re|march[eé] artisanal & halles de\s|banque,\s*dab & point de change|pharmacie & soins quotidiens de\s|caf[eé] historique & salon de th[eé] de\s|r[eé]seau de transports en commun de\s|taxis officiels & vtc \(uber \/ bolt\) de\s)/i;
+    if (fakeNamePattern.test(name)) return true;
+
+    const rawPhone = String(place.phone || '').trim();
+    if (/^\+?33\s*00[\s.-]*00[\s.-]*00[\s.-]*00$/.test(rawPhone)) return true;
+
+    return false;
+  }
+
+  function haversineDistanceKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+      Math.sin(dLng / 2) * Math.sin(dLng / 2);
+    return R * (2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a)));
+  }
+
+  function normalizeConciergePlaceItem(raw, centerCoords) {
+    if (isGenericPlaceholderPlace(raw)) return null;
+
+    let lat = raw.lat !== undefined && raw.lat !== null && raw.lat !== '' ? Number(raw.lat) : null;
+    let lng = raw.lng !== undefined && raw.lng !== null && raw.lng !== '' ? Number(raw.lng) : null;
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng) || Math.abs(lat) > 90 || Math.abs(lng) > 180 || (lat === 0 && lng === 0)) {
+      lat = null;
+      lng = null;
+    } else if (centerCoords && Number.isFinite(Number(centerCoords.lat)) && Number.isFinite(Number(centerCoords.lng))) {
+      const distKm = haversineDistanceKm(Number(centerCoords.lat), Number(centerCoords.lng), lat, lng);
+      if (distKm > 120) {
+        lat = null;
+        lng = null;
+      }
+    }
+
+    const bookingUrlRaw = String(raw.bookingUrl || raw.website || raw.url || '').trim();
+    const bookingUrl = /^https?:\/\//i.test(bookingUrlRaw) ? bookingUrlRaw : '';
+
+    return {
+      name: String(raw.name || '').trim(),
+      category: String(raw.category || '').trim() || 'Adresse locale',
+      location: String(raw.location || raw.address || '').trim(),
+      tag: String(raw.tag || '').trim(),
+      phone: sanitizeConciergePhone(raw.phone),
+      bookingUrl,
+      description: String(raw.description || '').trim(),
+      tips: String(raw.tips || '').trim(),
+      lat,
+      lng
+    };
+  }
+
+  function normalizeConciergeAiResponse(parsed, detectedCity, centerCoords) {
+    const src = (parsed && typeof parsed === 'object') ? parsed : {};
+    const themeKeys = ['resto', 'visites', 'shopping', 'pratique', 'detente'];
+    const normalizedThemes = {};
+    let totalPlaces = 0;
+
+    themeKeys.forEach(key => {
+      const rawArr = Array.isArray(src[key])
+        ? src[key]
+        : (src.themes && Array.isArray(src.themes[key]) ? src.themes[key] : []);
+      const cleaned = rawArr
+        .map(item => normalizeConciergePlaceItem(item, centerCoords))
+        .filter(Boolean);
+      normalizedThemes[key] = cleaned;
+      totalPlaces += cleaned.length;
+    });
+
+    const rawTransports = src.transports && !Array.isArray(src.transports)
+      ? src.transports
+      : (src.themes && src.themes.transports ? src.themes.transports : {});
+    const rawTransportPlaces = Array.isArray(src.transports)
+      ? src.transports
+      : (Array.isArray(rawTransports.places) ? rawTransports.places : []);
+    const transportPlaces = rawTransportPlaces
+      .map(item => normalizeConciergePlaceItem(item, centerCoords))
+      .filter(Boolean);
+    totalPlaces += transportPlaces.length;
+
+    const mapUrlRaw = String(rawTransports.transitMapUrl || '').trim();
+    const transitMapUrl = /^https?:\/\//i.test(mapUrlRaw)
+      ? mapUrlRaw
+      : `https://www.google.com/maps/search/transports+publics+${encodeURIComponent(detectedCity || '')}`;
+
+    normalizedThemes.transports = {
+      transitMapUrl,
+      guideHtml: String(rawTransports.guideHtml || '').trim(),
+      places: transportPlaces
+    };
+
+    const welcomeMessage = String(src.welcomeMessage || '').trim() ||
+      `Bienvenue à ${detectedCity} ! Je suis votre Concierge Voyage Girardot. Retrouvez nos adresses locales vérifiées pour profiter pleinement de votre temps libre.`;
+
+    return {
+      welcomeMessage,
+      themes: normalizedThemes,
+      totalPlaces
+    };
+  }
+
+  async function generateConciergeWithGemini(options) {
+    const opts = options || {};
+    const apiKey = String(opts.apiKey || getStoredGeminiKey() || '').trim();
+    if (!apiKey) {
+      const err = new Error("Aucune clé API Google Gemini configurée. Renseignez votre clé gratuite Google AI Studio dans « IA Gemini ».");
+      err.code = 'MISSING_GEMINI_KEY';
+      throw err;
+    }
+
+    const city = String(opts.city || '').trim() || 'Destination';
+    const tripTitle = String(opts.tripTitle || '').trim();
+    const tripSubtitle = String(opts.tripSubtitle || '').trim();
+    const hotels = Array.isArray(opts.hotels) ? opts.hotels : [];
+    const plannedTitles = Array.isArray(opts.plannedTitles) ? opts.plannedTitles.filter(Boolean) : [];
+    const centerCoords = opts.centerCoords && Number.isFinite(Number(opts.centerCoords.lat)) && Number.isFinite(Number(opts.centerCoords.lng))
+      ? { lat: Number(opts.centerCoords.lat), lng: Number(opts.centerCoords.lng) }
+      : null;
+
+    const hotelsContext = hotels.length > 0
+      ? hotels.map(h => `- ${h.name || 'Hôtel'}${h.address ? ` | Adresse : ${h.address}` : ''}${h.city ? ` | Ville : ${h.city}` : ''}${h.lat && h.lng ? ` | GPS : ${h.lat}, ${h.lng}` : ''}`).join('\n')
+      : `- Localité principale : ${city}`;
+
+    const plannedContext = plannedTitles.length > 0
+      ? plannedTitles.slice(0, 25).join(' ; ')
+      : 'Aucune visite spécifique fournie';
+
+    const prompt = `Tu es le Concierge Voyage expert de l'agence française "Voyages Girardot".
+Ta mission : effectuer une RECHERCHE RÉELLE ET VÉRIFIÉE d'établissements et de lieux existants pour le module Conciergerie client du carnet de voyage.
+
+CONTEXTE DU VOYAGE :
+- Localité / zone cible de recherche : "${city}"
+${tripTitle ? `- Titre du voyage : "${tripTitle}"` : ''}
+${tripSubtitle ? `- Sous-titre : "${tripSubtitle}"` : ''}
+- Hôtel(s) de séjour à destination :
+${hotelsContext}
+${centerCoords ? `- Coordonnées de référence : ${centerCoords.lat}, ${centerCoords.lng}` : ''}
+- Visites déjà programmées au circuit (à NE PAS proposer en doublon dans "visites") : ${plannedContext}
+
+RÈGLES IMPÉRATIVES D'AUTHENTICITÉ (ZÉRO INVENTION) :
+1. Propose EXCLUSIVEMENT des établissements, commerces, musées, sites, services et réseaux de transport 100 % RÉELS, EXISTANTS ET VÉRIFIABLES avec leur vrai nom officiel (enseigne exacte), leur vraie adresse postale ou quartier exact, leur vrai site web si connu et de vraies coordonnées GPS (lat, lng).
+2. Ne propose JAMAIS de titres génériques inventés ou placeholders du style "Restaurant Gastronomique Étoilé de ...", "Burger Gourmet & Viandes Rôties de ...", "Bistro Végétarien de ...", "Banque, DAB & Point de Change Central", "Pharmacie & Soins quotidiens de ...", etc.
+3. Numéros de téléphone : indique UNIQUEMENT le vrai numéro local international s'il est certain (sinon laisse une chaîne vide ""). INTERDICTION FORMELLE d'écrire "+33 00 00 00 00" ou un numéro factice.
+4. Gestion des petites localités, villages ou destinations isolées / arctiques (ex. Haparanda, Cape East, Laponie...) :
+   - Si la localité immédiate compte peu d'offres (pas de rooftop ni de restaurant étoilé sur place), élargis honnêtement aux communes et villes voisines dans un rayon de 20 à 30 km (par exemple Tornio en Finlande, Kalix ou Kemi autour d'Haparanda/Cape East) en précisant clairement la ville et la distance approximative depuis l'hôtel dans "location" ou "tag" (ex. "Tornio (à ~5 min)" ou "Centre d'Haparanda (à ~3 km)").
+   - Fournis 2 à 4 adresses réelles par thématique selon ce qui existe vraiment sur place.
+
+THÉMATIQUES À RENSEIGNER :
+- "resto" : Restaurants, cafés-bistros, brasseries ou tables locales réelles autour de ${city} (privilégier les spécialités locales et adresses authentiques réellement ouvertes).
+- "visites" : Musées, monuments, balades panoramiques, églises, sites naturels ou points d'intérêt libres réels (hors visites déjà au programme).
+- "shopping" : Boutiques d'artisanat, centres commerciaux, galeries ou halles/marchés locaux réels (ex. Iittala, artisanat lapon/nordique, etc. selon la région).
+- "pratique" : Vraies pharmacies (ex. Apoteket / Yliopiston Apteekki...), banques/DAB réels, bureaux de change ou supermarchés de proximité réels avec leur nom et adresse exacte.
+- "detente" : Vrais cafés, salons de thé, bars ou lieux conviviaux existants.
+- "transports" : Objet contenant :
+  * "transitMapUrl" : URL officielle du réseau de bus/trains/transports locaux (ex. Länstrafiken Norrbotten, Matkahuolto, etc.)
+  * "guideHtml" : Court guide pratique HTML (<br>, <strong>) sur comment circuler sur place (bus régionaux, gares routières, taxis locaux réels avec numéros ou applications comme Bolt/Uber si disponibles ou non sur place)
+  * "places" : 1 à 3 fiches réelles (compagnie de taxis locale réelle, réseau de bus régional, gare/terminal réel).
+
+FORMAT DE RÉPONSE OBLIGATOIRE :
+Réponds UNIQUEMENT avec un objet JSON valide (sans commentaire ni texte avant ou après), respectant strictement la structure :
+{
+  "welcomeMessage": "Message d'accueil personnalisé du Concierge Voyages Girardot pour ${city} mentionnant l'hôtel si pertinent",
+  "resto": [
+    {
+      "name": "Nom officiel réel",
+      "category": "Catégorie précise",
+      "location": "Adresse exacte et ville (avec distance approx si commune voisine)",
+      "tag": "Atout court",
+      "phone": "",
+      "bookingUrl": "https://...",
+      "description": "Description factuelle en 1-2 phrases en français.",
+      "tips": "Conseil pratique utile.",
+      "lat": 65.83,
+      "lng": 24.13
+    }
+  ],
+  "visites": [ ... ],
+  "shopping": [ ... ],
+  "pratique": [ ... ],
+  "detente": [ ... ],
+  "transports": {
+    "transitMapUrl": "https://...",
+    "guideHtml": "<strong>🚌 Se déplacer à ${city} :</strong><br>• ...",
+    "places": [ ... ]
+  }
+}`;
+
+    const model = getStoredGeminiModel();
+    let data = null;
+    let workingModel = model;
+    let usedWebSearch = false;
+
+    try {
+      // Tentative 1 : Gemini avec Google Search Grounding (ne PAS mettre responseMimeType: application/json avec tools)
+      const groundedPayload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        tools: [{ google_search: {} }],
+        generationConfig: {
+          temperature: 0.2
+        }
+      };
+      const groundedRes = await callGeminiApiWithFallback(apiKey, model, groundedPayload);
+      data = groundedRes.data;
+      workingModel = groundedRes.workingModel;
+      const gm = data && data.candidates && data.candidates[0] && data.candidates[0].groundingMetadata;
+      usedWebSearch = Boolean(
+        gm && ((Array.isArray(gm.webSearchQueries) && gm.webSearchQueries.length > 0) ||
+               (Array.isArray(gm.groundingChunks) && gm.groundingChunks.length > 0))
+      );
+    } catch (groundedErr) {
+      const msg = String(groundedErr && groundedErr.message ? groundedErr.message : '').toLowerCase();
+      const isToolUnsupported = /tool|google_search|search|400|invalid argument|unsupported|response_mime_type|cannot be used/i.test(msg);
+      if (!isToolUnsupported) {
+        throw groundedErr;
+      }
+      // Tentative 2 (repli uniquement si l'outil google_search est rejeté en 400 par le modèle/compte) : JSON strict sans tools
+      console.warn(`[Gemini Conciergerie] Outil google_search non supporté (${groundedErr.message}), relance en mode JSON direct...`);
+      const jsonPayload = {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.2,
+          responseMimeType: "application/json"
+        }
+      };
+      const fallbackRes = await callGeminiApiWithFallback(apiKey, model, jsonPayload);
+      data = fallbackRes.data;
+      workingModel = fallbackRes.workingModel;
+      usedWebSearch = false;
+    }
+
+    const parts = data && data.candidates && data.candidates[0] && data.candidates[0].content && Array.isArray(data.candidates[0].content.parts)
+      ? data.candidates[0].content.parts
+      : [];
+    const rawText = parts.map(p => (p && typeof p.text === 'string' ? p.text : '')).join('\n').trim();
+    if (!rawText) {
+      throw new Error("Aucune réponse textuelle exploitable n'a été retournée par Google Gemini.");
+    }
+
+    const parsed = extractJsonObjectFromGeminiText(rawText);
+    const normalized = normalizeConciergeAiResponse(parsed, city, centerCoords);
+
+    if (!normalized.totalPlaces) {
+      throw new Error(`L'IA n'a renvoyé aucune adresse réelle vérifiable pour "${city}". Essayez de préciser le nom de la ville ou région voisine.`);
+    }
+
+    return {
+      ...normalized,
+      workingModel,
+      usedWebSearch
+    };
+  }
+
+  // ---------------------------------------------------------------------------
   // EXPOSITION GLOBALE
   // ---------------------------------------------------------------------------
   global.getStoredGeminiKey = getStoredGeminiKey;
@@ -1271,6 +1596,7 @@ Retourne UNIQUEMENT un objet JSON valide au format exact :
   global.saveGeminiConfig = saveGeminiConfig;
   global.disconnectGeminiKey = disconnectGeminiKey;
   global.testGeminiConnection = testGeminiConnection;
+  global.formatGeminiUserErrorMessage = formatGeminiUserErrorMessage;
   global.generateFreeTimeWithGemini = generateFreeTimeWithGemini;
   global.showGeminiResultsModal = showGeminiResultsModal;
   global.closeGeminiResultsModal = closeGeminiResultsModal;
@@ -1281,12 +1607,20 @@ Retourne UNIQUEMENT un objet JSON valide au format exact :
   global.parseHotelDocumentLocally = parseHotelDocumentLocally;
   global.analyzeHotelDocumentWithGemini = analyzeHotelDocumentWithGemini;
   global.extractTextFromDocxArrayBuffer = extractTextFromDocxArrayBuffer;
+  global.extractJsonObjectFromGeminiText = extractJsonObjectFromGeminiText;
+  global.isGenericPlaceholderPlace = isGenericPlaceholderPlace;
+  global.normalizeConciergeAiResponse = normalizeConciergeAiResponse;
+  global.generateConciergeWithGemini = generateConciergeWithGemini;
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = {
       parseHotelDocumentLocally,
       analyzeHotelDocumentWithGemini,
-      extractTextFromDocxArrayBuffer
+      extractTextFromDocxArrayBuffer,
+      extractJsonObjectFromGeminiText,
+      isGenericPlaceholderPlace,
+      normalizeConciergeAiResponse,
+      generateConciergeWithGemini
     };
   }
 

@@ -3521,7 +3521,106 @@ function autoGeocodePlace(thIdx, pIdx) {
     });
 }
 
-// Générateur IA & Base de connaissances Conciergerie selon la destination
+// Générateur IA & Recherche réelle Conciergerie selon la destination (Google Gemini + Web Search)
+function setConciergeAiStatusBanner(type, htmlMessage) {
+  const statusEl = document.getElementById('adm-concierge-ai-status');
+  if (!statusEl) return;
+  const styles = {
+    info: { bg: '#eff6ff', border: '#bfdbfe', color: '#1e3a8a' },
+    success: { bg: '#ecfdf5', border: '#86efac', color: '#065f46' },
+    warning: { bg: '#fffbeb', border: '#fde68a', color: '#92400e' },
+    error: { bg: '#fef2f2', border: '#fecaca', color: '#991b1b' }
+  };
+  const st = styles[type] || styles.info;
+  statusEl.style.display = 'block';
+  statusEl.style.background = st.bg;
+  statusEl.style.border = `1px solid ${st.border}`;
+  statusEl.style.color = st.color;
+  statusEl.innerHTML = htmlMessage;
+}
+
+function detectConciergeTargetFromTrip() {
+  const title = (tripData.title || "").trim();
+  const subtitle = (tripData.subtitle || "").trim();
+  const fullText = `${title} ${subtitle}`.toLowerCase();
+  const tripIsDomesticFrance = /\bfrance\b|\bparis\b|\blyon\b|\bcorse\b|\balsace\b|\bbretagne\b|\bprovence\b/i.test(fullText);
+
+  const allHotels = Array.isArray(tripData.hotels) ? tripData.hotels : [];
+  const destinationHotels = allHotels.filter(h => {
+    const hText = `${h.name || ''} ${h.city || ''} ${h.address || ''} ${h.notes || ''}`.toLowerCase();
+    if (!tripIsDomesticFrance && /\b(france|lyon|paris|roissy|cdg|saint-exup[eé]ry|avant voyage|pr[eé]-acheminement)\b/i.test(hText)) {
+      return false;
+    }
+    return true;
+  });
+
+  const refHotels = destinationHotels.length > 0 ? destinationHotels : allHotels;
+  let candidateCity = "";
+  let centerCoords = null;
+
+  for (const h of refHotels) {
+    if (!centerCoords && h.lat && h.lng && Number.isFinite(Number(h.lat)) && Number.isFinite(Number(h.lng))) {
+      centerCoords = { lat: Number(h.lat), lng: Number(h.lng) };
+    }
+    if (!candidateCity) {
+      const c = (h.city || "").trim();
+      const addr = (h.address || "").trim();
+      if (c && !/^h[oô]tel/i.test(c) && !/votre\s+r[eé]gion/i.test(c)) {
+        candidateCity = c;
+      } else if (addr && !/^h[oô]tel\s+[àa]\s+/i.test(addr)) {
+        const cleanAddr = addr.replace(/\b\d{4,6}\b/g, '').replace(/\s+/g, ' ').trim();
+        const parts = cleanAddr.split(',').map(s => s.trim()).filter(Boolean);
+        candidateCity = parts.length >= 2 ? parts.slice(-2).join(', ') : (parts[0] || '');
+      }
+    }
+  }
+
+  if (!candidateCity && Array.isArray(tripData.itinerary)) {
+    const itinCities = tripData.itinerary
+      .map(d => (d.city || "").trim())
+      .filter(c => c && !/votre\s+r[eé]gion/i.test(c) && (tripIsDomesticFrance || !/^(paris|lyon|roissy|cdg|gen[eè]ve)$/i.test(c)));
+    if (itinCities.length > 0) {
+      // Choisir la ville la plus fréquente dans l'itinéraire (typique d'un séjour)
+      const counts = {};
+      itinCities.forEach(c => { counts[c] = (counts[c] || 0) + 1; });
+      candidateCity = Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+    }
+  }
+
+  if (!candidateCity && title) {
+    candidateCity = title.split(/[-–—:]/)[0].trim();
+  }
+
+  return {
+    candidateCity: candidateCity || "Destination du séjour",
+    destinationHotels: refHotels,
+    centerCoords
+  };
+}
+
+function ensureConciergeThemesStructure() {
+  if (!tripData.conciergerie) tripData.conciergerie = {};
+  const defaultThemes = [
+    { id: "resto", label: "Où bien manger ?", icon: "utensils", color: "#ea580c", description: "Tables gourmandes, spécialités locales et adresses sélectionnées.", enabled: true, places: [] },
+    { id: "visites", label: "Que visiter en temps libre ?", icon: "compass", color: "#059669", description: "Monuments incontournables et panoramas hors des sentiers battus.", enabled: true, places: [] },
+    { id: "shopping", label: "Boutiques & Souvenirs locaux", icon: "bag-shopping", color: "#c29958", description: "Artisanat, créateurs locaux et marchés typiques.", enabled: true, places: [] },
+    { id: "pratique", label: "Bureaux de change, Banques & Santé", icon: "landmark", color: "#2563eb", description: "DAB bancaires sécurisés, pharmacies et commerces utiles.", enabled: true, places: [] },
+    { id: "detente", label: "Bars branchés, Cafés & Rooftops", icon: "martini-glass", color: "#9333ea", description: "Prendre un verre avec vue ou savourer un café d'exception.", enabled: true, places: [] },
+    { id: "transports", label: "Transports en commun, Taxis & VTC", icon: "train-subway", color: "#0284c7", description: "Plans du réseau, pass illimités, bus, taxis et déplacements locaux.", enabled: true, transitMapUrl: "", guideHtml: "", places: [] }
+  ];
+
+  if (!Array.isArray(tripData.conciergerie.themes) || tripData.conciergerie.themes.length === 0) {
+    tripData.conciergerie.themes = defaultThemes;
+    return;
+  }
+
+  defaultThemes.forEach(def => {
+    if (!tripData.conciergerie.themes.some(t => t.id === def.id)) {
+      tripData.conciergerie.themes.push(def);
+    }
+  });
+}
+
 async function triggerAiConciergeGeneration() {
   const title = (tripData.title || "").trim();
   const subtitle = (tripData.subtitle || "").trim();
@@ -3548,1173 +3647,129 @@ async function triggerAiConciergeGeneration() {
     return;
   }
 
-  // Déterminer la ville ou destination phare
-  let detectedCity = "";
-  if (fullText.includes("san francisco") || fullText.includes("francisco") || fullText.includes("sfo")) detectedCity = "San Francisco";
-  else if (fullText.includes("chicago")) detectedCity = "Chicago";
-  else if (fullText.includes("new york") || fullText.includes("nyc")) detectedCity = "New York";
-  else if (fullText.includes("italie") || fullText.includes("dolomite") || fullText.includes("bolzano") || fullText.includes("lac de garde")) detectedCity = "Italie / Dolomites";
-  else if (fullText.includes("afrique") || fullText.includes("cap") || fullText.includes("kruger")) detectedCity = "Afrique du Sud / Le Cap";
-  else if (fullText.includes("japon") || fullText.includes("tokyo")) detectedCity = "Tokyo";
-  else if (fullText.includes("paris") || fullText.includes("france")) detectedCity = "Paris";
-  else if (fullText.includes("londres") || fullText.includes("london")) detectedCity = "Londres";
-  else {
-    // Si non reconnue dans les mots clés immédiats, extraire le premier mot significatif ou demander
-    const candidate = title.split(/[-–—:]/)[0].trim();
-    detectedCity = prompt("Pour quelle ville ou région principale souhaitez-vous générer les adresses de Conciergerie ?", candidate || "San Francisco");
-    if (!detectedCity || !detectedCity.trim()) return;
-    detectedCity = detectedCity.trim();
-  }
+  // 1. Détection intelligente de la localité cible (Hôtels à destination -> Itinéraire -> Titre)
+  const target = detectConciergeTargetFromTrip();
+  const userLocality = prompt(
+    "Pour quelle ville, localité ou région souhaitez-vous rechercher de vraies adresses de Conciergerie via IA ?",
+    target.candidateCity
+  );
+  if (!userLocality || !userLocality.trim()) return;
+  const detectedCity = userLocality.trim();
 
-  const promptMsg = `Voulez-vous générer automatiquement les recommandations de Conciergerie (restaurants, visites libres, boutiques, rooftops & services pratiques) pour ${detectedCity} ?`;
-  if (!confirm(promptMsg)) return;
-
-  // S'assurer de la présence des 5 thèmes de conciergerie
-  if (!tripData.conciergerie) tripData.conciergerie = {};
-  if (!tripData.conciergerie.themes || tripData.conciergerie.themes.length === 0) {
-    tripData.conciergerie.themes = [
-      { id: "resto", label: "Où bien manger ?", icon: "utensils", color: "#ea580c", description: "Tables gourmandes, spécialités locales et rooftops sélectionnés.", enabled: true, places: [] },
-      { id: "visites", label: "Que visiter en temps libre ?", icon: "compass", color: "#059669", description: "Monuments incontournables et panoramas hors des sentiers battus.", enabled: true, places: [] },
-      { id: "shopping", label: "Boutiques & Souvenirs locaux", icon: "bag-shopping", color: "#c29958", description: "Artisanat, créateurs locaux et marchés typiques.", enabled: true, places: [] },
-      { id: "pratique", label: "Bureaux de change, Banques & Santé", icon: "landmark", color: "#2563eb", description: "DAB bancaires sécurisés, pharmacies et commerces utiles.", enabled: true, places: [] },
-      { id: "detente", label: "Bars branchés, Cafés & Rooftops", icon: "martini-glass", color: "#9333ea", description: "Prendre un verre avec vue ou savourer un café d'exception.", enabled: true, places: [] },
-      { id: "transports", label: "Transports en commun, Taxis & VTC", icon: "train-subway", color: "#0284c7", description: "Plans du réseau, pass illimités, métros 'L', bus, taxis et VTC.", enabled: true, transitMapUrl: "", guideHtml: "", places: [] }
-    ];
-  } else {
-    // Si la thématique transports manque dans un voyage existant, l'ajouter
-    if (!tripData.conciergerie.themes.some(t => t.id === 'transports')) {
-      tripData.conciergerie.themes.push({
-        id: "transports",
-        label: "Transports en commun, Taxis & VTC",
-        icon: "train-subway",
-        color: "#0284c7",
-        description: "Plans du réseau, pass illimités, métros 'L', bus, taxis et VTC.",
-        enabled: true,
-        transitMapUrl: "",
-        guideHtml: "",
-        places: []
-      });
+  // 2. Vérifier la présence d'une clé Gemini AVANT toute confirmation ou modification
+  const storedKey = (typeof window.getStoredGeminiKey === 'function') ? window.getStoredGeminiKey() : '';
+  if (!storedKey) {
+    setConciergeAiStatusBanner(
+      'warning',
+      `<i class="fa-solid fa-key"></i> <strong>Clé API Google Gemini requise :</strong> Aucune adresse factice n'est plus générée localement. Renseignez votre clé gratuite Google AI Studio dans la fenêtre <strong>IA Gemini</strong> qui vient de s'ouvrir, puis relancez « Régénérer via IA ».`
+    );
+    if (typeof window.openGeminiConfigModal === 'function') {
+      window.openGeminiConfigModal();
     }
+    return;
   }
 
-  const lowerCity = detectedCity.toLowerCase();
+  // 3. Confirmation et passage en état de chargement
+  const confirmMsg = `Lancer une recherche IA réelle (Google Gemini + recherche Web) d'établissements existants pour « ${detectedCity} » ?\n\nLes adresses actuelles des 6 thématiques seront remplacées par les résultats vérifiés.`;
+  if (!confirm(confirmMsg)) return;
 
-  // 0. Pack Spécial SAN FRANCISCO (Calcul par rayons stricts : <1km immédiat, puis 1 à 4km, et visites <5km sans doublons)
-  if (lowerCity.includes("san francisco") || lowerCity.includes("francisco")) {
-    // Identifier l'hôtel sur la destination San Francisco (en excluant formellement l'hôtel de pré-acheminement en France)
-    const sfHotels = (tripData.hotels || []).filter(h => {
-      const text = ((h.name || '') + ' ' + (h.address || '') + ' ' + (h.notes || '')).toLowerCase();
-      // Exclure France, Lyon, Roissy, Paris, escale ou pré-acheminement
-      if (text.includes('france') || text.includes('lyon') || text.includes('paris') || text.includes('roissy') || text.includes('cdg') || text.includes('saint-exupéry') || text.includes('avant voyage') || text.includes('départ')) {
-        return false;
+  const btn = document.getElementById('btn-trigger-ai-concierge');
+  const originalBtnHtml = btn ? btn.innerHTML : '<i class="fa-solid fa-robot"></i> Régénérer via IA';
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> Recherche IA en cours...`;
+  }
+
+  setConciergeAiStatusBanner(
+    'info',
+    `<i class="fa-solid fa-spinner fa-spin"></i> <strong>Recherche réelle en cours pour « ${detectedCity} »...</strong> Interrogation de Google Gemini (avec recherche Web) pour identifier de vrais restaurants, visites, commerces, pharmacies et transports autour de votre séjour.`
+  );
+
+  try {
+    // 4. Géocodage de référence si l'hôtel n'a pas encore de coordonnées GPS
+    let centerCoords = target.centerCoords;
+    if (!centerCoords) {
+      try {
+        const geoRes = await fetch(
+          `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(detectedCity)}&limit=1`,
+          { headers: { 'Accept-Language': 'fr' } }
+        );
+        const geoData = await geoRes.json();
+        if (Array.isArray(geoData) && geoData.length > 0) {
+          const cLat = parseFloat(geoData[0].lat);
+          const cLon = parseFloat(geoData[0].lon);
+          if (Number.isFinite(cLat) && Number.isFinite(cLon)) {
+            centerCoords = { lat: cLat, lng: cLon };
+          }
+        }
+      } catch (geoErr) {
+        console.warn("Géocodage Nominatim de référence ignoré :", geoErr);
       }
-      // Si des coordonnées GPS existent, vérifier qu'elles sont dans la zone américaine / californienne
-      if (h.lat && h.lng) {
-        if (h.lat > 40 && h.lng > 0) return false; // En Europe / France
-      }
-      return true;
-    });
+    }
 
-    // L'hôtel de référence à San Francisco
-    const targetHotel = sfHotels[0] || (tripData.hotels || [])[0] || null;
-    const hotelRefName = targetHotel ? targetHotel.name : "votre hôtel à San Francisco";
-    const hotelLat = (targetHotel && targetHotel.lat) ? Number(targetHotel.lat) : 37.7879; // Défaut Union Sq
-    const hotelLng = (targetHotel && targetHotel.lng) ? Number(targetHotel.lng) : -122.4075;
-
-    // Fonction de calcul de distance précise (Haversine)
-    const computeDistanceKm = (lat1, lon1, lat2, lon2) => {
-      if (!lat1 || !lon1 || !lat2 || !lon2) return null;
-      const R = 6371; // Rayon de la Terre en km
-      const dLat = (lat2 - lat1) * Math.PI / 180;
-      const dLon = (lon2 - lon1) * Math.PI / 180;
-      const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                Math.sin(dLon / 2) * Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      return R * c;
-    };
-
-    const getDistanceLabel = (pLat, pLng) => {
-      const d = computeDistanceKm(hotelLat, hotelLng, pLat, pLng);
-      if (d === null) return "";
-      if (d < 1) {
-        const m = Math.round(d * 1000);
-        return `À ${m}m de ${targetHotel ? targetHotel.name.split(' ')[0] : 'l\'hôtel'}`;
-      }
-      return `À ${d.toFixed(1)} km de l'hôtel`;
-    };
-
-    tripData.conciergerie.welcomeMessage = `Bienvenue à San Francisco ! Je suis votre Concierge Voyage Girardot. Retrouvez vos adresses sélectionnées à proximité immédiate de ${hotelRefName} et pour votre temps libre dans la City by the Bay.`;
-    
-    // Extraction des titres de visites programmées pour exclure les doublons
+    // 5. Extraction des visites déjà programmées au circuit pour éviter les doublons
     const plannedTitles = (tripData.itinerary || [])
-      .flatMap(d => (d.timeline || []).map(v => (v.title || '').toLowerCase()))
-      .concat((tripData.itinerary || []).map(d => (d.title || '').toLowerCase()));
+      .flatMap(d => (d.timeline || []).map(v => (v.title || '').trim()))
+      .concat((tripData.itinerary || []).map(d => (d.title || '').trim()))
+      .filter(Boolean);
 
-    const isAlreadyPlanned = (name) => {
-      const lower = name.toLowerCase();
-      return plannedTitles.some(p => p.includes(lower) || lower.includes(p.replace(/visite|découverte|matin|après-midi/g, '').trim()));
-    };
+    if (typeof window.generateConciergeWithGemini !== 'function') {
+      throw new Error("Le module gemini_service.js (generateConciergeWithGemini) n'est pas chargé.");
+    }
 
-    tripData.conciergerie.themes.forEach(th => {
-      th.enabled = true;
-
-      if (th.id === 'resto') {
-        const allRestaurants = [
-          // PROXIMITÉ IMMÉDIATE DU COEUR HÔTELIER (< 1 km)
-          {
-            name: "John's Grill (Steakhouse historique)",
-            category: "Steakhouse & Fruits de mer",
-            location: "63 Ellis St, San Francisco, CA 94102",
-            tag: "Légendaire depuis 1908",
-            phone: "+1 415-986-0069",
-            bookingUrl: "https://www.johnsgrill.com",
-            description: "Table mythique de San Francisco fondée en 1908, immortalisée par Dashiell Hammett dans Le Faucon Maltais. Filets de bœuf grillés, côtes d'agneau et fruits de mer servis dans un somptueux décor boisé d'époque.",
-            tips: "Idéal pour dîner le premier soir sans marcher longtemps. Réservez à l'avance pour le premier étage.",
-            lat: 37.7858,
-            lng: -122.4082
-          },
-          {
-            name: "Sears Fine Food (Brasserie & Pancakes)",
-            category: "Brasserie américaine & Petit-déjeuner",
-            location: "439 Powell St, San Francisco, CA 94102",
-            tag: "Institution depuis 1938",
-            phone: "+1 415-986-0700",
-            bookingUrl: "https://www.searsfinefood.com",
-            description: "Célèbre institution face au passage des mythiques Cable Cars. Connue dans le monde entier pour ses 18 mini-pancakes suédois au beurre fondu, ses omelettes fermières et ses burgers traditionnels.",
-            tips: "Parfait pour un petit-déjeuner copieux ou un déjeuner rapide au saut du lit.",
-            lat: 37.7891,
-            lng: -122.4087
-          },
-          {
-            name: "Super Duper Burgers",
-            category: "Burger Gourmet Local 100% Bio",
-            location: "721 Market St, San Francisco, CA 94103",
-            tag: "Meilleurs Burgers Bio de SF",
-            phone: "+1 415-538-3437",
-            bookingUrl: "https://www.superduperburgers.com",
-            description: "La référence californienne du burger artisanal écoresponsable : viande de bœuf bio issue d'élevages locaux sans hormones, buns moelleux cuits le matin même, frites maison au sel de mer et pickles à volonté.",
-            tips: "Service au comptoir ultra-rapide. Ne manquez pas les milkshakes au caramel au beurre salé bio.",
-            lat: 37.7869,
-            lng: -122.4042
-          },
-          {
-            name: "Enjoy Vegetarian Restaurant",
-            category: "Végétarien & Vegan Asiatique",
-            location: "839 Kearny St, San Francisco, CA 94108",
-            tag: "100% Végétal & Sans OGM",
-            phone: "+1 415-956-7868",
-            bookingUrl: "https://enjoyveggie.com",
-            description: "Table réputée et certifiée bouddhiste proposant une cuisine chinoise entièrement végétarienne et végane sans glutamate : raviolis aux légumes frais, woks de champignons sauvages et tofu braisé savoureux.",
-            tips: "Rapport qualité/prix imbattable à quelques minutes de marche de votre hôtel.",
-            lat: 37.7958,
-            lng: -122.4051
-          },
-          {
-            name: "Mister Jiu's (Étoilé Michelin)",
-            category: "Haute Gastronomie Asiatique",
-            location: "28 Waverly Pl, Chinatown, San Francisco, CA 94108",
-            tag: "Étoile Michelin",
-            phone: "+1 415-857-9688",
-            bookingUrl: "https://misterjius.com",
-            description: "Le chef Brandon Jew réinvente la gastronomie cantonaise dans un ancien banquet historique de Waverly Place. Canard laqué rôti au feu de bois réputé dans tous les États-Unis et dim sums de haute voltige.",
-            tips: "Réservation indispensable plusieurs semaines à l'avance en ligne. Bar à cocktails d'exception à l'étage (Moongate Lounge).",
-            lat: 37.7938,
-            lng: -122.4069
-          },
-          {
-            name: "Tadich Grill (Fruits de mer & Grillades)",
-            category: "Fruits de mer & Cioppino traditionnel",
-            location: "240 California St, San Francisco, CA 94111",
-            tag: "Plus vieux restaurant de Californie (1849)",
-            phone: "+1 415-391-1849",
-            bookingUrl: "https://tadichgrillsf.com",
-            description: "Le plus ancien restaurant de Californie en activité continue depuis 1849. Spécialiste absolu du célèbre Cioppino (ragoût de fruits de mer et crabe Dungeness typique de San Francisco) et poisson frais grillé au feu de mesquite.",
-            tips: "Prenez place au grand comptoir en bois pour regarder les cuisiniers officier. Service élégant en veste blanche.",
-            lat: 37.7934,
-            lng: -122.3996
-          },
-
-          // RAYON 1 À 4 KM (Adresses emblématiques accessibles en court trajet)
-          {
-            name: "Original Joe's (North Beach)",
-            category: "Tradition Italo-Américaine",
-            location: "601 Union St, North Beach, San Francisco, CA 94133",
-            tag: "Institution chaleureuse",
-            phone: "+1 415-775-4877",
-            bookingUrl: "https://originaljoes.com",
-            description: "Temple chaleureux de la cuisine italo-américaine depuis 1937 face au parc Washington Square. Célèbres raviolis maison, escalopes de veau parmigiana, steaks charbon et banquettes en cuir rouge.",
-            tips: "Atmosphère vibrante au cœur du quartier italien. Très rapide d'accès en bus 30 ou 8.",
-            lat: 37.8005,
-            lng: -122.4103
-          },
-          {
-            name: "Shizen Vegan Sushi Bar & Izakaya",
-            category: "Sushis Végans Gastronomiques",
-            location: "370 14th St, Mission District, San Francisco, CA 94103",
-            tag: "Bib Gourmand Michelin",
-            phone: "+1 415-678-5767",
-            bookingUrl: "https://www.shizensf.com",
-            description: "Izakaya japonais gastronomique 100% végétalien récompensé par le Guide Michelin (Bib Gourmand). Créations spectaculaires combinant igname de montagne, konjac et champignons pour reproduire des textures marines sans aucune pêche.",
-            tips: "Arrivez dès l'ouverture à 17h ou inscrivez-vous sur leur liste d'attente en ligne.",
-            lat: 37.7683,
-            lng: -122.4217
-          },
-          {
-            name: "Greens Restaurant (Waterfront)",
-            category: "Haute Gastronomie Végétarienne",
-            location: "2 Marina Blvd, Fort Mason Center, San Francisco, CA 94123",
-            tag: "Vue panoramique Golden Gate",
-            phone: "+1 415-771-6222",
-            bookingUrl: "https://greensrestaurant.com",
-            description: "Pionnier mondial de la gastronomie végétale fondé en 1979 par le Centre Zen de San Francisco. Situé dans un ancien hangar maritime rénové avec d'immenses baies vitrées offrant une vue féerique sur le Golden Gate Bridge.",
-            tips: "Idéal pour un déjeuner panoramique ou un dîner au coucher du soleil face au pont.",
-            lat: 37.8066,
-            lng: -122.4318
-          }
-        ];
-
-        // Calcul dynamique et intégration de la distance réelle par rapport à l'hôtel de destination
-        th.places = allRestaurants.map(r => {
-          const dist = computeDistanceKm(hotelLat, hotelLng, r.lat, r.lng);
-          const distLabel = dist !== null 
-            ? (dist < 1 ? ` (${Math.round(dist * 1000)}m de l'hôtel)` : ` (${dist.toFixed(1)} km de l'hôtel)`)
-            : "";
-          return {
-            ...r,
-            category: r.category + distLabel
-          };
-        }).filter(r => {
-          const d = computeDistanceKm(hotelLat, hotelLng, r.lat, r.lng);
-          // Filtrer strictement les restaurants dans un rayon maximal de 4.5 km de l'hôtel
-          return d === null || d <= 4.5;
-        });
-      } else if (th.id === 'visites') {
-        const potentialVisits = [
-          {
-            name: "Dragon's Gate & Ruelles de Chinatown",
-            category: "Balade historique & Architecture (Rayon 700m)",
-            location: "Grant Ave & Bush St, San Francisco, CA 94108",
-            tag: "Patrimoine emblématique",
-            phone: "+1 415-982-6306",
-            bookingUrl: "https://www.sanfranciscochinatown.com",
-            description: "Porte monumentale gardée par des lions de pierre sculptés marquant l'entrée de la plus ancienne Chinatown d'Amérique du Nord. Parcourez Grant Avenue et Waverly Place aux façades ornées et balcons multicolores.",
-            tips: "À moins de 10 min à pied d'Union Square. Arrêtez-vous à la Golden Gate Fortune Cookie Factory pour voir fabriquer les biscuits artisanaux.",
-            lat: 37.7907,
-            lng: -122.4058
-          },
-          {
-            name: "Ferry Building Marketplace & Embarcadero",
-            category: "Marché gourmand & Baie panoramique (Rayon 1.5 km)",
-            location: "1 Ferry Building, The Embarcadero, San Francisco, CA 94111",
-            tag: "Halles gourmandes du front de mer",
-            phone: "+1 415-983-8030",
-            bookingUrl: "https://www.ferrybuildingmarketplace.com",
-            description: "Bâtiment historique de 1898 dominé par sa tour de l'horloge. Abrite sous ses verrières les meilleurs artisans culinaires de Californie (fromages artisanaux Cowgirl Creamery, pains au levain Acme Bread, glaces bio et cafés Blue Bottle).",
-            tips: "Grand marché des fermiers en plein air les mardis, jeudis et samedis matins face au Bay Bridge.",
-            lat: 37.7955,
-            lng: -122.3937
-          },
-          {
-            name: "Librairie City Lights & Alley Jack Kerouac",
-            category: "Littérature Beat & Culture (Rayon 1.4 km)",
-            location: "261 Columbus Ave, North Beach, San Francisco, CA 94133",
-            tag: "Monstre sacré de la Beat Generation",
-            phone: "+1 415-362-8193",
-            bookingUrl: "https://citylights.com",
-            description: "Fondée en 1953 par le poète Lawrence Ferlinghetti, cette librairie mythique a publié 'Howl' d'Allen Ginsberg et incarné le cœur de la liberté d'expression et de la Beat Generation.",
-            tips: "Montez au dernier étage dans la 'Poetry Room' pour feuilleter un recueil dans les fauteuils en bois au calme.",
-            lat: 37.7976,
-            lng: -122.4066
-          },
-          {
-            name: "Coit Tower & Télégraphe Hill",
-            category: "Belvédère & Fresques historiques (Rayon 2.1 km)",
-            location: "1 Telegraph Hill Blvd, San Francisco, CA 94133",
-            tag: "Vue 360° sur toute la baie",
-            phone: "+1 415-249-0995",
-            bookingUrl: "https://sfrecpark.org/destination/coit-tower/",
-            description: "Tour art-déco en béton blanc de 64 mètres de haut érigée au sommet de Telegraph Hill. L'intérieur abrite d'exceptionnelles fresques murales des années 1930 peintes par des artistes du New Deal.",
-            tips: "Montez-y à pied via les célèbres escaliers fleuris de Filbert Street pour apercevoir les colonies de perroquets sauvages.",
-            lat: 37.8024,
-            lng: -122.4058
-          },
-          {
-            name: "Palace of Fine Arts",
-            category: "Architecture néo-classique & Parc (Rayon 4.2 km)",
-            location: "3301 Lyon St, Marina District, San Francisco, CA 94123",
-            tag: "Dôme gréco-romain majestueux",
-            phone: "+1 415-563-6504",
-            bookingUrl: "https://palaceoffinearts.org",
-            description: "Monument féerique hérité de l'Exposition Universelle de 1915. Sa monumentale rotonde classique et ses colonnades se reflètent dans une lagune paisible habitée par des cygnes.",
-            tips: "Entrée libre et gratuite. Lieu particulièrement magique et paisible pour une balade au soleil couchant.",
-            lat: 37.8020,
-            lng: -122.4485
-          }
-        ];
-
-        // Filtrer automatiquement les visites qui feraient doublon avec une étape déjà prévue au programme
-        th.places = potentialVisits.filter(v => !isAlreadyPlanned(v.name));
-      } else if (th.id === 'shopping') {
-        th.places = [
-          {
-            name: "Westfield San Francisco Centre",
-            category: "Grandes enseignes & Dôme historique",
-            location: "865 Market St, Union Square, San Francisco, CA 94103",
-            tag: "Accès direct métro Powell St",
-            phone: "+1 415-512-6776",
-            bookingUrl: "https://www.westfield.com",
-            description: "Centre commercial historique abritant des dizaines de boutiques sous une magnifique verrière restaurée de 1908.",
-            tips: "Sous-sol gourmand très pratique avec accès direct aux lignes de métro BART et Muni.",
-            lat: 37.7842,
-            lng: -122.4065
-          },
-          {
-            name: "Union Square Boutiques & Galeries",
-            category: "Mode internationale & Horlogerie",
-            location: "Post St, Geary St & Maiden Lane, San Francisco, CA 94108",
-            tag: "Cœur commerçant piétonnier",
-            phone: "",
-            bookingUrl: "https://visitunionsquaresf.com",
-            description: "Les rues entourant Union Square concentrent les plus grandes maisons de mode, grands magasins (Macy's, Saks) et les jolies boutiques fleuries de Maiden Lane.",
-            tips: "Maiden Lane devient entièrement piétonne l'après-midi, idéale pour flâner en terrasse.",
-            lat: 37.7880,
-            lng: -122.4060
-          }
-        ];
-      } else if (th.id === 'pratique') {
-        th.places = [
-          {
-            name: "Chase Bank & Distributeurs DAB 24/7",
-            category: "Banque & Retraits sécurisés",
-            location: "211 Sutter St, Union Square, San Francisco, CA 94108",
-            tag: "DAB sécurisé multi-cartes",
-            phone: "+1 415-951-1997",
-            bookingUrl: "https://www.chase.com",
-            description: "Agence bancaire officielle disposant d'un hall DAB sécurisé 24h/24 acceptant toutes les cartes internationales (Visa, Mastercard, Amex).",
-            tips: "Refusez le taux de change proposé par le distributeur (Dynamic Currency Conversion) pour laisser votre banque appliquer le taux officiel sans surcoût.",
-            lat: 37.7895,
-            lng: -122.4038
-          },
-          {
-            name: "Walgreens Pharmacy (Powell & Geary)",
-            category: "Pharmacie, Santé & Dépannage quotidien",
-            location: "135 Powell St, San Francisco, CA 94102",
-            tag: "Ouvert 7j/7 en plein centre",
-            phone: "+1 415-391-7222",
-            bookingUrl: "https://www.walgreens.com",
-            description: "Grande pharmacie et supérette de dépannage : produits de premiers soins, paracétamol, pansements, adaptateurs électriques US, bouteilles d'eau et snacks.",
-            tips: "À 200 mètres d'Union Square. Personnel serviable pour vous orienter sur les médicaments en vente libre aux USA.",
-            lat: 37.7865,
-            lng: -122.4080
-          },
-          {
-            name: "CVS Pharmacy (Geary St)",
-            category: "Pharmacie & Parapharmacie",
-            location: "399 Geary St, Union Square, San Francisco, CA 94102",
-            tag: "Face aux théâtres d'Union Square",
-            phone: "+1 415-268-9949",
-            bookingUrl: "https://www.cvs.com",
-            description: "Pharmacie complète proposant soins d'hygiène, cosmétiques, chargeurs de téléphone et en-cas légers.",
-            tips: "Pratique pour trouver des protections solaires et des produits de voyage format cabine.",
-            lat: 37.7871,
-            lng: -122.4101
-          }
-        ];
-      } else if (th.id === 'detente') {
-        th.places = [
-          {
-            name: "Cityscape Sky Bar (Hilton 46e étage)",
-            category: "Rooftop panoramique 360° (Rayon 250m)",
-            location: "333 O'Farrell St, 46th Floor, San Francisco, CA 94102",
-            tag: "Plus haut lounge panoramique de SF",
-            phone: "+1 415-923-5002",
-            bookingUrl: "https://www.cityscapeskybar.com",
-            description: "Perché au 46e étage de la tour Hilton, ce sky bar offre d'immenses baies vitrées avec une vue à couper le souffle à 360° sur toute la skyline de San Francisco, le Golden Gate et le pont d'Oakland.",
-            tips: "Venez 45 minutes avant le coucher du soleil pour voir la ville s'illuminer dans la brume. Tenue correcte exigée.",
-            lat: 37.7861,
-            lng: -122.4111
-          },
-          {
-            name: "The View Lounge (Marriott Marquis 39e étage)",
-            category: "Cocktails & Verrière historique (Rayon 500m)",
-            location: "780 Mission St, 39th Floor, San Francisco, CA 94103",
-            tag: "Célèbre fenêtre en arche",
-            phone: "+1 415-896-1600",
-            bookingUrl: "https://www.marriott.com/en-us/hotels/sfodt-san-francisco-marriott-marquis/dining/",
-            description: "Lounge élégant réputé pour sa spectaculaire baie vitrée en éventail surplombant le sud de San Francisco et Market Street. Cocktails signature artisanaux et planches à partager.",
-            tips: "Entrée libre sans réservation obligatoire. Très prisé en début de soirée, accès par les ascenseurs rapides de l'hôtel.",
-            lat: 37.7854,
-            lng: -122.4045
-          }
-        ];
-      } else if (th.id === 'transports') {
-        th.transitMapUrl = "https://www.sfmta.com/maps";
-        th.transitMapImageUrl = "assets/sf-metro-map.jpg";
-        th.guideHtml = `
-          <strong>🚊 Guide pratique des transports à San Francisco (Réseau Muni, Cable Cars & BART) :</strong><br>
-          • <strong>Le Réseau Muni (Métro léger & Bus) :</strong> Muni dessert l'intégralité de la ville. Les lignes de métro souterrain/aérien (lignes J, K, L, M, N, T) circulent le long de Market Street et relient tous les quartiers majeurs.<br>
-          • <strong>Les Mythiques Cable Cars :</strong> 3 lignes historiques (Powell-Hyde, Powell-Mason et California St). Le terminus de Powell Street se situe à 200m d'Union Square. Tarif : 8 $ le trajet simple, mais <em>inclus en illimité</em> dans les Visitor Passports !<br>
-          • <strong>Ligne historique F-Market :</strong> De magnifiques tramways anciens venus de Milan, Porto ou Philadelphie qui parcourent toute la rue Market jusqu'au Fisherman's Wharf le long des quais de l'Embarcadero.<br>
-          • <strong>Pass Visiteur Muni (Très avantageux) :</strong><br>
-          &nbsp;&nbsp;- <strong>1-Day Visitor Passport :</strong> 13 $ (trajets illimités bus, métro ET Cable Cars pendant 24h sur smartphone via l'application <em>MuniMobile</em>)<br>
-          &nbsp;&nbsp;- <strong>3-Day Visitor Passport :</strong> 31 $ (idéal pour 3 jours de découverte complète)<br>
-          &nbsp;&nbsp;- <strong>7-Day Visitor Passport :</strong> 41 $<br>
-          • <strong>Payer avec son smartphone (Clipper / Contactless) :</strong> Vous pouvez également poser votre carte bancaire sans contact ou votre Apple Pay sur les bornes d'entrée (tarif 2,50 $ par trajet en bus/métro). Attention, le réseau régional <strong>BART</strong> reliant l'aéroport SFO au centre-ville fonctionne avec une tarification kilométrique séparée.
-        `;
-        th.places = [
-          {
-            name: "Terminus Cable Car de Powell Street (Union Square)",
-            category: "Lignes historiques de Cable Car",
-            location: "Powell St & Market St, San Francisco, CA 94102",
-            tag: "Départ des lignes Powell-Hyde & Powell-Mason",
-            phone: "+1 415-701-2311",
-            bookingUrl: "https://www.sfmta.com/getting-around/muni/cable-cars",
-            description: "Terminus mythique où les wattmen font pivoter manuellement les rames historiques en bois de 1873 sur une plaque tournante. Départ direct pour traverser Nob Hill et rejoindre Fisherman's Wharf.",
-            tips: "Arrivez avant 9h30 le matin pour éviter l'attente aux heures de pointe touristique.",
-            lat: 37.7845,
-            lng: -122.4080
-          },
-          {
-            name: "Application Officielle MuniMobile & Cartes SFMTA",
-            category: "Application mobile & Horaires en direct",
-            location: "Disponible sur smartphone (iOS & Android)",
-            tag: "Pass 1, 3 et 7 jours en ligne",
-            phone: "+1 415-701-2311",
-            bookingUrl: "https://www.sfmta.com/getting-around/muni/fares-passes/munimobile",
-            description: "L'application mobile officielle de la ville de San Francisco pour acheter vos Passports illimités dématérialisés en 1 minute sans faire la queue aux guichets.",
-            tips: "Activez votre pass juste avant de monter à bord pour la première fois.",
-            lat: 37.7879,
-            lng: -122.4075
-          },
-          {
-            name: "VTC Uber, Lyft & Taxis officiels de San Francisco",
-            category: "Taxis & Voitures avec chauffeur 24/7",
-            location: "Disponible immédiatement partout dans la métropole",
-            tag: "Berceau mondial du VTC",
-            phone: "+1 415-333-3333",
-            bookingUrl: "https://www.uber.com/fr/cities/san-francisco/",
-            description: "San Francisco est la ville natale d'Uber et Lyft. Les chauffeurs arrivent en 2 à 4 minutes partout dans la ville. Idéal pour remonter les célèbres collines escarpées sans fatigue le soir.",
-            tips: "Application indispensable pour regagner votre hôtel rapidement après le dîner.",
-            lat: 37.7833,
-            lng: -122.4167
-          }
-        ];
-      }
+    const aiResult = await window.generateConciergeWithGemini({
+      city: detectedCity,
+      tripTitle: title,
+      tripSubtitle: subtitle,
+      hotels: target.destinationHotels,
+      plannedTitles,
+      centerCoords
     });
 
-  // 1. Pack Spécial CHICAGO
-  } else if (lowerCity.includes("chicago")) {
-    tripData.conciergerie.welcomeMessage = "Bienvenue à Chicago ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre dans la Windy City ?";
-    
+    ensureConciergeThemesStructure();
+    tripData.conciergerie.welcomeMessage = aiResult.welcomeMessage;
+
     tripData.conciergerie.themes.forEach(th => {
       th.enabled = true;
       if (th.id === 'transports') {
-        th.transitMapUrl = "https://www.transitchicago.com/maps/";
-        th.transitMapImageUrl = "assets/chicago-metro-map.svg";
-        th.guideHtml = `
-          <strong>🚇 Comment utiliser les transports à Chicago (Réseau CTA - Métro 'L' & Bus) :</strong><br>
-          • <strong>Le Métro 'L' (Elevated Train) :</strong> 8 lignes identifiées par des couleurs (Red, Blue, Brown, Green...). Toutes convergent vers le centre historique (The Loop). Les lignes Blue et Orange relient directement les aéroports O'Hare et Midway au centre-ville.<br>
-          • <strong>Acheter son titre & Payer sans contact :</strong> Vous pouvez payer <em>directement</em> aux portillons du métro et à bord des bus en posant votre <strong>carte bancaire sans contact</strong> (ou Apple Pay / Google Pay sur smartphone). Tarif : 2,50 $ par trajet en métro, 2,25 $ en bus.<br>
-          • <strong>Pass Illimités Ventra (Très économiques) :</strong><br>
-          &nbsp;&nbsp;- <strong>1-Day CTA Pass :</strong> 5,00 $ (trajets illimités bus + métro pendant 24h)<br>
-          &nbsp;&nbsp;- <strong>3-Day CTA Pass :</strong> 15,00 $ (idéal pour un séjour week-end/court circuit)<br>
-          &nbsp;&nbsp;- <strong>7-Day CTA Pass :</strong> 20,00 $ (le meilleur rapport qualité/prix de la ville)<br>
-          Ces pass s'achètent en 1 minute sur les bornes automatiques tactiles <em>Ventra</em> présentes dans chaque station de métro (CB acceptée) ou directement sur l'application mobile gratuite <em>Ventra App</em>.<br>
-          • <strong>En bus :</strong> Montez obligatoirement par la porte avant et validez votre pass ou carte sans contact sur le lecteur du chauffeur.
-        `;
-        th.places = [
-          {
-            name: "Carte officielle & Horaires en direct CTA",
-            category: "Réseau Métro & Bus de Chicago",
-            location: "Ensemble de la métropole de Chicago",
-            tag: "Plan officiel & Tarifs",
-            phone: "+1 888-968-7282",
-            bookingUrl: "https://www.transitchicago.com/maps/",
-            description: "Accédez au plan officiel complet interactif du métro aérien 'L' et des lignes de bus de Chicago avec calcul d'itinéraire en temps réel.",
-            tips: "Téléchargez l'application Ventra pour suivre l'arrivée des rames à la minute près.",
-            lat: 41.8818,
-            lng: -87.6298
-          },
-          {
-            name: "VTC Uber & Lyft (Chicago)",
-            category: "VTC avec chauffeur 24/7",
-            location: "Disponible partout immédiatement",
-            tag: "Rapide & Prix fixé",
-            phone: "",
-            bookingUrl: "https://www.uber.com/global/fr/cities/chicago/",
-            description: "Les deux géants du VTC américain sont omniprésents à Chicago. Temps d'attente moyen inférieur à 3 minutes dans tout le centre.",
-            tips: "Application indispensable pour rentrer le soir. Le tarif est débité automatiquement sans pourboire obligatoire en cash.",
-            lat: 41.8845,
-            lng: -87.6278
-          },
-          {
-            name: "CURB Chicago Taxis (Taxis officiels Jaunes & Verts)",
-            category: "Compagnie de Taxis Officiels Agréés",
-            location: "Gares, hôtels, aéroports et maraude en rue",
-            tag: "Taxis officiels de la ville",
-            phone: "+1 312-829-4222",
-            bookingUrl: "https://www.gocurb.com/cities/chicago",
-            description: "Plus de 3 000 taxis agréés par la ville de Chicago. Hélables d'un geste de la main dans la rue (voyant lumineux allumé sur le toit) ou réservables via l'application CURB.",
-            tips: "Tous les taxis acceptent obligatoirement la carte bancaire. Compteur officiel affiché sur l'écran du tableau de bord.",
-            lat: 41.8837,
-            lng: -87.6324
-          },
-          {
-            name: "Water Taxi Chicago (Bateaux-Bus sur la rivière)",
-            category: "Navette fluviale panoramique",
-            location: "Quais de Michigan Ave, Willis Tower et Chinatown",
-            tag: "Trajet ludique & panoramique",
-            phone: "+1 312-337-1446",
-            bookingUrl: "https://www.chicagowatertaxi.com",
-            description: "Navettes fluviales jaunes reliant les grands pôles de la ville sur la rivière Chicago. Moyen magique et sans embouteillage pour rejoindre Chinatown ou la Willis Tower.",
-            tips: "Billet simple à 6 $ ou pass journée à 10 $. Très agréable entre avril et novembre.",
-            lat: 41.8890,
-            lng: -87.6235
-          },
-          {
-            name: "Divvy Bikes (Vélos en libre-service & Électriques)",
-            category: "Vélos en libre-service (Bikeshare)",
-            location: "Plus de 600 stations dans toute la ville",
-            tag: "Pistes cyclables du lac",
-            phone: "+1 855-553-4889",
-            bookingUrl: "https://divvybikes.com",
-            description: "Le système de vélos partagés de la ville. Idéal pour parcourir les 30 kilomètres de pistes cyclables aménagées du 'Lakefront Trail' au bord du lac Michigan.",
-            tips: "Déverrouillage directement depuis l'application Lyft ou Divvy.",
-            lat: 41.8817,
-            lng: -87.6247
-          }
-        ];
-      }
-      if (th.id === 'resto') {
-        th.places = [
-          {
-            name: "Lou Malnati's Pizzeria (River North)",
-            category: "Deep Dish Pizza Authentique",
-            location: "439 N Wells St, Chicago",
-            tag: "Spécialité culte",
-            phone: "+1 312-828-9800",
-            bookingUrl: "https://www.loumalnatis.com",
-            description: "La véritable Deep Dish Pizza de Chicago avec sa pâte au beurre croustillante, sa sauce tomate maison et sa mozzarella fondante.",
-            tips: "Comptez 30 à 40 min de cuisson pour une vraie Deep Dish. Commandez-la dès votre arrivée à table.",
-            lat: 41.8903,
-            lng: -87.6343
-          },
-          {
-            name: "Au Cheval",
-            category: "Burger Gourmet & Brasserie",
-            location: "800 W Randolph St, Chicago",
-            tag: "Meilleur burger des USA",
-            phone: "+1 312-929-4580",
-            bookingUrl: "http://auchevaldiner.com",
-            description: "Classé régulièrement meilleur cheeseburger d'Amérique (double patty croustillant, cheddar fondu, œuf au plat et bacon épais). Ambiance diner rétro branchée.",
-            tips: "Ne prend pas de réservations. Venez dès l'ouverture à 11h ou en milieu d'après-midi pour limiter l'attente.",
-            lat: 41.8841,
-            lng: -87.6479
-          },
-          {
-            name: "The Purple Pig",
-            category: "Petites assiettes & Méditerranéen",
-            location: "444 N Michigan Ave, Chicago",
-            tag: "Sur la Magnificent Mile",
-            phone: "+1 312-464-1744",
-            bookingUrl: "https://thepurplepigchicago.com",
-            description: "Institution primée au Michelin Bib Gourmand, célèbre pour ses spécialités méditerranéennes à partager, charcuteries artisanales et terrasse animée.",
-            tips: "Idéal pour un déjeuner raffiné pendant votre shopping sur Michigan Avenue.",
-            lat: 41.8906,
-            lng: -87.6243
-          },
-          {
-            name: "Gibsons Bar & Steakhouse",
-            category: "Steakhouse Américain d'exception",
-            location: "1028 N Rush St, Chicago",
-            tag: "Classique légendaire",
-            phone: "+1 312-266-8999",
-            bookingUrl: "https://www.gibsonssteakhouse.com",
-            description: "Le steakhouse le plus emblématique de Chicago : bœuf certifié Gibsons Prime Angus, portions généreuses, cocktails martini et ambiance vintage.",
-            tips: "Pensez à réserver plusieurs jours à l'avance pour le service du soir.",
-            lat: 41.9016,
-            lng: -87.6277
-          },
-          {
-            name: "Alinea",
-            category: "Haute Gastronomie (3 Étoiles Michelin)",
-            location: "1723 N Halsted St, Chicago",
-            tag: "3 étoiles Michelin mondial",
-            phone: "+1 312-867-0110",
-            bookingUrl: "https://www.alinearestaurant.com",
-            description: "Temple de la cuisine moderniste et moléculaire du Chef Grant Achatz. Une expérience multisensorielle inoubliable élue parmi les meilleures tables du monde.",
-            tips: "Réservation indispensable plusieurs mois à l'avance via leur billetterie en ligne.",
-            lat: 41.9134,
-            lng: -87.6481
-          },
-          {
-            name: "The Chicago Diner (Meat Free Since '83)",
-            category: "Végétarien & Végane Gourmand",
-            location: "3411 N Halsted St, Chicago",
-            tag: "100% Végétarien & Végane",
-            phone: "+1 773-935-6696",
-            bookingUrl: "https://www.veggiediner.com",
-            description: "Pionnier de la cuisine végétale à Chicago : version végane bluffante du sandwich Reuben, poutines végétales, burgers bios et milkshakes sans lactose récompensés.",
-            tips: "Ne manquez pas leur célèbre milkshake au beurre de cacahuète végétal !",
-            lat: 41.9442,
-            lng: -87.6491
-          },
-          {
-            name: "Duck Duck Goat (Chef Stephanie Izard)",
-            category: "Cuisine Asiatique & Dim Sum créatifs",
-            location: "857 W Fulton Market, Chicago",
-            tag: "Saveurs asiatiques & Wok",
-            phone: "+1 312-902-3825",
-            bookingUrl: "https://www.duckduckgoatchicago.com",
-            description: "Table asiatique vibrante au cœur du quartier branché de Fulton Market : nouilles fraîches tirées à la main, dumplings vapeur et canard laqué pékinois d'exception.",
-            tips: "Commandez plusieurs dim sum à partager au centre de la table.",
-            lat: 41.8867,
-            lng: -87.6496
-          },
-          {
-            name: "Shaw's Crab House",
-            category: "Poissons, Huîtres & Fruits de mer frais",
-            location: "21 E Hubbard St, Chicago",
-            tag: "Fruits de mer & Oyster Bar",
-            phone: "+1 312-527-2722",
-            bookingUrl: "https://www.shawscrabhouse.com",
-            description: "Bar à huîtres et restaurant de poissons haut de gamme style rétro : crabes royaux de l'Alaska, homards du Maine, sushis de maître et arrivages de l'Atlantique.",
-            tips: "L'Oyster Bar côté taverne propose d'excellentes formules happy hour en fin d'après-midi.",
-            lat: 41.8899,
-            lng: -87.6271
-          }
-        ];
-      } else if (th.id === 'visites') {
-        th.places = [
-          {
-            name: "Art Institute of Chicago & Millenium Park",
-            category: "Musée Mondial d'Art",
-            location: "111 S Michigan Ave, Chicago",
-            tag: "Chef-d'œuvre mondial",
-            phone: "+1 312-443-3600",
-            bookingUrl: "https://www.artic.edu",
-            description: "L'un des plus grands musées du monde : célèbre collection impressionniste, peintures d'Edward Hopper, Grant Wood et statues modernes.",
-            tips: "Passez voir la sculpture 'The Bean' (Cloud Gate) dans le parc attenant juste après.",
-            lat: 41.8796,
-            lng: -87.6237
-          },
-          {
-            name: "Skydeck Chicago (Willis Tower - The Ledge)",
-            category: "Panorama 360° & Boîtes de verre",
-            location: "233 S Wacker Dr, Chicago",
-            tag: "Vue à couper le souffle",
-            phone: "+1 312-875-9696",
-            bookingUrl: "https://theskydeck.com",
-            description: "Montez au 103ème étage et marchez au-dessus du vide sur 'The Ledge', les balcons en verre surplombant la ville à 412 mètres.",
-            tips: "Montez 1h avant le coucher du soleil pour profiter de la lumière dorée puis des lumières nocturnes.",
-            lat: 41.8789,
-            lng: -87.6359
-          },
-          {
-            name: "Chicago Architecture River Cruise",
-            category: "Croisière Architecturale",
-            location: "112 E Wacker Dr, Chicago",
-            tag: "Incontournable",
-            phone: "+1 312-922-3432",
-            bookingUrl: "https://www.architecture.org/cruises",
-            description: "Croisière sur la rivière Chicago commentée par des guides architectes : l'histoire fascinante de la naissance des gratte-ciels.",
-            tips: "Prenez une place sur le pont supérieur pour les meilleures photos de la Tribune Tower et de Marina City.",
-            lat: 41.8887,
-            lng: -87.6247
-          }
-        ];
-      } else if (th.id === 'shopping') {
-        th.places = [
-          {
-            name: "The Magnificent Mile (Michigan Avenue)",
-            category: "Avenue commerçante mythique",
-            location: "North Michigan Ave, Chicago",
-            tag: "Grands magasins & Boutiques",
-            phone: "",
-            bookingUrl: "https://www.themagnificentmile.com",
-            description: "Plus de 450 boutiques, grands magasins prestigieux (Nordstrom, Macy's) et galeries marchandes au cœur de la ville.",
-            tips: "Flânez du pont de la rivière Chicago jusqu'à la Water Tower historique.",
-            lat: 41.8968,
-            lng: -87.6243
-          },
-          {
-            name: "Water Tower Place",
-            category: "Centre commercial historique sur 8 étages",
-            location: "835 N Michigan Ave, Chicago",
-            tag: "Mode & Souvenirs",
-            phone: "+1 312-440-3166",
-            bookingUrl: "https://www.shopwatertower.com",
-            description: "Complexe commercial iconique abritant des marques américaines exclusives, boutiques de souvenirs et espaces gourmands.",
-            tips: "Parfait en cas de météo fraîche ou pluvieuse pour faire du shopping à l'abri.",
-            lat: 41.8979,
-            lng: -87.6234
-          }
-        ];
-      } else if (th.id === 'pratique') {
-        th.places = [
-          {
-            name: "Chase Bank & ATM Loop Michigan",
-            category: "Distributeur automatique de billets (DAB)",
-            location: "10 S Dearborn St / Michigan Ave, Chicago",
-            tag: "Sécurisé 24/7",
-            phone: "+1 312-732-4000",
-            bookingUrl: "",
-            description: "Agence bancaire principale avec DAB acceptant toutes cartes internationales (Visa, Mastercard).",
-            tips: "Privilégiez les DAB situés dans les sas intérieurs sécurisés des agences bancaires.",
-            lat: 41.8818,
-            lng: -87.6298
-          },
-          {
-            name: "Walgreens Pharmacy & Convenience Store",
-            category: "Pharmacie & Dépannage quotidien",
-            location: "151 N State St, Chicago",
-            tag: "Ouvert tard",
-            phone: "+1 312-863-4249",
-            bookingUrl: "",
-            description: "Grande enseigne américaine regroupant pharmacie de soins, produits de parapharmacie, adaptateurs électriques et snacks frais.",
-            tips: "Idéal pour trouver de l'eau minérale, des pansements ou des souvenirs de Chicago à petits prix.",
-            lat: 41.8845,
-            lng: -87.6278
-          }
-        ];
-      } else if (th.id === 'detente') {
-        th.places = [
-          {
-            name: "Cindy's Rooftop (Chicago Athletic Association)",
-            category: "Rooftop panoramique face au lac",
-            location: "12 S Michigan Ave, Chicago",
-            tag: "Vue époustouflante sur Millennium Park",
-            phone: "+1 312-792-3502",
-            bookingUrl: "https://www.cindysrooftop.com",
-            description: "Terrasse sous verrière spectaculaire offrant une vue plongeante sur 'The Bean', le Millennium Park et le lac Michigan. Cocktails signature d'exception.",
-            tips: "Arrivez tôt en fin d'après-midi pour profiter de la lumière du coucher de soleil sur le parc.",
-            lat: 41.8817,
-            lng: -87.6247
-          },
-          {
-            name: "Green Mill Cocktail Lounge",
-            category: "Club de Jazz Historique (Al Capone)",
-            location: "4802 N Broadway, Chicago",
-            tag: "Histoire & Jazz live",
-            phone: "+1 773-878-5552",
-            bookingUrl: "https://greenmilljazz.com",
-            description: "Le bar de jazz le plus légendaire des États-Unis, ancien repaire d'Al Capone conservé dans son décor des années 1930 avec concerts live chaque soir.",
-            tips: "Paiement en espèces (Cash only). Venez tôt pour avoir une place assise.",
-            lat: 41.9692,
-            lng: -87.6598
-          }
-        ];
+        const trData = aiResult.themes.transports || { transitMapUrl: '', guideHtml: '', places: [] };
+        th.transitMapUrl = trData.transitMapUrl || th.transitMapUrl || '';
+        th.guideHtml = trData.guideHtml || th.guideHtml || '';
+        th.places = Array.isArray(trData.places) ? trData.places : [];
+      } else {
+        th.places = Array.isArray(aiResult.themes[th.id]) ? aiResult.themes[th.id] : [];
       }
     });
 
-  // 2. Pack Spécial ITALIE & DOLOMITES
-  } else if (lowerCity.includes("italie") || lowerCity.includes("dolomite") || lowerCity.includes("bolzano") || lowerCity.includes("garde")) {
-    tripData.conciergerie.welcomeMessage = "Benvenuti in Italia ! Je suis votre Concierge Voyage Girardot. Que désirez-vous pour votre temps libre entre les lacs et les Dolomites ?";
-    
-    tripData.conciergerie.themes.forEach(th => {
-      th.enabled = true;
-      if (th.id === 'resto') {
-        th.places = [
-          {
-            name: "Wirtshaus Vögele",
-            category: "Cuisine traditionnelle tyrolienne",
-            location: "Via Goethe 3, Bolzano",
-            tag: "Coup de cœur terroir",
-            phone: "+39 0471 973938",
-            bookingUrl: "https://www.voegele.it",
-            description: "Auberge historique depuis 1870 servant les meilleurs Knödel, goulash alpin et vins du Haut-Adige.",
-            tips: "Demandez une table dans la 'Goethestube' lambrissée de bois traditionnel.",
-            lat: 46.4995,
-            lng: 11.3538
-          },
-          {
-            name: "Ristorante Il Bacio da Ciro",
-            category: "Pizzas au feu de bois & Poissons",
-            location: "Via Grappoli 41, Bolzano",
-            tag: "Tradition italienne",
-            phone: "+39 0471 977990",
-            bookingUrl: "https://www.ilbaciodaciro.it",
-            description: "Pizzas napolitaines croustillantes et généreuses, poissons frais de la Méditerranée et pâtes faites maison.",
-            tips: "Excellente option pour changer des spécialités de montagne.",
-            lat: 46.5010,
-            lng: 11.3560
-          },
-          {
-            name: "Restaurant Zur Kaiserkron",
-            category: "Haute Gastronomie Italienne & Étoilé",
-            location: "Piazza della Mostra 1, Bolzano",
-            tag: "Gastronomique & Raffiné",
-            phone: "+39 0471 028000",
-            bookingUrl: "https://www.zurkaiserkron.com",
-            description: "Haute cuisine raffinée mêlant produits alpins et créations méditerranéennes dans un somptueux palais baroque avec cave à vin prestigieuse.",
-            tips: "Menu dégustation hautement recommandé pour un dîner d'exception.",
-            lat: 46.4991,
-            lng: 11.3551
-          },
-          {
-            name: "Lokal & Burger Bar 1838",
-            category: "Burger Gourmet & Viandes du Tyrol",
-            location: "Via Museo 24, Bolzano",
-            tag: "Burgers artisanaux",
-            phone: "+39 0471 974000",
-            bookingUrl: "",
-            description: "Burgers gourmets préparés avec de la viande de bœuf alpine locale, pains au levain briochés et frites maison croustillantes.",
-            tips: "Essayez le burger au fromage d'alpage affiné et speck croustillant.",
-            lat: 46.5002,
-            lng: 11.3510
-          },
-          {
-            name: "Green Garden & Veg Bistro",
-            category: "Végétarien & Végane Méditerranéen",
-            location: "Via Bottai 15, Bolzano",
-            tag: "100% Bio & Végétal",
-            phone: "+39 0471 982555",
-            bookingUrl: "",
-            description: "Cuisine végétale créative, bols de saison, risottos aux herbes des Dolomites et desserts sans gluten.",
-            tips: "Terrasse intime parfaite pour un déjeuner léger et sain.",
-            lat: 46.5008,
-            lng: 11.3548
-          },
-          {
-            name: "Koisan Asian Fusion & Sushi",
-            category: "Cuisine Asiatique, Wok & Sushis",
-            location: "Via Claudia Augusta 19, Bolzano",
-            tag: "Saveurs d'Asie & Sushis frais",
-            phone: "+39 0471 289111",
-            bookingUrl: "https://www.koisan.it",
-            description: "Cuisine fusion asiatique de haute volée : sushis et sashimis ultra-frais, plats sautés au wok et gyozas faits maison.",
-            tips: "Option à emporter ou sur place dans un cadre zen et soigné.",
-            lat: 46.4885,
-            lng: 11.3472
-          }
-        ];
-      } else if (th.id === 'visites') {
-        th.places = [
-          {
-            name: "Château Mareccio (Schloss Maretsch)",
-            category: "Château Renaissance & Vignobles",
-            location: "Via Claudia de' Medici 12, Bolzano",
-            tag: "Cadre enchanteur",
-            phone: "+39 0471 976615",
-            bookingUrl: "https://www.maretsch.info",
-            description: "Forteresse médiévale ceinte par des vignes au bord de la rivière Talvera, avec une vue splendide sur les parois du mont Rosengarten.",
-            tips: "Promenade piétonne très agréable depuis le centre historique de Bolzano le long de la rivière.",
-            lat: 46.5042,
-            lng: 11.3512
-          },
-          {
-            name: "Musée d'Archéologie du Haut-Adige (Ötzi)",
-            category: "Musée Historique Mondial",
-            location: "Via Museo 43, Bolzano",
-            tag: "Incontournable",
-            phone: "+39 0471 320100",
-            bookingUrl: "https://www.iceman.it",
-            description: "Le célèbre musée abritant la momie des glaces Ötzi âgée de plus de 5 000 ans, découverte intacte dans les glaciers des Alpes.",
-            tips: "Réservez votre créneau en ligne pour éviter l'attente en haute saison.",
-            lat: 46.4998,
-            lng: 11.3496
-          }
-        ];
-      } else if (th.id === 'shopping') {
-        th.places = [
-          {
-            name: "Marché de la Piazza delle Erbe",
-            category: "Marché traditionnel gourmand",
-            location: "Piazza delle Erbe, Bolzano",
-            tag: "Produits du terroir",
-            phone: "",
-            bookingUrl: "",
-            description: "Le marché aux étals colorés de fruits des vallées, fromages d'alpage affinés, speck du Tyrol et pain au cumin (Schüttelbrot).",
-            tips: "Fermé le dimanche après-midi. Idéal le matin pour goûter les produits locaux.",
-            lat: 46.4993,
-            lng: 11.3524
-          }
-        ];
-      } else if (th.id === 'pratique') {
-        th.places = [
-          {
-            name: "Pharmacie Madonna / Apotheke",
-            category: "Pharmacie centrale",
-            location: "Piazza Walther, Bolzano",
-            tag: "Centre-ville",
-            phone: "+39 0471 971360",
-            bookingUrl: "",
-            description: "Pharmacie historique sur la place principale avec personnel parlant français, allemand et italien.",
-            tips: "Pratique pour trouver des protections solaires haute montagne et pansements de randonnée.",
-            lat: 46.4982,
-            lng: 11.3546
-          }
-        ];
-      } else if (th.id === 'detente') {
-        th.places = [
-          {
-            name: "Caffè Stadt Hotel Walther",
-            category: "Café viennois historique",
-            location: "Piazza Walther 2, Bolzano",
-            tag: "Terrasse au soleil",
-            phone: "+39 0471 300007",
-            bookingUrl: "",
-            description: "La grande terrasse ensoleillée de la ville pour savourer un véritable espresso italien ou un spritz vénitien face au Duomo.",
-            tips: "Goûtez à leur strudel aux pommes chaud servi avec de la crème vanillée.",
-            lat: 46.4980,
-            lng: 11.3540
-          }
-        ];
-      } else if (th.id === 'transports') {
-        th.transitMapUrl = "https://www.suedtirolmobil.info/fr/";
-        th.guideHtml = `
-          <strong>🚌 Transports en commun du Sud-Tyrol & Dolomites (Südtirol Mobil) :</strong><br>
-          • <strong>Réseau intégré :</strong> Bus urbains SASA, trains régionaux et téléphériques (Renon, San Genesio...).<br>
-          • <strong>Billetterie :</strong> Billet simple à 1,50 € (valable 60 min) disponible sur les bornes ou par carte sans contact. La carte <em>Mobilcard Südtirol</em> (1, 3 ou 7 jours) permet des voyages illimités sur l'ensemble du réseau public.<br>
-          • <strong>Taxis & VTC :</strong> Radio Taxi Bolzano disponible 24/7 au +39 0471 981111 (station principale face à la gare).
-        `;
-        th.places = [
-          {
-            name: "Südtirol Mobil (Carte & Lignes de Bus/Train)",
-            category: "Réseau Transports Publics du Tyrol",
-            location: "Gare centrale de Bolzano (Bozen)",
-            tag: "Réseau officiel",
-            phone: "+39 0471 220880",
-            bookingUrl: "https://www.suedtirolmobil.info/fr/",
-            description: "Carte interactive et calculateur d'itinéraires pour tous les bus, trains régionaux et téléphériques des vallées alpines.",
-            tips: "Application officielle 'südtirolmobil' recommandée pour les horaires de passage en temps réel.",
-            lat: 46.4969,
-            lng: 11.3575
-          },
-          {
-            name: "Radio Taxi Bolzano 24/7",
-            category: "Centrale de Taxis Officiels",
-            location: "Piazza Stazione, Bolzano",
-            tag: "Taxis officiels agréés",
-            phone: "+39 0471 981111",
-            bookingUrl: "https://www.radiotaxibolzano.it",
-            description: "Centrale officielle de taxis disponible 24h/24 pour les déplacements en ville et transferts vers les cols alpins.",
-            tips: "Paiement par carte bancaire accepté dans tous les véhicules.",
-            lat: 46.4970,
-            lng: 11.3580
-          }
-        ];
-      }
-    });
+    renderAdminConcierge();
 
-  // 3. Pack Spécial AFRIQUE DU SUD / LE CAP
-  } else if (lowerCity.includes("afrique") || lowerCity.includes("cap") || lowerCity.includes("kruger")) {
-    tripData.conciergerie = JSON.parse(JSON.stringify(window.defaultTravelData.conciergerie));
+    const searchBadge = aiResult.usedWebSearch
+      ? 'Recherche Web Google active'
+      : 'Mode JSON direct';
+    setConciergeAiStatusBanner(
+      'success',
+      `<i class="fa-solid fa-circle-check"></i> <strong>Conciergerie mise à jour pour « ${detectedCity} » :</strong> ${aiResult.totalPlaces} adresse(s) réelle(s) générée(s) via <code>${aiResult.workingModel}</code> (${searchBadge}). Pensez à relire puis enregistrer le voyage.`
+    );
+  } catch (err) {
+    console.error("Erreur génération IA Conciergerie :", err);
+    const readableErr = (typeof window.formatGeminiUserErrorMessage === 'function')
+      ? window.formatGeminiUserErrorMessage(err)
+      : (err && err.message ? err.message : 'Erreur inconnue lors de la recherche IA.');
 
-  // 4. Génération Universelle Dynamique (Toutes destinations mondiales)
-  } else {
-    tripData.conciergerie.welcomeMessage = `Bienvenue à ${detectedCity} ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre aujourd'hui ?`;
-    
-    tripData.conciergerie.themes.forEach(th => {
-      th.enabled = true;
-      if (th.id === 'resto') {
-        th.places = [
-          {
-            name: `Restaurant Gastronomique Étoilé de ${detectedCity}`,
-            category: "Haute Gastronomie & Produits d'exception",
-            location: `Centre historique, ${detectedCity}`,
-            tag: "Table d'exception",
-            phone: "+33 00 00 00 00",
-            bookingUrl: "",
-            description: `Table renommée primée par les guides gastronomiques, sublimant les trésors culinaires et accords mets-vins de ${detectedCity}.`,
-            tips: "Pensez à réserver à l'avance pour le service du soir.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Burger Gourmet & Viandes Rôties de ${detectedCity}`,
-            category: "Burger Gourmet & Grill",
-            location: `Quartier animé, ${detectedCity}`,
-            tag: "Burgers artisanaux",
-            phone: "",
-            bookingUrl: "",
-            description: `Burgers maison généreux, pains artisanaux briochés, sauces signatures et frites croustillantes préparés avec des viandes locales.`,
-            tips: "Option conviviale et rapide pour un déjeuner décontracté.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Bistro Végétarien & Saveurs du Jardin de ${detectedCity}`,
-            category: "Végétarien, Végane & Produits Frais",
-            location: `Quartier commerçant, ${detectedCity}`,
-            tag: "100% Frais & Végétal",
-            phone: "",
-            bookingUrl: "",
-            description: `Cuisine végétale créative, plats colorés de saison, risottos gourmands et pâtisseries saines élaborés à partir de récoltes locales.`,
-            tips: "Idéal pour une pause gourmande légère et ressourçante.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Table Asiatique, Dim Sum & Wok de ${detectedCity}`,
-            category: "Cuisine Asiatique & Saveurs d'Asie",
-            location: `Centre-ville, ${detectedCity}`,
-            tag: "Saveurs d'Asie & Wok",
-            phone: "",
-            bookingUrl: "",
-            description: `Spécialités asiatiques parfumées : nouilles sautées au wok, dim sum vapeur, woks croustillants et sushis frais.`,
-            tips: "Parfait pour partager plusieurs plats au centre de la table.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Brasserie Traditionnelle & Terroir de ${detectedCity}`,
-            category: "Cuisine Locale & Spécialités Régionales",
-            location: `Place principale, ${detectedCity}`,
-            tag: "Ambiance chaleureuse",
-            phone: "",
-            bookingUrl: "",
-            description: `Établissement apprécié des locaux pour ses recettes de tradition, ses poissons ou viandes mijotées et son atmosphère typique.`,
-            tips: "Terrasse très agréable à l'heure du déjeuner ou pour dîner.",
-            lat: null,
-            lng: null
-          }
-        ];
-      } else if (th.id === 'visites') {
-        th.places = [
-          {
-            name: `Monuments & Cœur Historique de ${detectedCity}`,
-            category: "Patrimoine & Histoire",
-            location: `${detectedCity}`,
-            tag: "À ne pas manquer",
-            phone: "",
-            bookingUrl: "",
-            description: `Promenade à travers les rues historiques, places emblématiques et chefs-d'œuvre architecturaux de la cité.`,
-            tips: "Prévoyez des chaussures confortables pour flâner à pied.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Grand Musée & Belvédère Panoramique de ${detectedCity}`,
-            category: "Culture & Vue panoramique",
-            location: `Centre culturel, ${detectedCity}`,
-            tag: "Panorama grandiose",
-            phone: "",
-            bookingUrl: "",
-            description: `Collections prestigieuses retraçant l'histoire de la région avec point de vue surplombant toute la ville.`,
-            tips: "Idéal pour prendre de superbes photos souvenirs.",
-            lat: null,
-            lng: null
-          }
-        ];
-      } else if (th.id === 'shopping') {
-        th.places = [
-          {
-            name: `Marché artisanal & Halles de ${detectedCity}`,
-            category: "Artisanat & Spécialités locales",
-            location: `Marché central, ${detectedCity}`,
-            tag: "Souvenirs authentiques",
-            phone: "",
-            bookingUrl: "",
-            description: `Lieu parfait pour rencontrer des artisans locaux et rapporter des souvenirs typiques et produits régionaux.`,
-            tips: "Privilégiez les matinées pour profiter de l'animation des étals.",
-            lat: null,
-            lng: null
-          }
-        ];
-      } else if (th.id === 'pratique') {
-        th.places = [
-          {
-            name: `Banque, DAB & Point de Change Central`,
-            category: "Distributeur d'espèces (DAB)",
-            location: `Avenue principale, ${detectedCity}`,
-            tag: "Sécurisé 24/7",
-            phone: "",
-            bookingUrl: "",
-            description: `DAB bancaire officiel acceptant les cartes bancaires internationales pour vos retraits d'argent en toute sécurité.`,
-            tips: "Refusez la conversion dynamique proposée par le DAB pour économiser sur les frais.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Pharmacie & Soins quotidiens de ${detectedCity}`,
-            category: "Pharmacie & Santé",
-            location: `Centre-ville, ${detectedCity}`,
-            tag: "Service de proximité",
-            phone: "",
-            bookingUrl: "",
-            description: `Établissement fournissant médicaments de premier secours, protections solaires et conseils santé.`,
-            tips: "Le numéro d'urgence de votre accompagnateur reste joignable à tout moment.",
-            lat: null,
-            lng: null
-          }
-        ];
-      } else if (th.id === 'detente') {
-        th.places = [
-          {
-            name: `Café historique & Salon de thé de ${detectedCity}`,
-            category: "Café de tradition",
-            location: `Quartier piétonnier, ${detectedCity}`,
-            tag: "Pause gourmande",
-            phone: "",
-            bookingUrl: "",
-            description: `Pause idéale pour savourer un café, un thé ou une boisson rafraîchissante dans un décor élégant.`,
-            tips: "Idéal pour faire une pause détente entre deux visites libres.",
-            lat: null,
-            lng: null
-          }
-        ];
-      } else if (th.id === 'transports') {
-        th.transitMapUrl = `https://www.google.com/maps/search/transports+publics+${encodeURIComponent(detectedCity)}`;
-        th.guideHtml = `
-          <strong>🚌 Conseils transports en commun à ${detectedCity} :</strong><br>
-          • <strong>Réseau urbain :</strong> Privilégiez le réseau officiel de métros, trams ou bus pour vous déplacer rapidement dans l'agglomération.<br>
-          • <strong>Achat des billets & Pass :</strong> Des pass 24h ou carnets de tickets sont généralement vendus aux distributeurs automatiques des stations ou via l'application mobile locale de transport.<br>
-          • <strong>Taxis & VTC :</strong> Utilisez les stations de taxis officielles ou les applications de VTC (Uber, Bolt) pour vos retours nocturnes en toute sécurité.
-        `;
-        th.places = [
-          {
-            name: `Réseau de transports en commun de ${detectedCity}`,
-            category: "Transports publics urbains",
-            location: `Gare centrale, ${detectedCity}`,
-            tag: "Lignes & Horaires",
-            phone: "",
-            bookingUrl: `https://www.google.com/maps/search/transports+publics+${encodeURIComponent(detectedCity)}`,
-            description: `Réseau de bus, trams et métros desservant le centre-ville et les sites touristiques majeurs de ${detectedCity}.`,
-            tips: "Pensez à composter ou valider votre titre de transport dès la montée.",
-            lat: null,
-            lng: null
-          },
-          {
-            name: `Taxis Officiels & VTC (Uber / Bolt) de ${detectedCity}`,
-            category: "Taxis & VTC sécurisés",
-            location: `Stations d'hôtels et gares`,
-            tag: "Disponible 24/7",
-            phone: "",
-            bookingUrl: "",
-            description: `Services de taxis officiels agréés et applications de chauffeurs privés pour vos transferts rapides en ville.`,
-            tips: "Vérifiez que le chauffeur enclenche le compteur ou réservez votre trajet via l'application.",
-            lat: null,
-            lng: null
-          }
-        ];
-      }
-    });
-  }
+    setConciergeAiStatusBanner(
+      'error',
+      `<i class="fa-solid fa-triangle-exclamation"></i> <strong>Échec de la recherche IA pour « ${detectedCity} » :</strong> ${readableErr}<br><span style="font-size:0.78rem; opacity:0.9;">Les données existantes de votre conciergerie n'ont pas été écrasées et aucune adresse fictive n'a été générée.</span>`
+    );
 
-  // Si des coordonnées GPS manquent, essayer de géocoder automatiquement la ville pour le premier restaurant et premier monument
-  try {
-    const geoRes = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(detectedCity)}&limit=1`, { headers: { 'Accept-Language': 'fr' } });
-    const geoData = await geoRes.json();
-    if (geoData && geoData.length > 0) {
-      const cLat = parseFloat(geoData[0].lat);
-      const cLon = parseFloat(geoData[0].lon);
-      tripData.conciergerie.themes.forEach(th => {
-        th.places.forEach(p => {
-          if (!p.lat || !p.lng) {
-            p.lat = cLat;
-            p.lng = cLon;
-          }
-        });
-      });
+    if (err && err.code === 'MISSING_GEMINI_KEY' && typeof window.openGeminiConfigModal === 'function') {
+      window.openGeminiConfigModal();
     }
-  } catch (e) {
-    console.warn("Geocode fallback silent error:", e);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = originalBtnHtml;
+    }
   }
-
-  renderAdminConcierge();
-  alert(`✓ Conciergerie générée avec succès pour "${detectedCity}" ! Les ${tripData.conciergerie.themes.length} thématiques sont maintenant garnies d'adresses vérifiées. Vous pouvez dérouler chaque section pour les modifier à votre convenance.`);
 }
 
 // -----------------------------------------------------------------------------
