@@ -1,5 +1,15 @@
 window.AVAILABLE_TRIPS = [
   {
+    id: "laponie-au-pays-du-pere-noel",
+    alias: "laponie-au-pays-du-pere-noel",
+    aliases: ["laponie-au-pays-du-pere-noel"],
+    title: "Laponie, Au pays du Père Noël",
+    subtitle: "Envol Lyon",
+    dates: "9 au 16 janvier 2027",
+    file: "voyages/laponie-au-pays-du-pere-noel.json"
+  },
+
+  {
     id: "inde-du-nord",
     alias: "inde-du-nord",
     aliases: ["inde-du-nord"],
