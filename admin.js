@@ -1038,28 +1038,780 @@ function updateBaggageField(field, val) {
 }
 
 // -----------------------------------------------------------------------------
-// 2. PROGRAMME JOUR PAR JOUR & VISITES AVEC GPS AUTOMATIQUE
+// 2. PROGRAMME JOUR PAR JOUR, REGROUPEMENT SÉJOUR LIBRE (JOUR X À Y) & VISITES
 // -----------------------------------------------------------------------------
+let stayGroupingPanelForcedOpen = false;
+
+function formatAdminDayLabel(item, prefix = 'Jour') {
+  if (!item) return prefix;
+  const start = Number(item.day) || 1;
+  const end = Number(item.endDay) || 0;
+  if (end > start) {
+    return prefix === 'J' ? `J${start} à ${end}` : `${prefix} ${start} à ${end}`;
+  }
+  return prefix === 'J' ? `J${start}` : `${prefix} ${start}`;
+}
+
+function getItineraryMaxDay(itinerary) {
+  if (!Array.isArray(itinerary) || itinerary.length === 0) return 0;
+  return itinerary.reduce((max, d) => {
+    const start = Number(d.day) || 0;
+    const end = Number(d.endDay) || 0;
+    return Math.max(max, start, end);
+  }, 0);
+}
+
+function hasGroupedStayDays(itinerary) {
+  if (!Array.isArray(itinerary)) return false;
+  return itinerary.some(d => Number(d.endDay) > Number(d.day));
+}
+
+function expandItineraryToIndividualDays(itinerary) {
+  if (!Array.isArray(itinerary) || itinerary.length === 0) return [];
+  const expanded = [];
+
+  itinerary.forEach(item => {
+    const start = Number(item.day) || 1;
+    const end = (item.endDay && Number(item.endDay) > start) ? Number(item.endDay) : start;
+
+    if (end > start) {
+      const sourceList = Array.isArray(item._groupedSourceDays) ? item._groupedSourceDays : [];
+      for (let dNum = start; dNum <= end; dNum++) {
+        const savedOrig = sourceList.find(s => Number(s.day) === dNum);
+        if (savedOrig) {
+          const restored = JSON.parse(JSON.stringify(savedOrig));
+          restored.day = dNum;
+          delete restored.endDay;
+          delete restored._groupedSourceDays;
+          if (!restored.city && item.city) restored.city = item.city;
+          if (!restored.image && item.image) restored.image = item.image;
+          if ((!restored.lat || !restored.lng) && item.lat && item.lng) {
+            restored.lat = item.lat;
+            restored.lng = item.lng;
+          }
+          expanded.push(restored);
+        } else {
+          const cloned = JSON.parse(JSON.stringify(item));
+          cloned.day = dNum;
+          delete cloned.endDay;
+          delete cloned._groupedSourceDays;
+          cloned.dateStr = `Jour ${dNum}`;
+          if (cloned.title && /jours?\s*\d+\s*(?:à|au|[-–—])\s*\d+/i.test(cloned.title)) {
+            cloned.title = cloned.title.replace(/jours?\s*\d+\s*(?:à|au|[-–—])\s*\d+/i, `Jour ${dNum}`);
+          }
+          expanded.push(cloned);
+        }
+      }
+    } else {
+      const single = JSON.parse(JSON.stringify(item));
+      single.day = start;
+      delete single.endDay;
+      delete single._groupedSourceDays;
+      expanded.push(single);
+    }
+  });
+
+  expanded.sort((a, b) => Number(a.day) - Number(b.day));
+
+  // Déduplication par numéro de jour au cas où
+  const byDay = new Map();
+  expanded.forEach(d => {
+    if (!byDay.has(d.day)) byDay.set(d.day, d);
+  });
+  return Array.from(byDay.values()).sort((a, b) => a.day - b.day);
+}
+
+function mergeDaySliceIntoGroup(daysSlice, startDay, endDay) {
+  if (!Array.isArray(daysSlice) || daysSlice.length === 0) {
+    return {
+      day: startDay,
+      endDay: endDay > startDay ? endDay : undefined,
+      title: `Séjour libre (Jour ${startDay} à ${endDay})`,
+      highlight: "Séjour libre & découvertes",
+      city: "",
+      description: "Journées libres pour profiter de la destination à votre rythme.",
+      dateStr: `Jour ${startDay} à ${endDay}`,
+      lat: null,
+      lng: null,
+      image: "",
+      timeline: [
+        {
+          time: "",
+          title: "Journées libres & découverte",
+          subtitle: "Journées libres en pension complète, demi-pension ou nuit + petit-déjeuner selon le programme.",
+          icon: "compass"
+        }
+      ]
+    };
+  }
+
+  if (daysSlice.length === 1 && startDay === endDay) {
+    const single = JSON.parse(JSON.stringify(daysSlice[0]));
+    single.day = startDay;
+    delete single.endDay;
+    delete single._groupedSourceDays;
+    return single;
+  }
+
+  const first = daysSlice[0];
+  const last = daysSlice[daysSlice.length - 1];
+  const city = (daysSlice.find(d => d.city && d.city.trim()) || first).city || "";
+  const image = (daysSlice.find(d => d.image && d.image.trim()) || first).image || "";
+  const withCoords = daysSlice.find(d => d.lat && d.lng && (Number(d.lat) !== 0 || Number(d.lng) !== 0)) || first;
+  const highlight = (daysSlice.find(d => d.highlight && d.highlight.trim()) || first).highlight || `Séjour libre (${endDay - startDay + 1} jours)`;
+
+  // Construction intelligente du titre
+  const cleanedTitles = [];
+  daysSlice.forEach(d => {
+    let t = (d.title || "").trim();
+    t = t.replace(/^jours?\s*\d+(?:\s*(?:à|au|[-–—])\s*\d+)?\s*[:•\-–—]\s*/i, '').trim();
+    if (t && !cleanedTitles.some(existing => existing.toLowerCase() === t.toLowerCase())) {
+      cleanedTitles.push(t);
+    }
+  });
+
+  let mergedTitle = "";
+  if (cleanedTitles.length === 1) {
+    mergedTitle = cleanedTitles[0];
+  } else if (cleanedTitles.length > 1 && cleanedTitles.every(t => /journ[ée]es?\s+libres?|s[ée]jour\s+libre/i.test(t))) {
+    mergedTitle = city ? `Séjour libre à ${city}` : "Journées libres en séjour";
+  } else if (cleanedTitles.length > 1) {
+    mergedTitle = cleanedTitles.slice(0, 3).join(' • ');
+  } else {
+    mergedTitle = city ? `Séjour libre à ${city}` : `Séjour libre (Jour ${startDay} à ${endDay})`;
+  }
+
+  // Construction de la date affichée
+  const d1Str = (first.dateStr || "").trim();
+  const d2Str = (last.dateStr || "").trim();
+  let mergedDateStr = `Jour ${startDay} à ${endDay}`;
+  const isGenericDayLabel = (s) => !s || /^jours?\s*\d+/i.test(s) || /^[ée]tapes?\s*\d+/i.test(s);
+  if (!isGenericDayLabel(d1Str) && !isGenericDayLabel(d2Str) && d1Str !== d2Str) {
+    mergedDateStr = `${d1Str} → ${d2Str}`;
+  } else if (!isGenericDayLabel(d1Str)) {
+    mergedDateStr = d1Str;
+  }
+
+  // Fusion sans doublons des descriptions
+  const uniqueDescs = [];
+  daysSlice.forEach(d => {
+    const desc = (d.description || "").trim();
+    if (desc && !uniqueDescs.some(u => u.toLowerCase() === desc.toLowerCase())) {
+      uniqueDescs.push(desc);
+    }
+  });
+  let mergedDescription = uniqueDescs.join('\n\n');
+  if (uniqueDescs.length === 1) {
+    mergedDescription = uniqueDescs[0].replace(/^Journée libre\b/i, 'Journées libres');
+  }
+
+  // Fusion intelligente de la timeline (évite de répéter 3 fois "Journée libre" ou "Déjeuner / Dîner logement" identiques)
+  const mergedTimeline = [];
+  const seenGenericKeys = new Set();
+  const multiDaySpan = daysSlice.length > 1;
+
+  daysSlice.forEach(d => {
+    const list = Array.isArray(d.timeline) ? d.timeline : [];
+    list.forEach(v => {
+      const vTitle = (v.title || "").trim();
+      const vSub = (v.subtitle || "").trim();
+      const isGenericFreeOrMeal = /^(journ[ée]es?\s+libres?|temps\s+libre|d[ée]jeuner(\s+libre)?|d[îi]ner(\s+libre|\s+logement|\s+et\s+nuit)?|petit[- ]d[ée]jeuner|logement)$/i.test(vTitle);
+      const dedupKey = `${vTitle.toLowerCase()}||${vSub.toLowerCase()}`;
+
+      if (isGenericFreeOrMeal || seenGenericKeys.has(dedupKey)) {
+        if (seenGenericKeys.has(dedupKey)) return;
+        seenGenericKeys.add(dedupKey);
+        const clonedV = JSON.parse(JSON.stringify(v));
+        if (/^journ[ée]e\s+libre$/i.test(clonedV.title)) {
+          clonedV.title = "Journées libres";
+        }
+        if (clonedV.subtitle) {
+          clonedV.subtitle = clonedV.subtitle.replace(/^Journée libre\b/i, 'Journées libres');
+        }
+        mergedTimeline.push(clonedV);
+      } else {
+        seenGenericKeys.add(dedupKey);
+        const clonedV = JSON.parse(JSON.stringify(v));
+        if (multiDaySpan && !/jour\s*\d+/i.test(clonedV.title)) {
+          clonedV.title = `${clonedV.title} (J${d.day})`;
+        }
+        mergedTimeline.push(clonedV);
+      }
+    });
+  });
+
+  if (mergedTimeline.length === 0) {
+    mergedTimeline.push({
+      time: "",
+      title: "Journées libres",
+      subtitle: mergedDescription || "Séjour libre pour découvrir la ville à votre rythme.",
+      icon: "compass"
+    });
+  }
+
+  const sourceBackup = daysSlice.map(d => {
+    const cleanCopy = JSON.parse(JSON.stringify(d));
+    delete cleanCopy.endDay;
+    delete cleanCopy._groupedSourceDays;
+    return cleanCopy;
+  });
+
+  return {
+    day: startDay,
+    endDay: endDay,
+    title: mergedTitle,
+    highlight: highlight,
+    city: city,
+    description: mergedDescription,
+    dateStr: mergedDateStr,
+    image: image,
+    lat: withCoords ? withCoords.lat : null,
+    lng: withCoords ? withCoords.lng : null,
+    weather: first.weather || "",
+    nextEvent: first.nextEvent ? JSON.parse(JSON.stringify(first.nextEvent)) : undefined,
+    timeline: mergedTimeline,
+    _groupedSourceDays: sourceBackup
+  };
+}
+
+function getCurrentActiveGroupingRanges(itinerary) {
+  if (!Array.isArray(itinerary)) return [];
+  const ranges = [];
+  itinerary.forEach(item => {
+    const s = Number(item.day) || 0;
+    const e = Number(item.endDay) || 0;
+    if (e > s) {
+      ranges.push({ start: s, end: e });
+    }
+  });
+  return ranges.sort((a, b) => a.start - b.start);
+}
+
+function applyStayDayGroupingPartitions(desiredRanges) {
+  if (!tripData || !Array.isArray(tripData.itinerary) || tripData.itinerary.length === 0) return false;
+
+  const individualDays = expandItineraryToIndividualDays(tripData.itinerary);
+  const maxDay = getItineraryMaxDay(individualDays);
+
+  if (maxDay < 3) {
+    alert("Le voyage doit comporter au moins 3 jours (idéalement 4 jours ou plus) pour regrouper des journées intermédiaires tout en conservant le Jour 1 et le dernier jour.");
+    return false;
+  }
+
+  // Filtrer et sécuriser les plages : JAMAIS le Jour 1 ni le dernier jour (maxDay)
+  const validRanges = (desiredRanges || [])
+    .map(r => ({
+      start: Math.max(2, Number(r.start) || 2),
+      end: Math.min(maxDay - 1, Number(r.end) || 0)
+    }))
+    .filter(r => r.end > r.start && r.start >= 2 && r.end <= maxDay - 1)
+    .sort((a, b) => a.start - b.start);
+
+  // Construire le nouvel itinéraire en respectant Jour 1, les plages ou jours isolés, et Jour maxDay
+  const newItinerary = [];
+  let cursor = 1;
+
+  while (cursor <= maxDay) {
+    if (cursor === 1 || cursor === maxDay) {
+      const singleObj = individualDays.find(d => Number(d.day) === cursor);
+      if (singleObj) {
+        const cleanSingle = JSON.parse(JSON.stringify(singleObj));
+        delete cleanSingle.endDay;
+        delete cleanSingle._groupedSourceDays;
+        newItinerary.push(cleanSingle);
+      }
+      cursor++;
+      continue;
+    }
+
+    const matchingRange = validRanges.find(r => r.start === cursor);
+    if (matchingRange) {
+      const slice = individualDays.filter(d => Number(d.day) >= matchingRange.start && Number(d.day) <= matchingRange.end);
+      const groupedItem = mergeDaySliceIntoGroup(slice, matchingRange.start, matchingRange.end);
+      newItinerary.push(groupedItem);
+      cursor = matchingRange.end + 1;
+    } else {
+      const singleObj = individualDays.find(d => Number(d.day) === cursor);
+      if (singleObj) {
+        const cleanSingle = JSON.parse(JSON.stringify(singleObj));
+        delete cleanSingle.endDay;
+        delete cleanSingle._groupedSourceDays;
+        newItinerary.push(cleanSingle);
+      }
+      cursor++;
+    }
+  }
+
+  tripData.itinerary = newItinerary;
+  renderAdminDays();
+  if (typeof populateGeminiDaySelector === 'function') populateGeminiDaySelector();
+  return true;
+}
+
+function groupAllIntermediateStayDays() {
+  if (!tripData || !Array.isArray(tripData.itinerary)) return;
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
+  if (maxDay < 4) {
+    alert(`Ce séjour comporte ${maxDay} jour(s). Pour regrouper plusieurs jours intermédiaires tout en laissant le Jour 1 et le dernier jour (Jour ${maxDay}), le séjour doit compter au moins 4 jours.`);
+    return;
+  }
+
+  applyStayDayGroupingPartitions([{ start: 2, end: maxDay - 1 }]);
+}
+
+function groupCustomStayDaysRange(fromDayOpt, toDayOpt) {
+  if (!tripData || !Array.isArray(tripData.itinerary)) return;
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
+  if (maxDay < 4) {
+    alert("Le séjour doit compter au moins 4 jours pour créer un regroupement intermédiaire (Jour 1 et dernier jour étant toujours conservés).");
+    return;
+  }
+
+  const fromEl = document.getElementById('stay-group-from-day');
+  const toEl = document.getElementById('stay-group-to-day');
+  const fromDay = fromDayOpt !== undefined ? Number(fromDayOpt) : (fromEl ? Number(fromEl.value) : 2);
+  const toDay = toDayOpt !== undefined ? Number(toDayOpt) : (toEl ? Number(toEl.value) : (maxDay - 1));
+
+  if (fromDay <= 1) {
+    alert("Le Jour 1 (départ / arrivée) doit obligatoirement rester isolé.");
+    return;
+  }
+  if (toDay >= maxDay) {
+    alert(`Le dernier jour (Jour ${maxDay}) doit obligatoirement rester isolé.`);
+    return;
+  }
+  if (toDay <= fromDay) {
+    alert(`Le jour de fin (Jour ${toDay}) doit être supérieur au jour de début (Jour ${fromDay}).`);
+    return;
+  }
+
+  // Conserver les plages existantes qui ne chevauchent pas [fromDay..toDay], et découper proprement celles qui chevauchent
+  const currentRanges = getCurrentActiveGroupingRanges(tripData.itinerary);
+  const updatedRanges = [];
+
+  currentRanges.forEach(r => {
+    if (r.end < fromDay || r.start > toDay) {
+      // Aucun chevauchement : on garde la plage existante intacte
+      updatedRanges.push(r);
+    } else {
+      // Chevauchement : si la plage existante dépassait à gauche ou à droite de [fromDay..toDay] et contient au moins 2 jours restants, on peut conserver le reliquat
+      if (r.start < fromDay && (fromDay - 1) > r.start) {
+        updatedRanges.push({ start: r.start, end: fromDay - 1 });
+      }
+      if (r.end > toDay && r.end > (toDay + 1)) {
+        updatedRanges.push({ start: toDay + 1, end: r.end });
+      }
+    }
+  });
+
+  updatedRanges.push({ start: fromDay, end: toDay });
+  applyStayDayGroupingPartitions(updatedRanges);
+}
+
+function isolateSingleStayDayForVisits(targetDayOpt) {
+  if (!tripData || !Array.isArray(tripData.itinerary)) return;
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
+  const selEl = document.getElementById('stay-isolate-day-select');
+  const targetDay = targetDayOpt !== undefined ? Number(targetDayOpt) : (selEl ? Number(selEl.value) : 0);
+
+  if (!targetDay || targetDay <= 1 || targetDay >= maxDay) {
+    alert("Veuillez choisir un jour intermédiaire à isoler.");
+    return;
+  }
+
+  const currentRanges = getCurrentActiveGroupingRanges(tripData.itinerary);
+  const updatedRanges = [];
+
+  currentRanges.forEach(r => {
+    if (targetDay < r.start || targetDay > r.end) {
+      updatedRanges.push(r);
+    } else {
+      // Découper la plage [r.start .. r.end] autour de targetDay
+      if ((targetDay - 1) > r.start) {
+        updatedRanges.push({ start: r.start, end: targetDay - 1 });
+      }
+      if (r.end > (targetDay + 1)) {
+        updatedRanges.push({ start: targetDay + 1, end: r.end });
+      }
+    }
+  });
+
+  applyStayDayGroupingPartitions(updatedRanges);
+}
+
+function ungroupStayDayItem(dayIndex) {
+  if (!tripData || !Array.isArray(tripData.itinerary) || !tripData.itinerary[dayIndex]) return;
+  const item = tripData.itinerary[dayIndex];
+  const s = Number(item.day);
+  const e = Number(item.endDay);
+  if (!e || e <= s) return;
+
+  const currentRanges = getCurrentActiveGroupingRanges(tripData.itinerary)
+    .filter(r => !(r.start === s && r.end === e));
+  applyStayDayGroupingPartitions(currentRanges);
+}
+
+function ungroupAllStayDays() {
+  if (!tripData || !Array.isArray(tripData.itinerary)) return;
+  applyStayDayGroupingPartitions([]);
+}
+
+function updateDayEndRangeManual(dayIndex, newEndDayVal) {
+  if (!tripData || !Array.isArray(tripData.itinerary) || !tripData.itinerary[dayIndex]) return;
+  const item = tripData.itinerary[dayIndex];
+  const startDay = Number(item.day) || 1;
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
+  const parsedEnd = parseInt(newEndDayVal, 10);
+
+  if (startDay <= 1 || startDay >= maxDay) {
+    alert("Le Jour 1 et le dernier jour doivent toujours rester individuels.");
+    renderAdminDays();
+    return;
+  }
+
+  if (!parsedEnd || isNaN(parsedEnd) || parsedEnd <= startDay) {
+    ungroupStayDayItem(dayIndex);
+    return;
+  }
+
+  const clampedEnd = Math.min(maxDay - 1, parsedEnd);
+  if (clampedEnd <= startDay) {
+    ungroupStayDayItem(dayIndex);
+    return;
+  }
+
+  // Retirer d'abord l'ancienne plage de cet item puis appliquer [startDay .. clampedEnd]
+  const oldEnd = Number(item.endDay) || startDay;
+  const currentRanges = getCurrentActiveGroupingRanges(tripData.itinerary)
+    .filter(r => !(r.start === startDay && r.end === oldEnd));
+
+  const updatedRanges = [];
+  currentRanges.forEach(r => {
+    if (r.end < startDay || r.start > clampedEnd) {
+      updatedRanges.push(r);
+    } else {
+      if (r.start < startDay && (startDay - 1) > r.start) {
+        updatedRanges.push({ start: r.start, end: startDay - 1 });
+      }
+      if (r.end > clampedEnd && r.end > (clampedEnd + 1)) {
+        updatedRanges.push({ start: clampedEnd + 1, end: r.end });
+      }
+    }
+  });
+  updatedRanges.push({ start: startDay, end: clampedEnd });
+  applyStayDayGroupingPartitions(updatedRanges);
+}
+
+function onStayGroupFromDayChange() {
+  const fromEl = document.getElementById('stay-group-from-day');
+  const toEl = document.getElementById('stay-group-to-day');
+  if (!fromEl || !toEl || !tripData) return;
+
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
+  const fromVal = Number(fromEl.value) || 2;
+  const currentTo = Number(toEl.value) || (fromVal + 1);
+
+  toEl.innerHTML = '';
+  for (let d = fromVal + 1; d <= maxDay - 1; d++) {
+    const opt = document.createElement('option');
+    opt.value = d;
+    opt.textContent = `Jour ${d}`;
+    if (d === Math.max(fromVal + 1, currentTo)) opt.selected = true;
+    toEl.appendChild(opt);
+  }
+}
+
+function toggleStayGroupingPanel() {
+  const panel = document.getElementById('adm-stay-grouping-panel');
+  if (!panel) return;
+  const isVisible = panel.style.display !== 'none';
+  stayGroupingPanelForcedOpen = !isVisible;
+  renderStayGroupingPanel();
+  if (stayGroupingPanelForcedOpen) {
+    panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+}
+
+function renderStayGroupingPanel() {
+  const panel = document.getElementById('adm-stay-grouping-panel');
+  if (!panel || !tripData) return;
+
+  const isCityBreakMode = tripData.conciergeMode === 'full';
+  const hasGroups = hasGroupedStayDays(tripData.itinerary);
+  const shouldShow = stayGroupingPanelForcedOpen || isCityBreakMode || hasGroups;
+
+  const toggleBtn = document.getElementById('btn-admin-toggle-grouping');
+  if (toggleBtn) {
+    toggleBtn.style.background = hasGroups ? '#4338ca' : '#eef2ff';
+    toggleBtn.style.color = hasGroups ? '#ffffff' : '#4338ca';
+    toggleBtn.innerHTML = `<i class="fa-solid fa-layer-group"></i> ${hasGroups ? 'Jours regroupés (Séjour Libre)' : 'Regrouper des jours (Séjour / City-break)'}`;
+  }
+
+  if (!shouldShow) {
+    panel.style.display = 'none';
+    return;
+  }
+
+  panel.style.display = 'block';
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
+
+  if (maxDay < 4) {
+    panel.innerHTML = `
+      <div style="background:linear-gradient(135deg, #eef2ff 0%, #f5f3ff 100%); border:1px solid #c7d2fe; border-radius:14px; padding:14px 16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div style="font-size:0.88rem; font-weight:800; color:#312e81;">
+            <i class="fa-solid fa-layer-group" style="color:#4f46e5; margin-right:6px;"></i>
+            Regroupement des jours de séjour (Séjour Libre / City-Break)
+          </div>
+          <button type="button" onclick="stayGroupingPanelForcedOpen=false; document.getElementById('adm-stay-grouping-panel').style.display='none';" style="background:none; border:none; color:#64748b; cursor:pointer; font-size:0.85rem;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+        <p style="font-size:0.8rem; color:#4338ca; margin:6px 0 0;">
+          Votre programme compte actuellement <strong>${maxDay} jour(s)</strong>. Le Jour 1 et le dernier jour étant toujours conservés individuellement, ajoutez au moins 4 jours au programme pour pouvoir regrouper des journées intermédiaires (ex: Jour 2 à 3).
+        </p>
+      </div>
+    `;
+    return;
+  }
+
+  // Construire les options des sélecteurs "Du Jour X au Jour Y"
+  let fromOptionsHtml = '';
+  for (let d = 2; d <= maxDay - 2; d++) {
+    fromOptionsHtml += `<option value="${d}">Jour ${d}</option>`;
+  }
+  let toOptionsHtml = '';
+  for (let d = 3; d <= maxDay - 1; d++) {
+    toOptionsHtml += `<option value="${d}" ${d === Math.min(4, maxDay - 1) ? 'selected' : ''}>Jour ${d}</option>`;
+  }
+
+  // Construire les options pour "Isoler un jour spécifique (avec visites)" parmi les jours actuellement inclus dans un groupe
+  const groupedDaysOptions = [];
+  (tripData.itinerary || []).forEach(item => {
+    const s = Number(item.day) || 0;
+    const e = Number(item.endDay) || 0;
+    if (e > s) {
+      for (let d = s; d <= e; d++) {
+        groupedDaysOptions.push({ day: d, rangeLabel: `Jour ${s} à ${e}` });
+      }
+    }
+  });
+
+  // Aperçu visuel des onglets tels qu'ils s'afficheront sur le carnet Client
+  const pillsPreviewHtml = (tripData.itinerary || []).map((item, idx) => {
+    const s = Number(item.day) || 1;
+    const e = Number(item.endDay) || 0;
+    const isGrouped = e > s;
+    const isLockedBoundary = (s === 1 && !isGrouped) || (s === maxDay && !isGrouped);
+
+    if (isGrouped) {
+      return `
+        <span style="display:inline-flex; align-items:center; gap:6px; background:#4338ca; color:white; padding:5px 11px; border-radius:999px; font-size:0.78rem; font-weight:800; box-shadow:0 2px 6px rgba(67,56,202,0.2);">
+          <i class="fa-solid fa-layer-group" style="font-size:0.72rem; color:#c7d2fe;"></i>
+          Jour ${s} à ${e}
+          <button type="button" onclick="ungroupStayDayItem(${idx})" title="Dissocier Jour ${s} à ${e}" style="background:rgba(255,255,255,0.2); color:white; border:none; border-radius:50%; width:18px; height:18px; display:inline-flex; align-items:center; justify-content:center; font-size:0.68rem; cursor:pointer; margin-left:2px;">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </span>
+      `;
+    }
+    return `
+      <span style="display:inline-flex; align-items:center; gap:5px; background:${isLockedBoundary ? '#f1f5f9' : '#ffffff'}; color:${isLockedBoundary ? '#334155' : '#0f172a'}; border:1px solid ${isLockedBoundary ? '#94a3b8' : '#cbd5e1'}; padding:5px 11px; border-radius:999px; font-size:0.78rem; font-weight:700;">
+        ${isLockedBoundary ? '<i class="fa-solid fa-lock" style="font-size:0.68rem; color:#64748b;" title="Conservé individuellement"></i>' : '<i class="fa-regular fa-calendar-check" style="font-size:0.72rem; color:#059669;"></i>'}
+        Jour ${s}
+      </span>
+    `;
+  }).join('<i class="fa-solid fa-chevron-right" style="font-size:0.65rem; color:#94a3b8;"></i>');
+
+  panel.innerHTML = `
+    <div style="background:linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%); border:1.5px solid #a5b4fc; border-radius:14px; padding:16px; box-shadow:0 4px 14px rgba(79,70,229,0.08);">
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px; flex-wrap:wrap; margin-bottom:10px;">
+        <div>
+          <div style="font-size:0.95rem; font-weight:800; color:#1e1b4b; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+            <span style="background:#4f46e5; color:white; width:26px; height:26px; border-radius:7px; display:inline-flex; align-items:center; justify-content:center; font-size:0.8rem;">
+              <i class="fa-solid fa-layer-group"></i>
+            </span>
+            Regroupement des Jours de Séjour (Séjour Libre / City-Break)
+            <span style="background:#e0e7ff; color:#3730a3; font-size:0.72rem; padding:2px 8px; border-radius:999px; font-weight:800;">
+              <i class="fa-solid fa-shield-halved"></i> Jour 1 & Jour ${maxDay} toujours conservés
+            </span>
+          </div>
+          <p style="font-size:0.78rem; color:#475569; margin:4px 0 0;">
+            Regroupez tous les jours intermédiaires ou créez des plages sur-mesure (ex: <strong>Jour 2 à 4</strong>, puis <strong>Jour 5</strong> avec visites spécifiques, <strong>Jour 6 à 7</strong> et <strong>Jour ${maxDay}</strong>). Le carnet client affichera un seul onglet <strong>« Jour X à Y »</strong> par groupe.
+          </p>
+        </div>
+        ${!isCityBreakMode ? `
+          <button type="button" onclick="stayGroupingPanelForcedOpen=false; document.getElementById('adm-stay-grouping-panel').style.display='none';" class="btn-secondary" style="font-size:0.72rem; padding:4px 8px;">
+            Masquer
+          </button>
+        ` : ''}
+      </div>
+
+      <!-- APERÇU EN DIRECT DES ONGLETS CLIENT -->
+      <div style="background:white; border:1px solid #e2e8f0; border-radius:10px; padding:10px 12px; margin-bottom:12px;">
+        <div style="font-size:0.73rem; font-weight:800; color:#64748b; text-transform:uppercase; letter-spacing:0.4px; margin-bottom:6px;">
+          <i class="fa-solid fa-mobile-screen-button" style="color:#4f46e5;"></i> Aperçu des onglets sur le carnet Client (${tripData.itinerary.length} onglet${tripData.itinerary.length > 1 ? 's' : ''} pour ${maxDay} jours) :
+        </div>
+        <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+          ${pillsPreviewHtml}
+        </div>
+      </div>
+
+      <!-- OUTILS DE REGROUPEMENT -->
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:10px;">
+        <!-- 1. Tout regrouper entre J1 et Dernier Jour -->
+        <div style="background:white; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
+          <div>
+            <div style="font-size:0.8rem; font-weight:800; color:#1e293b;">
+              <i class="fa-solid fa-compress" style="color:#4f46e5;"></i> 1. Regroupement global (Séjour complet)
+            </div>
+            <div style="font-size:0.74rem; color:#64748b; margin-top:2px;">
+              Conserve <strong>Jour 1</strong> et <strong>Jour ${maxDay}</strong>, et fusionne tous les jours intermédiaires en un seul onglet <strong>Jour 2 à ${maxDay - 1}</strong>.
+            </div>
+          </div>
+          <div style="display:flex; gap:6px; flex-wrap:wrap;">
+            <button type="button" onclick="groupAllIntermediateStayDays()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#4f46e5; color:white; border-color:#4338ca; font-weight:700; flex:1;">
+              <i class="fa-solid fa-layer-group"></i> Tout regrouper (Jour 2 à ${maxDay - 1})
+            </button>
+            ${hasGroups ? `
+              <button type="button" onclick="ungroupAllStayDays()" class="btn-secondary" style="font-size:0.76rem; padding:6px 10px; background:#fff1f2; color:#be123c; border-color:#fecdd3; font-weight:700;" title="Revenir à 1 onglet par jour (Jour 1 à Jour ${maxDay})">
+                <i class="fa-solid fa-expand"></i> Tout dissocier
+              </button>
+            ` : ''}
+          </div>
+        </div>
+
+        <!-- 2. Regroupement spécifique par plage (ex: Jour 2 à 4, Jour 6 à 7) -->
+        <div style="background:white; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
+          <div>
+            <div style="font-size:0.8rem; font-weight:800; color:#1e293b;">
+              <i class="fa-solid fa-sliders" style="color:#0284c7;"></i> 2. Regrouper une plage spécifique
+            </div>
+            <div style="font-size:0.74rem; color:#64748b; margin-top:2px;">
+              Créez un onglet <strong>Jour X à Y</strong> (cumulable : ex. regroupez J2 à J4, laissez J5 seul, puis regroupez J6 à J7).
+            </div>
+          </div>
+          <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+            <span style="font-size:0.76rem; font-weight:700; color:#475569;">Du</span>
+            <select id="stay-group-from-day" class="form-control" style="width:auto; padding:4px 8px; font-size:0.78rem; font-weight:700;" onchange="onStayGroupFromDayChange()">
+              ${fromOptionsHtml}
+            </select>
+            <span style="font-size:0.76rem; font-weight:700; color:#475569;">au</span>
+            <select id="stay-group-to-day" class="form-control" style="width:auto; padding:4px 8px; font-size:0.78rem; font-weight:700;">
+              ${toOptionsHtml}
+            </select>
+            <button type="button" onclick="groupCustomStayDaysRange()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700; flex:1; white-space:nowrap;">
+              <i class="fa-solid fa-check"></i> Regrouper cette plage
+            </button>
+          </div>
+        </div>
+
+        ${groupedDaysOptions.length > 0 ? `
+          <!-- 3. Isoler un jour au sein d'un groupe pour des visites spécifiques (ex: isoler Jour 5 dans Jour 2 à 7) -->
+          <div style="background:white; border:1px solid #cbd5e1; border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; justify-content:space-between; gap:8px;">
+            <div>
+              <div style="font-size:0.8rem; font-weight:800; color:#1e293b;">
+                <i class="fa-solid fa-calendar-day" style="color:#059669;"></i> 3. Isoler un jour avec visites spécifiques
+              </div>
+              <div style="font-size:0.74rem; color:#64748b; margin-top:2px;">
+                Extrait un jour d'une plage regroupée (ex: isoler <strong>Jour 5</strong> découpe automatiquement J2-7 en <strong>J2 à 4</strong>, <strong>J5</strong> et <strong>J6 à 7</strong>).
+              </div>
+            </div>
+            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+              <select id="stay-isolate-day-select" class="form-control" style="flex:1; padding:4px 8px; font-size:0.78rem; font-weight:700;">
+                ${groupedDaysOptions.map(o => `<option value="${o.day}">Jour ${o.day} (actuellement dans ${o.rangeLabel})</option>`).join('')}
+              </select>
+              <button type="button" onclick="isolateSingleStayDayForVisits()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:#ecfdf5; color:#047857; border-color:#86efac; font-weight:700; white-space:nowrap;">
+                <i class="fa-solid fa-scissors"></i> Isoler ce jour
+              </button>
+            </div>
+          </div>
+        ` : ''}
+      </div>
+    </div>
+  `;
+}
+
 function renderAdminDays() {
   const container = document.getElementById('adm-days-list');
   container.innerHTML = '';
 
   if (!tripData.itinerary) tripData.itinerary = [];
+  renderStayGroupingPanel();
+
+  const maxDay = getItineraryMaxDay(tripData.itinerary);
 
   tripData.itinerary.forEach((item, dayIndex) => {
     if (!item.timeline) item.timeline = [];
+    const startDay = Number(item.day) || (dayIndex + 1);
+    const endDay = (item.endDay && Number(item.endDay) > startDay) ? Number(item.endDay) : null;
+    const isGrouped = Boolean(endDay && endDay > startDay);
+    const dayLabel = formatAdminDayLabel(item, 'Jour');
+    const isBoundaryDay = (!isGrouped && (startDay === 1 || (maxDay > 1 && startDay === maxDay)));
+
+    // Options de regroupement rapide directement sur la carte pour tout jour intermédiaire (1 < startDay < maxDay)
+    let endDaySelectHtml = '';
+    if (startDay === 1) {
+      endDaySelectHtml = `
+        <div style="font-size:0.75rem; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:7px 10px; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-lock" style="color:#64748b;"></i> Jour 1 (Toujours individuel)
+        </div>
+      `;
+    } else if (maxDay > 1 && startDay >= maxDay) {
+      endDaySelectHtml = `
+        <div style="font-size:0.75rem; color:#475569; background:#f1f5f9; border:1px solid #cbd5e1; border-radius:8px; padding:7px 10px; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <i class="fa-solid fa-lock" style="color:#64748b;"></i> Dernier jour (Toujours individuel)
+        </div>
+      `;
+    } else {
+      let opts = `<option value="${startDay}" ${!isGrouped ? 'selected' : ''}>Jour ${startDay} seul (1 jour)</option>`;
+      for (let d = startDay + 1; d <= maxDay - 1; d++) {
+        opts += `<option value="${d}" ${endDay === d ? 'selected' : ''}>Regrouper : Jour ${startDay} à ${d} (${d - startDay + 1} jours)</option>`;
+      }
+      endDaySelectHtml = `
+        <div style="display:flex; gap:6px; align-items:center;">
+          <select id="day-end-${dayIndex}" class="form-control" style="font-weight:700; border-color:${isGrouped ? '#6366f1' : '#cbd5e1'}; background:${isGrouped ? '#eef2ff' : '#ffffff'}; color:${isGrouped ? '#312e81' : '#0f172a'};" onchange="updateDayEndRangeManual(${dayIndex}, this.value)">
+            ${opts}
+          </select>
+          ${isGrouped ? `
+            <button type="button" onclick="ungroupStayDayItem(${dayIndex})" class="btn-secondary" style="font-size:0.75rem; padding:6px 10px; background:#fff1f2; color:#be123c; border-color:#fecdd3; white-space:nowrap; font-weight:700;" title="Dissocier Jour ${startDay} à ${endDay} en jours individuels">
+              <i class="fa-solid fa-expand"></i> Dissocier
+            </button>
+          ` : ''}
+        </div>
+      `;
+    }
 
     const box = document.createElement('div');
     box.className = 'section-box';
-    box.style = "border-top:3px solid var(--accent-gold);";
+    box.style = isGrouped
+      ? "border-top:4px solid #4f46e5; background:linear-gradient(180deg, #f5f7ff 0%, #ffffff 120px);"
+      : "border-top:3px solid var(--accent-gold);";
 
     box.innerHTML = `
-      <button type="button" class="btn-delete" onclick="removeDay(${dayIndex})"><i class="fa-solid fa-trash"></i> Supprimer ce jour</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:10px;">
+        <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+          <span style="background:${isGrouped ? '#4f46e5' : 'var(--primary-color)'}; color:white; font-size:0.8rem; font-weight:800; padding:4px 12px; border-radius:999px; display:inline-flex; align-items:center; gap:6px;">
+            <i class="fa-solid ${isGrouped ? 'fa-layer-group' : (isBoundaryDay ? 'fa-lock' : 'fa-calendar-day')}"></i>
+            Onglet Client : ${dayLabel}
+          </span>
+          ${isGrouped ? `
+            <span style="font-size:0.75rem; font-weight:700; color:#4338ca; background:#e0e7ff; padding:3px 9px; border-radius:6px;">
+              Regroupe ${endDay - startDay + 1} journées de séjour (J${startDay} → J${endDay})
+            </span>
+          ` : ''}
+        </div>
+        <button type="button" class="btn-delete" style="position:static;" onclick="removeDay(${dayIndex})"><i class="fa-solid fa-trash"></i> Supprimer ${isGrouped ? 'ce groupe' : 'ce jour'}</button>
+      </div>
       
       <div class="form-row">
         <div class="form-group" style="max-width:120px;">
-          <label>Jour N° :</label>
-          <input type="number" class="form-control" value="${item.day}" onchange="updateDayField(${dayIndex}, 'day', parseInt(this.value))">
+          <label>${isGrouped ? 'Du Jour N° :' : 'Jour N° :'}</label>
+          <input type="number" id="day-start-${dayIndex}" class="form-control" value="${item.day}" onchange="updateDayField(${dayIndex}, 'day', parseInt(this.value))">
+        </div>
+        <div class="form-group" style="min-width:230px;">
+          <label><i class="fa-solid fa-layer-group" style="color:#4f46e5;"></i> Regroupement d'onglet (Jour X à Y) :</label>
+          ${endDaySelectHtml}
         </div>
         <div class="form-group">
           <label>Ville / Étape principale :</label>
@@ -1068,8 +1820,8 @@ function renderAdminDays() {
       </div>
 
       <div class="form-group">
-        <label>Titre de l'étape :</label>
-        <input type="text" class="form-control" value="${item.title || ''}" placeholder="Ex: Péninsule du Cap de Bonne Espérance" onchange="updateDayField(${dayIndex}, 'title', this.value)">
+        <label>Titre de l'étape (${dayLabel}) :</label>
+        <input type="text" id="day-title-${dayIndex}" class="form-control" value="${item.title || ''}" placeholder="Ex: Séjour libre & découverte de la ville" onchange="updateDayField(${dayIndex}, 'title', this.value)">
       </div>
 
       <div class="form-group">
@@ -1079,13 +1831,13 @@ function renderAdminDays() {
 
       <div class="form-group">
         <label>Description globale du programme :</label>
-        <textarea class="form-control" rows="2" onchange="updateDayField(${dayIndex}, 'description', this.value)">${item.description || ''}</textarea>
+        <textarea id="day-desc-${dayIndex}" class="form-control" rows="2" onchange="updateDayField(${dayIndex}, 'description', this.value)">${item.description || ''}</textarea>
       </div>
 
       <div class="form-group" style="background:#ffffff; border:1px solid #e2e8f0; border-radius:10px; padding:12px; margin-bottom:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
           <label style="margin:0; font-weight:700; color:var(--primary-dark); font-size:0.85rem;">
-            <i class="fa-solid fa-camera" style="color:var(--accent-gold); margin-right:4px;"></i> Photo d'illustration de cette étape (Jour ${item.day}) :
+            <i class="fa-solid fa-camera" style="color:var(--accent-gold); margin-right:4px;"></i> Photo d'illustration de cette étape (${dayLabel}) :
           </label>
           <button type="button" onclick="openPhotoPickerModal('day', ${dayIndex})" class="btn-secondary" style="font-size:0.75rem; padding:3px 10px; background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; font-weight:700;">
             <i class="fa-solid fa-wand-magic-sparkles"></i> Proposer une photo
@@ -1133,7 +1885,7 @@ function renderAdminDays() {
       <div style="background:white; border:1px solid #cbd5e1; border-radius:12px; padding:14px; margin-top:14px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
           <h4 style="font-size:0.92rem; font-weight:800; color:var(--primary-dark); margin:0;">
-            <i class="fa-solid fa-clock" style="color:var(--accent-gold); margin-right:4px;"></i> Déroulé chronologique & Visites du Jour ${item.day}
+            <i class="fa-solid fa-clock" style="color:var(--accent-gold); margin-right:4px;"></i> Déroulé chronologique & Visites (${dayLabel})
           </h4>
           <button type="button" onclick="addNewVisitToDay(${dayIndex})" class="btn-secondary" style="font-size:0.75rem; padding:4px 10px; background:#f0fdf4; color:#15803d; border-color:#86efac; font-weight:700;">
             <i class="fa-solid fa-plus"></i> Ajouter une visite
@@ -1418,7 +2170,8 @@ function updateDayCoordinates(dayIndex) {
 }
 
 function addNewDay() {
-  const nextDay = (tripData.itinerary && tripData.itinerary.length) ? tripData.itinerary.length + 1 : 1;
+  const maxExisting = getItineraryMaxDay(tripData.itinerary);
+  const nextDay = maxExisting > 0 ? maxExisting + 1 : 1;
   tripData.itinerary.push({
     day: nextDay,
     title: "Nouvelle étape",
@@ -9051,10 +9804,11 @@ function onConciergeModeChange(mode, userInitiated = true) {
   } else if (mode === 'cruise') {
     desc.innerHTML = "🚢 <strong>Croisière :</strong> Plan d'ensemble du navire, sélection des ponts, décodeur de cabine, boussole marine et vie à bord actifs.";
   } else if (mode === 'full') {
-    desc.innerHTML = "🏙️ <strong>Séjour Libre / City-break :</strong> Conciergerie complète de la ville activée (restaurants, bars, cafés, transports, visites libres).";
+    desc.innerHTML = "🏙️ <strong>Séjour Libre / City-break :</strong> Conciergerie complète de la ville activée (restaurants, bars, cafés, transports, visites libres) + outil de regroupement des jours de séjour (Jour X à Y).";
   } else if (mode === 'disabled') {
     desc.innerHTML = "🚫 <strong>100% Guidé sans aucun temps libre :</strong> L'onglet Conciergerie est totalement masqué dans le carnet du voyageur pour une clarté maximale.";
   }
+  if (typeof renderStayGroupingPanel === 'function') renderStayGroupingPanel();
 }
 
 function populateGeminiDaySelector() {
@@ -9068,10 +9822,10 @@ function populateGeminiDaySelector() {
       opt.value = d.day;
       let displayCity = d.city || "";
       if (!displayCity || displayCity.toLowerCase().includes('votre') || displayCity.length <= 4) {
-        let clean = d.title.replace(/votre\s+r[ée]gion\s*[-–—•]\s*/i, '').trim();
+        let clean = (d.title || "").replace(/votre\s+r[ée]gion\s*[-–—•]\s*/i, '').trim();
         displayCity = clean || d.title;
       }
-      opt.innerText = `Jour ${d.day} : ${displayCity}`;
+      opt.innerText = `${formatAdminDayLabel(d, 'Jour')} : ${displayCity}`;
       daySelect.appendChild(opt);
     });
   }

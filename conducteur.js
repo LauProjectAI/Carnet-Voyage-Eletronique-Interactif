@@ -365,6 +365,20 @@ function switchDriverTab(tabId) {
 // -----------------------------------------------------------------------------
 // 1. ROUTE & ITINÉRAIRE TECHNIQUE
 // -----------------------------------------------------------------------------
+function formatDriverDayLabel(day, prefix = 'Jour') {
+  if (!day) return prefix;
+  const s = Number(day.day) || 1;
+  const e = Number(day.endDay) || 0;
+  if (e > s) {
+    if (prefix === 'J') return `J${s} à ${e}`;
+    if (prefix === 'JOUR') return `JOUR ${s} À ${e}`;
+    return `${prefix} ${s} à ${e}`;
+  }
+  if (prefix === 'J') return `J${s}`;
+  if (prefix === 'JOUR') return `JOUR ${s}`;
+  return `${prefix} ${s}`;
+}
+
 function renderDriverRouteDayPills() {
   const container = document.getElementById('driver-day-pills');
   if (!container || !driverTrip.itinerary) return;
@@ -374,7 +388,7 @@ function renderDriverRouteDayPills() {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.style = `padding: 6px 14px; border-radius: 20px; font-weight: 800; font-size: 0.78rem; white-space: nowrap; border: 1px solid ${idx === currentActiveDay ? '#38bdf8' : '#334155'}; background: ${idx === currentActiveDay ? '#0284c7' : '#1e293b'}; color: ${idx === currentActiveDay ? '#ffffff' : '#94a3b8'}; cursor: pointer;`;
-    btn.innerText = `J${day.day} • ${day.city || 'Étape'}`;
+    btn.innerText = `${formatDriverDayLabel(day, 'J')} • ${day.city || 'Étape'}`;
     btn.onclick = () => {
       currentActiveDay = idx;
       renderDriverRouteDayPills();
@@ -397,7 +411,7 @@ function renderDriverRouteDayContent(dayIdx) {
     <div class="driver-card-header">
       <div>
         <span style="background:#0284c7; color:white; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:4px;">
-          JOUR ${day.day}
+          ${formatDriverDayLabel(day, 'JOUR')}
         </span>
         <h2 style="font-size:1.15rem; font-weight:800; color:white; margin:4px 0 2px;">${day.title}</h2>
         <div style="font-size:0.8rem; color:#94a3b8;">Destination : <strong style="color:#f8fafc;">${day.city || 'Non spécifiée'}</strong></div>
@@ -414,7 +428,7 @@ function renderDriverRouteDayContent(dayIdx) {
 
     <!-- Déroulé des horaires et étapes -->
     <div style="font-size:0.8rem; font-weight:800; color:#38bdf8; text-transform:uppercase; margin:14px 0 8px; letter-spacing:0.5px;">
-      <i class="fa-solid fa-clock"></i> Déroulé chronologique du Jour ${day.day}
+      <i class="fa-solid fa-clock"></i> Déroulé chronologique (${formatDriverDayLabel(day, 'Jour')})
     </div>
 
     <div style="background:#0b1120; border-radius:12px; padding:12px; margin-bottom:12px;">

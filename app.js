@@ -363,11 +363,65 @@ function normalizeTripDocuments() {
 }
 
 
+function formatDayLabel(item, prefix = 'Jour') {
+  if (!item) return prefix;
+  const start = Number(item.day) || 1;
+  const end = Number(item.endDay) || 0;
+  if (end > start) {
+    if (prefix === 'J') return `J${start} à ${end}`;
+    return `${prefix} ${start} à ${end}`;
+  }
+  if (prefix === 'J') return `J${start}`;
+  return `${prefix} ${start}`;
+}
+
+function isDayInItemRange(dayNum, item) {
+  if (!item || dayNum === undefined || dayNum === null || dayNum === '') return false;
+  const d = Number(dayNum);
+  if (isNaN(d)) return String(dayNum) === String(item.day);
+  const start = Number(item.day) || 0;
+  const end = (item.endDay && Number(item.endDay) > start) ? Number(item.endDay) : start;
+  return d >= start && d <= end;
+}
+
+function findItineraryIndexForDayNumber(dayNum, itinerary) {
+  if (!Array.isArray(itinerary)) return -1;
+  return itinerary.findIndex(item => isDayInItemRange(dayNum, item));
+}
+
+function getTripTotalDaysCount(itinerary) {
+  if (!Array.isArray(itinerary) || itinerary.length === 0) return 0;
+  const maxDay = itinerary.reduce((max, item) => {
+    const s = Number(item.day) || 0;
+    const e = Number(item.endDay) || 0;
+    return Math.max(max, s, e);
+  }, 0);
+  return Math.max(maxDay, itinerary.length);
+}
+
 function normalizeTripItinerary() {
   if (!currentTrip || !Array.isArray(currentTrip.itinerary)) return;
   currentTrip.itinerary.forEach((item, idx) => {
+    if (typeof item.day === 'string') {
+      const rangeMatch = item.day.match(/(\d+)\s*(?:à|au|[-–—])\s*(\d+)/i);
+      if (rangeMatch) {
+        item.day = parseInt(rangeMatch[1], 10);
+        item.endDay = parseInt(rangeMatch[2], 10);
+      } else {
+        const parsed = parseInt(item.day, 10);
+        if (!isNaN(parsed)) item.day = parsed;
+      }
+    }
     if (!item.day && item.dayNumber) item.day = item.dayNumber;
     if (!item.day) item.day = idx + 1;
+    if (item.endDay !== undefined && item.endDay !== null) {
+      const parsedEnd = parseInt(item.endDay, 10);
+      if (!isNaN(parsedEnd) && parsedEnd > Number(item.day)) {
+        item.endDay = parsedEnd;
+      } else {
+        delete item.endDay;
+      }
+    }
     if (!item.dayNumber) item.dayNumber = item.day;
     if (!item.dateStr && item.date) item.dateStr = item.date;
     if (!item.timeline && Array.isArray(item.steps)) {
@@ -575,8 +629,11 @@ function renderTravelerPersonalBanner() {
       </span>
       ${normOpts.map(o => {
         const dayPrefix = o.day ? `J${o.day} • ` : '';
-        const clickAttr = (o.day && currentTrip && Array.isArray(currentTrip.itinerary) && currentTrip.itinerary[o.day - 1])
-          ? `onclick="selectDay(${o.day - 1})"`
+        const matchedTabIdx = (o.day && currentTrip && Array.isArray(currentTrip.itinerary))
+          ? findItineraryIndexForDayNumber(o.day, currentTrip.itinerary)
+          : -1;
+        const clickAttr = (matchedTabIdx >= 0)
+          ? `onclick="selectDay(${matchedTabIdx})"`
           : '';
         return `<button type="button" class="personal-option-chip" ${clickAttr} title="${escapeClientHtml(o.details || o.title)}"><i class="fa-solid fa-check-circle"></i> ${escapeClientHtml(dayPrefix + o.title)}</button>`;
       }).join('')}
@@ -673,6 +730,11 @@ function determineInitialDayIndex() {
     const start = new Date(currentTrip.startDate);
     const diffTime = today - start;
     const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+    const currentDayNumber = diffDays + 1;
+    const matchedIdx = findItineraryIndexForDayNumber(currentDayNumber, currentTrip.itinerary);
+    if (matchedIdx >= 0) {
+      return matchedIdx;
+    }
     if (diffDays >= 0 && diffDays < currentTrip.itinerary.length) {
       return diffDays;
     }
@@ -1086,7 +1148,7 @@ function renderDaySelectorPills() {
   currentTrip.itinerary.forEach((item, idx) => {
     const btn = document.createElement('button');
     btn.className = `day-pill-btn ${idx === activeDayIndex ? 'active' : ''}`;
-    btn.innerText = `Jour ${item.day}`;
+    btn.innerText = formatDayLabel(item, 'Jour');
     btn.onclick = () => {
       selectDay(idx);
     };
@@ -1106,6 +1168,9 @@ function selectDay(index) {
 function renderTodayFocus() {
   const currentDay = currentTrip.itinerary[activeDayIndex];
   if (!currentDay) return;
+  const dayLabel = formatDayLabel(currentDay, 'Jour');
+  const stepLabel = formatDayLabel(currentDay, 'Étape');
+  const isMultiDayTab = Boolean(currentDay.endDay && Number(currentDay.endDay) > Number(currentDay.day));
 
   // 1. Bannière générale de la destination (En haut du carnet)
   const heroBanner = document.getElementById('destination-hero-banner');
@@ -1129,15 +1194,15 @@ function renderTodayFocus() {
 
   if (dayPhotoBox && currentDay.image) {
     dayPhotoImg.src = currentDay.image;
-    dayPhotoCaption.innerText = currentDay.highlight || currentDay.title || `Étape Jour ${currentDay.day}`;
+    dayPhotoCaption.innerText = currentDay.highlight || currentDay.title || `Étape ${dayLabel}`;
     dayPhotoBox.style.display = 'block';
   } else if (dayPhotoBox) {
     dayPhotoBox.style.display = 'none';
   }
 
   // Header Title & Weather
-  document.getElementById('day-headline').innerText = `Jour ${currentDay.day} • ${currentDay.city || ''}`;
-  document.getElementById('day-date-text').innerText = currentDay.dateStr || `Étape ${currentDay.day}`;
+  document.getElementById('day-headline').innerText = `${dayLabel}${currentDay.city ? ' • ' + currentDay.city : ''}`;
+  document.getElementById('day-date-text').innerText = currentDay.dateStr || stepLabel;
   
   const weatherPill = document.getElementById('day-weather-pill');
   if (currentDay.weather) {
@@ -1148,13 +1213,13 @@ function renderTodayFocus() {
 
   // Next Event Card (Uniquement NEXT / ÉTAPE À VENIR et le titre de la journée)
   const nextEvent = currentDay.nextEvent || {
-    title: currentDay.title || currentDay.highlight || `Jour ${currentDay.day}`,
+    title: currentDay.title || currentDay.highlight || dayLabel,
     sub: "",
     qrCodeText: `GIRARDOT-JOUR-${currentDay.day}`
   };
 
   const nextTitleEl = document.getElementById('next-title');
-  if (nextTitleEl) nextTitleEl.innerText = currentDay.title || nextEvent.title || `Jour ${currentDay.day}`;
+  if (nextTitleEl) nextTitleEl.innerText = currentDay.title || nextEvent.title || dayLabel;
   const nextSubEl = document.getElementById('next-sub');
   if (nextSubEl) nextSubEl.style.display = 'none';
   
@@ -1239,18 +1304,19 @@ function renderTodayFocus() {
     timelineStream.appendChild(itemEl);
   });
 
-  // Excursions & options facultatives réservées spécifiquement par ce voyageur pour ce jour
+  // Excursions & options facultatives réservées spécifiquement par ce voyageur pour ce jour (ou cette plage de jours)
   if (window.GirardotAuth && currentTrip) {
     const persDay = window.GirardotAuth.getSessionTripPersonalization(currentTrip.id);
     const dayOpts = (persDay && Array.isArray(persDay.options))
-      ? persDay.options.map(normalizeTravelerOption).filter(o => o && o.day === Number(currentDay.day))
+      ? persDay.options.map(normalizeTravelerOption).filter(o => o && isDayInItemRange(o.day, currentDay))
       : [];
     dayOpts.forEach(opt => {
       const optEl = document.createElement('div');
       optEl.className = 'timeline-option-card';
+      const optDaySuffix = (isMultiDayTab && opt.day) ? ` • Jour ${opt.day}` : '';
       optEl.innerHTML = `
         <div class="timeline-option-badge">
-          <i class="fa-solid fa-star"></i> Option réservée sur votre dossier${opt.time ? ' • ' + escapeClientHtml(opt.time) : ''}
+          <i class="fa-solid fa-star"></i> Option réservée sur votre dossier${optDaySuffix}${opt.time ? ' • ' + escapeClientHtml(opt.time) : ''}
         </div>
         <div style="font-size:0.95rem; font-weight:800; color:var(--primary-dark);">${escapeClientHtml(opt.title)}</div>
         ${opt.details ? `<div style="font-size:0.8rem; color:#78350f; margin-top:3px;">${escapeClientHtml(opt.details)}</div>` : ''}
@@ -1259,16 +1325,16 @@ function renderTodayFocus() {
     });
   }
 
-  // Notification temps libre ciblé pour la journée si présent
+  // Notification temps libre ciblé pour la journée (ou la plage de journées) si présent
   if (currentTrip.freeTimeSuggestions && currentTrip.freeTimeSuggestions.length > 0) {
-    const dayFreeTime = currentTrip.freeTimeSuggestions.filter(s => String(s.day) === String(currentDay.day));
+    const dayFreeTime = currentTrip.freeTimeSuggestions.filter(s => isDayInItemRange(s.day, currentDay));
     if (dayFreeTime.length > 0) {
       const bannerEl = document.createElement('div');
       bannerEl.style.cssText = "margin-top:20px; padding:16px; background:linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%); border:1px solid #86efac; border-radius:16px; display:flex; justify-content:space-between; align-items:center; gap:12px; box-shadow:0 4px 12px rgba(16,185,129,0.08); flex-wrap:wrap;";
       bannerEl.innerHTML = `
         <div style="flex:1; min-width:200px;">
           <div style="font-weight:800; color:#166534; font-size:0.95rem; display:flex; align-items:center; gap:8px;">
-            <i class="fa-solid fa-compass" style="color:#059669; font-size:1.1rem;"></i> Temps Libre Prévu Aujourd'hui
+            <i class="fa-solid fa-compass" style="color:#059669; font-size:1.1rem;"></i> Temps Libre Prévu (${dayLabel})
           </div>
           <div style="font-size:0.8rem; color:#15803d; margin-top:3px;">
             ${dayFreeTime.length} sélection(s) coup de cœur (restaurants & visites) pour votre moment libre.
@@ -1433,25 +1499,28 @@ function renderFullCircuit() {
   container.innerHTML = '';
   if (!currentTrip.itinerary) return;
 
-  badge.innerText = `${currentTrip.itinerary.length} jours au programme`;
+  const totalDaysCount = getTripTotalDaysCount(currentTrip.itinerary);
+  badge.innerText = `${totalDaysCount} jour${totalDaysCount > 1 ? 's' : ''} au programme`;
 
   currentTrip.itinerary.forEach((item, idx) => {
     const card = document.createElement('div');
     card.style = "background:white; border-radius:18px; padding:16px; margin-bottom:14px; border:1px solid var(--border-light); box-shadow:var(--shadow-subtle);";
     const gpsUrl = (item.lat && item.lng) ? getGpsUrl(item.lat, item.lng, item.title) : null;
+    const itemDayLabel = formatDayLabel(item, 'Jour');
+    const isMulti = Boolean(item.endDay && Number(item.endDay) > Number(item.day));
 
     card.innerHTML = `
       ${item.image ? `
         <div style="height:140px; margin:-16px -16px 12px -16px; border-radius:18px 18px 0 0; overflow:hidden; position:relative;">
           <img src="${item.image}" alt="${item.title}" loading="lazy" style="width:100%; height:100%; object-fit:cover;">
           <div style="position:absolute; bottom:8px; left:12px; background:rgba(0,0,0,0.6); color:white; font-size:0.75rem; font-weight:700; padding:2px 8px; border-radius:4px; backdrop-filter:blur(2px);">
-            <i class="fa-solid fa-camera"></i> ${item.city || `Jour ${item.day}`}
+            <i class="fa-solid fa-camera"></i> ${item.city || itemDayLabel}
           </div>
         </div>
       ` : ''}
       <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
         <span style="background:var(--primary-color); color:white; font-size:0.75rem; font-weight:800; padding:3px 10px; border-radius:20px;">
-          Jour ${item.day}
+          ${itemDayLabel}
         </span>
         <span style="font-size:0.8rem; color:var(--text-muted); font-weight:600;">${item.city || ''}</span>
       </div>
@@ -1459,7 +1528,7 @@ function renderFullCircuit() {
       <p style="font-size:0.84rem; color:#475569; line-height:1.45; margin-bottom:10px;">${item.description}</p>
       <div style="display:flex; gap:8px;">
         <button class="btn-entry-gps" style="background:#eef7f2; color:var(--primary-color);" onclick="switchMainTab('tab-today'); selectDay(${idx});">
-          <i class="fa-regular fa-calendar-check"></i> Voir la journée
+          <i class="fa-regular fa-calendar-check"></i> ${isMulti ? 'Voir ces journées' : 'Voir la journée'}
         </button>
         ${gpsUrl ? `
           <a href="${gpsUrl}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps">
@@ -1511,9 +1580,12 @@ function initCaptureFeature() {
       if (file) {
         try {
           const compressedBase64 = await compressImageFile(file);
+          const activeDayObj = (currentTrip && Array.isArray(currentTrip.itinerary) && currentTrip.itinerary[activeDayIndex])
+            ? currentTrip.itinerary[activeDayIndex]
+            : { day: activeDayIndex + 1 };
           saveSouvenir({
             id: 'souv_' + Date.now(),
-            title: `Souvenir Jour ${activeDayIndex + 1}`,
+            title: `Souvenir ${formatDayLabel(activeDayObj, 'Jour')}`,
             date: new Date().toLocaleDateString('fr-FR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }),
             image: compressedBase64
           });
@@ -4319,7 +4391,7 @@ function initMap() {
       return `
         <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 0; border-bottom:1px solid #eef2ef;">
           <div>
-            <div style="font-size:0.8rem; font-weight:800; color:var(--primary-dark);">Jour ${escapeClientHtml(d.day)}${d.city ? ` • ${escapeClientHtml(d.city)}` : ''}</div>
+            <div style="font-size:0.8rem; font-weight:800; color:var(--primary-dark);">${escapeClientHtml(formatDayLabel(d, 'Jour'))}${d.city ? ` • ${escapeClientHtml(d.city)}` : ''}</div>
             <div style="font-size:0.76rem; color:#475569;">${escapeClientHtml(d.title || '')}</div>
           </div>
           ${gpsHref ? `<a href="${gpsHref}" target="_blank" rel="noopener noreferrer" class="btn-entry-gps" style="flex-shrink:0;"><i class="fa-solid fa-location-arrow"></i> GPS</a>` : ''}
@@ -4431,17 +4503,20 @@ function renderMapMarkers(filterCategory = 'all') {
 
         if (!isNaN(itemLat) && !isNaN(itemLng) && (itemLat !== 0 || itemLng !== 0)) {
           const gpsUrl = getGpsUrl(itemLat, itemLng, item.title);
+          const isMulti = Boolean(item.endDay && Number(item.endDay) > Number(item.day));
+          const pinText = isMulti ? `${item.day}-${item.endDay}` : `${item.day}`;
+          const itemDayLabel = formatDayLabel(item, 'Jour');
           const icon = L.divIcon({
             className: 'custom-map-pin',
-            html: `<div style="background:#144534; color:white; border-radius:50%; width:26px; height:26px; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:800; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3);">${item.day}</div>`,
-            iconSize: [26, 26],
-            iconAnchor: [13, 13]
+            html: `<div style="background:#144534; color:white; border-radius:999px; min-width:26px; height:26px; padding:0 ${isMulti ? '5px' : '0'}; display:inline-flex; align-items:center; justify-content:center; font-size:${isMulti ? '10px' : '11px'}; font-weight:800; border:2px solid white; box-shadow:0 2px 6px rgba(0,0,0,0.3); white-space:nowrap;">${pinText}</div>`,
+            iconSize: [isMulti ? 36 : 26, 26],
+            iconAnchor: [isMulti ? 18 : 13, 13]
           });
 
           const marker = L.marker([itemLat, itemLng], { icon: icon }).addTo(leafletMap);
           marker.bindPopup(`
             <div style="font-family:'Archivo',sans-serif; max-width:210px;">
-              <strong style="color:#144534;">Jour ${item.day} • ${item.city || ''}</strong><br>
+              <strong style="color:#144534;">${itemDayLabel} • ${item.city || ''}</strong><br>
               <div style="font-size:12px; margin:4px 0;">${item.title}</div>
               <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:6px; background:#0284c7; color:white; padding:4px 10px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">
                 <i class="fa-solid fa-location-arrow"></i> Lancer GPS
@@ -4454,6 +4529,7 @@ function renderMapMarkers(filterCategory = 'all') {
 
         // Points des visites précises du jour si géolocalisées
         if (item.timeline && Array.isArray(item.timeline)) {
+          const itemDayLabel = formatDayLabel(item, 'Jour');
           item.timeline.forEach(visit => {
             const vLat = parseFloat(visit.lat);
             const vLng = parseFloat(visit.lng);
@@ -4469,7 +4545,7 @@ function renderMapMarkers(filterCategory = 'all') {
               const vMarker = L.marker([vLat, vLng], { icon: icon }).addTo(leafletMap);
               vMarker.bindPopup(`
                 <div style="font-family:'Archivo',sans-serif; max-width:210px;">
-                  <span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold;">Jour ${item.day} • ${visit.time || 'Visite'}</span>
+                  <span style="font-size:10px; background:#e0f2fe; color:#0369a1; padding:2px 6px; border-radius:4px; font-weight:bold;">${itemDayLabel} • ${visit.time || 'Visite'}</span>
                   <div style="font-size:12px; font-weight:bold; margin:4px 0 2px; color:#0f172a;">${visit.title}</div>
                   ${visit.subtitle ? `<div style="font-size:11px; color:#64748b; margin-bottom:4px;">${visit.subtitle}</div>` : ''}
                   <a href="${gpsUrl}" target="_blank" style="display:inline-block; margin-top:4px; background:#0284c7; color:white; padding:3px 8px; border-radius:4px; font-size:11px; text-decoration:none; font-weight:bold;">
