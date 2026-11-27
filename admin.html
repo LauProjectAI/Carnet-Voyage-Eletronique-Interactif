@@ -680,11 +680,16 @@
 
       <!-- 3. HOTELS -->
       <div id="adm-sec-hotels" class="admin-section" style="display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
           <h3 style="font-size:1.1rem; color:var(--primary-dark);"><i class="fa-solid fa-bed" style="color:var(--accent-gold); margin-right:6px;"></i> 3. Hébergement (Hôtels ou Navire)</h3>
-          <button type="button" onclick="addNewHotel()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
-            <i class="fa-solid fa-plus"></i> Ajouter un hébergement
-          </button>
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button type="button" id="btn-open-hotel-enrich" onclick="openHotelEnrichModal(-1)" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:800;">
+              <i class="fa-solid fa-wand-magic-sparkles"></i> Importer fiche hôtel (PDF / Word / IA)
+            </button>
+            <button type="button" onclick="addNewHotel()" class="btn-secondary" style="font-size:0.8rem; padding:6px 12px;">
+              <i class="fa-solid fa-plus"></i> Ajouter un hébergement
+            </button>
+          </div>
         </div>
         <div id="adm-hotels-list"></div>
       </div>
@@ -1378,6 +1383,108 @@
           <i class="fa-solid fa-paper-plane"></i> Ouvrir dans ma messagerie
         </button>
       </div>
+    </div>
+  </dialog>
+
+  <!-- MODALE ENRICHISSEMENT FICHE HÔTEL (PDF / WORD / TEXTE + IA GEMINI) -->
+  <dialog id="hotel-enrich-modal" class="girardot-admin-dialog" closedby="any" aria-labelledby="hotel-enrich-modal-title">
+    <div style="padding:16px 20px; background:linear-gradient(135deg, #312e81 0%, #1e1b4b 100%); color:white; display:flex; justify-content:space-between; align-items:center; gap:12px;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <i class="fa-solid fa-wand-magic-sparkles" style="color:#fde047; font-size:1.2rem;" aria-hidden="true"></i>
+        <div>
+          <h1 id="hotel-enrich-modal-title" style="margin:0; font-size:1.05rem; font-weight:800; color:white;">Enrichir une fiche Hôtel (PDF / Word / IA)</h1>
+          <p style="margin:2px 0 0; font-size:0.74rem; color:#c7d2fe;">Classe automatiquement les rubriques fournisseur dans les 6 cadres Hôtel de séjour (hors tarifs B2B)</p>
+        </div>
+      </div>
+      <button type="button" onclick="closeHotelEnrichModal()" aria-label="Fermer la fenêtre" style="background:none; border:none; color:#e2e8f0; font-size:1.4rem; line-height:1; cursor:pointer; padding:4px;">&times;</button>
+    </div>
+
+    <div style="padding:18px 20px; overflow-y:auto; flex:1; background:#ffffff;">
+      <div class="form-group" style="margin-bottom:12px;">
+        <label for="hotel-enrich-target-select">Hôtel cible dans le carnet :</label>
+        <select id="hotel-enrich-target-select" class="form-control"></select>
+      </div>
+
+      <div style="background:#f8fafc; border:1px dashed #cbd5e1; border-radius:12px; padding:12px 14px; margin-bottom:12px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <span style="font-size:0.82rem; font-weight:700; color:#334155;">
+            <i class="fa-solid fa-file-arrow-up" style="color:#4f46e5; margin-right:6px;"></i> Document fournisseur (.pdf, .docx, .txt, .html) :
+          </span>
+          <button type="button" onclick="document.getElementById('hotel-enrich-file-input').click()" class="btn-secondary" style="font-size:0.78rem; padding:6px 12px; background:white; font-weight:700;">
+            <i class="fa-solid fa-folder-open"></i> Choisir un fichier
+          </button>
+          <input type="file" id="hotel-enrich-file-input" accept=".pdf,.docx,.txt,.html,.htm" style="display:none;" onchange="handleHotelEnrichFileUpload(event)">
+        </div>
+        <div id="hotel-enrich-file-status" style="font-size:0.75rem; font-weight:700; margin-top:6px;"></div>
+      </div>
+
+      <div class="form-group" style="margin-bottom:12px;">
+        <label for="hotel-enrich-raw-text">Ou collez directement le texte du descriptif hôtel / fournisseur :</label>
+        <textarea id="hotel-enrich-raw-text" class="form-control" rows="6" placeholder="Collez ici la fiche FRAM, Framissima, Marmara, TUI ou du réceptif (LOGEMENT, EQUIPEMENTS, ANIMATION, ACTIVITES ENFANTS, SPORTS ET LOISIRS, RESTAURATION, BON A SAVOIR...)" autofocus style="font-size:0.82rem; line-height:1.45; resize:vertical;"></textarea>
+      </div>
+
+      <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px;">
+        <button type="button" id="btn-hotel-enrich-ai" onclick="runHotelEnrichAnalysis(true)" class="btn-save-main" style="background:#4f46e5; font-size:0.82rem; padding:8px 16px;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Remplir les cadres avec l'IA Gemini
+        </button>
+        <button type="button" id="btn-hotel-enrich-local" onclick="runHotelEnrichAnalysis(false)" class="btn-secondary" style="font-size:0.82rem; padding:8px 14px; background:#eff6ff; color:#0369a1; border-color:#93c5fd; font-weight:700;">
+          <i class="fa-solid fa-bolt"></i> Remplissage rapide (sans IA)
+        </button>
+        <span style="font-size:0.72rem; color:#64748b; margin-left:auto;">
+          <i class="fa-solid fa-shield-halved" style="color:#059669;"></i> Les tarifs nets, devis et commissions sont automatiquement exclus.
+        </span>
+      </div>
+
+      <div id="hotel-enrich-feedback" style="font-size:0.8rem; font-weight:700; min-height:1.2em; margin-bottom:10px;"></div>
+
+      <div id="hotel-enrich-preview-box" style="display:none; background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px; padding:14px;">
+        <div style="font-size:0.86rem; font-weight:800; color:#0369a1; margin-bottom:10px;">
+          <i class="fa-solid fa-list-check"></i> Prévisualisation des 6 cadres (modifiables avant application)
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin-bottom:8px;">
+            <label for="he-name" style="font-size:0.76rem; color:#0369a1;">Nom de l'hôtel détecté :</label>
+            <input type="text" id="he-name" class="form-control" style="font-size:0.82rem;">
+          </div>
+          <div class="form-group" style="margin-bottom:8px;">
+            <label for="he-city" style="font-size:0.76rem; color:#0369a1;">Ville / Commune :</label>
+            <input type="text" id="he-city" class="form-control" style="font-size:0.82rem;">
+          </div>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="he-intro" style="font-size:0.76rem; color:#0369a1;">Cadre &amp; Ambiance :</label>
+          <textarea id="he-intro" class="form-control" rows="2" style="font-size:0.8rem;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="he-chambres" style="font-size:0.76rem; color:#0369a1;">Les Chambres :</label>
+          <textarea id="he-chambres" class="form-control" rows="2" style="font-size:0.8rem;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="he-restauration" style="font-size:0.76rem; color:#0369a1;">Restauration :</label>
+          <textarea id="he-restauration" class="form-control" rows="2" style="font-size:0.8rem;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="he-formule" style="font-size:0.76rem; color:#0369a1;">Formule Repas / Tout Inclus :</label>
+          <textarea id="he-formule" class="form-control" rows="2" style="font-size:0.8rem;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:8px;">
+          <label for="he-services" style="font-size:0.76rem; color:#0369a1;">Services, Sports &amp; Loisirs (inclut Animation, Club/Activités Enfants) :</label>
+          <textarea id="he-services" class="form-control" rows="3" style="font-size:0.8rem;"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+          <label for="he-disposition" style="font-size:0.76rem; color:#0369a1;">À votre disposition (inclut Équipements &amp; Bon à savoir) :</label>
+          <textarea id="he-disposition" class="form-control" rows="3" style="font-size:0.8rem;"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:14px 20px; background:#f8fafc; border-top:1px solid #e2e8f0; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+      <button type="button" onclick="closeHotelEnrichModal()" class="btn-secondary" style="font-size:0.8rem; padding:8px 14px;">
+        Fermer
+      </button>
+      <button type="button" id="btn-apply-hotel-enrich" onclick="applyHotelEnrichResult()" class="btn-save-main" style="display:none; background:#059669; font-size:0.85rem; padding:8px 18px;">
+        <i class="fa-solid fa-check"></i> Appliquer à la fiche hôtel
+      </button>
     </div>
   </dialog>
 

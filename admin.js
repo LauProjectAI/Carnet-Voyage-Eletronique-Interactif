@@ -2961,10 +2961,15 @@ function renderAdminHotels() {
 
       <!-- Encart Hôtel de Séjour (Présentation détaillée) -->
       <div style="margin-top:14px; padding:12px 14px; background:#f0f9ff; border:1px solid #bae6fd; border-radius:12px;">
-        <label style="display:flex; align-items:center; gap:8px; font-weight:800; color:#0369a1; cursor:pointer; font-size:0.88rem;">
-          <input type="checkbox" ${hotel.isStayHotel ? 'checked' : ''} onchange="toggleStayHotel(${index}, this.checked)">
-          <i class="fa-solid fa-umbrella-beach"></i> Hôtel de séjour (activer la fiche détaillée de présentation)
-        </label>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+          <label style="display:flex; align-items:center; gap:8px; font-weight:800; color:#0369a1; cursor:pointer; font-size:0.88rem; margin:0;">
+            <input type="checkbox" ${hotel.isStayHotel ? 'checked' : ''} onchange="toggleStayHotel(${index}, this.checked)">
+            <i class="fa-solid fa-umbrella-beach"></i> Hôtel de séjour (activer la fiche détaillée de présentation)
+          </label>
+          <button type="button" onclick="openHotelEnrichModal(${index})" class="btn-secondary" style="font-size:0.74rem; padding:4px 10px; background:#f5f3ff; color:#6d28d9; border-color:#ddd6fe; font-weight:800;">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Enrichir via doc / IA
+          </button>
+        </div>
         <div id="hotel-pres-box-${index}" style="margin-top:10px; display:${hotel.isStayHotel ? 'block' : 'none'};">
           <div class="form-group" style="margin-bottom:8px;">
             <label style="font-size:0.78rem; font-weight:700; color:#0369a1;"><i class="fa-solid fa-sun"></i> Cadre & Ambiance (présentation générale) :</label>
@@ -10551,4 +10556,276 @@ function applyPartnerEnrichmentToCurrentTrip() {
   closePartnerEnrichModal();
 
   alert(`✓ Enrichissement réussi du voyage "${tripData.title}" !\n\n• ${result.totalEnrichedVisits} visite(s) enrichie(s) sur ${result.totalEnrichedDays} journée(s)\n• L'ordre des journées et l'ordre des visites ont été strictement conservés.\n• Vos hôtels, vols et contacts sont intacts.`);
+}
+
+// =============================================================================
+// ENRICHISSEMENT FICHE HÔTEL DE SÉJOUR (PDF / WORD .DOCX / TEXTE + IA GEMINI)
+// =============================================================================
+let currentHotelEnrichTargetIndex = -1;
+
+function installHotelEnrichDialogFallback() {
+  if (typeof document === 'undefined' || typeof HTMLDialogElement === 'undefined') return;
+  if ('closedBy' in HTMLDialogElement.prototype) return;
+  const dialog = document.getElementById('hotel-enrich-modal');
+  if (!dialog || dialog.dataset.lightDismissBound === '1') return;
+  dialog.dataset.lightDismissBound = '1';
+  const isOutside = (e) => {
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  };
+  let pressedOutside = false;
+  dialog.addEventListener('pointerdown', (e) => { pressedOutside = isOutside(e); });
+  dialog.addEventListener('pointerup', (e) => { if (pressedOutside && isOutside(e)) dialog.close(); });
+}
+
+function openHotelEnrichModal(hotelIndex = -1) {
+  const dialog = document.getElementById('hotel-enrich-modal');
+  if (!dialog) return;
+
+  installHotelEnrichDialogFallback();
+  currentHotelEnrichTargetIndex = Number(hotelIndex);
+
+  const sel = document.getElementById('hotel-enrich-target-select');
+  if (sel) {
+    const hotels = (tripData && Array.isArray(tripData.hotels)) ? tripData.hotels : [];
+    const options = ['<option value="-1">+ Créer un nouvel hôtel de séjour</option>'];
+    hotels.forEach((h, idx) => {
+      options.push(`<option value="${idx}">${h.name || `Hébergement #${idx + 1}`}${h.dates ? ` (${h.dates})` : ''}</option>`);
+    });
+    sel.innerHTML = options.join('');
+    sel.value = (hotelIndex >= 0 && hotelIndex < hotels.length) ? String(hotelIndex) : '-1';
+  }
+
+  const fileInput = document.getElementById('hotel-enrich-file-input');
+  if (fileInput) fileInput.value = '';
+  const fileStatus = document.getElementById('hotel-enrich-file-status');
+  if (fileStatus) fileStatus.textContent = '';
+  const feedback = document.getElementById('hotel-enrich-feedback');
+  if (feedback) feedback.textContent = '';
+  const rawBox = document.getElementById('hotel-enrich-raw-text');
+  if (rawBox) rawBox.value = '';
+
+  const previewBox = document.getElementById('hotel-enrich-preview-box');
+  if (previewBox) previewBox.style.display = 'none';
+  const applyBtn = document.getElementById('btn-apply-hotel-enrich');
+  if (applyBtn) applyBtn.style.display = 'none';
+
+  ['he-name', 'he-city', 'he-intro', 'he-chambres', 'he-restauration', 'he-formule', 'he-services', 'he-disposition'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+
+  if (typeof dialog.showModal === 'function') {
+    if (!dialog.open) dialog.showModal();
+  } else {
+    dialog.setAttribute('open', 'open');
+  }
+}
+
+function closeHotelEnrichModal() {
+  const dialog = document.getElementById('hotel-enrich-modal');
+  if (!dialog) return;
+  if (typeof dialog.close === 'function' && dialog.open) {
+    dialog.close();
+  } else {
+    dialog.removeAttribute('open');
+  }
+}
+
+async function handleHotelEnrichFileUpload(event) {
+  const file = event && event.target && event.target.files ? event.target.files[0] : null;
+  if (!file) return;
+
+  const statusEl = document.getElementById('hotel-enrich-file-status');
+  const rawBox = document.getElementById('hotel-enrich-raw-text');
+  const ext = (file.name.split('.').pop() || '').toLowerCase();
+
+  if (statusEl) {
+    statusEl.style.color = '#0369a1';
+    statusEl.textContent = `⏳ Lecture de "${file.name}" en cours...`;
+  }
+
+  try {
+    let extracted = '';
+    if (ext === 'pdf') {
+      if (!window.pdfjsLib) {
+        throw new Error("La bibliothèque PDF.js n'est pas prête. Rechargez la page ou collez le texte manuellement.");
+      }
+      const buf = await file.arrayBuffer();
+      const pdf = await window.pdfjsLib.getDocument({ data: new Uint8Array(buf) }).promise;
+      for (let p = 1; p <= pdf.numPages; p++) {
+        const page = await pdf.getPage(p);
+        const content = await page.getTextContent();
+        const items = content.items || [];
+        let lastY = null;
+        let pageText = '';
+        items.forEach(item => {
+          const y = item.transform ? item.transform[5] : null;
+          if (lastY !== null && y !== null && Math.abs(y - lastY) > 4) {
+            pageText += '\n';
+          } else if (pageText && !pageText.endsWith('\n') && !pageText.endsWith(' ')) {
+            pageText += ' ';
+          }
+          pageText += item.str || '';
+          if (y !== null) lastY = y;
+        });
+        extracted += pageText + '\n';
+      }
+    } else if (ext === 'docx') {
+      if (typeof window.extractTextFromDocxArrayBuffer !== 'function') {
+        throw new Error("Extracteur Word (.docx) indisponible.");
+      }
+      const buf = await file.arrayBuffer();
+      extracted = await window.extractTextFromDocxArrayBuffer(buf);
+    } else {
+      const txt = await file.text();
+      if (ext === 'html' || ext === 'htm') {
+        const doc = new DOMParser().parseFromString(txt, 'text/html');
+        extracted = (doc.body && doc.body.innerText) ? doc.body.innerText : txt.replace(/<[^>]+>/g, ' ');
+      } else {
+        extracted = txt;
+      }
+    }
+
+    if (rawBox) rawBox.value = extracted.trim();
+    if (statusEl) {
+      statusEl.style.color = '#047857';
+      statusEl.textContent = `✓ Document "${file.name}" chargé (${extracted.trim().length} caractères). Choisissez IA Gemini ou Remplissage rapide.`;
+    }
+  } catch (err) {
+    console.error('Erreur lecture fiche hôtel:', err);
+    if (statusEl) {
+      statusEl.style.color = '#dc2626';
+      statusEl.textContent = `❌ ${err.message}`;
+    }
+  }
+}
+
+async function runHotelEnrichAnalysis(useAi) {
+  const rawBox = document.getElementById('hotel-enrich-raw-text');
+  const feedback = document.getElementById('hotel-enrich-feedback');
+  const previewBox = document.getElementById('hotel-enrich-preview-box');
+  const applyBtn = document.getElementById('btn-apply-hotel-enrich');
+  const sel = document.getElementById('hotel-enrich-target-select');
+
+  const rawText = rawBox ? rawBox.value.trim() : '';
+  if (!rawText) {
+    if (feedback) {
+      feedback.style.color = '#dc2626';
+      feedback.textContent = '⚠ Importez un fichier (.pdf, .docx, .txt) ou collez le descriptif de l’hôtel ci-dessus.';
+    }
+    return;
+  }
+
+  const targetIdx = sel ? Number(sel.value) : currentHotelEnrichTargetIndex;
+  const existingHotel = (targetIdx >= 0 && tripData && tripData.hotels && tripData.hotels[targetIdx])
+    ? tripData.hotels[targetIdx]
+    : null;
+
+  const aiBtn = document.getElementById('btn-hotel-enrich-ai');
+  const localBtn = document.getElementById('btn-hotel-enrich-local');
+  if (aiBtn) aiBtn.disabled = true;
+  if (localBtn) localBtn.disabled = true;
+
+  if (feedback) {
+    feedback.style.color = useAi ? '#6d28d9' : '#0369a1';
+    feedback.textContent = useAi
+      ? '⏳ Analyse IA Gemini en cours (classement dans les 6 cadres et filtrage des tarifs)...'
+      : '⏳ Structuration rapide en cours...';
+  }
+
+  try {
+    let result;
+    if (useAi) {
+      if (typeof window.analyzeHotelDocumentWithGemini !== 'function') {
+        throw new Error("Module IA Gemini indisponible.");
+      }
+      result = await window.analyzeHotelDocumentWithGemini(rawText, existingHotel);
+    } else {
+      if (typeof window.parseHotelDocumentLocally !== 'function') {
+        throw new Error("Parseur local hôtel indisponible.");
+      }
+      result = window.parseHotelDocumentLocally(rawText);
+    }
+
+    const p = result.presentation || {};
+    const setVal = (id, v) => {
+      const el = document.getElementById(id);
+      if (el) el.value = v || '';
+    };
+    setVal('he-name', result.name || (existingHotel && existingHotel.name) || '');
+    setVal('he-city', result.city || (existingHotel && existingHotel.city) || '');
+    setVal('he-intro', p.intro || '');
+    setVal('he-chambres', p.chambres || '');
+    setVal('he-restauration', p.restauration || '');
+    setVal('he-formule', p.formule || '');
+    setVal('he-services', p.services || '');
+    setVal('he-disposition', p.disposition || '');
+
+    if (previewBox) previewBox.style.display = 'block';
+    if (applyBtn) applyBtn.style.display = 'inline-flex';
+    if (feedback) {
+      feedback.style.color = '#047857';
+      feedback.textContent = '✓ Cadres pré-remplis ! Relisez ou ajustez ci-dessous puis cliquez sur « Appliquer à la fiche hôtel ».';
+    }
+  } catch (err) {
+    console.error('Erreur analyse fiche hôtel:', err);
+    if (feedback) {
+      feedback.style.color = '#dc2626';
+      feedback.textContent = `❌ ${err.message}`;
+    }
+  } finally {
+    if (aiBtn) aiBtn.disabled = false;
+    if (localBtn) localBtn.disabled = false;
+  }
+}
+
+function applyHotelEnrichResult() {
+  if (!tripData) return;
+  if (!Array.isArray(tripData.hotels)) tripData.hotels = [];
+
+  const sel = document.getElementById('hotel-enrich-target-select');
+  const targetIdx = sel ? Number(sel.value) : currentHotelEnrichTargetIndex;
+  const getVal = (id) => {
+    const el = document.getElementById(id);
+    return el ? el.value.trim() : '';
+  };
+
+  const presentation = {
+    intro: getVal('he-intro'),
+    chambres: getVal('he-chambres'),
+    restauration: getVal('he-restauration'),
+    formule: getVal('he-formule'),
+    services: getVal('he-services'),
+    disposition: getVal('he-disposition')
+  };
+
+  const newName = getVal('he-name');
+  const newCity = getVal('he-city');
+
+  if (targetIdx >= 0 && tripData.hotels[targetIdx]) {
+    const h = tripData.hotels[targetIdx];
+    if (newName && !h.name) h.name = newName;
+    if (newCity && !h.city) h.city = newCity;
+    h.isStayHotel = true;
+    h.presentation = presentation;
+  } else {
+    tripData.hotels.push({
+      id: 'hotel-' + Date.now(),
+      name: newName || 'Hôtel de séjour',
+      dates: '',
+      phone: '',
+      city: newCity,
+      address: newCity ? `${newName ? newName + ', ' : ''}${newCity}` : '',
+      lat: null,
+      lng: null,
+      isStayHotel: true,
+      presentation
+    });
+  }
+
+  hasUnsavedChanges = true;
+  if (typeof renderAdminHotels === 'function') renderAdminHotels();
+  if (typeof updateChangeBadge === 'function') updateChangeBadge();
+  closeHotelEnrichModal();
 }

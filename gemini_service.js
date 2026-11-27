@@ -893,6 +893,374 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT :
   }
 
   // ---------------------------------------------------------------------------
+  // ENRICHISSEMENT FICHE HÔTEL DE SÉJOUR (IA GEMINI + PARSEUR LOCAL + DOCX)
+  // ---------------------------------------------------------------------------
+  function stripB2BCommercialNoise(rawText) {
+    let txt = String(rawText || '').replace(/\r\n?/g, '\n');
+    const cutoffRe = /^\s*(?:DESCRIPTIF\s+TARIFAIRE|TARIFS?\s+NET\s+DE\s+COMMISSION|LE\s+PRIX\s+COMPREND|LE\s+PRIX\s+NE\s+COMPREND\s+PAS|Devis\s+établi\s+le|Devis\s+sous\s+réserve|PACK\s+ACTIVI?T[ÉE]S?\s+EXCURSIONS|VOTRE\s+COMMISSION)\b/im;
+    const cutMatch = txt.match(cutoffRe);
+    if (cutMatch && typeof cutMatch.index === 'number') {
+      txt = txt.slice(0, cutMatch.index);
+    }
+
+    const noiseLinePatterns = [
+      /net\s+de\s+commission/i,
+      /\d+\s*€\s*\/\s*pers/i,
+      /CLIQUER\s+ICI\s+pour\s+le\s+Descriptif/i,
+      /Descriptif\s+étant\s+amené\s+à\s+évoluer/i,
+      /^<td\b/i
+    ];
+    return txt
+      .split('\n')
+      .filter(line => !noiseLinePatterns.some(re => re.test(line)))
+      .join('\n')
+      .trim();
+  }
+
+  function cleanHotelBlockText(str) {
+    return String(str || '')
+      .replace(/[ \t]+/g, ' ')
+      .replace(/\n{3,}/g, '\n\n')
+      .trim();
+  }
+
+  function detectHotelMetaFromText(text) {
+    const clean = String(text || '');
+    let name = '';
+    const brandMatch = clean.match(/\b((?:Framissima|Club\s+Marmara|Club\s+Lookéa|Top\s+Clubs?|TUI\s+Blue|Club\s+Med|Hôtel|Hotel|Resort)\s+[A-ZÀ-ÿ0-9][A-Za-zÀ-ÿ0-9'’\-\s]{2,45}?(?:\s*\d\s*\*+)?)(?=\s*[!.,\n]|$)/i);
+    if (brandMatch) {
+      name = brandMatch[1].replace(/\s+/g, ' ').trim();
+    } else {
+      const starMatch = clean.match(/^([A-ZÀ-ÿ0-9][A-ZÀ-ÿ0-9'’\-\s]{2,40}\s+\d\s*\*+)/m);
+      if (starMatch) name = starMatch[1].replace(/\s+/g, ' ').trim();
+    }
+
+    let city = '';
+    const cityMatch = clean.match(/(?:commune\s+d['’]|situé(?:e)?\s+(?:à|dans\s+la\s+ville\s+de)\s+)([A-ZÀ-ÿ][A-Za-zÀ-ÿ\-']{2,30})/i);
+    if (cityMatch) {
+      city = cityMatch[1].trim();
+    }
+
+    let phone = '';
+    const phoneMatch = clean.match(/(?:Tél\.?|Téléphone)\s*[:\-]?\s*(\+?[\d\s.\-()]{8,20})/i);
+    if (phoneMatch) phone = phoneMatch[1].trim();
+
+    return { name, city, phone };
+  }
+
+  function parseHotelDocumentLocally(rawText) {
+    const clean = stripB2BCommercialNoise(rawText);
+    const meta = detectHotelMetaFromText(clean);
+
+    // Titres de rubriques reconnus : soit en MAJUSCULES, soit suivis de ":", soit seuls sur la ligne
+    const headingPatterns = [
+      { key: 'ignore_info', re: /^(INFORMATIONS?\s+PRATIQUES?|FORMALIT[ÉE]S?)(\s*:)?\s*(.*)$/i },
+      { key: 'chambres', re: /^(LOGEMENT|H[ÉE]BERGEMENT|LES\s+CHAMBRES|CHAMBRES?)(\s*:)?\s*(.*)$/i },
+      { key: 'equipements', re: /^([ÉE]QUIPEMENTS?)(\s*:)?\s*(.*)$/i },
+      { key: 'animation', re: /^(ANIMATIONS?)(\s*:)?\s*(.*)$/i },
+      { key: 'enfants', re: /^(ACTIVIT[ÉE]S?\s+ENFANTS?|CLUB\s+ENFANTS?|ENFANTS?\s*(?:&|ET)\s*ADOS?)(\s*:)?\s*(.*)$/i },
+      { key: 'sports', re: /^(SPORTS?\s*(?:&|ET)\s*LOISIRS?|BIEN[- ]ÊTRE\s*(?:&|ET)\s*SPA|SPA\s*(?:&|ET)\s*LOISIRS?)(\s*:)?\s*(.*)$/i },
+      { key: 'supplement', re: /^(AVEC\s+SUPPL[ÉE]MENT)(\s*:)?\s*(.*)$/i },
+      { key: 'restauration', re: /^(RESTAURATION|RESTAURANTS?\s*(?:&|ET)\s*BARS?)(\s*:)?\s*(.*)$/i },
+      { key: 'formule', re: /^(FORMULE(?:\s+REPAS|\s+TOUT\s+INCLUS|\s+ALL\s+INCLUSIVE)?|TOUT\s+INCLUS|TOUT\s+COMPRIS)(\s*:)?\s*(.*)$/i },
+      { key: 'bon_a_savoir', re: /^(BON\s+[ÀA]\s+SAVOIR|[ÀA]\s+VOTRE\s+DISPOSITION)(\s*:)?\s*(.*)$/i }
+    ];
+
+    const buckets = {
+      intro: [],
+      ignore_info: [],
+      chambres: [],
+      equipements: [],
+      animation: [],
+      enfants: [],
+      sports: [],
+      supplement: [],
+      restauration: [],
+      formule: [],
+      bon_a_savoir: []
+    };
+
+    let currentKey = 'intro';
+    const lines = clean.split('\n');
+    for (let i = 0; i < lines.length; i++) {
+      const line = lines[i].trim();
+      if (!line) continue;
+
+      let matchedHeading = false;
+      for (let h = 0; h < headingPatterns.length; h++) {
+        const hp = headingPatterns[h];
+        const m = line.match(hp.re);
+        if (m) {
+          const kw = m[1] || '';
+          const hasColon = Boolean(m[2] && m[2].includes(':'));
+          const rest = (m[3] || '').trim();
+          const isAllCapsKw = kw === kw.toUpperCase() && /[A-ZÀ-Ÿ]/.test(kw);
+          const isStandalone = rest.length === 0;
+          if (!isAllCapsKw && !hasColon && !isStandalone) {
+            continue;
+          }
+          // Ne traiter "AVEC SUPPLEMENT" comme rubrique que s'il est en majuscules / sans puce
+          if (hp.key === 'supplement' && !isAllCapsKw) {
+            continue;
+          }
+          currentKey = hp.key;
+          if (rest) {
+            buckets[currentKey].push(rest);
+          }
+          matchedHeading = true;
+          break;
+        }
+      }
+      if (matchedHeading) continue;
+
+      // Si on était dans INFORMATIONS PRATIQUES / FORMALITES et qu'on détecte le début de la fiche hôtel, revenir en mode intro
+      if (currentKey === 'ignore_info' && /^(?:CAPE\s+EAST|FRAMISSIMA|CLUB\s+MARMARA|CLUB\s+LOOK[ÉE]A|TOP\s+CLUB|Votre\s+équipe|R[ée]servez\s+votre\s+s[ée]jour|Situ[ée]\s+dans|L['’]h[ôo]tel|[A-ZÀ-ÿ0-9'’\-\s]{3,40}\s+\d\s*\*+)/i.test(line)) {
+        currentKey = 'intro';
+      }
+
+      buckets[currentKey].push(line);
+    }
+
+    // Si on a capturé des paragraphes de destination pays tout au début avant INFORMATIONS PRATIQUES, ne garder dans intro que la partie hôtel si présente
+    let introLines = buckets.intro.slice();
+    const hotelAnchorIdx = introLines.findIndex(l => /(?:R[ée]servez\s+votre\s+s[ée]jour|Situ[ée]\s+dans\s+la\s+commune|Votre\s+équipe\s+d['’]animation|accueille\s+dans\s+des\s+chambres)/i.test(l));
+    if (hotelAnchorIdx > 0) {
+      introLines = introLines.slice(hotelAnchorIdx);
+    }
+
+    const intro = cleanHotelBlockText(introLines.join('\n').replace(/CAPE\s+EAST\s+3\*\s*Arrivée\s+Kemi/gi, '').trim());
+    const chambres = cleanHotelBlockText(buckets.chambres.join('\n'));
+    const restauration = cleanHotelBlockText(buckets.restauration.join('\n'));
+
+    // Extraire les éléments de Formule depuis buckets.formule + phrases clés de restauration / bon à savoir
+    const formuleParts = [];
+    if (buckets.formule.length) formuleParts.push(buckets.formule.join('\n'));
+    const allRestLines = buckets.restauration.join('\n').split(/(?<=[.!?])\s+|\n/);
+    allRestLines.forEach(s => {
+      if (/(?:formule\s+(?:pension|tout\s+inclus|demi-pension)|inclus\s+pour\s+le\s+déjeuner|avec\s+supplément\s*:|bar\s+lounge|boissons)/i.test(s)) {
+        if (!formuleParts.some(p => p.includes(s.trim()))) {
+          formuleParts.push(s.trim());
+        }
+      }
+    });
+    const formule = cleanHotelBlockText(formuleParts.join('\n'));
+
+    // Règle métier explicite : Animation, Sports et Loisirs, Club/Activités Enfants (+ Avec supplément) -> Services, Sports & Loisirs
+    const servicesParts = [];
+    if (buckets.animation.length) servicesParts.push(`Animation :\n${buckets.animation.join('\n')}`);
+    if (buckets.enfants.length) servicesParts.push(`Club & Activités Enfants :\n${buckets.enfants.join('\n')}`);
+    if (buckets.sports.length) servicesParts.push(`Sports & Loisirs :\n${buckets.sports.join('\n')}`);
+    if (buckets.supplement.length) servicesParts.push(`Avec supplément :\n${buckets.supplement.join('\n')}`);
+    const services = cleanHotelBlockText(servicesParts.join('\n\n'));
+
+    // Règle métier explicite : Équipements (+ Bon à savoir pratique) -> À votre disposition
+    const dispoParts = [];
+    if (buckets.equipements.length) dispoParts.push(`Équipements :\n${buckets.equipements.join('\n')}`);
+    if (buckets.bon_a_savoir.length) dispoParts.push(`Bon à savoir :\n${buckets.bon_a_savoir.join('\n')}`);
+    const disposition = cleanHotelBlockText(dispoParts.join('\n\n'));
+
+    return {
+      name: meta.name,
+      city: meta.city,
+      address: '',
+      phone: meta.phone,
+      presentation: {
+        intro,
+        chambres,
+        restauration,
+        formule,
+        services,
+        disposition
+      }
+    };
+  }
+
+  async function analyzeHotelDocumentWithGemini(rawText, existingHotel) {
+    const apiKey = getStoredGeminiKey();
+    if (!apiKey) {
+      throw new Error("Aucune clé API Google Gemini configurée. Utilisez le bouton « IA Gemini (Free) » en haut à droite ou cliquez sur « Remplissage rapide (sans IA) ».");
+    }
+
+    const cleanSource = stripB2BCommercialNoise(rawText);
+    if (!cleanSource || cleanSource.length < 30) {
+      throw new Error("Le texte du document hôtel est trop court pour être analysé.");
+    }
+
+    const model = getStoredGeminiModel();
+    const existingName = existingHotel && existingHotel.name ? existingHotel.name : '';
+
+    const systemPrompt = `Tu es un expert en production touristique chez Voyages Girardot.
+À partir d'une fiche descriptive d'hôtel ou de club de séjour fournie par un tour-opérateur (ex: FRAM, Framissima, Marmara, TUI, Top Clubs), tu dois extraire et classer fidèlement les informations dans les 6 cadres pré-établis de la fiche "Hôtel de Séjour".
+
+RÈGLES DE CLASSEMENT STRICTES :
+1. "intro" (Cadre & Ambiance) : présentation générale de l'hôtel, situation géographique, distance centre-ville / aéroports, ambiance globale.
+2. "chambres" (Les Chambres) : capacité totale, bâtiments, superficie, literie, équipements en chambre, capacité maximale, remarques chambre.
+3. "restauration" (Restauration) : restaurants, buffets, horaires des repas, dîners à thème (ex: dîner tipi), bars, remarques restauration.
+4. "formule" (Formule Repas / Tout Inclus) : régime de pension (pension complète, tout inclus, demi-pension), boissons incluses ou en supplément, snacks, dîners de fêtes inclus.
+5. "services" (Services, Sports & Loisirs) : OBLIGATOIREMENT toutes les rubriques Animation, Sports et Loisirs, Spa / Piscines / Fitness, Club ou Activités Enfants / Ados, et activités avec supplément.
+6. "disposition" (À votre disposition) : OBLIGATOIREMENT la rubrique Équipements de l'hôtel (réception, Wi-Fi, parking, salles de conférence...) ainsi que les informations pratiques utiles au client (Bon à savoir : horaires arrivée/départ, ménage, prêt de tenue grand froid ou serviettes, animaux, PMR, paiement CB, classification locale).
+
+INTERDICTIONS STRICTES :
+- N'invente aucune information absente du document.
+- Exclue totalement les prix, tarifs nets de commission, devis, suppléments chiffrés de vente et commissions d'agence.
+- Rédige en français clair, structuré et directement lisible par le voyageur.`;
+
+    const userPrompt = `${existingName ? `Hôtel concerné : ${existingName}\n\n` : ''}DOCUMENT SOURCE À ANALYSER :
+${cleanSource.slice(0, 28000)}
+
+Retourne UNIQUEMENT un objet JSON valide au format exact :
+{
+  "name": "Nom de l'hôtel avec catégorie si mentionnée",
+  "city": "Ville ou commune de l'hôtel",
+  "address": "Adresse postale si présente sinon chaîne vide",
+  "phone": "Téléphone si présent sinon chaîne vide",
+  "presentation": {
+    "intro": "...",
+    "chambres": "...",
+    "restauration": "...",
+    "formule": "...",
+    "services": "...",
+    "disposition": "..."
+  }
+}`;
+
+    const payload = {
+      systemInstruction: { parts: [{ text: systemPrompt }] },
+      contents: [{ parts: [{ text: userPrompt }] }],
+      generationConfig: {
+        temperature: 0.2,
+        responseMimeType: "application/json"
+      }
+    };
+
+    const { data } = await callGeminiApiWithFallback(apiKey, model, payload);
+    const jsonStr = data && data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts && data.candidates[0].content.parts[0]
+      ? data.candidates[0].content.parts[0].text
+      : '';
+    if (!jsonStr) throw new Error("Aucune réponse JSON reçue de Gemini.");
+
+    let parsed;
+    try {
+      parsed = JSON.parse(jsonStr);
+    } catch (e) {
+      const m = jsonStr.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error("Format JSON invalide retourné par Gemini.");
+      parsed = JSON.parse(m[0]);
+    }
+
+    const p = (parsed && parsed.presentation && typeof parsed.presentation === 'object') ? parsed.presentation : {};
+    return {
+      name: String(parsed.name || existingName || '').trim(),
+      city: String(parsed.city || '').trim(),
+      address: String(parsed.address || '').trim(),
+      phone: String(parsed.phone || '').trim(),
+      presentation: {
+        intro: cleanHotelBlockText(p.intro || ''),
+        chambres: cleanHotelBlockText(p.chambres || ''),
+        restauration: cleanHotelBlockText(p.restauration || ''),
+        formule: cleanHotelBlockText(p.formule || ''),
+        services: cleanHotelBlockText(p.services || ''),
+        disposition: cleanHotelBlockText(p.disposition || '')
+      }
+    };
+  }
+
+  function decodeXmlEntities(str) {
+    return String(str || '')
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
+      .replace(/&#x([0-9a-f]+);/gi, (_, hex) => String.fromCharCode(parseInt(hex, 16)));
+  }
+
+  async function extractTextFromDocxArrayBuffer(arrayBuffer) {
+    const bytes = new Uint8Array(arrayBuffer);
+    const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
+
+    // Localiser End of Central Directory (PK\x05\x06)
+    let eocdOffset = -1;
+    const minOffset = Math.max(0, bytes.length - 65557);
+    for (let i = bytes.length - 22; i >= minOffset; i--) {
+      if (bytes[i] === 0x50 && bytes[i + 1] === 0x4b && bytes[i + 2] === 0x05 && bytes[i + 3] === 0x06) {
+        eocdOffset = i;
+        break;
+      }
+    }
+    if (eocdOffset === -1) {
+      throw new Error("Fichier Word (.docx) invalide ou corrompu.");
+    }
+
+    const cdSize = view.getUint32(eocdOffset + 12, true);
+    const cdOffset = view.getUint32(eocdOffset + 16, true);
+    const decoder = new TextDecoder('utf-8');
+
+    let pos = cdOffset;
+    const cdEnd = cdOffset + cdSize;
+    let xmlText = '';
+
+    while (pos < cdEnd && pos + 46 <= bytes.length) {
+      if (view.getUint32(pos, true) !== 0x02014b50) break;
+      const compMethod = view.getUint16(pos + 10, true);
+      const compSize = view.getUint32(pos + 20, true);
+      const nameLen = view.getUint16(pos + 28, true);
+      const extraLen = view.getUint16(pos + 30, true);
+      const commentLen = view.getUint16(pos + 32, true);
+      const localHeaderOffset = view.getUint32(pos + 42, true);
+      const fileName = decoder.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+
+      if (fileName === 'word/document.xml') {
+        const lfhNameLen = view.getUint16(localHeaderOffset + 26, true);
+        const lfhExtraLen = view.getUint16(localHeaderOffset + 28, true);
+        const dataStart = localHeaderOffset + 30 + lfhNameLen + lfhExtraLen;
+        const compressedSlice = bytes.subarray(dataStart, dataStart + compSize);
+
+        if (compMethod === 0) {
+          xmlText = decoder.decode(compressedSlice);
+        } else if (compMethod === 8) {
+          if (typeof DecompressionStream === 'undefined') {
+            throw new Error("Ce navigateur ne prend pas en charge la décompression native des fichiers .docx.");
+          }
+          const ds = new DecompressionStream('deflate-raw');
+          const decompressedStream = new Blob([compressedSlice]).stream().pipeThrough(ds);
+          const outBuf = await new Response(decompressedStream).arrayBuffer();
+          xmlText = decoder.decode(new Uint8Array(outBuf));
+        } else {
+          throw new Error(`Méthode de compression .docx non supportée (${compMethod}).`);
+        }
+        break;
+      }
+
+      pos += 46 + nameLen + extraLen + commentLen;
+    }
+
+    if (!xmlText) {
+      throw new Error("Contenu word/document.xml introuvable dans ce fichier .docx.");
+    }
+
+    // Convertir les paragraphes Word (<w:p>) et sauts de ligne (<w:br/>) en texte structuré
+    const paragraphs = xmlText.split(/<\/w:p>/i);
+    const outLines = [];
+    paragraphs.forEach(pXml => {
+      const withBreaks = pXml
+        .replace(/<w:br\b[^>]*\/?>/gi, '\n')
+        .replace(/<w:tab\b[^>]*\/?>/gi, ' ');
+      const runs = [];
+      const tRe = /<w:t(?:\s+[^>]*)?>([\s\S]*?)<\/w:t>/gi;
+      let m;
+      while ((m = tRe.exec(withBreaks)) !== null) {
+        runs.push(decodeXmlEntities(m[1]));
+      }
+      const line = runs.join('').replace(/[ \t]+/g, ' ').trim();
+      if (line) outLines.push(line);
+    });
+
+    return outLines.join('\n');
+  }
+
+  // ---------------------------------------------------------------------------
   // EXPOSITION GLOBALE
   // ---------------------------------------------------------------------------
   global.getStoredGeminiKey = getStoredGeminiKey;
@@ -910,5 +1278,16 @@ RÉPONDS STRICTEMENT AU FORMAT JSON SUIVANT :
   global.cleanParsedTripWithGemini = cleanParsedTripWithGemini;
   global.cleanActiveCarnetWithGemini = cleanActiveCarnetWithGemini;
   global.callGeminiApiWithFallback = callGeminiApiWithFallback;
+  global.parseHotelDocumentLocally = parseHotelDocumentLocally;
+  global.analyzeHotelDocumentWithGemini = analyzeHotelDocumentWithGemini;
+  global.extractTextFromDocxArrayBuffer = extractTextFromDocxArrayBuffer;
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = {
+      parseHotelDocumentLocally,
+      analyzeHotelDocumentWithGemini,
+      extractTextFromDocxArrayBuffer
+    };
+  }
 
 })(typeof window !== 'undefined' ? window : global);

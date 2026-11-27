@@ -1030,6 +1030,9 @@
                   ${otherCount > 0 ? `<span style="background:#e0f2fe; color:#0369a1; font-size:0.72rem; font-weight:800; padding:2px 8px; border-radius:999px;">+${otherCount} autre(s) voyage(s)</span>` : ''}
                 </div>
                 <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                  <button type="button" onclick="openSendClientEmailModal('${esc(acc.id)}')" class="btn-secondary" style="font-size:0.74rem; padding:4px 10px; background:#ecfdf5; color:#047857; border-color:#86efac; font-weight:800;">
+                    <i class="fa-solid fa-paper-plane"></i> Envoyer Client
+                  </button>
                   <button type="button" onclick="copyTravelerCredentials('${esc(acc.id)}')" class="btn-secondary" style="font-size:0.74rem; padding:4px 10px; background:#eff6ff; color:#0369a1; border-color:#bae6fd; font-weight:700;">
                     <i class="fa-solid fa-copy"></i> Copier accès
                   </button>
@@ -1334,6 +1337,357 @@
     }
   }
 
+  // ---------------------------------------------------------------------------
+  // GÉNÉRATEUR D'E-MAIL PERSONNALISÉ « ENVOYER CLIENT »
+  // ---------------------------------------------------------------------------
+  function buildClientEmailDraft(trip, travelerAcc, plainPwd, overrides) {
+    const t = trip || {};
+    const ov = overrides || {};
+    const branding = (t.branding && typeof t.branding === 'object') ? t.branding : {};
+    const brandName = (branding.partnerName && String(branding.partnerName).trim())
+      ? String(branding.partnerName).trim()
+      : 'Voyages Girardot';
+    const isWhiteLabel = Boolean(branding.hideGirardotBrand);
+    const welcomeMessage = (branding.welcomeMessage && String(branding.welcomeMessage).trim())
+      ? String(branding.welcomeMessage).trim()
+      : '';
+
+    const tripId = t.id || '';
+    const defaultLink = tripId
+      ? `${getBasePublicSiteUrl()}/index.html?id=${encodeURIComponent(tripId)}`
+      : `${getBasePublicSiteUrl()}/index.html`;
+    const link = (ov.link && String(ov.link).trim()) ? String(ov.link).trim() : defaultLink;
+
+    const entry = (travelerAcc && Array.isArray(travelerAcc.trips))
+      ? travelerAcc.trips.find(item => item.tripId === tripId)
+      : null;
+
+    const defaultTo = (travelerAcc && travelerAcc.login && String(travelerAcc.login).includes('@'))
+      ? String(travelerAcc.login).trim()
+      : '';
+    const to = ov.to !== undefined ? String(ov.to).trim() : defaultTo;
+
+    const fallbackName = travelerAcc
+      ? (travelerAcc.displayName || [travelerAcc.firstName, travelerAcc.lastName].filter(Boolean).join(' '))
+      : '';
+    const clientName = ov.clientName !== undefined
+      ? String(ov.clientName).trim()
+      : String(fallbackName || '').trim();
+
+    const tripTitle = t.title || 'Votre voyage';
+    const subject = `Votre Carnet de Voyages interactif — ${tripTitle}${t.dates ? ` (${t.dates})` : ''}`;
+
+    const lines = [];
+    lines.push(clientName ? `Bonjour ${clientName},` : 'Bonjour Madame, Monsieur,');
+    lines.push('');
+
+    const detailsParts = [t.subtitle ? String(t.subtitle).trim() : '', t.dates ? String(t.dates).trim() : ''].filter(Boolean);
+    lines.push(
+      `Nous avons le plaisir de vous transmettre votre Carnet de Voyages interactif pour votre départ « ${tripTitle} »${detailsParts.length ? ` (${detailsParts.join(' • ')})` : ''}.`
+    );
+
+    if (welcomeMessage) {
+      lines.push('');
+      lines.push(welcomeMessage);
+    }
+
+    lines.push('');
+    lines.push(`👉 Accéder à votre Carnet de Voyages : ${link}`);
+
+    const requiresAuth = Boolean(t.accessControl && t.accessControl.requireAuth);
+    if (travelerAcc || requiresAuth) {
+      const loginVal = travelerAcc
+        ? (travelerAcc.login || (entry && entry.dossierRef) || travelerAcc.dossierRef || '')
+        : '(Votre identifiant personnel)';
+      const pwdVal = plainPwd
+        ? String(plainPwd)
+        : '(utilisez le mot de passe communiqué ou demandez sa réinitialisation)';
+      const dossierVal = (entry && entry.dossierRef) || (travelerAcc && travelerAcc.dossierRef) || '';
+
+      lines.push('');
+      lines.push('🔐 Vos accès personnels :');
+      if (loginVal) lines.push(`• Identifiant : ${loginVal}`);
+      lines.push(`• Mot de passe : ${pwdVal}`);
+      if (dossierVal) lines.push(`• N° de dossier : ${dossierVal}`);
+    }
+
+    if (entry) {
+      const persLines = [];
+      if (entry.pickupPoint) {
+        persLines.push(`• Prise en charge : ${entry.pickupPoint}${entry.pickupTime ? ` à ${entry.pickupTime}` : ''}`);
+      }
+      if (entry.seatNumber) persLines.push(`• Place autocar : ${entry.seatNumber}`);
+      if (entry.cabinNumber) persLines.push(`• Cabine : ${entry.cabinNumber}`);
+      if (entry.roomNumber) persLines.push(`• Chambre : ${entry.roomNumber}`);
+      const opts = (Array.isArray(entry.options) ? entry.options : []).map(o => {
+        if (typeof o === 'string') return o.trim();
+        if (!o || !o.title) return '';
+        return o.day ? `Jour ${o.day} : ${o.title}` : o.title;
+      }).filter(Boolean);
+      if (opts.length > 0) persLines.push(`• Options réservées : ${opts.join(' | ')}`);
+
+      if (persLines.length > 0) {
+        lines.push('');
+        lines.push('🧳 Vos informations personnalisées :');
+        persLines.forEach(l => lines.push(l));
+      }
+    }
+
+    lines.push('');
+    lines.push(
+      '💡 Astuce pratique : ouvrez ce lien une première fois sur votre smartphone avant le départ (ou ajoutez-le à votre écran d’accueil) pour le consulter ensuite 100 % hors-ligne tout au long du voyage. Vous pouvez également l’imprimer en PDF ou télécharger votre carnet souvenir numérique directement depuis l’en-tête.'
+    );
+    lines.push('');
+    lines.push('Bon voyage !');
+    lines.push(`L’équipe ${brandName}`);
+
+    if (!isWhiteLabel && t.contacts && t.contacts.agence) {
+      const ag = t.contacts.agence;
+      const agInfo = [ag.phone || '', ag.email || ''].filter(Boolean).join(' • ');
+      if (agInfo) lines.push(agInfo);
+    }
+
+    return {
+      to,
+      clientName,
+      link,
+      subject,
+      body: lines.join('\n')
+    };
+  }
+
+  function encodeRfc2047Utf8(str) {
+    const raw = String(str || '');
+    if (!raw) return '';
+    let b64 = '';
+    if (typeof Buffer !== 'undefined') {
+      b64 = Buffer.from(raw, 'utf8').toString('base64');
+    } else if (typeof TextEncoder !== 'undefined' && typeof btoa === 'function') {
+      const bytes = new TextEncoder().encode(raw);
+      let bin = '';
+      for (let i = 0; i < bytes.length; i++) {
+        bin += String.fromCharCode(bytes[i]);
+      }
+      b64 = btoa(bin);
+    } else {
+      return raw;
+    }
+    return `=?UTF-8?B?${b64}?=`;
+  }
+
+  function buildEmlFileContent(params) {
+    const p = params || {};
+    const to = String(p.to || '').replace(/[\r\n]+/g, ' ').trim();
+    const subject = String(p.subject || 'Votre Carnet de Voyages').replace(/[\r\n]+/g, ' ').trim();
+    const body = String(p.body || '').replace(/\r?\n/g, '\r\n');
+
+    const headers = [
+      'X-Unsent: 1',
+      'MIME-Version: 1.0'
+    ];
+    if (to) headers.push(`To: ${to}`);
+    headers.push(`Subject: ${encodeRfc2047Utf8(subject)}`);
+    headers.push('Content-Type: text/plain; charset=UTF-8');
+    headers.push('Content-Transfer-Encoding: 8bit');
+
+    return headers.join('\r\n') + '\r\n\r\n' + body + '\r\n';
+  }
+
+  function getActiveClientShareLinkForEmail() {
+    const inputEl = typeof document !== 'undefined' ? document.getElementById('client-share-link') : null;
+    if (inputEl && inputEl.value && /^https?:\/\//i.test(inputEl.value.trim())) {
+      return inputEl.value.trim();
+    }
+    if (typeof tripData !== 'undefined' && tripData && tripData.id) {
+      return `${getBasePublicSiteUrl()}/index.html?id=${encodeURIComponent(tripData.id)}`;
+    }
+    return `${getBasePublicSiteUrl()}/index.html`;
+  }
+
+  function installSendEmailDialogFallback() {
+    if (typeof document === 'undefined' || typeof HTMLDialogElement === 'undefined') return;
+    if ('closedBy' in HTMLDialogElement.prototype) return;
+    const dialog = document.getElementById('send-client-email-modal');
+    if (!dialog || dialog.dataset.lightDismissBound === '1') return;
+    dialog.dataset.lightDismissBound = '1';
+    const isOutside = (e) => {
+      const r = dialog.getBoundingClientRect();
+      return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+    };
+    let pressedOutside = false;
+    dialog.addEventListener('pointerdown', (e) => { pressedOutside = isOutside(e); });
+    dialog.addEventListener('pointerup', (e) => { if (pressedOutside && isOutside(e)) dialog.close(); });
+  }
+
+  function applySelectedTravelerToEmailModal(preserveManualFields) {
+    if (typeof document === 'undefined' || typeof tripData === 'undefined' || !tripData) return;
+    const sel = document.getElementById('email-traveler-select');
+    const toInput = document.getElementById('email-to-input');
+    const nameInput = document.getElementById('email-client-name-input');
+    const linkInput = document.getElementById('email-trip-link-input');
+    const subjectInput = document.getElementById('email-subject-input');
+    const bodyEl = document.getElementById('email-body-textarea');
+    const hintEl = document.getElementById('email-access-hint');
+    const feedbackEl = document.getElementById('send-email-feedback');
+
+    const accountId = sel ? sel.value : '';
+    const acc = accountId && adminRegistry
+      ? (adminRegistry.travelerAccounts || []).find(a => a.id === accountId)
+      : null;
+    const plainPwd = acc ? getPlainPwd(acc.id) : '';
+
+    const overrides = {
+      link: (linkInput && linkInput.value.trim()) ? linkInput.value.trim() : getActiveClientShareLinkForEmail()
+    };
+    if (preserveManualFields) {
+      if (toInput) overrides.to = toInput.value;
+      if (nameInput) overrides.clientName = nameInput.value;
+    }
+
+    const draft = buildClientEmailDraft(tripData, acc, plainPwd, overrides);
+
+    if (!preserveManualFields) {
+      if (toInput) toInput.value = draft.to;
+      if (nameInput) nameInput.value = draft.clientName;
+      if (linkInput) linkInput.value = draft.link;
+    }
+    if (subjectInput) subjectInput.value = draft.subject;
+    if (bodyEl) bodyEl.value = draft.body;
+    if (feedbackEl) feedbackEl.textContent = '';
+
+    if (hintEl) {
+      const requiresAuth = Boolean(tripData.accessControl && tripData.accessControl.requireAuth);
+      if (acc) {
+        hintEl.innerHTML = plainPwd
+          ? '<span style="color:#047857; font-weight:700;"><i class="fa-solid fa-circle-check"></i> Identifiant, mot de passe et fiche nominative inclus dans le message.</span>'
+          : '<span style="color:#b45309; font-weight:700;"><i class="fa-solid fa-key"></i> Mot de passe déjà défini : pensez à le régénérer dans « Voyageurs &amp; Accès » si le client l’a oublié.</span>';
+      } else if (requiresAuth) {
+        hintEl.innerHTML = '<span style="color:#b45309; font-weight:700;"><i class="fa-solid fa-lock"></i> Ce carnet est protégé par ID/MDP : sélectionnez un voyageur ci-dessus pour inclure ses accès.</span>';
+      } else {
+        hintEl.innerHTML = '<span style="color:#0369a1; font-weight:700;"><i class="fa-solid fa-lock-open"></i> Accès direct par lien (?id=...) prêt à envoyer au client.</span>';
+      }
+    }
+  }
+
+  function regenerateClientEmailBody() {
+    applySelectedTravelerToEmailModal(true);
+    const feedbackEl = document.getElementById('send-email-feedback');
+    if (feedbackEl) {
+      feedbackEl.style.color = '#0369a1';
+      feedbackEl.textContent = '✓ Texte de l’e-mail actualisé.';
+    }
+  }
+
+  async function openSendClientEmailModal(accountId = '') {
+    if (typeof document === 'undefined' || typeof tripData === 'undefined' || !tripData) {
+      alert('Aucun voyage actif sélectionné.');
+      return;
+    }
+    await ensureAdminRegistryLoaded(false);
+
+    const dialog = document.getElementById('send-client-email-modal');
+    if (!dialog) return;
+
+    installSendEmailDialogFallback();
+
+    const sel = document.getElementById('email-traveler-select');
+    const linkInput = document.getElementById('email-trip-link-input');
+    if (linkInput) linkInput.value = getActiveClientShareLinkForEmail();
+
+    if (sel) {
+      const travelers = getActiveTripTravelerAccounts();
+      const optsHtml = ['<option value="">— Message générique (lien direct du carnet) —</option>'];
+      travelers.forEach(acc => {
+        const entry = Array.isArray(acc.trips) ? acc.trips.find(t => t.tripId === tripData.id) : null;
+        const dossier = (entry && entry.dossierRef) || acc.dossierRef || '';
+        const label = `${acc.displayName || acc.login || 'Voyageur'}${dossier ? ` (Dossier ${dossier})` : ''}`;
+        optsHtml.push(`<option value="${esc(acc.id)}">${esc(label)}</option>`);
+      });
+      sel.innerHTML = optsHtml.join('');
+      sel.value = accountId || '';
+    }
+
+    applySelectedTravelerToEmailModal(false);
+
+    if (typeof dialog.showModal === 'function') {
+      if (!dialog.open) dialog.showModal();
+    } else {
+      dialog.setAttribute('open', 'open');
+    }
+  }
+
+  function closeSendClientEmailModal() {
+    const dialog = typeof document !== 'undefined' ? document.getElementById('send-client-email-modal') : null;
+    if (!dialog) return;
+    if (typeof dialog.close === 'function' && dialog.open) {
+      dialog.close();
+    } else {
+      dialog.removeAttribute('open');
+    }
+  }
+
+  function getModalEmailFields() {
+    const toEl = document.getElementById('email-to-input');
+    const subjectEl = document.getElementById('email-subject-input');
+    const bodyEl = document.getElementById('email-body-textarea');
+    return {
+      to: toEl ? toEl.value.trim() : '',
+      subject: subjectEl ? subjectEl.value.trim() : '',
+      body: bodyEl ? bodyEl.value : ''
+    };
+  }
+
+  function sendClientEmailViaMailto() {
+    const { to, subject, body } = getModalEmailFields();
+    const feedbackEl = document.getElementById('send-email-feedback');
+    const mailtoUrl = `mailto:${encodeURIComponent(to)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+
+    if (mailtoUrl.length > 1850 && feedbackEl) {
+      feedbackEl.style.color = '#b45309';
+      feedbackEl.textContent = '⚠ Message long pour mailto: — si votre messagerie le tronque, utilisez « Brouillon Outlook (.eml) » ou « Copier l’e-mail ».';
+    } else if (feedbackEl) {
+      feedbackEl.style.color = '#047857';
+      feedbackEl.textContent = '✓ Ouverture de votre client de messagerie...';
+    }
+
+    const a = document.createElement('a');
+    a.href = mailtoUrl;
+    a.style.display = 'none';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+
+  function downloadClientEmailEml() {
+    const { to, subject, body } = getModalEmailFields();
+    const eml = buildEmlFileContent({ to, subject, body });
+    const slug = (typeof tripData !== 'undefined' && tripData && tripData.id) ? tripData.id : 'voyage';
+    downloadTextFile(`Email-Carnet-${slug}.eml`, eml, 'message/rfc822;charset=utf-8');
+    const feedbackEl = document.getElementById('send-email-feedback');
+    if (feedbackEl) {
+      feedbackEl.style.color = '#047857';
+      feedbackEl.textContent = '✓ Brouillon .eml téléchargé (double-cliquez dessus pour l’ouvrir dans Outlook).';
+    }
+  }
+
+  function copyClientEmailToClipboard() {
+    const { subject, body } = getModalEmailFields();
+    const fullText = `Objet : ${subject}\n\n${body}`;
+    const feedbackEl = document.getElementById('send-email-feedback');
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === 'function') {
+      navigator.clipboard.writeText(fullText).then(() => {
+        if (feedbackEl) {
+          feedbackEl.style.color = '#047857';
+          feedbackEl.textContent = '✓ Objet et message copiés dans le presse-papier !';
+        }
+      }).catch(() => {
+        prompt('Copiez l’e-mail ci-dessous :', fullText);
+      });
+    } else {
+      prompt('Copiez l’e-mail ci-dessous :', fullText);
+    }
+  }
+
   // Expositions globales pour HTML inline et admin.js
   global.renderAdminAccessTab = renderAdminAccessTab;
   global.switchAccessSubTab = switchAccessSubTab;
@@ -1360,6 +1714,13 @@
   global.handleTravelerDocFileUpload = handleTravelerDocFileUpload;
   global.removeTravelerDoc = removeTravelerDoc;
   global.copyTravelerCredentials = copyTravelerCredentials;
+  global.openSendClientEmailModal = openSendClientEmailModal;
+  global.closeSendClientEmailModal = closeSendClientEmailModal;
+  global.applySelectedTravelerToEmailModal = applySelectedTravelerToEmailModal;
+  global.regenerateClientEmailBody = regenerateClientEmailBody;
+  global.sendClientEmailViaMailto = sendClientEmailViaMailto;
+  global.downloadClientEmailEml = downloadClientEmailEml;
+  global.copyClientEmailToClipboard = copyClientEmailToClipboard;
   global.addNewStaffAccount = addNewStaffAccount;
   global.updateStaffAccountField = updateStaffAccountField;
   global.toggleStaffTripAssignment = toggleStaffTripAssignment;
@@ -1371,6 +1732,8 @@
   global.GirardotAdminAccess = {
     parseLogitoTravelersCsv,
     buildMailMergeCsv,
+    buildClientEmailDraft,
+    buildEmlFileContent,
     sanitizeRegistryForPublish,
     upsertTravelerForTrip,
     ensureAdminRegistryLoaded,
@@ -1378,5 +1741,9 @@
     setPlainPwd,
     getRegistrySnapshot: () => adminRegistry
   };
+
+  if (typeof module !== 'undefined' && module.exports) {
+    module.exports = global.GirardotAdminAccess;
+  }
 
 })(typeof window !== 'undefined' ? window : global);
