@@ -523,7 +523,7 @@
   "shipName": "",
   "decks": [],
   "conciergerie": {
-    "welcomeMessage": "Bienvenue à Laponie, Au pays du Père Noël ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre aujourd'hui ?",
+    "welcomeMessage": "Bienvenue à Haparanda ! Votre Concierge Voyages Girardot est ravi de vous accompagner dans cette aventure arctique au Framissima Cape East. Situé à la frontière exacte entre la Suède et la Finlande, votre séjour vous offre l'opportunité unique de vivre sur deux fuseaux horaires. Voici nos recommandations exclusives pour explorer Haparanda et sa ville jumelle finlandaise, Tornio.",
     "themes": [
       {
         "id": "resto",
@@ -533,64 +533,40 @@
         "description": "Tables gourmandes, spécialités africaines et rooftops d'exception sélectionnés par nos guides.",
         "places": [
           {
-            "name": "Restaurant Gastronomique Étoilé de Laponie, Au pays du Père Noël",
-            "category": "Haute Gastronomie & Produits d'exception",
-            "location": "Centre historique, Laponie, Au pays du Père Noël",
-            "tag": "Table d'exception",
-            "phone": "+33 00 00 00 00",
-            "bookingUrl": "",
-            "description": "Table renommée primée par les guides gastronomiques, sublimant les trésors culinaires et accords mets-vins de Laponie, Au pays du Père Noël.",
-            "tips": "Pensez à réserver à l'avance pour le service du soir.",
-            "lat": null,
-            "lng": null
+            "name": "Gulasch Baronen",
+            "category": "Cuisine locale et internationale",
+            "location": "Torget 7, 953 31 Haparanda (à ~3 km)",
+            "tag": "Cadre historique",
+            "phone": "+46 922 614 90",
+            "bookingUrl": "https://www.haparandastadshotell.se/restaurang/",
+            "description": "Situé dans le magnifique hôtel de ville historique, ce restaurant propose des spécialités de Laponie comme le renne et l'omble chevalier dans un décor élégant du XIXe siècle.",
+            "tips": "Goûtez leur célèbre ragoût de goulash, une institution locale.",
+            "lat": 65.835521,
+            "lng": 24.133214
           },
           {
-            "name": "Burger Gourmet & Viandes Rôties de Laponie, Au pays du Père Noël",
-            "category": "Burger Gourmet & Grill",
-            "location": "Quartier animé, Laponie, Au pays du Père Noël",
-            "tag": "Burgers artisanaux",
-            "phone": "",
+            "name": "Mustaparran Päämaja",
+            "category": "Restaurant thématique",
+            "location": "Hallituskatu 6, 95400 Tornio, Finlande (à ~4 km)",
+            "tag": "Ambiance trappeur",
+            "phone": "+358 40 010 5800",
             "bookingUrl": "",
-            "description": "Burgers maison généreux, pains artisanaux briochés, sauces signatures et frites croustillantes préparés avec des viandes locales.",
-            "tips": "Option conviviale et rapide pour un déjeuner décontracté.",
-            "lat": null,
-            "lng": null
+            "description": "Inspiré par la légende du contrebandier local 'Barbe Noire', ce restaurant à Tornio propose une cuisine finlandaise robuste à base de produits de la forêt et de la mer dans un cadre boisé chaleureux.",
+            "tips": "Pensez à changer d'heure sur votre montre en traversant le pont vers la Finlande (+1h).",
+            "lat": 65.843215,
+            "lng": 24.144562
           },
           {
-            "name": "Bistro Végétarien & Saveurs du Jardin de Laponie, Au pays du Père Noël",
-            "category": "Végétarien, Végane & Produits Frais",
-            "location": "Quartier commerçant, Laponie, Au pays du Père Noël",
-            "tag": "100% Frais & Végétal",
-            "phone": "",
-            "bookingUrl": "",
-            "description": "Cuisine végétale créative, plats colorés de saison, risottos gourmands et pâtisseries saines élaborés à partir de récoltes locales.",
-            "tips": "Idéal pour une pause gourmande légère et ressourçante.",
-            "lat": null,
-            "lng": null
-          },
-          {
-            "name": "Table Asiatique, Dim Sum & Wok de Laponie, Au pays du Père Noël",
-            "category": "Cuisine Asiatique & Saveurs d'Asie",
-            "location": "Centre-ville, Laponie, Au pays du Père Noël",
-            "tag": "Saveurs d'Asie & Wok",
-            "phone": "",
-            "bookingUrl": "",
-            "description": "Spécialités asiatiques parfumées : nouilles sautées au wok, dim sum vapeur, woks croustillants et sushis frais.",
-            "tips": "Parfait pour partager plusieurs plats au centre de la table.",
-            "lat": null,
-            "lng": null
-          },
-          {
-            "name": "Brasserie Traditionnelle & Terroir de Laponie, Au pays du Père Noël",
-            "category": "Cuisine Locale & Spécialités Régionales",
-            "location": "Place principale, Laponie, Au pays du Père Noël",
-            "tag": "Ambiance chaleureuse",
-            "phone": "",
-            "bookingUrl": "",
-            "description": "Établissement apprécié des locaux pour ses recettes de tradition, ses poissons ou viandes mijotées et son atmosphère typique.",
-            "tips": "Terrasse très agréable à l'heure du déjeuner ou pour dîner.",
-            "lat": null,
-            "lng": null
+            "name": "Kukkolaforsen Turist & Konferens",
+            "category": "Cuisine traditionnelle au feu de bois",
+            "location": "Kukkolaforsen 184, 953 91 Haparanda (à ~15 km)",
+            "tag": "Vue sur les rapides",
+            "phone": "+46 922 310 00",
+            "bookingUrl": "https://www.kukkolaforsen.se/",
+            "description": "Un lieu authentique au bord des rapides du fleuve Torne, célèbre pour sa méthode traditionnelle de cuisson du corégone (poisson blanc) sur des braises.",
+            "tips": "Idéal pour un déjeuner panoramique après une balade le long du fleuve.",
+            "lat": 65.963889,
+            "lng": 24.038889
           }
         ],
         "enabled": true
@@ -603,28 +579,40 @@
         "description": "Monuments, panoramas incontournables et trésors naturels hors des sentiers battus.",
         "places": [
           {
-            "name": "Monuments & Cœur Historique de Laponie, Au pays du Père Noël",
-            "category": "Patrimoine & Histoire",
-            "location": "Laponie, Au pays du Père Noël",
-            "tag": "À ne pas manquer",
-            "phone": "",
-            "bookingUrl": "",
-            "description": "Promenade à travers les rues historiques, places emblématiques et chefs-d'œuvre architecturaux de la cité.",
-            "tips": "Prévoyez des chaussures confortables pour flâner à pied.",
-            "lat": null,
-            "lng": null
+            "name": "Musée de la Vallée de la Torne (Tornionlaakson museo)",
+            "category": "Musée d'histoire et de culture",
+            "location": "Keskikatu 22, 95400 Tornio, Finlande (à ~4 km)",
+            "tag": "Culture transfrontalière",
+            "phone": "+358 50 597 1557",
+            "bookingUrl": "https://www.tornio.fi/tornionlaakson-museo/",
+            "description": "Le seul musée au monde géré par deux villes de deux pays différents. Il retrace l'histoire commune, les traditions et le mode de vie des habitants des deux rives du fleuve.",
+            "tips": "L'entrée est souvent couplée avec le musée d'art Aine situé juste à côté.",
+            "lat": 65.8428,
+            "lng": 24.1415
           },
           {
-            "name": "Grand Musée & Belvédère Panoramique de Laponie, Au pays du Père Noël",
-            "category": "Culture & Vue panoramique",
-            "location": "Centre culturel, Laponie, Au pays du Père Noël",
-            "tag": "Panorama grandiose",
+            "name": "Église de Haparanda (Haparanda Kyrka)",
+            "category": "Architecture",
+            "location": "Västra Kyrkogatan, 953 31 Haparanda (à ~3 km)",
+            "tag": "Design moderne unique",
+            "phone": "+46 922 292 90",
+            "bookingUrl": "",
+            "description": "Une église à l'architecture surprenante et sombre, construite en 1967 pour remplacer l'ancienne église brûlée. Son design minimaliste nordique est saisissant.",
+            "tips": "L'intérieur est très lumineux malgré l'aspect extérieur massif.",
+            "lat": 65.8341,
+            "lng": 24.1278
+          },
+          {
+            "name": "Victoria Square (Victoriantori)",
+            "category": "Site symbolique",
+            "location": "Länsiranta, 95400 Tornio / Haparanda (à ~3.5 km)",
+            "tag": "La frontière exacte",
             "phone": "",
             "bookingUrl": "",
-            "description": "Collections prestigieuses retraçant l'histoire de la région avec point de vue surplombant toute la ville.",
-            "tips": "Idéal pour prendre de superbes photos souvenirs.",
-            "lat": null,
-            "lng": null
+            "description": "Une place publique située exactement sur la ligne de frontière. Vous pouvez avoir un pied en Suède et l'autre en Finlande, changeant ainsi de fuseau horaire instantanément.",
+            "tips": "Cherchez la sculpture 'L'Arc' qui symbolise l'union des deux nations.",
+            "lat": 65.8425,
+            "lng": 24.1325
           }
         ],
         "enabled": true
@@ -637,16 +625,40 @@
         "description": "Artisanat d'art, marchés authentiques, épiceries fines et créateurs sud-africains.",
         "places": [
           {
-            "name": "Marché artisanal & Halles de Laponie, Au pays du Père Noël",
-            "category": "Artisanat & Spécialités locales",
-            "location": "Marché central, Laponie, Au pays du Père Noël",
-            "tag": "Souvenirs authentiques",
-            "phone": "",
+            "name": "Rajalla På Gränsen",
+            "category": "Centre commercial",
+            "location": "Länsiranta 10, 95400 Tornio, Finlande (à ~3.5 km)",
+            "tag": "Shopping transfrontalier",
+            "phone": "+358 40 132 9400",
+            "bookingUrl": "https://www.rajallacentre.fi/",
+            "description": "Un grand centre commercial moderne situé sur la frontière, abritant de nombreuses marques nordiques comme Iittala (design finlandais) et des boutiques de mode.",
+            "tips": "On y trouve un grand supermarché K-Citymarket pour ramener des chocolats Fazer.",
+            "lat": 65.8435,
+            "lng": 24.1355
+          },
+          {
+            "name": "IKEA HaparandaTornio",
+            "category": "Magasin emblématique",
+            "location": "Norrskensvägen 2, 953 36 Haparanda (à ~3.5 km)",
+            "tag": "Le plus au nord du monde",
+            "phone": "+46 77 570 05 00",
             "bookingUrl": "",
-            "description": "Lieu parfait pour rencontrer des artisans locaux et rapporter des souvenirs typiques et produits régionaux.",
-            "tips": "Privilégiez les matinées pour profiter de l'animation des étals.",
-            "lat": null,
-            "lng": null
+            "description": "Célèbre pour être le magasin IKEA le plus septentrional de la planète, il attire des visiteurs de toute la Laponie et de la Russie voisine.",
+            "tips": "Même si vous ne meublez pas votre salon, l'épicerie suédoise propose des spécialités locales.",
+            "lat": 65.8415,
+            "lng": 24.1235
+          },
+          {
+            "name": "Candy World",
+            "category": "Confiserie géante",
+            "location": "Hästskovägen 4, 953 33 Haparanda (à ~3 km)",
+            "tag": "Paradis des enfants",
+            "phone": "+46 922 133 30",
+            "bookingUrl": "",
+            "description": "L'un des plus grands magasins de bonbons d'Europe du Nord avec des centaines de variétés de confiseries suédoises et finlandaises.",
+            "tips": "Idéal pour acheter des souvenirs gourmands avant le retour.",
+            "lat": 65.8395,
+            "lng": 24.1215
           }
         ],
         "enabled": true
@@ -659,28 +671,28 @@
         "description": "Distributeurs fiables, bureaux de change certifiés, pharmacies et supermarchés de proximité.",
         "places": [
           {
-            "name": "Banque, DAB & Point de Change Central",
-            "category": "Distributeur d'espèces (DAB)",
-            "location": "Avenue principale, Laponie, Au pays du Père Noël",
-            "tag": "Sécurisé 24/7",
-            "phone": "",
+            "name": "Apoteket Kronan",
+            "category": "Pharmacie",
+            "location": "Storgatan 82, 953 31 Haparanda (à ~3 km)",
+            "tag": "Santé",
+            "phone": "+46 77 145 04 50",
             "bookingUrl": "",
-            "description": "DAB bancaire officiel acceptant les cartes bancaires internationales pour vos retraits d'argent en toute sécurité.",
-            "tips": "Refusez la conversion dynamique proposée par le DAB pour économiser sur les frais.",
-            "lat": null,
-            "lng": null
+            "description": "Pharmacie principale située dans le centre-ville de Haparanda pour tous vos besoins de santé courants.",
+            "tips": "Ouverte généralement de 10h à 18h en semaine.",
+            "lat": 65.8345,
+            "lng": 24.1315
           },
           {
-            "name": "Pharmacie & Soins quotidiens de Laponie, Au pays du Père Noël",
-            "category": "Pharmacie & Santé",
-            "location": "Centre-ville, Laponie, Au pays du Père Noël",
-            "tag": "Service de proximité",
-            "phone": "",
+            "name": "ICA Maxi Haparanda",
+            "category": "Supermarché",
+            "location": "Hästskovägen 4, 953 33 Haparanda (à ~3 km)",
+            "tag": "Alimentation et services",
+            "phone": "+46 922 129 00",
             "bookingUrl": "",
-            "description": "Établissement fournissant médicaments de premier secours, protections solaires et conseils santé.",
-            "tips": "Le numéro d'urgence de votre accompagnateur reste joignable à tout moment.",
-            "lat": null,
-            "lng": null
+            "description": "Très grand supermarché suédois proposant une large gamme de produits locaux, un DAB (ATM) et un point de change.",
+            "tips": "Pratique pour acheter des produits de première nécessité ou des snacks suédois.",
+            "lat": 65.8385,
+            "lng": 24.1225
           }
         ],
         "enabled": true
@@ -693,16 +705,28 @@
         "description": "Prendre un verre face au coucher de soleil sur l'Atlantique ou savourer un café d'exception.",
         "places": [
           {
-            "name": "Café historique & Salon de thé de Laponie, Au pays du Père Noël",
-            "category": "Café de tradition",
-            "location": "Quartier piétonnier, Laponie, Au pays du Père Noël",
-            "tag": "Pause gourmande",
-            "phone": "",
+            "name": "Cape East Spa - Midnight Ice",
+            "category": "Bien-être / Sauna",
+            "location": "Sundholmen 1, 953 33 Haparanda (sur place)",
+            "tag": "Expérience arctique",
+            "phone": "+46 922 800 790",
+            "bookingUrl": "https://capeeast.se/spa/",
+            "description": "L'un des plus grands saunas du monde avec une expérience unique de 'Midnight Ice' incluant plusieurs étapes de températures différentes et un plongeon dans l'eau glacée.",
+            "tips": "Incontournable pour les résidents de l'hôtel.",
+            "lat": 65.8198,
+            "lng": 24.1416
+          },
+          {
+            "name": "Café Putiikki",
+            "category": "Salon de thé / Café",
+            "location": "Keskikatu 26, 95400 Tornio, Finlande (à ~4 km)",
+            "tag": "Charme cosy",
+            "phone": "+358 40 556 1612",
             "bookingUrl": "",
-            "description": "Pause idéale pour savourer un café, un thé ou une boisson rafraîchissante dans un décor élégant.",
-            "tips": "Idéal pour faire une pause détente entre deux visites libres.",
-            "lat": null,
-            "lng": null
+            "description": "Un café charmant situé dans une ancienne maison en bois, proposant des pâtisseries maison et une ambiance typiquement nordique.",
+            "tips": "Essayez le 'Korvapuusti' (brioche à la cannelle finlandaise).",
+            "lat": 65.8438,
+            "lng": 24.1422
           }
         ],
         "enabled": true
@@ -716,32 +740,32 @@
         "description": "Taxis officiels, VTC sécurisés, bus MyCiTi et conseils de mobilité urbaine dans la ville.",
         "places": [
           {
-            "name": "Réseau de transports en commun de Laponie, Au pays du Père Noël",
-            "category": "Transports publics urbains",
-            "location": "Gare centrale, Laponie, Au pays du Père Noël",
-            "tag": "Lignes & Horaires",
-            "phone": "",
-            "bookingUrl": "https://www.google.com/maps/search/transports+publics+Laponie%2C%20Au%20pays%20du%20P%C3%A8re%20No%C3%ABl",
-            "description": "Réseau de bus, trams et métros desservant le centre-ville et les sites touristiques majeurs de Laponie, Au pays du Père Noël.",
-            "tips": "Pensez à composter ou valider votre titre de transport dès la montée.",
-            "lat": null,
-            "lng": null
-          },
-          {
-            "name": "Taxis Officiels & VTC (Uber / Bolt) de Laponie, Au pays du Père Noël",
-            "category": "Taxis & VTC sécurisés",
-            "location": "Stations d'hôtels et gares",
-            "tag": "Disponible 24/7",
+            "name": "Haparanda Tornio Resecentrum (Travel Center)",
+            "category": "Gare routière centrale",
+            "location": "Krannigatan 5, 953 31 Haparanda",
+            "tag": "Hub de transport",
             "phone": "",
             "bookingUrl": "",
-            "description": "Services de taxis officiels agréés et applications de chauffeurs privés pour vos transferts rapides en ville.",
-            "tips": "Vérifiez que le chauffeur enclenche le compteur ou réservez votre trajet via l'application.",
-            "lat": null,
-            "lng": null
+            "description": "Le point de connexion principal pour tous les bus régionaux suédois et finlandais.",
+            "tips": "",
+            "lat": 65.8422,
+            "lng": 24.1318
+          },
+          {
+            "name": "Taxi Haparanda",
+            "category": "Compagnie de Taxi",
+            "location": "Haparanda",
+            "tag": "Transport privé",
+            "phone": "+46 922 121 21",
+            "bookingUrl": "",
+            "description": "Service de taxi local fiable pour vos déplacements entre l'hôtel et les centres-villes.",
+            "tips": "",
+            "lat": 65.835,
+            "lng": 24.132
           }
         ],
-        "transitMapUrl": "https://www.google.com/maps/search/transports+publics+Laponie%2C%20Au%20pays%20du%20P%C3%A8re%20No%C3%ABl",
-        "guideHtml": "\n          <strong>🚌 Conseils transports en commun à Laponie, Au pays du Père Noël :</strong><br>\n          • <strong>Réseau urbain :</strong> Privilégiez le réseau officiel de métros, trams ou bus pour vous déplacer rapidement dans l'agglomération.<br>\n          • <strong>Achat des billets & Pass :</strong> Des pass 24h ou carnets de tickets sont généralement vendus aux distributeurs automatiques des stations ou via l'application mobile locale de transport.<br>\n          • <strong>Taxis & VTC :</strong> Utilisez les stations de taxis officielles ou les applications de VTC (Uber, Bolt) pour vos retours nocturnes en toute sécurité.\n        "
+        "transitMapUrl": "https://www.ltnb.se/",
+        "guideHtml": "<strong>🚌 Se déplacer à Haparanda et Tornio :</strong><br>• <strong>À pied :</strong> Le centre de Haparanda est accessible en 30-40 min de marche depuis l'hôtel Cape East (3 km).<br>• <strong>Bus locaux :</strong> Le réseau suédois <strong>Länstrafiken Norrbotten</strong> et le réseau finlandais <strong>Matkahuolto</strong> se rejoignent au Travel Center (Resecentrum).<br>• <strong>Taxis :</strong> Les taxis sont le moyen le plus simple pour rejoindre le centre. Appelez <strong>Taxi Haparanda</strong> au +46 922 121 21.<br>• <strong>Attention :</strong> En traversant le pont vers Tornio (Finlande), vous avancez votre montre d'une heure (+1h par rapport à la Suède)."
       }
     ]
   },
