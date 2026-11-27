@@ -1,0 +1,770 @@
+{
+  "id": "laponie-au-pays-du-pere-noel",
+  "title": "Laponie, Au pays du Père Noël",
+  "subtitle": "Envol Lyon",
+  "dates": "9 au 16 janvier 2027",
+  "startDate": "2027-01-09",
+  "endDate": "2027-01-16",
+  "coverImage": "https://upload.wikimedia.org/wikipedia/commons/b/b8/Envol_enflamme.jpg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=thumbnail_unscaled",
+  "intro": "Quand la Laponie vous fait vibrer ! Située en majeure partie au-dessus du cercle polaire, la Laponie du nord est l'une des rares régions du monde où l'on peut encore découvrir une nature immaculée et sauvage, vivre des instants de silence et de paix . Un dépaysement total ! Ce séjour, essentiellement dédié aux plaisirs de la nature, vous permettra de découvrir, les rennes et la culture des Samis, la modernité de la motoneige, en passant par les mythiques chiens de traîneaux, les célèbres huskies aux yeux bleus...",
+  "alert": {
+    "title": "Formalités indispensables",
+    "text": "Carte nationale d'identité de moins de 10 ans valide après la date de votre retour.",
+    "link": ""
+  },
+  "flightsList": [
+    {
+      "type": "Aller",
+      "airline": "Transavia",
+      "flightNumber": "TO 1550",
+      "departureAirport": "Lyon Saint-Exupéry",
+      "departureTime": "12h45",
+      "arrivalAirport": "Kemi",
+      "arrivalTime": "17h35",
+      "date": "09/01/2027",
+      "via": "",
+      "notes": "Convocation à 10h45 au comptoir d'enregistrement • Prestations payantes à bord"
+    },
+    {
+      "type": "Retour",
+      "airline": "Transavia",
+      "flightNumber": "TO 1551",
+      "departureAirport": "Kemi",
+      "departureTime": "16h05",
+      "arrivalAirport": "Lyon Saint-Exupéry",
+      "arrivalTime": "19h20",
+      "date": "16/01/2027",
+      "via": "",
+      "notes": "Prestations payantes à bord"
+    }
+  ],
+  "flights": {
+    "outbound": {
+      "airline": "Transavia",
+      "flightNumber": "TO 1550",
+      "departureAirport": "Lyon Saint-Exupéry",
+      "departureTime": "12h45",
+      "arrivalAirport": "Kemi",
+      "arrivalTime": "17h35",
+      "date": "09/01/2027",
+      "layover": ""
+    },
+    "inbound": {
+      "airline": "Transavia",
+      "flightNumber": "TO 1551",
+      "departureAirport": "Kemi",
+      "departureTime": "16h05",
+      "arrivalAirport": "Lyon Saint-Exupéry",
+      "arrivalTime": "19h20",
+      "date": "16/01/2027",
+      "layover": ""
+    },
+    "domesticFlights": [],
+    "baggage": {
+      "cabin": "1 Bagage cabine p/p* : 1 sac de : 40 x 30 x 20 cm - 5 Kg maxi .",
+      "hold": "1 Bagage en soute p/p : 1 bagage de dimensions maximales (roues et poignées comprises) : 165 cm (longueur + largeur + hauteur) - 20 Kg.",
+      "details": "*Aucun contenant de plus de 100ml, ciseaux, couteau en cabine Le dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place. Conservez avec vous : pièce d'identité et médicaments."
+    }
+  },
+  "baggage": {
+    "cabin": "1 Bagage cabine p/p* : 1 sac de : 40 x 30 x 20 cm - 5 Kg maxi .",
+    "hold": "1 Bagage en soute p/p : 1 bagage de dimensions maximales (roues et poignées comprises) : 165 cm (longueur + largeur + hauteur) - 20 Kg.",
+    "details": "*Aucun contenant de plus de 100ml, ciseaux, couteau en cabine Le dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place. Conservez avec vous : pièce d'identité et médicaments."
+  },
+  "itinerary": [
+    {
+      "isRange": false,
+      "startDay": 0,
+      "day": 1,
+      "title": "Votre région - Lyon - Kemi Tornio",
+      "city": "Kemi Tornio",
+      "lat": 65.8457589,
+      "lng": 24.1464,
+      "highlight": "",
+      "description": "Jour consacré à l'acheminement. Transfert à l'aéroport de Lyon. Formalités d'embarquement. Envol pour Kemi Tornio . Accueil. Installation à l'hôtel. Réunion d'informations. Remise de votre équipement grand froid. Dîner logement.",
+      "image": "",
+      "weather": "",
+      "dateStr": "Jour 1",
+      "timeline": [
+        {
+          "time": "",
+          "title": "Transfert à l'aéroport de Lyon",
+          "subtitle": "Jour consacré à l'acheminement. Transfert à l'aéroport de Lyon.",
+          "icon": "location-dot",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "time": "",
+          "title": "Envol pour Kemi Tornio",
+          "subtitle": "Formalités d'embarquement. Envol pour Kemi Tornio . Accueil. Installation à l'hôtel. Réunion d'informations. Remise de votre équipement grand froid.",
+          "icon": "plane-departure",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "time": "",
+          "title": "Dîner logement",
+          "subtitle": "Dîner logement.",
+          "icon": "location-dot",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    },
+    {
+      "day": 2,
+      "endDay": 7,
+      "title": "Séjour avec 6 excursions incluses",
+      "highlight": "Séjour libre (6 jours)",
+      "city": "Kemi Tornio",
+      "description": "Journées libres en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+      "dateStr": "Jour 2 à 7",
+      "image": "",
+      "lat": 65.8457589,
+      "lng": 24.1464,
+      "weather": "",
+      "timeline": [
+        {
+          "time": "",
+          "title": "Journées libres",
+          "subtitle": "Journées libres en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme qui sera affiché dans le hall de votre hôtel. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ],
+      "_groupedSourceDays": [
+        {
+          "day": 2,
+          "title": "Jour 2 • Séjour avec 6 excursions incluses",
+          "city": "Kemi Tornio",
+          "lat": 65.8457589,
+          "lng": 24.1464,
+          "highlight": "",
+          "description": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "image": "",
+          "weather": "",
+          "dateStr": "Jour 2",
+          "timeline": [
+            {
+              "time": "",
+              "title": "Journée libre",
+              "subtitle": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme",
+              "lat": null,
+              "lng": null,
+              "address": ""
+            }
+          ]
+        },
+        {
+          "day": 3,
+          "title": "Jour 3 • Séjour avec 6 excursions incluses",
+          "city": "Kemi Tornio",
+          "lat": 65.8457589,
+          "lng": 24.1464,
+          "highlight": "",
+          "description": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "image": "",
+          "weather": "",
+          "dateStr": "Jour 3",
+          "timeline": [
+            {
+              "time": "",
+              "title": "Journée libre",
+              "subtitle": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme",
+              "lat": null,
+              "lng": null,
+              "address": ""
+            }
+          ]
+        },
+        {
+          "day": 4,
+          "title": "Jour 4 • Séjour avec 6 excursions incluses",
+          "city": "Kemi Tornio",
+          "lat": 65.8457589,
+          "lng": 24.1464,
+          "highlight": "",
+          "description": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "image": "",
+          "weather": "",
+          "dateStr": "Jour 4",
+          "timeline": [
+            {
+              "time": "",
+              "title": "Journée libre",
+              "subtitle": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme",
+              "lat": null,
+              "lng": null,
+              "address": ""
+            }
+          ]
+        },
+        {
+          "day": 5,
+          "title": "Jour 5 • Séjour avec 6 excursions incluses",
+          "city": "Kemi Tornio",
+          "lat": 65.8457589,
+          "lng": 24.1464,
+          "highlight": "",
+          "description": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "image": "",
+          "weather": "",
+          "dateStr": "Jour 5",
+          "timeline": [
+            {
+              "time": "",
+              "title": "Journée libre",
+              "subtitle": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme",
+              "lat": null,
+              "lng": null,
+              "address": ""
+            }
+          ]
+        },
+        {
+          "day": 6,
+          "title": "Jour 6 • Séjour avec 6 excursions incluses",
+          "city": "Kemi Tornio",
+          "lat": 65.8457589,
+          "lng": 24.1464,
+          "highlight": "",
+          "description": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "image": "",
+          "weather": "",
+          "dateStr": "Jour 6",
+          "timeline": [
+            {
+              "time": "",
+              "title": "Journée libre",
+              "subtitle": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme",
+              "lat": null,
+              "lng": null,
+              "address": ""
+            }
+          ]
+        },
+        {
+          "day": 7,
+          "title": "Jour 7 • Séjour avec 6 excursions incluses",
+          "city": "Kemi Tornio",
+          "lat": 65.8457589,
+          "lng": 24.1464,
+          "highlight": "",
+          "description": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme. Explorez votre destination de vacances grâce à des activités neige incluses dans votre séjour : • Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de Rovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur place) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau sec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les rennes... Dans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses espèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières de Noël ! Excursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après le déjeuner. • Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous partirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés... Promenade déconseillée aux enfants de moins de 7 ans. • Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une rivière gelée. Expérience insolite et originale. À noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité ne pourrait se dérouler normalement, elle sera remboursée. • Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous fera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse. En début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau (1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau. • Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont garanties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les rivières gelées principalement. Pour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m peuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans seront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents. • Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui vous expliqueront le mode de vie de ces animaux selon les saisons.",
+          "image": "",
+          "weather": "",
+          "dateStr": "Jour 7",
+          "timeline": [
+            {
+              "time": "",
+              "title": "Journée libre",
+              "subtitle": "Journée libre en pension complète, demi-pension ou nuit+petit-déjeuner selon le programme",
+              "lat": null,
+              "lng": null,
+              "address": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "isRange": false,
+      "startDay": 0,
+      "day": 8,
+      "title": "Kemi Tornio - Lyon - Votre région",
+      "city": "Kemi Tornio",
+      "lat": 65.8457589,
+      "lng": 24.1464,
+      "highlight": "",
+      "description": "Jour consacré au réacheminement. Transfert à l'aéroport de Kemi Tornio. Envol pour Lyon . Retour dans votre région.",
+      "image": "",
+      "weather": "",
+      "dateStr": "Jour 8",
+      "timeline": [
+        {
+          "time": "",
+          "title": "Transfert à l'aéroport de Kemi Tornio",
+          "subtitle": "Jour consacré au réacheminement. Transfert à l'aéroport de Kemi Tornio.",
+          "icon": "location-dot",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        },
+        {
+          "time": "",
+          "title": "Envol pour Lyon",
+          "subtitle": "Envol pour Lyon . Retour dans votre région.",
+          "icon": "plane-departure",
+          "lat": null,
+          "lng": null,
+          "address": ""
+        }
+      ]
+    }
+  ],
+  "hotels": [
+    {
+      "id": "hotel-1795796931923",
+      "name": "Framissima Cape East 3*",
+      "dates": "",
+      "phone": "",
+      "city": "Haparanda",
+      "address": "Framissima Cape East 3*, Haparanda",
+      "lat": null,
+      "lng": null,
+      "isStayHotel": true,
+      "presentation": {
+        "intro": "Situé dans la commune d'Haparanda en Suède, à l'extrême nord du golfe de Botnie et à la frontière avec la Finlande, le Framissima Cape East 3* offre un dépaysement total au cœur de la Laponie suédoise. L'hôtel se trouve sur les rives du fleuve Torne, à 2 km du centre-ville et à 3 km de la ville finlandaise de Torneå. Il bénéficie d'un cadre sauvage et préservé, idéal pour l'observation des aurores boréales. L'aéroport de Kemi-Tornio se situe à 30 km et celui de Luleå à 135 km.",
+        "chambres": "L'établissement dispose de 156 chambres à la décoration scandinave réparties dans 3 bâtiments de 2 ou 3 étages (ascenseur disponible dans le bâtiment principal). Les clients séjournent en chambre standard rénovée de 22 m², équipée de 2 lits simples (90 cm), d'une salle de bain avec douche, du Wi-Fi, d'une télévision, d'une bouilloire et d'un sèche-cheveux. La capacité maximale est de 3 adultes (le 3ème lit est un lit d'appoint de 80 cm, limité à 70 kg). À noter qu'en occupation triple, l'espace de rangement est limité.",
+        "restauration": "L'hôtel propose un restaurant principal et un bar lounge ouvert de 7h à 23h. La cuisine est locale et servie sous forme de buffets : petit-déjeuner (7h-10h), déjeuner léger (salade, pain, plat chaud de 12h à 14h) et dîner (soupe, poisson, viande, pâtes et desserts de 18h à 21h). Un dîner typique sous un tipi (3 plats) est inclus une fois par semaine en extérieur. Le bar lounge propose des boissons, cafés et snacks avec supplément.",
+        "formule": "Le séjour s'effectue en formule pension complète. Les boissons incluses durant les repas (déjeuner et dîner) sont le thé, le café et l'eau en carafe. Les dîners de Noël et du Nouvel An sont inclus dans la formule (hors boissons).",
+        "services": "L'animation est assurée par les pilotes-vacances Fram avec un programme d'activités ludiques, jeux, marches nordiques, baptême lapon et soirées interactives (quizz, casino, chasse aux aurores boréales). Le spa (accessible 6j/7 de 14h à 21h) comprend une piscine extérieure chauffée, des bassins relaxants (intérieur et toit), sauna, hammam, bain à remous et salle de fitness. Pour les enfants, un club (4-12 ans) et un club ados (13-17 ans) fonctionnent 6j/7 pendant les vacances scolaires avec le programme 'Snow & Fun'. Le pack d'activités incluses comprend : visite du village du Père Noël à Rovaniemi, pêche sous glace, balade en chiens de traîneau (5-6 km), randonnée en motoneige (2h) et visite d'une ferme de rennes. Avec supplément : soins et massages, ski de fond à proximité.",
+        "disposition": "À votre disposition : réception (7h-22h en semaine, jusqu'à minuit le week-end), Wi-Fi gratuit dans tout l'hôtel, parking privé et salles de conférence. Bon à savoir : arrivée dès 15h, départ avant 12h. Le ménage et le changement du linge sont effectués une fois par semaine. Un équipement grand froid (combinaison, bottes, gants) est prêté pour la durée du séjour. Les animaux sont admis (supplément à prévoir). L'hôtel est adapté aux PMR (sauf une partie du spa et les activités extérieures). Le paiement sur place s'effectue uniquement par carte bancaire. Il n'existe pas de classification hôtelière officielle en Suède, la catégorie 3* est donnée à titre indicatif."
+      }
+    }
+  ],
+  "hotelsList": [
+    {
+      "name": "Club Jumbo Cape East 3*** NL",
+      "dates": "9 au 16 janvier 2027",
+      "city": "ascenseur dans le bâtiment principal. Ménage, changement de draps et serviettes 1 fois par semaine.",
+      "address": "Sundholmen 1, SE 953 33 Haparanda, Situé dans la commune d'Haparanda en Suède, à 2 km du centre-ville, sur les rives du fleuve Torne, le Club, Jumbo Cape East 3*** NL vous accueille dans des chambres modernes et confortables. Offrez-vous un moment, de détente au spa et goûtez à la cuisine locale au restaurant de l'hôtel. Profitez des différentes activités, proposées afin de découvrir pleinement la nature environnante et admirez la magie des aurores boréales*. L a, ville de Torneå en Finlande est située à 3 km., Chambres : 159 chambres à la décoration scandinave répartie dans 3 bâtiments de 2 ou 3 étages avec 1, ascenseur dans le bâtiment principal. Ménage, changement de draps et serviettes 1 fois par semaine.",
+      "phone": "+46 922 800 790",
+      "lat": null,
+      "lng": null,
+      "notes": "",
+      "isStayHotel": true,
+      "presentation": {
+        "intro": "",
+        "chambres": "",
+        "restauration": "L'hôtel dispose d'un restaurant et d'un bar lounge. Repas sous forme de buffet au restaurant proposant une cuisine locale. Déjeuner léger comprenant salade, pain, beurre et un choix de plat chaud. Dîner comprenant salade, pain, soupe, poisson, viande, pâtes et 2 choix de dessert. Petit-déjeuner de 6h30 à 10h, déjeuner de 11h30 à 14h30 et dîner de 18h à 21h30. Thé/café et eau en carafe",
+        "formule": "",
+        "services": "",
+        "disposition": ""
+      }
+    }
+  ],
+  "documents": [],
+  "freeTimeSuggestions": [],
+  "contactsList": [
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "En cas d'urgence uniquement : tél. : +358 400 394 299",
+      "phone": "",
+      "address": "Permanence Fram en France 7j/7 et 24h/24 • En cas d'urgence uniquement : tél. : +33 5 17 02 21 77 • A CONFIRMER (+358 20 747 9444)",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France dans le pays de destination",
+      "name": "",
+      "phone": "",
+      "address": "",
+      "link": "",
+      "isEmergency": true
+    },
+    {
+      "category": "Fil d'Ariane — Ressortissants Français",
+      "name": "Portail officiel France Diplomatie (Inscription gratuite)",
+      "phone": "",
+      "address": "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      "link": "https://fildariane.diplomatie.gouv.fr",
+      "isEmergency": false
+    }
+  ],
+  "practicalTipsList": [
+    {
+      "title": "Formalités indispensables (Passeport & Visas)",
+      "icon": "passport",
+      "content": "Carte nationale d'identité de moins de 10 ans valide après la date de votre retour."
+    },
+    {
+      "title": "Bon à savoir",
+      "icon": "circle-info",
+      "content": "L'ordre des visites peut être modifié, pour des raisons climatiques et/ou techniques mais tout en respectant l'intégralité du programme. En partenariat avec Fram. *Les aurores boréales ne peuvent être garanties et sont visibles selon conditions climatiques. Afin d'optimiser vos chances de voir le phénomène, Nous vous conseillons de sortir dès le premier soir pour maximiser vos chances. IMPORTANT : Pour la motoneige, il faut être âgé de 18 ans minimum et posséder un permis de conduire valide. Franchise en cas d'accident avec la motoneige. Les enfants de moins de 18 ans sont transportés à l'arrière du conducteur, les enfants de moins de 15 ans sont transportés dans des traîneaux tirés par les motoneiges."
+    },
+    {
+      "title": "Prestations incluses",
+      "icon": "circle-check",
+      "content": "Vols spéciaux Lyon / Kemi Tornio / Lyon, compagnie Transavia ou similaire. Taxes aéroport : 49 € révisables. Hôtel 3*** NL en chambre double. Pension complète selon programme, hors boissons. Repas sous forme de buffets : déjeuner léger comprenant salade, pain, beurre et un choix de plat chaud - dîner comprenant différents types de salades, pain, soupe, poisson, viande, pâtes et 2 choix de dessert. Thé/café et eau en carafe pour le déjeuner et le dîner. Possibilité de panier-repas pour le déjeuner. Dîner Tipi inclus 1 fois par semaine (dîner 3 plats servi dans un tipi à l'extérieur de l'hôtel, prévoir des vêtements chauds). Guide local francophone. Visites selon programme. Équipement complet isotherme grand froid pour la durée du séjour (bottes, combinaison, gants). Vous vous laisserez envahir par des sensations fortes et inoubliables dans ce paradis blanc. Un programme très complet avec une formule en pension complète et une rencontre et échange avec le Père Noël dans son village."
+    },
+    {
+      "title": "Assurance & Rapatriement",
+      "icon": "kit-medical",
+      "content": "Afin de faire face aux frais d’hospitalisation et aux dépenses de santé, parfois très élevés à l’étranger, il est impératif de disposer d’un contrat d’assistance ou d’une assurance permettant de couvrir tous les frais médicaux (dont la chirurgie et l’hospitalisation) et de rapatriement sanitaire, au risque de ne pas avoir accès aux soins, y compris en cas d’urgence vitale. Ces frais ne pourront en aucun cas être pris en charge par la société VOYAGES GIRARDOT ORGANISATION. Merci de vous munir de votre numéro de contrat d’assurance et le numéro de téléphone d’assistance (sur les documents que vous avez reçu lors la souscription de l’assurance)."
+    },
+    {
+      "title": "Conseils pour votre voyage",
+      "icon": "compass",
+      "content": "La passion des voyages, des couleurs et des saveurs, de ces lieux lointains, ne doit pas vous faire oublier que les voyages sont souvent l’occasion de changer vos habitudes, votre vigilance et que des aléas sont toujours possibles. Aussi, soucieux que votre voyage soit une réussite, malgré la multiplicité des intervenants au cours de votre périple, voici quelques conseils de voyage. Nous vous conseillons de les lire attentivement et restons à votre disposition pour toutes questions que nous n’aurions pas traitées. Nous vous souhaitons un excellent voyage."
+    },
+    {
+      "title": "Aéroport / Port",
+      "icon": "plane-departure",
+      "content": "Vous aurez très souvent rendez-vous au comptoir d’assistance que nous avons réservé pour vous. Reportez- vous à l’information précisée sur votre convocation. Ensuite, vous serez invités à passer au comptoir d’enregistrement et présenter votre pièce d’identité. Conservez vos pièces d’identité avec vous durant les formalités et jusqu'à l’avion ou le bateau."
+    },
+    {
+      "title": "Bagages (Conseils)",
+      "icon": "suitcase-rolling",
+      "content": "Référez-vous à la page \"Information horaires de vols\". Notre conseil : - Ne placez pas : médicaments, denrées périssables, alimentaires, objets fragiles ou de valeur (bijoux, chèques, devises, appareils photos…), dossiers, papiers importants dans vos bagages en soute. Conservez-les avec vous en cabine. - Par souci de sécurité, n'acceptez jamais des bagages d'une autre personne. - Arrivée à destination, rendez-vous en zone de livraison des bagages. Récupérez les vôtres, En cas d’avarie, manquement, reportez immédiatement au service bagages de l'aéroport, du port ou le représentant de la compagnie, pour procéder à un constat et ouvrir, le cas échéant, un dossier auprès de votre assurance dès votre retour. Conservez le talon joint à votre billet lors de l’enregistrement de votre bagage."
+    },
+    {
+      "title": "Charter & Vols spéciaux",
+      "icon": "plane-circle-check",
+      "content": "Le terme \"charter\", \"vol spécial\", désigne un vol non régulier, opéré à la demande d’une agence de voyages, qui dessert ponctuellement une destination touristique au départ d’un aéroport. Ces vols ont des horaires définitifs qui s’intercalent entre les vols réguliers, connus très souvent qu'une semaine avant le départ. L’horaire de retour vous est souvent confirmé sur place. Ces vols peuvent être tôt le matin/tard le soir."
+    },
+    {
+      "title": "Services à bord",
+      "icon": "mug-hot",
+      "content": "La plupart des compagnies aériennes pour des vols de moins de 3h ne proposent plus de services à bord. La restauration et les boissons, si elles sont proposées, sont désormais très souvent payantes. Des encas sont en vente dans les boutiques de l’aéroport."
+    },
+    {
+      "title": "Douanes & Franchises",
+      "icon": "scale-balanced",
+      "content": "Les adultes peuvent bénéficier de franchises sur certaines marchandises : . Tabacs : franchise 200 cigarettes. . Boissons alcoolisées : franchise 2 L de vin, ou 1 L d’alcool fort. . Parfum : 50 g de parfum, ou 100 ml d'eau de toilette. Et ce dans de nombreux pays, toutefois vérifiez les informations à la douane de chaque pays concerné. Les médicaments que vous transportez, le cas échéant, doivent correspondre à vos besoins personnels."
+    },
+    {
+      "title": "Formalités (Conseils généraux)",
+      "icon": "file-shield",
+      "content": "Il appartient au voyageur de vérifier les formalités administratives et sanitaires nécessaires au voyage auprès des organismes compétents tels que consulats, ambassades et médecin traitant pour vaccins et traitements. La validité des papiers en votre possession doit être vérifiée avant le départ. Tout défaut ou oubli, conduit au refus d’embarquement et vos vacances sont perdues. Pour les mineurs non accompagnés de leur(s) parent(s) une carte nationale d’identité, un passeport, ainsi qu’une autorisation de sortie de territoires sont indispensables."
+    },
+    {
+      "title": "Sûreté aéroportuaire",
+      "icon": "shield-halved",
+      "content": "Soumettez-vous de bonne grâce aux contrôles de sûreté : il y va de votre propre intérêt ! Ces contrôles sont effectués avant l'arrivée en salle d'embarquement. Les bagages à mains doivent passer dans un appareil de contrôle électronique et vous devez vous-même franchir un portique de détection. Posez de côté : ceinture, trousseau de clefs, objet métallique, téléphone… N’oubliez pas de les reprendre. Si vous portez un stimulateur cardiaque (voire même certains appareils auditifs), informez-en l'agent de sûreté et ne passez pas sous le portique. Dans certains pays d'ailleurs, une fouille corporelle complète les procédés de détection électroniques. Sachez ainsi que par précaution supplémentaire, il peut vous être demandé de procéder, au pied de l'appareil, à l'identification de vos bagages enregistrés. Enfin, ne laissez jamais vos bagages sans surveillance dans l'enceinte de l'aérogare. La réglementation gouvernementale (en France et dans de nombreux autres pays) implique la destruction immédiate de tout bagage suspect, sans qu'aucune indemnisation puisse être par la suite réclamée à quiconque."
+    }
+  ],
+  "practicalInfo": {
+    "formalities": "Carte nationale d'identité de moins de 10 ans valide après la date de votre retour."
+  },
+  "driverDossier": {
+    "busModel": "",
+    "busCapacity": 50,
+    "busPlanUrl": "",
+    "busNotes": "",
+    "roomingList": [],
+    "roomingFileUrl": "",
+    "passengersList": []
+  },
+  "_rawImportedText": "Votre carnet de voyage Laponie, Au pays du\nPère Noël samedi 9 janvier 2027 - samedi 16\njanvier 2027\nEn date du 26/11/2026 à 13:09:43\nLaponie, Au pays du Père Noël\nEnvol Lyon\nQuand la Laponie vous fait vibrer !\nSituée en majeure partie au-dessus du cercle polaire, la Laponie du nord est l'une des rares régions du monde\noù l'on peut encore découvrir une nature immaculée et sauvage, vivre des instants de silence et de paix .\nUn dépaysement total ! Ce séjour, essentiellement dédié aux plaisirs de la nature, vous permettra de découvrir,\nles rennes et la culture des Samis, la modernité de la motoneige, en passant par les mythiques chiens de\ntraîneaux, les célèbres huskies aux yeux bleus...\n\nConvocation aérienne\nA CONFIRMER\nAller : 09/01/2027\nDécollage de l’aéroport de : Lyon Saint-Exupéry\nHeure de présentation à l’aéroport : 10h45\nLieu : Comptoir d'enregistrement du vol\nN° de vol : TO1550\nDécollage prévu à : 12h45\nArrivée prévue à : 17h35\nA l’aéroport de : Kemi\nCompagnie : Transavia\nObservations : Prestations payantes à bord\n\nRetour : 16/01/2027\nDécollage de l’aéroport de : Kemi\nN° de vol : TO1551\nDécollage prévu à : 16h05\nArrivée prévue à : 19h20\nA l’aéroport de : Lyon Saint-Exupéry\nCompagnie : Transavia\nObservations : Prestations payantes à bord\nNous attirons votre attention sur le fait que les horaires prévus peuvent être sujets à\nmodifications. Le vol peut être opéré par des compagnies aériennes partenaires.\nLa compagnie étant souveraine dans le placement, nous nous efforçons au mieux de vous\nregrouper dans l’avion. Lorsque cela est possible, nous avons regroupé les couples.\nToutefois, nous vous remercions de votre compréhension en cas d’impossibilité et vous\ninvitons à intervertir avec d’autres passagers chaque fois que possible. Consultez la\npolitique de chaque compagnie.\nBagages Aériens autorisés :\n1 Bagage cabine p/p* : 1 sac de : 40 x 30 x 20 cm - 5 Kg maxi .\n*Aucun contenant de plus de 100ml, ciseaux, couteau en cabine\n1 Bagage en soute p/p : 1 bagage de dimensions maximales (roues et poignées\ncomprises) : 165 cm (longueur + largeur + hauteur) - 20 Kg.\nLe dépassement du poids, taille … fait l’objet d’une facturation de la part de la compagnie à régler sur place.\nConservez avec vous : pièce d'identité et médicaments.\nJour 1 • Votre région - Lyon - Kemi Tornio\nJour consacré à l'acheminement. Transfert à l'aéroport de Lyon. Formalités d'embarquement. Envol pour\nKemi Tornio . Accueil. Installation à l'hôtel. Réunion d'informations. Remise de votre équipement grand froid.\nDîner logement.\nJours 2 à 7 • Séjour avec 6 excursions incluses\n\nExplorez votre destination de vacances grâce à des activités neige incluses dans votre séjour :\n• Village du Père Noël (trajet ≃ 1h45 / 2h et 2h sur place) : Visite du village, le \"Santa Claus Village\" de\nRovaniemi en Finlande dont le centre est traversé par le cercle polaire. De nombreuses activités (payantes sur\nplace) vous y attendent : rencontre avec le Père Noël dans sa maison, prendre un fika (café avec petit gâteau\nsec local) dans la maison de la Mère Noël, promenade en traineaux tirés par des rennes, photos avec les\nrennes...\nDans cette découverte du village est incluse l'entrée au \" Santa Pets' Village \" : ferme avec de nombreuses\nespèces d'animaux comme les rennes, alpagas, poneys, moutons... Une visite pleine de joie et de lumières\nde Noël !\nExcursion en demi-journée. En matinée : retour à l'hôtel pour le déjeuner. En après-midi : départ de l'hôtel après\nle déjeuner.\n• Balade en raquettes (2h) : Avec un guide connaissant parfaitement le territoire et son écosystème, vous\npartirez en raquettes depuis l'hôtel à travers les forêts, rivières et lacs gelés...\nPromenade déconseillée aux enfants de moins de 7 ans.\n• Pêche sous glace (2h) : Départ à pied de l'hôtel pour une partie de pêche sous glace endiablée sur une\nrivière gelée. Expérience insolite et originale.\nÀ noter : Cette activité est soumise aux conditions météo et à l'autorisation de la mairie. Dans le cas où l'activité\nne pourrait se dérouler normalement, elle sera remboursée.\n• Balade en chiens de traîneaux : Tirés par un traîneau à chiens, vous serez dirigé par votre \"musher\" qui vous\nfera vivre l'expérience d'une balade ( ≃ 5/6 km) sur le fleuve gelé Torne. Boisson chaude incluse.\nEn début de saison, il est possible que le fleuve ne soit pas encore gelé. 3 à 4 personnes maximum par traîneau\n(1 à 2 adultes + enfants), pas de possibilité de conduire le traîneau.\n• Randonnée en motoneige (2h) : Que vous soyez au volant ou derrière le conducteur, les sensations sont\ngaranties ! 2 personnes par motoneige, vous conduirez tour à tour la moitié du temps, à travers les lacs et les\nrivières gelées principalement.\nPour conduire, être âgé de 18 ans minimum et permis de conduire obligatoire. Les enfants à partir de 1,40 m\npeuvent être passagers à l'arrière de la motoneige (ils payent alors le prix adulte). Les enfants de 4 à 14 ans\nseront tirés sur une luge accrochée à la motoneige du guide. Ils sont sous la responsabilité des parents.\n• Ferme de rennes (2h) : Visite d'une ferme pour découvrir un troupeau de rennes élevés par les Samis qui\nvous expliqueront le mode de vie de ces animaux selon les saisons.\nJour 8 • Kemi Tornio - Lyon - Votre région\n\nJour consacré au réacheminement. Transfert à l'aéroport de Kemi Tornio. Envol pour Lyon . Retour dans votre\nrégion.\nLe voyage n’étant pas une science exacte, votre programme peut être amené à subir quelques modifications\nbien indépendantes de notre volonté.\nEn pareilles circonstances, nous faisons appel à votre compréhension si toutefois le déroulé de celui-ci se\ntrouvait devoir être modifié, inversé, adapté, réorganisé en fonction de la circulation, des retards aériens, des\nconditions climatiques, événements géopolitiques, fermetures exceptionnelles de sites, routes, musées...\nNous vous souhaitons un beau voyage.\nCoordonnées de votre hôtel\nsous réserve de modification\nClub Jumbo Cape East 3*** NL\nSundholmen 1\nSE 953 33 Haparanda\nTél. : +46 922 800 790\n\nSitué dans la commune d'Haparanda en Suède, à 2 km du centre-ville, sur les rives du fleuve Torne, le Club\nJumbo Cape East 3*** NL vous accueille dans des chambres modernes et confortables. Offrez-vous un moment\nde détente au spa et goûtez à la cuisine locale au restaurant de l'hôtel. Profitez des différentes activités\nproposées afin de découvrir pleinement la nature environnante et admirez la magie des aurores boréales*. L a\nville de Torneå en Finlande est située à 3 km.\n\nChambres : 159 chambres à la décoration scandinave répartie dans 3 bâtiments de 2 ou 3 étages avec 1\nascenseur dans le bâtiment principal. Ménage, changement de draps et serviettes 1 fois par semaine.\nRestauration : L'hôtel dispose d'un restaurant et d'un bar lounge.\n- Repas sous forme de buffet au restaurant proposant une cuisine locale.\n- Déjeuner léger comprenant salade, pain, beurre et un choix de plat chaud. Dîner comprenant salade, pain,\nsoupe, poisson, viande, pâtes et 2 choix de dessert.\n- Petit-déjeuner de 6h30 à 10h, déjeuner de 11h30 à 14h30 et dîner de 18h à 21h30.\n- Thé/café et eau en carafe inclus pour le déjeuner et le dîner.\n- Dîner Tipi inclus 1 fois par semaine (dîner 3 plats servi dans un tipi à l'extérieur de l'hôtel, prévoir des\nvêtements chauds).\n- Avec supplément : bar lounge proposant diverses boissons, café, snacks et collations. Ouvert de 7h à 23h.\nINFO VÉRITÉ : La restauration scandinave est plus simple et moins variée que la cuisine française.\nAnimation : équipe francophone adaptée à la destination et à l'ambiance de l'hôtel. Jeux et moments\nconviviaux.\nClub enfants : enfants (7-12 ans) encadré par 1 animateur qualifié, 6j/7 pendant les vacances scolaires de Noël\net d'hiver.\nenfants (4-12 ans) et ados (13-17 ans) encadré par des pilotes-vacances qualifiés, 6j/7 pendant les vacances\nscolaires de Noël et d'hiver.\nSnow & Fun (bonhommes de neige, batailles de boules de neige, construction d'igloo...).\nSpa de 7 à 14 ans, 5j/7 (accompagné par un adulte) du dimanche au jeudi de 14h à 17h. Peignoir et chaussons\nnon inclus.\nAire de jeux.\nÀ votre disposition : Wi-Fi gratuit dans tout l'hôtel.\nSpa accessible 6j/7 (sauf samedi) de 14h à 21h : piscine extérieure chauffée (au rez-de-chaussée, ≃ 20°C ),\nbassin relaxant intérieur chauffé, 1 petit bassin relaxant extérieur chauffé sur le toit, sauna, hammam, bain à\nremous, bain de vapeur, bassin et douche d'eau glacée, douche relaxante parfumée, espace détente, salle de\nfitness.\nSpa non accessible aux personnes à mobilité réduite.\nInformations pratiques\nLe climat\nL’hiver en Laponie suédoise est généralement froid et très sec. Pensez donc à régulièrement vous hydrater avec\nune boisson chaude contenue dans un thermos ! Les températures varient de -30°C à 0°C tout au long de la\nsaison mais sont supportables avec les bons équipements. L’air tonique et vivifiant se prête à merveille à toutes\n\nles activités sportives hivernales ! La lumière naturelle ne dure que quelques heures fin décembre et début\njanvier – ça tombe bien, de bonnes nuits de sommeil sont essentielles pour résister aux températures négatives.\nLes jours rallongent ensuite rapidement dès le mois de février.\nTempératures maximales/ minimales durant l’hiver :\nJanvier : entre -30 et -9 degrés\nFévrier : entre -14 et -8 degrés\nMars : entre -11 et 0 degrés\nEnsoleillement :\nJanvier : environ 4h par jour\nFévrier : environ 8h par jour\nMars : environ 11h par jour\nEquipement grand froid complet remis sur place : une combinaison grand froid, des gants / moufles grand\nfroid, des bottes, un casque pour l’activité motoneige. Vous aurez également à disposition des patins à glace,\ndes kicksled et des raquettes. Merci de prendre le plus grand soin du matériel prêté et de le restituer dans l’état\noù vous l’avez trouvé. L’ensemble protège très efficacement des rigueurs de l’hiver lapon et de toutes les\ngammes de températures que vous pourrez rencontrer. De plus, l’activité physique déployée contribuera à vous\ntenir chaud.\nNous vous conseillons d’emporter : des sous-vêtements chauds en thermolactyl (complet des pieds au bout des\nbras), cols roulés, pull en laine, chaussettes minces et épaisses en laine et soie, pantalon chaud (survêtement\nou autre), gant en thermolactyl ou soie pour enfiler sous les moufles, tenue de sport d’hiver adéquate (doudoune\nou parka, pantalon chaud, écharpe, bonnet, grosses chaussures, bottes de neige), lunettes de soleil (pour les\npériodes de fort ensoleillement), chaufferettes, stick hydratant pour les lèvres, crème de protection adaptée aux\ngrands froids, maillot de bain, petit sac à dos (utile pour les expéditions), votre permis de conduire valide pour\nl’excursion en motoneige. Toutes les motoneiges sont équipées de démarreurs électriques, poignées\nchauffantes et de levier d’accélérateur (pouce) chauffant.\nAfin que votre séjour en Laponie soit des plus féeriques, nous vous demandons de respecter quelques\nconsignes et de bien prendre connaissance des éléments ci-après .\nSpécificités culturelles\nLes portions peuvent être jugées parfois légères par la clientèle française habituée à des repas plus consistants\nmidi et soir, mais restent tout à fait correctes. Sur ces destinations, les petits déjeuners sont toujours copieux. Le\nservice, tout en étant bon, peut être lent et différé des standards français. Le pain et l'eau sur table ne sont pas\nune obligation pour les restaurateurs sur ces destinations. En Europe du Nord, la pomme de terre est le légume\nde base et accompagne la plupart des repas.\nA NOTER\n\nLes aurores boréales ne peuvent être garanties et sont visibles selon conditions climatiques. Afin d'optimiser vos\nchances de voir le phénomène, le jour et l'heure de départ pourront être changés sur place en fonction de la\nmétéo. Nous vous conseillons de sortir dès le premier soir pour maximiser vos chances. Vous pouvez aussi\ntélécharger une application type Aurora Forecast pour recevoir des alertes prédisant les chances d’en voir.\nPour la motoneige, il faut être âgé de 18 ans minimum et posséder un permis de conduire valide.\nEn cas d’accident sur place le montant de la franchise s’élève à 950 €. Possibilité de rachat de franchise\nmotoneige sur place le jour de l’excursion (15 €). Dans ce cas, le montant de la franchise en cas\nd’accident s’élève à 150 €.\nLes enfants de moins de 18 ans sont transportés à l'arrière du conducteur , les enfants de moins de 15 ans sont\ntransportés dans des traîneaux tirés par les motoneiges.\n\nVotre contact sur place\nA CONFIRMER\nNORTH EUROPEAN BUS TOURS KY\nVirkamaankatu 16\n95420 TORNIO - FINLANDE\nTel : +358 20 747 9444\nEmail : net@net-matkat.fi\nEn cas d'urgence uniquement : tél. : +358 400 394 299\nPermanence Fram en France 7j/7 et 24h/24\nEn cas d'urgence uniquement : tél. : +33 5 17 02 21 77\nFormalités indispensables\nCarte nationale d'identité de moins de 10 ans valide après la date de votre retour.\n\nBon à savoir\nL'ordre des visites peut être modifié, pour des raisons climatiques et/ou techniques mais tout en respectant\nl'intégralité du programme. En partenariat avec Fram.\n*Les aurores boréales ne peuvent être garanties et sont visibles selon conditions climatiques. Afin d'optimiser\nvos chances de voir le phénomène, Nous vous conseillons de sortir dès le premier soir pour maximiser vos\nchances.\nIMPORTANT : Pour la motoneige, il faut être âgé de 18 ans minimum et posséder un permis de conduire valide.\nFranchise en cas d'accident avec la motoneige. Les enfants de moins de 18 ans sont transportés à l'arrière du\nconducteur, les enfants de moins de 15 ans sont transportés dans des traîneaux tirés par les motoneiges.\nInclus\nVols spéciaux Lyon / Kemi Tornio / Lyon, compagnie Transavia ou similaire. Taxes aéroport : 49 € révisables.\nHôtel 3*** NL en chambre double. Pension complète selon programme, hors boissons. Repas sous forme de\nbuffets : déjeuner léger comprenant salade, pain, beurre et un choix de plat chaud - dîner comprenant différents\ntypes de salades, pain, soupe, poisson, viande, pâtes et 2 choix de dessert. Thé/café et eau en carafe pour le\ndéjeuner et le dîner. Possibilité de panier-repas pour le déjeuner. Dîner Tipi inclus 1 fois par semaine (dîner 3\nplats servi dans un tipi à l'extérieur de l'hôtel, prévoir des vêtements chauds). Guide local francophone. Visites\nselon programme. Équipement complet isotherme grand froid pour la durée du séjour (bottes, combinaison,\ngants).\nVous vous laisserez envahir par des sensations fortes et inoubliables dans ce paradis blanc. Un programme très\ncomplet avec une formule en pension complète et une rencontre et échange avec le Père Noël dans son village.\nAssurance multirisque voyage et assistance / rapatriement\nAfin de faire face aux frais d’hospitalisation et aux dépenses de santé, parfois très élevés à l’étranger,\nil est impératif de disposer d’un contrat d’assistance ou d’une assurance permettant de couvrir tous\nles frais médicaux (dont la chirurgie et l’hospitalisation) et de rapatriement sanitaire, au risque de ne\npas avoir accès aux soins, y compris en cas d’urgence vitale. Ces frais ne pourront en aucun cas être\npris en charge par la société VOYAGES GIRARDOT ORGANISATION. Merci de vous munir de votre\nnuméro de contrat d’assurance et le numéro de téléphone d’assistance (sur les documents que vous\navez reçu lors la souscription de l’assurance).\nQuelques conseils pour votre voyage…\nLa passion des voyages, des couleurs et des saveurs, de ces lieux lointains, ne doit pas vous faire oublier que\nles voyages sont souvent l’occasion de changer vos habitudes, votre vigilance et que des aléas sont toujours\npossibles.\n\nAussi, soucieux que votre voyage soit une réussite, malgré la multiplicité des intervenants au cours de votre\npériple, voici quelques conseils de voyage.\nNous vous conseillons de les lire attentivement et restons à votre disposition pour toutes questions que nous\nn’aurions pas traitées.\nNous vous souhaitons un excellent voyage.\n✔ AEROPORT / PORT\nVous aurez très souvent rendez-vous au comptoir d’assistance que nous avons réservé pour vous. Reportez-\nvous à l’information précisée sur votre convocation. Ensuite, vous serez invités à passer au comptoir\nd’enregistrement et présenter votre pièce d’identité. Conservez vos pièces d’identité avec vous durant les\nformalités et jusqu'à l’avion ou le bateau.\n✔ BAGAGES\nRéférez-vous à la page \"Information horaires de vols\".\nNotre conseil :\n- Ne placez pas : médicaments, denrées périssables, alimentaires, objets fragiles ou de valeur (bijoux, chèques,\ndevises, appareils photos…), dossiers, papiers importants dans vos bagages en soute. Conservez-les avec\nvous en cabine.\n- Par souci de sécurité, n'acceptez jamais des bagages d'une autre personne.\n- Arrivée à destination, rendez-vous en zone de livraison des bagages. Récupérez les vôtres,\nEn cas d’avarie, manquement, reportez immédiatement au service bagages de l'aéroport, du port ou le\nreprésentant de la compagnie, pour procéder à un constat et ouvrir, le cas échéant, un dossier auprès de votre\nassurance dès votre retour. Conservez le talon joint à votre billet lors de l’enregistrement de votre bagage.\n✔ CHARTER - VOLS SPECIAUX\nLe terme \"charter\", \"vol spécial\", désigne un vol non régulier, opéré à la demande d’une agence de voyages, qui\ndessert ponctuellement une destination touristique au départ d’un aéroport. Ces vols ont des horaires définitifs\nqui s’intercalent entre les vols réguliers, connus très souvent qu'une semaine avant le départ. L’horaire de retour\nvous est souvent confirmé sur place. Ces vols peuvent être tôt le matin/tard le soir.\n\n✔ SERVICES A BORD\nLa plupart des compagnies aériennes pour des vols de moins de 3h ne proposent plus de services à bord. La\nrestauration et les boissons, si elles sont proposées, sont désormais très souvent payantes. Des encas sont en\nvente dans les boutiques de l’aéroport.\n✔ DOUANES\nLes adultes peuvent bénéficier de franchises sur certaines marchandises :\n. Tabacs : franchise 200 cigarettes.\n. Boissons alcoolisées : franchise 2 L de vin, ou 1 L d’alcool fort.\n. Parfum : 50 g de parfum, ou 100 ml d'eau de toilette.\nEt ce dans de nombreux pays, toutefois vérifiez les informations à la douane de chaque pays concerné. Les\nmédicaments que vous transportez, le cas échéant, doivent correspondre à vos besoins personnels.\n✔ FORMALITES\nIl appartient au voyageur de vérifier les formalités administratives et sanitaires nécessaires au voyage auprès\ndes organismes compétents tels que consulats, ambassades et médecin traitant pour vaccins et traitements. La\nvalidité des papiers en votre possession doit être vérifiée avant le départ. Tout défaut ou oubli, conduit au refus\nd’embarquement et vos vacances sont perdues. Pour les mineurs non accompagnés de leur(s) parent(s) une\ncarte nationale d’identité, un passeport, ainsi qu’une autorisation de sortie de territoires sont indispensables.\n✔ SURETE\nSoumettez-vous de bonne grâce aux contrôles de sûreté : il y va de votre propre intérêt ! Ces contrôles sont\neffectués avant l'arrivée en salle d'embarquement. Les bagages à mains doivent passer dans un appareil de\ncontrôle électronique et vous devez vous-même franchir un portique de détection. Posez de côté : ceinture,\ntrousseau de clefs, objet métallique, téléphone… N’oubliez pas de les reprendre. Si vous portez un stimulateur\ncardiaque (voire même certains appareils auditifs), informez-en l'agent de sûreté et ne passez pas sous le\nportique. Dans certains pays d'ailleurs, une fouille corporelle complète les procédés de détection électroniques.\nSachez ainsi que par précaution supplémentaire, il peut vous être demandé de procéder, au pied de l'appareil, à\nl'identification de vos bagages enregistrés.\nEnfin, ne laissez jamais vos bagages sans surveillance dans l'enceinte de l'aérogare. La réglementation\ngouvernementale (en France et dans de nombreux autres pays) implique la destruction immédiate de tout\n\nbagage suspect, sans qu'aucune indemnisation puisse être par la suite réclamée à quiconque.\n\n",
+  "_landContactsList": [
+    {
+      "category": "Correspondant Réceptif & Urgence",
+      "name": "En cas d'urgence uniquement : tél. : +358 400 394 299",
+      "phone": "",
+      "address": "Permanence Fram en France 7j/7 et 24h/24 • En cas d'urgence uniquement : tél. : +33 5 17 02 21 77 • A CONFIRMER (+358 20 747 9444)",
+      "isEmergency": true
+    },
+    {
+      "category": "Assistance Girardot 24h/7j",
+      "name": "Permanence Urgences Girardot",
+      "phone": "03 85 42 82 50",
+      "address": "Chalon-sur-Saône, France",
+      "isEmergency": true
+    },
+    {
+      "category": "Ambassade de France dans le pays de destination",
+      "name": "",
+      "phone": "",
+      "address": "",
+      "link": "",
+      "isEmergency": true
+    },
+    {
+      "category": "Fil d'Ariane — Ressortissants Français",
+      "name": "Portail officiel France Diplomatie (Inscription gratuite)",
+      "phone": "",
+      "address": "Recevez les alertes de sécurité par SMS ou e-mail durant votre séjour à l'étranger : https://fildariane.diplomatie.gouv.fr",
+      "link": "https://fildariane.diplomatie.gouv.fr",
+      "isEmergency": false
+    }
+  ],
+  "_landFlightsList": [
+    {
+      "type": "Aller",
+      "airline": "Transavia",
+      "flightNumber": "TO 1550",
+      "departureAirport": "Lyon Saint-Exupéry",
+      "departureTime": "12h45",
+      "arrivalAirport": "Kemi",
+      "arrivalTime": "17h35",
+      "date": "09/01/2027",
+      "via": "",
+      "notes": "Convocation à 10h45 au comptoir d'enregistrement • Prestations payantes à bord"
+    },
+    {
+      "type": "Retour",
+      "airline": "Transavia",
+      "flightNumber": "TO 1551",
+      "departureAirport": "Kemi",
+      "departureTime": "16h05",
+      "arrivalAirport": "Lyon Saint-Exupéry",
+      "arrivalTime": "19h20",
+      "date": "16/01/2027",
+      "via": "",
+      "notes": "Prestations payantes à bord"
+    }
+  ],
+  "_detectedShip": "",
+  "_accompName": "",
+  "conciergeMode": "full",
+  "isCruise": false,
+  "shipName": "",
+  "decks": [],
+  "conciergerie": {
+    "welcomeMessage": "Bienvenue à Laponie, Au pays du Père Noël ! Je suis votre Concierge Voyage Girardot. Que recherchez-vous pour votre temps libre aujourd'hui ?",
+    "themes": [
+      {
+        "id": "resto",
+        "label": "Où bien manger ?",
+        "icon": "utensils",
+        "color": "#ea580c",
+        "description": "Tables gourmandes, spécialités africaines et rooftops d'exception sélectionnés par nos guides.",
+        "places": [
+          {
+            "name": "Restaurant Gastronomique Étoilé de Laponie, Au pays du Père Noël",
+            "category": "Haute Gastronomie & Produits d'exception",
+            "location": "Centre historique, Laponie, Au pays du Père Noël",
+            "tag": "Table d'exception",
+            "phone": "+33 00 00 00 00",
+            "bookingUrl": "",
+            "description": "Table renommée primée par les guides gastronomiques, sublimant les trésors culinaires et accords mets-vins de Laponie, Au pays du Père Noël.",
+            "tips": "Pensez à réserver à l'avance pour le service du soir.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Burger Gourmet & Viandes Rôties de Laponie, Au pays du Père Noël",
+            "category": "Burger Gourmet & Grill",
+            "location": "Quartier animé, Laponie, Au pays du Père Noël",
+            "tag": "Burgers artisanaux",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Burgers maison généreux, pains artisanaux briochés, sauces signatures et frites croustillantes préparés avec des viandes locales.",
+            "tips": "Option conviviale et rapide pour un déjeuner décontracté.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Bistro Végétarien & Saveurs du Jardin de Laponie, Au pays du Père Noël",
+            "category": "Végétarien, Végane & Produits Frais",
+            "location": "Quartier commerçant, Laponie, Au pays du Père Noël",
+            "tag": "100% Frais & Végétal",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Cuisine végétale créative, plats colorés de saison, risottos gourmands et pâtisseries saines élaborés à partir de récoltes locales.",
+            "tips": "Idéal pour une pause gourmande légère et ressourçante.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Table Asiatique, Dim Sum & Wok de Laponie, Au pays du Père Noël",
+            "category": "Cuisine Asiatique & Saveurs d'Asie",
+            "location": "Centre-ville, Laponie, Au pays du Père Noël",
+            "tag": "Saveurs d'Asie & Wok",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Spécialités asiatiques parfumées : nouilles sautées au wok, dim sum vapeur, woks croustillants et sushis frais.",
+            "tips": "Parfait pour partager plusieurs plats au centre de la table.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Brasserie Traditionnelle & Terroir de Laponie, Au pays du Père Noël",
+            "category": "Cuisine Locale & Spécialités Régionales",
+            "location": "Place principale, Laponie, Au pays du Père Noël",
+            "tag": "Ambiance chaleureuse",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Établissement apprécié des locaux pour ses recettes de tradition, ses poissons ou viandes mijotées et son atmosphère typique.",
+            "tips": "Terrasse très agréable à l'heure du déjeuner ou pour dîner.",
+            "lat": null,
+            "lng": null
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "visites",
+        "label": "Que visiter en temps libre ?",
+        "icon": "compass",
+        "color": "#059669",
+        "description": "Monuments, panoramas incontournables et trésors naturels hors des sentiers battus.",
+        "places": [
+          {
+            "name": "Monuments & Cœur Historique de Laponie, Au pays du Père Noël",
+            "category": "Patrimoine & Histoire",
+            "location": "Laponie, Au pays du Père Noël",
+            "tag": "À ne pas manquer",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Promenade à travers les rues historiques, places emblématiques et chefs-d'œuvre architecturaux de la cité.",
+            "tips": "Prévoyez des chaussures confortables pour flâner à pied.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Grand Musée & Belvédère Panoramique de Laponie, Au pays du Père Noël",
+            "category": "Culture & Vue panoramique",
+            "location": "Centre culturel, Laponie, Au pays du Père Noël",
+            "tag": "Panorama grandiose",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Collections prestigieuses retraçant l'histoire de la région avec point de vue surplombant toute la ville.",
+            "tips": "Idéal pour prendre de superbes photos souvenirs.",
+            "lat": null,
+            "lng": null
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "shopping",
+        "label": "Boutiques & Souvenirs locaux",
+        "icon": "bag-shopping",
+        "color": "#c29958",
+        "description": "Artisanat d'art, marchés authentiques, épiceries fines et créateurs sud-africains.",
+        "places": [
+          {
+            "name": "Marché artisanal & Halles de Laponie, Au pays du Père Noël",
+            "category": "Artisanat & Spécialités locales",
+            "location": "Marché central, Laponie, Au pays du Père Noël",
+            "tag": "Souvenirs authentiques",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Lieu parfait pour rencontrer des artisans locaux et rapporter des souvenirs typiques et produits régionaux.",
+            "tips": "Privilégiez les matinées pour profiter de l'animation des étals.",
+            "lat": null,
+            "lng": null
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "pratique",
+        "label": "Bureaux de change, Banques & Santé",
+        "icon": "landmark",
+        "color": "#2563eb",
+        "description": "Distributeurs fiables, bureaux de change certifiés, pharmacies et supermarchés de proximité.",
+        "places": [
+          {
+            "name": "Banque, DAB & Point de Change Central",
+            "category": "Distributeur d'espèces (DAB)",
+            "location": "Avenue principale, Laponie, Au pays du Père Noël",
+            "tag": "Sécurisé 24/7",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "DAB bancaire officiel acceptant les cartes bancaires internationales pour vos retraits d'argent en toute sécurité.",
+            "tips": "Refusez la conversion dynamique proposée par le DAB pour économiser sur les frais.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Pharmacie & Soins quotidiens de Laponie, Au pays du Père Noël",
+            "category": "Pharmacie & Santé",
+            "location": "Centre-ville, Laponie, Au pays du Père Noël",
+            "tag": "Service de proximité",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Établissement fournissant médicaments de premier secours, protections solaires et conseils santé.",
+            "tips": "Le numéro d'urgence de votre accompagnateur reste joignable à tout moment.",
+            "lat": null,
+            "lng": null
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "detente",
+        "label": "Bars branchés, Cafés & Rooftops",
+        "icon": "martini-glass",
+        "color": "#9333ea",
+        "description": "Prendre un verre face au coucher de soleil sur l'Atlantique ou savourer un café d'exception.",
+        "places": [
+          {
+            "name": "Café historique & Salon de thé de Laponie, Au pays du Père Noël",
+            "category": "Café de tradition",
+            "location": "Quartier piétonnier, Laponie, Au pays du Père Noël",
+            "tag": "Pause gourmande",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Pause idéale pour savourer un café, un thé ou une boisson rafraîchissante dans un décor élégant.",
+            "tips": "Idéal pour faire une pause détente entre deux visites libres.",
+            "lat": null,
+            "lng": null
+          }
+        ],
+        "enabled": true
+      },
+      {
+        "id": "transports",
+        "enabled": true,
+        "label": "Transports & Déplacements urbains",
+        "icon": "taxi",
+        "color": "#0891b2",
+        "description": "Taxis officiels, VTC sécurisés, bus MyCiTi et conseils de mobilité urbaine dans la ville.",
+        "places": [
+          {
+            "name": "Réseau de transports en commun de Laponie, Au pays du Père Noël",
+            "category": "Transports publics urbains",
+            "location": "Gare centrale, Laponie, Au pays du Père Noël",
+            "tag": "Lignes & Horaires",
+            "phone": "",
+            "bookingUrl": "https://www.google.com/maps/search/transports+publics+Laponie%2C%20Au%20pays%20du%20P%C3%A8re%20No%C3%ABl",
+            "description": "Réseau de bus, trams et métros desservant le centre-ville et les sites touristiques majeurs de Laponie, Au pays du Père Noël.",
+            "tips": "Pensez à composter ou valider votre titre de transport dès la montée.",
+            "lat": null,
+            "lng": null
+          },
+          {
+            "name": "Taxis Officiels & VTC (Uber / Bolt) de Laponie, Au pays du Père Noël",
+            "category": "Taxis & VTC sécurisés",
+            "location": "Stations d'hôtels et gares",
+            "tag": "Disponible 24/7",
+            "phone": "",
+            "bookingUrl": "",
+            "description": "Services de taxis officiels agréés et applications de chauffeurs privés pour vos transferts rapides en ville.",
+            "tips": "Vérifiez que le chauffeur enclenche le compteur ou réservez votre trajet via l'application.",
+            "lat": null,
+            "lng": null
+          }
+        ],
+        "transitMapUrl": "https://www.google.com/maps/search/transports+publics+Laponie%2C%20Au%20pays%20du%20P%C3%A8re%20No%C3%ABl",
+        "guideHtml": "\n          <strong>🚌 Conseils transports en commun à Laponie, Au pays du Père Noël :</strong><br>\n          • <strong>Réseau urbain :</strong> Privilégiez le réseau officiel de métros, trams ou bus pour vous déplacer rapidement dans l'agglomération.<br>\n          • <strong>Achat des billets & Pass :</strong> Des pass 24h ou carnets de tickets sont généralement vendus aux distributeurs automatiques des stations ou via l'application mobile locale de transport.<br>\n          • <strong>Taxis & VTC :</strong> Utilisez les stations de taxis officielles ou les applications de VTC (Uber, Bolt) pour vos retours nocturnes en toute sécurité.\n        "
+      }
+    ]
+  },
+  "contacts": {
+    "receptif": {
+      "name": "En cas d'urgence uniquement : tél. : +358 400 394 299",
+      "emergency": "",
+      "phone": "",
+      "address": "Permanence Fram en France 7j/7 et 24h/24 • En cas d'urgence uniquement : tél. : +33 5 17 02 21 77 • A CONFIRMER (+358 20 747 9444)"
+    },
+    "guide": {
+      "name": "",
+      "role": "Accompagnateur Girardot",
+      "phone": ""
+    },
+    "agence": {
+      "name": "Voyages Girardot",
+      "phone": "03 85 42 82 50",
+      "email": "contact@voyages-girardot.com"
+    }
+  },
+  "accessControl": {
+    "requireAuth": false
+  },
+  "branding": null
+}
