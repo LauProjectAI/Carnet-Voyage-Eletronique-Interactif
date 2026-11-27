@@ -1,0 +1,327 @@
+{
+  "version": 1,
+  "updatedAt": "2026-11-27T16:35:35.459Z",
+  "tripsAccess": {
+    "canada-etats-unis": {
+      "requireAuth": false
+    },
+    "chicago": {
+      "requireAuth": false
+    },
+    "cocktail-mexicain": {
+      "requireAuth": false
+    },
+    "sejour-dans-les-pouilles": {
+      "requireAuth": true
+    },
+    "laponie-au-pays-du-pere-noel": {
+      "requireAuth": false
+    }
+  },
+  "staffAccounts": [
+    {
+      "id": "staff-demo-conducteur",
+      "login": "conducteur@girardot.demo",
+      "passwordHash": "fa057210b86a896622bff9fc458563059bf33ca6ad1fc16fe56aedb5a13bfac0",
+      "role": "driver",
+      "firstName": "Marc",
+      "lastName": "Laurent",
+      "displayName": "Marc Laurent (Conducteur)",
+      "active": true,
+      "assignedTrips": [
+        "canada-etats-unis",
+        "chicago",
+        "cocktail-mexicain"
+      ]
+    }
+  ],
+  "travelerAccounts": [
+    {
+      "id": "client-demo-dupont",
+      "login": "dupont@client.demo",
+      "dossierRef": "GIR-2026-001",
+      "passwordHash": "a8d20732ec9a71f11f3213c8a3483d90122c6d04b867d35c1a65d15a38ceb940",
+      "role": "traveler",
+      "firstName": "Jean & Marie",
+      "lastName": "Dupont",
+      "displayName": "M. & Mme Dupont",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "canada-etats-unis",
+          "dossierRef": "GIR-2026-001",
+          "pickupPoint": "Chalon-sur-Saône (Gare)",
+          "pickupTime": "05h30",
+          "seatNumber": "4A / 4B",
+          "roomNumber": "Double Supérieure",
+          "cabinNumber": "",
+          "options": [
+            {
+              "title": "Survol en hélicoptère des Chutes du Niagara",
+              "day": 8,
+              "time": "15h00",
+              "details": "Départ héliport Niagara • Confirmé sur votre dossier"
+            }
+          ],
+          "personalDocs": [
+            {
+              "id": "nom-etkt-canada-dupont",
+              "type": "flight",
+              "title": "E-Ticket Vol Aller/Retour — M. & Mme Dupont",
+              "reference": "AF-GIR-2026-DUP",
+              "date": "18/09/2026",
+              "notes": "Sièges pré-réservés 24A / 24B • Bagage soute 23 kg inclus",
+              "qrCode": "ETKT-AF-DUPONT-GIR2026001",
+              "fileUrl": ""
+            }
+          ]
+        },
+        {
+          "tripId": "chicago",
+          "dossierRef": "GIR-2027-042",
+          "pickupPoint": "Beaune (Péage)",
+          "pickupTime": "07h15",
+          "seatNumber": "2C / 2D",
+          "roomNumber": "Chambre Twin",
+          "cabinNumber": "",
+          "options": [
+            {
+              "title": "Place Tribune VIP — Match NBA United Center",
+              "day": 3,
+              "time": "19h30",
+              "details": "Section 112 • Rang 6 • Places 14 & 15"
+            }
+          ],
+          "personalDocs": [
+            {
+              "id": "nom-nba-chicago-dupont",
+              "type": "ticket",
+              "title": "Billet Match NBA — United Center",
+              "reference": "NBA-CHI-112-R6",
+              "date": "25/02/2027",
+              "notes": "Accès Porte 3 — Ouverture 18h00",
+              "qrCode": "NBA-VIP-DUPONT-CHI2027",
+              "fileUrl": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913443-5xs7",
+      "login": "kahn.martine@wanadoo.fr",
+      "dossierRef": "2026-I7547001002",
+      "passwordHash": "6accb6b77e1ef4b1147ae271323ed1d9328e9f6a519e6276e921d99ff7af5b58",
+      "role": "traveler",
+      "firstName": "MARTINE",
+      "lastName": "KAHN",
+      "displayName": "MARTINE KAHN",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001002",
+          "pickupPoint": "CHALON SUR SAONE PARKING GIRARDOT 20 RUE LJ THENARD",
+          "pickupTime": "05h15",
+          "seatNumber": "",
+          "roomNumber": "Double",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913444-l635",
+      "login": "2026-I7547001003",
+      "dossierRef": "2026-I7547001003",
+      "passwordHash": "faf3724f63ca97014138a6b18ee5938fd32163b954c8a9e88981879a348c8881",
+      "role": "traveler",
+      "firstName": "CORINNE",
+      "lastName": "MONTGOBERT",
+      "displayName": "CORINNE MONTGOBERT",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001003",
+          "pickupPoint": "SAINT VALLIER PARKING GIRARDOT 135 AVENUE JEAN JAURES",
+          "pickupTime": "04h15",
+          "seatNumber": "",
+          "roomNumber": "Double 2 lits",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913444-kvq4",
+      "login": "michelegines7@orange.fr",
+      "dossierRef": "2026-I7547001004",
+      "passwordHash": "7f4508e6766c4bc318960e31a93fa078510aea9a15d60685318362b51b2841fa",
+      "role": "traveler",
+      "firstName": "JEAN PAUL",
+      "lastName": "JACQUES",
+      "displayName": "JEAN PAUL JACQUES",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001004",
+          "pickupPoint": "DOLE AEROPORT DOLE - JURA",
+          "pickupTime": "06h25",
+          "seatNumber": "",
+          "roomNumber": "Double",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913444-f9bt",
+      "login": "dubois-valerie@orange.fr",
+      "dossierRef": "2026-I7547001007",
+      "passwordHash": "fdb67f281f452e7abd06e94ee345e1504769bf6e851d2cba24afdc1cbf884587",
+      "role": "traveler",
+      "firstName": "VALERIE",
+      "lastName": "VUILLEMENOT DUBOIS",
+      "displayName": "VALERIE VUILLEMENOT DUBOIS",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001007",
+          "pickupPoint": "RENDU SUR PLACE",
+          "pickupTime": "06h25",
+          "seatNumber": "",
+          "roomNumber": "Double",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913444-b3dd",
+      "login": "pascalvion@wanadoo.fr",
+      "dossierRef": "2026-I7547001008",
+      "passwordHash": "733b1107905354ae3f9a0882cce080f8b5eb8c1e88ced3eb18e7de8b3d63e49c",
+      "role": "traveler",
+      "firstName": "MARTINE",
+      "lastName": "VION",
+      "displayName": "MARTINE VION",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001008",
+          "pickupPoint": "CHALON SUR SAONE PARKING GIRARDOT 20 RUE LJ THENARD",
+          "pickupTime": "05h15",
+          "seatNumber": "",
+          "roomNumber": "Double 2 lits",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913444-gxbj",
+      "login": "patrice.vachon@wanadoo.fr",
+      "dossierRef": "2026-I7547001009",
+      "passwordHash": "20d30f6d09302150e07cd27537c13639a180e3352232490bedb117e70dfc0940",
+      "role": "traveler",
+      "firstName": "PATRICE",
+      "lastName": "VACHON",
+      "displayName": "PATRICE VACHON",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001009",
+          "pickupPoint": "DOLE AEROPORT DOLE - JURA",
+          "pickupTime": "06h25",
+          "seatNumber": "",
+          "roomNumber": "Double",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913444-3qpp",
+      "login": "pdubief25@gmail.com",
+      "dossierRef": "2026-I7547001012",
+      "passwordHash": "af6b873408cf79186eef7aa0f8483a982e18abd8da8b84f80596f4f95b38b61d",
+      "role": "traveler",
+      "firstName": "MARIE CATHERINE",
+      "lastName": "DUBIEF",
+      "displayName": "MARIE CATHERINE DUBIEF",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001012",
+          "pickupPoint": "DOLE AEROPORT DOLE - JURA",
+          "pickupTime": "06h25",
+          "seatNumber": "",
+          "roomNumber": "Double",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795789913445-vsep",
+      "login": "daniel.jonot0895@orange.fr",
+      "dossierRef": "2026-I7547001013",
+      "passwordHash": "56f7ae7c1ddeae9fbaf36f3a03a44d4aab6ec7f0db3be7ae51b84b366e7eb286",
+      "role": "traveler",
+      "firstName": "MADELEINE, JEANNE, DENISE",
+      "lastName": "RAY",
+      "displayName": "MADELEINE, JEANNE, DENISE RAY",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "sejour-dans-les-pouilles",
+          "dossierRef": "2026-I7547001013",
+          "pickupPoint": "DOLE AEROPORT DOLE - JURA",
+          "pickupTime": "06h25",
+          "seatNumber": "",
+          "roomNumber": "Double 2 lits",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    },
+    {
+      "id": "trav-1795793927550-shw9",
+      "login": "marine71@live.fr",
+      "dossierRef": "LAPONI-001",
+      "passwordHash": "213a844e8019b150a7a763b67f7a8e793a5c87f9292edc434301ada76a66b37c",
+      "role": "traveler",
+      "firstName": "MARINE",
+      "lastName": "GENEVOIS",
+      "displayName": "GENEVOIS",
+      "active": true,
+      "trips": [
+        {
+          "tripId": "laponie-au-pays-du-pere-noel",
+          "dossierRef": "2027-I8466001018",
+          "pickupPoint": "",
+          "pickupTime": "",
+          "seatNumber": "",
+          "roomNumber": "DOUBLE 2 LITS",
+          "cabinNumber": "",
+          "options": [],
+          "personalDocs": []
+        }
+      ]
+    }
+  ]
+}
